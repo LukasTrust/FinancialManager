@@ -1,5 +1,5 @@
 -- Create USER table
-CREATE TABLE IF NOT EXISTS "User" (
+CREATE TABLE IF NOT EXISTS User (
                                       id SERIAL PRIMARY KEY,
                                       firstName VARCHAR(255) NOT NULL,
     lastName VARCHAR(255) NOT NULL,
@@ -10,13 +10,11 @@ CREATE TABLE IF NOT EXISTS "User" (
 CREATE TABLE IF NOT EXISTS Account (
                                        id SERIAL PRIMARY KEY,
                                        userId INT NOT NULL,
-                                       lastName VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
     amountSearchStrings JSON,
     dateSearchStrings JSON,
     counterPartySearchStrings JSON,
     amountInBankAfterSearchStrings JSON,
-    FOREIGN KEY (userId) REFERENCES "User"(id)
+    FOREIGN KEY (userId) REFERENCES User(id)
     );
 
 -- Create CHECKING-ACCOUNT table
