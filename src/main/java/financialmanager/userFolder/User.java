@@ -2,8 +2,11 @@ package financialmanager.userFolder;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
 @Entity
 @Table(name = "User")
 @Data
@@ -20,10 +23,10 @@ public class User {
     @Column(nullable = false)
     private String lastName;
 
+    @Setter
     @Column(nullable = false, unique = true)
     private String email;
 
-    // Constructor
     public User(String firstName, String lastName, String email) {
         this.firstName = firstName;
         this.lastName = lastName;

@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS ContractHistory (
 CREATE TABLE IF NOT EXISTS CounterParty (
                                             id SERIAL PRIMARY KEY,
                                             name VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
     counterPartySearchStrings JSON
     );
 
@@ -66,7 +67,7 @@ CREATE TABLE IF NOT EXISTS Category (
                                         id SERIAL PRIMARY KEY,
                                         name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
-    maxSpendingPerMonth DOUBLE PRECISION NOT NULL,
+    maxSpendingPerMonth DOUBLE PRECISION,
     categorySearchStrings JSON
     );
 
