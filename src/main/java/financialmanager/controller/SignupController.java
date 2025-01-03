@@ -43,13 +43,13 @@ public class SignupController {
 
             // Validate password
             String password = user.getPassword();
-            String passwordValidationMessage = validatePassword(password);
-            if (passwordValidationMessage != null) {
-                return ResponseEntity.badRequest().body(new Response(
-                        AlertType.WARNING,
-                        passwordValidationMessage
-                ));
-            }
+//            String passwordValidationMessage = validatePassword(password);
+//            if (passwordValidationMessage != null) {
+//                return ResponseEntity.badRequest().body(new Response(
+//                        AlertType.WARNING,
+//                        passwordValidationMessage
+//                ));
+//            }
 
             // Encode password
             user.setPassword(passwordEncoder.encode(password));
