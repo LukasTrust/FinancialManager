@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="scripts/signup.js" defer></script>
+    <script src="scripts/alert.js"></script>
+</head>
+<body>
+<section>
+    <form action="/api/login" method="post">
+        <h1>Login</h1>
+        <div class="inputbox">
+            <span class="bi bi-envelope"></span>
+            <input type="email" name="email" placeholder="Email">
+        </div>
+        <div class="inputbox">
+            <span class="bi bi-lock"></span>
+            <input type="password" name="password" placeholder="Password">
+        </div>
+        <button><span class="bi bi-box-arrow-in-right"></span> Sign Up</button>
+        <div class="register">
+            <p>Don´t have an account yet? <a href="signup">Sign Up</a></p>
+        </div>
+    </form>
+</section>
+</body>
+</html>
