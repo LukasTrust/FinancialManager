@@ -89,23 +89,23 @@ button:hover {
     background-color: rgb(255, 255, 255, 0.5);
 }
 
-.register {
+.link {
     font-size: 0.9rem;
     color: #fff;
     font-weight: 600;
     margin: 25px 0 10px;
 }
 
-.register p a {
+.link p a {
     text-decoration: none;
-    color: #fff;
+    color: lightblue;
     font-weight: 600;
     transition: all 0.1s ease-in-out;
 }
 
-.register p a:hover {
+.link p a:hover {
     text-decoration: underline;
-    color: #a8a8a8
+    color: darkcyan;
 }
 
 /* Base alert styles */
