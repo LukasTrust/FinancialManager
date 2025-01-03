@@ -10,12 +10,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.getElementById("submitButton");
     submitButton.addEventListener("click", (event) => {
         event.preventDefault();
-        sendSignup();
+        submitSignup();
     });
-
 });
 
-async function sendSignup() {
+async function submitSignup() {
     const firstName = document.getElementById("firstName").value.trim();
     const lastName = document.getElementById("lastName").value.trim();
     const email = document.getElementById("email").value.trim();

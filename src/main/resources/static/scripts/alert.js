@@ -71,7 +71,7 @@ function removeAlert(alert) {
         alert.remove();
         alerts = alerts.filter(a => a !== alert);
         updateAlertPositions();
-    }, 300); // Allow animation to complete
+    }, 3000); // Allow animation to complete
 }
 
 function updateAlertPositions() {

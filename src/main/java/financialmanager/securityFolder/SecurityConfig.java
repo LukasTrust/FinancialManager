@@ -46,7 +46,10 @@ public class SecurityConfig {
                 .formLogin(
                 httpForm -> {
             httpForm
-                    .loginPage("/login").permitAll();
+                    .loginPage("/login")
+                    .failureUrl("/login?error=true") // Redirect with error parameter
+                    .defaultSuccessUrl("/dashboard", true)
+                    .permitAll();
             })
                 .authorizeHttpRequests(registry -> {
                     registry.requestMatchers("/signup", "/css/**", "/scripts/**", "/images/**").permitAll();
