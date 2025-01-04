@@ -48,7 +48,7 @@ public class SecurityConfig {
             httpForm
                     .loginPage("/login")
                     .failureUrl("/login?error=true") // Redirect with error parameter
-                    .defaultSuccessUrl("/dashboard", true)
+                    .defaultSuccessUrl("/index", true)
                     .permitAll();
             })
                 .authorizeHttpRequests(registry -> {
