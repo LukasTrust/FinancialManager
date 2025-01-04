@@ -12,7 +12,6 @@ import java.util.List;
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "SavingsAccount")
 @Data
 @NoArgsConstructor
 public class SavingsAccount extends Account {
@@ -23,15 +22,15 @@ public class SavingsAccount extends Account {
     @Convert(converter = JsonStringListConverter.class)
     private List<String> interestRateSearchStrings;
 
-    public SavingsAccount(Users users, Double interestRate) {
-        super(users);
+    public SavingsAccount(Users users, String name, Double interestRate) {
+        super(users, name);
         this.interestRate = interestRate;
     }
 
-    public SavingsAccount(Users users, List<String> amountSearchStrings, List<String> dateSearchStrings,
+    public SavingsAccount(Users users, String name, String description, List<String> amountSearchStrings, List<String> dateSearchStrings,
                           List<String> counterPartySearchStrings, List<String> amountInBankAfterSearchStrings,
                           Double interestRate, List<String> interestRateSearchStrings) {
-        super(users, amountSearchStrings, dateSearchStrings, counterPartySearchStrings, amountInBankAfterSearchStrings);
+        super(users, name, description, amountSearchStrings, dateSearchStrings, counterPartySearchStrings, amountInBankAfterSearchStrings);
         this.interestRate = interestRate;
         this.interestRateSearchStrings = interestRateSearchStrings;
     }

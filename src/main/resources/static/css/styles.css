@@ -7,7 +7,6 @@
 body {
     font-family: 'Roboto', sans-serif;
     display: flex;
-    align-items: center;
     min-height: 100vh;
     background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
     overflow: hidden;
@@ -270,4 +269,14 @@ a:hover {
     position: absolute;
     bottom: 30px;
     width: 100%;
+}
+
+.mainContent {
+    margin-left: 300px;
+    padding: 16px;
+    transition: 0.4s ease;
+}
+
+.mainContent.fullScreen {
+    margin-left: 100px;
 }

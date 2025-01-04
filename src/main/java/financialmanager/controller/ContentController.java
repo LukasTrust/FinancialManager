@@ -16,8 +16,8 @@ public class ContentController {
         return "signup";
     }
 
-    @GetMapping("/index")
-    public String getIndexPage(){
-        return "index";
+    @GetMapping("/addBank")
+    public String getAddBankPage(){
+        return "addBank";
     }
 }

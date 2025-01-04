@@ -12,7 +12,6 @@ import java.util.List;
 @Getter
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "Account")
 @Data
 @NoArgsConstructor
 public abstract class Account {
@@ -24,6 +23,14 @@ public abstract class Account {
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
     private Users users;
+
+    @Setter
+    @Column(nullable = false)
+    private String name;
+
+    @Setter
+    @Column
+    private String description;
 
     @Setter
     @Convert(converter = JsonStringListConverter.class)
@@ -41,13 +48,17 @@ public abstract class Account {
     @Convert(converter = JsonStringListConverter.class)
     private List<String> amountInBankAfterSearchStrings;
 
-    public Account(Users users) {
+    public Account(Users users, String name) {
         this.users = users;
+        this.name = name;
     }
 
-    public Account(Users users, List<String> amountSearchStrings, List<String> dateSearchStrings,
-                   List<String> counterPartySearchStrings, List<String> amountInBankAfterSearchStrings) {
+    public Account(Users users, String name, String description, List<String> amountSearchStrings,
+                   List<String> dateSearchStrings, List<String> counterPartySearchStrings,
+                   List<String> amountInBankAfterSearchStrings) {
         this.users = users;
+        this.name = name;
+        this.description = description;
         this.amountSearchStrings = amountSearchStrings;
         this.dateSearchStrings = dateSearchStrings;
         this.counterPartySearchStrings = counterPartySearchStrings;

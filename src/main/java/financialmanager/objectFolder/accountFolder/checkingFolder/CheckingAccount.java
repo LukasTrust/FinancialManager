@@ -12,17 +12,18 @@ import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "CheckingAccount")
 @Data
 @NoArgsConstructor
 public class CheckingAccount extends Account {
 
-    public CheckingAccount(Users users) {
-        super(users);
+    public CheckingAccount(Users users, String name) {
+        super(users, name);
     }
 
-    public CheckingAccount(Users users, List<String> amountSearchStrings, List<String> dateSearchStrings,
-                           List<String> counterPartySearchStrings, List<String> amountInBankAfterSearchStrings) {
-        super(users, amountSearchStrings, dateSearchStrings, counterPartySearchStrings, amountInBankAfterSearchStrings);
+    public CheckingAccount(Users users, String name, String description, List<String> amountSearchStrings,
+                           List<String> dateSearchStrings, List<String> counterPartySearchStrings,
+                           List<String> amountInBankAfterSearchStrings) {
+        super(users, name, description, amountSearchStrings, dateSearchStrings, counterPartySearchStrings,
+                amountInBankAfterSearchStrings);
     }
 }
