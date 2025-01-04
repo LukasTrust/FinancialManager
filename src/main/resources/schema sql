@@ -20,6 +20,8 @@ create table if not exists  account
     user_id                             bigint not null
         constraint account_to_users
             references users,
+    description                  varchar(255),
+        name                         varchar(255) not null,
     amount_in_bank_after_search_strings varchar(255),
     amount_search_strings               varchar(255),
     counter_party_search_strings        varchar(255),

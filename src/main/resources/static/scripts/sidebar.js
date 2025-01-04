@@ -1,7 +1,11 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const sidebar = document.querySelector('.sidebar');
     const sidebarToggle = document.querySelector('.sidebarToggle');
     const mainContent = document.querySelector('.mainContent');
+
+    // Load localization messages
+    const userLocale = navigator.language || 'en';
+    await fetchLocalization("general", userLocale);
 
     sidebarToggle.addEventListener('click', () => {
         toggleSidebar(sidebar, mainContent);

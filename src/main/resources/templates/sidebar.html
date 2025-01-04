@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinTrackr </title>
+    <title>FinTrackr</title>
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="scripts/sidebar.js"></script>
+    <script src="scripts/localization.js" defer></script>
+
 </head>
 <body>
 <aside th:fragment="sidebar" class="sidebar">
@@ -27,16 +29,16 @@
             <li class="navItem">
                 <a href="#" class="navLink">
                     <span class="bi bi-bar-chart-line-fill"></span>
-                    <span class="navLable">Dashboard</span>
+                    <span class="navLable" data-i18n="dashboard"></span>
                 </a>
-                <span class="navTooltip">Dashboard</span>
+                <span class="navTooltip" data-i18n="dashboard"></span>
             </li>
             <li class="navItem">
                 <a href="#" class="navLink">
                     <span class="bi bi-bank2"></span>
-                    <span class="navLable">Add new bank account</span>
+                    <span class="navLable" data-i18n="addBank"></span>
                 </a>
-                <span class="navTooltip">Add new bank account</span>
+                <span class="navTooltip" data-i18n="addBank"></span>
             </li>
         </ul>
 
@@ -45,16 +47,16 @@
             <li class="navItem">
                 <a href="#" class="navLink">
                     <span class="bi bi-gear-fill"></span>
-                    <span class="navLable">Settings</span>
+                    <span class="navLable" data-i18n="settings"></span>
                 </a>
-                <span class="navTooltip">Settings</span>
+                <span class="navTooltip" data-i18n="settings"></span>
             </li>
             <li class="navItem">
                 <a href="#" class="navLink">
                     <span class="bi bi-box-arrow-left"></span>
-                    <span class="navLable">Logout</span>
+                    <span class="navLable" data-i18n="logout"></span>
                 </a>
-                <span class="navTooltip">Logout</span>
+                <span class="navTooltip" data-i18n="logout"></span>
             </li>
         </ul>
     </nav>

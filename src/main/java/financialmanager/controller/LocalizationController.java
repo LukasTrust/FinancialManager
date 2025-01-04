@@ -17,10 +17,10 @@ import java.nio.file.Files;
 @RequestMapping("/localization")
 public class LocalizationController {
 
-    @GetMapping("/{subFolder}/messages_{locale}.json")
-    public ResponseEntity<?> getLocalization(@PathVariable String subFolder, @PathVariable String locale) {
+    @GetMapping("/{subDirectory}/messages_{locale}.json")
+    public ResponseEntity<?> getLocalization(@PathVariable String subDirectory, @PathVariable String locale) {
         try {
-            String filePath = "localization/" + subFolder + "/messages_" + locale + ".json";
+            String filePath = "localization/" + subDirectory + "/messages_" + locale + ".json";
             Resource resource = new ClassPathResource(filePath);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)

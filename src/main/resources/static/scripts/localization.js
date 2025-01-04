@@ -1,5 +1,5 @@
-async function fetchLocalization(subfolder, locale) {
-    const filePath = `/localization/${subfolder}/messages_${locale}.json`; // Adjust the path if necessary
+async function fetchLocalization(subDirectory, locale) {
+    const filePath = `/localization/${subDirectory}/messages_${locale}.json`; // Adjust the path if necessary
     try {
         const response = await fetch(filePath);
         if (response.ok) {
