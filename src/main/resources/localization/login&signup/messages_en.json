@@ -1,0 +1,20 @@
+{
+  "login": "Login",
+  "email": "Email",
+  "password": "Password",
+  "confirmPassowrd": "Confirm Password",
+  "signup": "Sign Up",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "noAccount": "Don’t have an account yet?",
+  "alreadyAccount": "Already have an account?",
+  "invalidCredentials": "Invalid username or password. Please try again.",
+  "allFieldsRequired": "All fields are required",
+  "invalidEmail": "Please enter a valid email address",
+  "passwordLength": "Password must be at least 8 characters long",
+  "passwordStrength": "Password must contain a mix of upper and lower case letters, numbers, and special characters",
+  "success": "Signup successful!",
+  "userExists": "User with the same email already exists",
+  "generic": "An unexpected error occurred. Please try again",
+  "passwordNotMatch": "Passwords do not match"
+}

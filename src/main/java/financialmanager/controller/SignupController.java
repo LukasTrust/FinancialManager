@@ -1,10 +1,12 @@
 package financialmanager.controller;
 
+import financialmanager.configFolder.JsonMessageSource;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.usersFolder.Users;
 import financialmanager.objectFolder.usersFolder.UsersRepository;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import lombok.AllArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +16,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 @RestController
 @AllArgsConstructor
 public class SignupController {
 
+    private final String subDirectory = "login&signup";
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JsonMessageSource jsonMessageSource;
 
     private final Pattern passwordPattern =
             Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$");
@@ -30,26 +35,26 @@ public class SignupController {
 
     @PostMapping(value = "/signup", consumes = "application/json", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<Response> createUser(@RequestBody Users user) {
+    public ResponseEntity<Response> createUser(@RequestBody Users user, Locale locale) {
         try {
             // Validate email
             String email = user.getEmail();
             if (!isValidEmail(email)) {
                 return ResponseEntity.badRequest().body(new Response(
                         AlertType.WARNING,
-                        "Please enter a valid email address"
+                        jsonMessageSource.getMessageWithSubDirectory(subDirectory, "invalidEmail", locale)
                 ));
             }
 
             // Validate password
             String password = user.getPassword();
-//            String passwordValidationMessage = validatePassword(password);
-//            if (passwordValidationMessage != null) {
-//                return ResponseEntity.badRequest().body(new Response(
-//                        AlertType.WARNING,
-//                        passwordValidationMessage
-//                ));
-//            }
+            String passwordValidationMessage = validatePassword(password, locale);
+            if (passwordValidationMessage != null) {
+                return ResponseEntity.badRequest().body(new Response(
+                        AlertType.WARNING,
+                        passwordValidationMessage
+                ));
+            }
 
             // Encode password
             user.setPassword(passwordEncoder.encode(password));
@@ -60,32 +65,29 @@ public class SignupController {
             // Success response
             return ResponseEntity.ok(new Response(
                     AlertType.SUCCESS,
-                    "Signup successful!",
+                    jsonMessageSource.getMessageWithSubDirectory(subDirectory, "success", locale),
                     savedUser
             ));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(
                     AlertType.ERROR,
-                    "User with the same email already exists"
+                    jsonMessageSource.getMessageWithSubDirectory(subDirectory, "userExists", locale)
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(
                     AlertType.ERROR,
-                    "An unexpected error occurred. Please try again"
+                    jsonMessageSource.getMessageWithSubDirectory(subDirectory, "generic", locale)
             ));
         }
     }
 
     // Utility method for password validation
-    public String validatePassword(String password) {
-        if (password == null || password.isEmpty()) {
-            return "Password cannot be empty";
-        }
+    public String validatePassword(String password, Locale locale) {
         if (password.length() < 8) {
-            return "Password must be at least 8 characters long";
+            return jsonMessageSource.getMessageWithSubDirectory(subDirectory, "passwordLength", locale);
         }
         if (!isStrongPassword(password)) {
-            return "Password must contain a mix of upper and lower case letters, numbers, and special characters";
+            return jsonMessageSource.getMessageWithSubDirectory(subDirectory, "passwordStrength", locale);
         }
         return null; // Indicates password is valid
     }

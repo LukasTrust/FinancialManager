@@ -1,10 +1,9 @@
-package financialmanager.securityFolder;
+package financialmanager.configFolder;
 
 import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -52,7 +51,8 @@ public class SecurityConfig {
                     .permitAll();
             })
                 .authorizeHttpRequests(registry -> {
-                    registry.requestMatchers("/signup", "/css/**", "/scripts/**", "/images/**").permitAll();
+                    registry.requestMatchers("/signup", "/css/**", "/scripts/**", "/images/**", "/localization/**").permitAll();
+
                     registry.anyRequest().authenticated();
                 })
                 .build();

@@ -2,40 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Signup</title>
+    <title data-i18n="signup"></title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/alert.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script src="scripts/signup.js" defer></script>
     <script src="scripts/alert.js" defer></script>
+    <script src="scripts/localization.js" defer></script>
 </head>
 <body style="justify-content: center; align-items: center;">
     <section>
         <form action="/signup" method="post">
-            <h1>Sign Up</h1>
+            <h1 data-i18n="signup"></h1>
             <div class="inputbox">
                 <span class="bi bi-person"></span>
-                <label for="firstName"></label><input type="text" id="firstName" placeholder="First Name" required>
+                <label for="firstName"></label><input type="text" id="firstName" data-i18n-placeholder="firstName" required>
             </div>
             <div class="inputbox">
                 <span class="bi bi-person"></span>
-                <label for="lastName"></label><input type="text" id="lastName" placeholder="Last Name">
+                <label for="lastName"></label><input type="text" id="lastName" data-i18n-placeholder="lastName">
             </div>
             <div class="inputbox">
                 <span class="bi bi-envelope"></span>
-                <label for="email"></label><input type="email" id="email" placeholder="Email Address">
+                <label for="email"></label><input type="email" id="email" data-i18n-placeholder="email">
             </div>
             <div class="inputbox">
                 <span class="bi bi-lock"></span>
-                <label for="password"></label><input type="password" id="password" placeholder="Password">
+                <label for="password"></label><input type="password" id="password" data-i18n-placeholder="password">
             </div>
             <div class="inputbox">
                 <span class="bi bi-lock"></span>
-                <label for="confirmPassword"></label><input type="password" id="confirmPassword" placeholder="Confirm Password">
+                <label for="confirmPassword"></label><input type="password" id="confirmPassword" data-i18n-placeholder="confirmPassowrd">
             </div>
-            <button type="submit" id="submitButton"><span class="bi bi-box-arrow-right"></span> Sign Up</button>
+            <button type="submit" id="submitButton">
+                <span class="bi bi-box-arrow-right"></span>
+                <span data-i18n="signup"></span>
+            </button>
             <div>
-                <p>Already have an account? <a href="login"><span class="bi bi-box-arrow-right"></span> Login</a></p>
+                <p data-i18n="alreadyAccount">
+                </p>
+                <a href="login">
+                    <span class="bi bi-box-arrow-right"> </span>
+                    <span data-i18n="login"></span>
+                </a>
             </div>
         </form>
     </section>

@@ -1,4 +1,8 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded",  async () => {
+    // Load localization messages
+    const userLocale = navigator.language || 'en';
+    const messages = await fetchLocalization("login&signup", userLocale);
+
     const signUpForm = document.querySelector('section');
     signUpForm.style.opacity = "0";
 
@@ -10,11 +14,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.getElementById("submitButton");
     submitButton.addEventListener("click", (event) => {
         event.preventDefault();
-        submitSignup();
+        submitSignup(messages);
     });
 });
 
-async function submitSignup() {
+async function submitSignup(messages) {
     const firstName = document.getElementById("firstName").value.trim();
     const lastName = document.getElementById("lastName").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -23,13 +27,13 @@ async function submitSignup() {
 
     // Check if all fields are filled
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-        showAlert('WARNING', 'All fields are required');
+        showAlert('WARNING', messages["allFieldsRequired"]);
         return;
     }
 
     // Check if passwords match
     if (password !== confirmPassword) {
-        showAlert('WARNING', 'Passwords do not match');
+        showAlert('WARNING', messages["passwordNotMatch"]);
         return;
     }
 
@@ -62,6 +66,6 @@ async function submitSignup() {
 
     } catch (error) {
         console.error("There was a problem with the signup request:", error);
-        showAlert('ERROR', 'Signup failed. Please try again.');
+        showAlert('ERROR', messages["generic"]);
     }
 }

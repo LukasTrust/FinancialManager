@@ -2,30 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title data-i18n="login"></title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/alert.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script src="scripts/login.js" defer></script>
     <script src="scripts/alert.js"></script>
+    <script src="scripts/localization.js" defer></script>
 </head>
 <body style="justify-content: center; align-items: center;">
 <section>
     <form action="login" method="post">
-        <h1>Login</h1>
+        <h1 data-i18n="login"></h1>
         <div class="inputbox">
             <span class="bi bi-envelope"></span>
-            <label for="email"> </label>
-            <input type="email" id="email" name="username" placeholder="Email">
+            <label for="email"></label>
+            <input type="email" id="email" name="username" data-i18n-placeholder="email">
         </div>
         <div class="inputbox">
             <span class="bi bi-lock"></span>
-            <label for="password"> </label>
-            <input type="password" id="password" name="password" placeholder="Password">
+            <label for="password"></label>
+            <input type="password" id="password" name="password" data-i18n-placeholder="password">
         </div>
-        <button type="submit" id="submitButton"><span class="bi bi-box-arrow-right"></span> Sign Up</button>
+        <button type="submit" id="submitButton">
+            <span class="bi bi-box-arrow-right"></span>
+            <span data-i18n="login"></span>
+        </button>
         <div>
-            <p>Don´t have an account yet? <a href="signup"><span class="bi bi-box-arrow-right"></span> Sign Up</a></p>
+            <p data-i18n="noAccount">
+            </p>
+            <a href="signup">
+                <span class="bi bi-box-arrow-right"> </span>
+                <span data-i18n="signup"></span>
+            </a>
         </div>
     </form>
 </section>
