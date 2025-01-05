@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", async () => {
     const fields = [
-        { addButtonId: "addCounterPartyStrings", inputId: "inputCounterPartyStrings", listId: "counterPartyStrings", listName: "Counter Party" },
-        { addButtonId: "addAmountStrings", inputId: "inputAmountStrings", listId: "amountStrings", listName: "Amount" },
-        { addButtonId: "addAmountAfterStrings", inputId: "inputAmountAfterStrings", listId: "amountAfterStrings", listName: "Amount After" },
-        { addButtonId: "addDateStrings", inputId: "inputDateStrings", listId: "dateStrings", listName: "Date" }
+        {addButtonId: "addCounterPartyStrings", inputId: "inputCounterPartyStrings", listId: "counterPartyStrings"},
+        {addButtonId: "addAmountStrings", inputId: "inputAmountStrings", listId: "amountStrings"},
+        {addButtonId: "addAmountAfterStrings", inputId: "inputAmountAfterStrings", listId: "amountAfterStrings"},
+        {addButtonId: "addDateStrings", inputId: "inputDateStrings", listId: "dateStrings"}
     ];
 
     fields.forEach(field => {
@@ -14,21 +14,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         addButton.addEventListener("click", () => {
             const inputValue = inputField.value.trim();
             if (inputValue) {
-                addStringToList(inputValue, stringList, field.listName);
+                addStringToList(inputValue, stringList);
                 inputField.value = ""; // Clear input field
+            }
+            else{
+                showAlert('info', "Please enter a word to add to the search strings");
             }
         });
     });
 });
 
 // Function to add a string to the list
-function addStringToList(input, stringList, listName) {
-    // Check if the string is already in the list
-    // const existingItems = Array.from(stringList.children).map(item => item.textContent.trim());
-    // if (existingItems.includes(input)) {
-    //     showAlert('Warning', "This string is already in the list!");
-    //     return;
-    // }
+function addStringToList(input, stringList) {
+    //Check if the string is already in the list
+    const existingItems = Array.from(stringList.children).map(item => item.textContent.trim());
+    if (existingItems.includes(input)) {
+        showAlert('Warning', "This string is already in the list!");
+        return;
+    }
 
     // Create a new list item
     const newString = document.createElement("div");
@@ -39,20 +42,15 @@ function addStringToList(input, stringList, listName) {
     const removeButton = document.createElement("button");
     removeButton.className = "removeButton bi bi-x-square";
     removeButton.addEventListener("click", () => {
-        removeStringFromList(newString, stringList, listName);
+        removeStringFromList(newString, stringList);
     });
 
     // Append the button to the list item and the item to the list
     newString.appendChild(removeButton);
-
     stringList.appendChild(newString);
-
-    // Show an alert message indicating the item was added
-    showAlert('success', `'${input}' was added to the ${listName} list.`);
 }
 
 // Function to remove a string from the list
-function removeStringFromList(item, stringList, listName) {
+function removeStringFromList(item, stringList) {
     stringList.removeChild(item);
-    showAlert('success', `The item '${item.textContent}' was removed from the ${listName} list.`);
 }

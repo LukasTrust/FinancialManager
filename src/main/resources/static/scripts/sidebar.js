@@ -1,18 +1,18 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const sidebar = document.querySelector('.sidebar');
     const sidebarToggle = document.querySelector('.sidebarToggle');
-    const mainContent = document.querySelector('.mainContent');
+    const content = document.querySelector('.content');
 
     // Load localization messages
     const userLocale = navigator.language || 'en';
     await fetchLocalization("general", userLocale);
 
     sidebarToggle.addEventListener('click', () => {
-        toggleSidebar(sidebar, mainContent);
+        toggleSidebar(sidebar, content);
     })
 });
 
-function toggleSidebar(sidebar, mainContent) {
+function toggleSidebar(sidebar, content) {
     sidebar.classList.toggle("collapsed");
-    mainContent.classList.toggle("fullScreen");
+    content.classList.toggle("fullScreen");
 }

@@ -36,12 +36,24 @@ h2 {
     text-align: center;
 }
 
-h3 {
-    font-size: 1rem;
+p {
+    font-size: 0.9rem;
     color: #fff;
-    text-align: center;
+    font-weight: 600;
+    margin: 25px 0 10px;
 }
 
+a {
+    text-decoration: none;
+    color: lightblue;
+    font-weight: 600;
+    transition: all 0.1s ease-in-out;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: darkcyan;
+}
 
 .inputbox {
     display: flex;
@@ -51,12 +63,6 @@ h3 {
     min-width: 350px;
     width: 100%;
     border-bottom: 2px solid #fff;
-}
-
-.inputContainer {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
 }
 
 .inputbox input {
@@ -114,6 +120,7 @@ button:hover {
 .addButton {
     padding: 10px 15px;
     margin-left: 10px;
+    margin-right: 10px;
     background-color: #007bff;
     color: white;
     border: none;
@@ -135,6 +142,7 @@ button:hover {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    width: auto;
     transition: background-color 0.3s;
 }
 
@@ -147,11 +155,13 @@ button:hover {
     align-items: center;
     background-color: #151A2D;
     color: #fff;
-    padding-left: 10px;
-    border-radius: 8px;
     margin-right: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s;
+    padding: 8px;
+    border-radius: 5px;
+    text-align: center;
+    border: 1px solid #ccc;
 }
 
 .listItem:hover {
@@ -160,30 +170,12 @@ button:hover {
 
 .listContainer {
     display: flex;
+    height: 40px;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    padding: 1rem;
-    border-radius: 8px;
-    max-width: 100%;
-}
-
-p {
-    font-size: 0.9rem;
-    color: #fff;
-    font-weight: 600;
-    margin: 25px 0 10px;
-}
-
-a {
-    text-decoration: none;
-    color: lightblue;
-    font-weight: 600;
-    transition: all 0.1s ease-in-out;
-}
-
-a:hover {
-    text-decoration: underline;
-    color: darkcyan;
+    gap: 10px; /* Space between the items */
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 .flexContainer {
@@ -192,11 +184,17 @@ a:hover {
     padding-bottom: 20px;
     min-width: 350px;
     gap: 10px;
-    white-space: wrap;
 }
 
-.vertical {
+.flexContainerColumn {
+    display: flex;
     flex-direction: column;
+    margin-bottom: 20px;
+    min-height: 24%;
+    max-height: 24%;
+    overflow-y: auto;
+    border-radius: 20px;
+    border: 1px solid #ccc;
 }
 
 /* Style for the error image */
@@ -204,6 +202,19 @@ a:hover {
     max-width: 500px; /* Limit the image width */
     height: auto; /* Maintain aspect ratio */
     margin-bottom: 20px; /* Space between the image and icon */
+}
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.inputContainer {
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    width: 100%;
 }
 
 .sidebar {
@@ -345,13 +356,22 @@ a:hover {
     width: 100%;
 }
 
-.mainContent {
+.content {
     width: 100%;
     margin-left: 300px;
     padding: 16px;
     transition: 0.4s ease;
 }
 
-.mainContent.fullScreen {
+.content.fullScreen {
     margin-left: 100px;
+}
+
+.mainContent {
+    width: 60%;
+}
+
+.sideContent {
+    width: 40%;
+    padding-left: 20px;
 }
