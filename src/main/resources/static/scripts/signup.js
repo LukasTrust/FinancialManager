@@ -27,13 +27,13 @@ async function submitSignup(messages) {
 
     // Check if all fields are filled
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-        showAlert('WARNING', messages["allFieldsRequired"]);
+        showAlert('warning', messages["allFieldsRequired"]);
         return;
     }
 
     // Check if passwords match
     if (password !== confirmPassword) {
-        showAlert('WARNING', messages["passwordNotMatch"]);
+        showAlert('warning', messages["passwordNotMatch"]);
         return;
     }
 
@@ -59,13 +59,13 @@ async function submitSignup(messages) {
         const responseBody = await response.json();
         showAlert(responseBody.alertType, responseBody.message);
 
-        if (responseBody.alertType === 'WARNING' || responseBody.alertType === 'Error') {
+        if (responseBody.alertType.toLowerCase() === 'warning' || responseBody.alertType.toLowerCase() === 'error') {
             document.getElementById("password").value = '';
             document.getElementById("confirmPassword").value = '';
         }
 
     } catch (error) {
         console.error("There was a problem with the signup request:", error);
-        showAlert('ERROR', messages["generic"]);
+        showAlert('error', messages["generic"]);
     }
 }

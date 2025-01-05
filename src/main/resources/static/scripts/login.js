@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('error')) {
         // Call showAlert with type "ERROR" and a localized message
-        showAlert('ERROR', messages["invalidCredentials"], 5000);
+        showAlert('error', messages["invalidCredentials"]);
     }
 
     const submitButton = document.getElementById("submitButton");
@@ -23,14 +23,14 @@ async function submitSignin(messages) {
 
     // Check if all fields are filled
     if (!email || !password) {
-        showAlert('WARNING', messages["allFieldsRequired"]);
+        showAlert('warning', messages["allFieldsRequired"]);
         return;
     }
 
     // Check if email is in valid format
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     if (!emailRegex.test(email)) {
-        showAlert('ERROR', messages["invalidEmail"]);
+        showAlert('error', messages["invalidEmail"]);
         return;
     }
 
