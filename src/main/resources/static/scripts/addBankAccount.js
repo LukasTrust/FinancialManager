@@ -7,11 +7,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     })
 
     const fields = [
-        {addButtonId: "addCounterPartyStrings", inputId: "inputCounterPartyStrings", listId: "counterPartySearchStrings"},
+        {
+            addButtonId: "addCounterPartyStrings",
+            inputId: "inputCounterPartyStrings",
+            listId: "counterPartySearchStrings"
+        },
         {addButtonId: "addAmountStrings", inputId: "inputAmountStrings", listId: "amountSearchStrings"},
-        {addButtonId: "addAmountAfterStrings", inputId: "inputAmountAfterStrings", listId: "amountInBankAfterSearchStrings"},
+        {
+            addButtonId: "addAmountAfterStrings",
+            inputId: "inputAmountAfterStrings",
+            listId: "amountInBankAfterSearchStrings"
+        },
         {addButtonId: "addDateStrings", inputId: "inputDateStrings", listId: "dateSearchStrings"},
-        {addButtonId: "addInterestRateStrings", inputId: "inputinterestRateStrings", listId: "interestRateSearchStrings"}
+        {
+            addButtonId: "addInterestRateStrings",
+            inputId: "inputinterestRateStrings",
+            listId: "interestRateSearchStrings"
+        }
     ];
 
     const submitButton = document.getElementById("submitButton");
@@ -83,37 +95,40 @@ async function submitAddNewBank(isSavingsAccount, listIds) {
         }
     });
 
-    addBankAccountToSidebar("Test", 1, 'true');
+    try {
+        const response = await fetch('/addBankAccount', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
 
-    // try {
-    //     const response = await fetch('/addBankAccount', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'Accept': 'application/json',
-    //         },
-    //         body: JSON.stringify(data),
-    //     });
-    //
-    //     const responseBody = await response.json();
-    //     showAlert(responseBody.alertType, responseBody.message);
-    //
-    //     // Clear when successful
-    //     if (responseBody.alertType.toLowerCase() === 'success') {
-    //         document.getElementById("name").value = '';
-    //         document.getElementById("description").value = '';
-    //
-    //         listIds.forEach((listId, index) => {
-    //             const listElement = document.getElementById(listId);
-    //
-    //             listElement.innerHTML = '';
-    //         });
-    //     }
-    //
-    // } catch (error) {
-    //     console.error("There was a problem with the create bank request:", error);
-    //     showAlert('error', "An unexpected error occurred. Please try again");
-    // }
+        const responseBody = await response.json();
+        showAlert(responseBody.alertType, responseBody.message);
+
+        // Clear when successful
+        if (responseBody.alertType.toLowerCase() === 'success') {
+            const bankAccount = responseBody.data;
+
+            addBankAccountToSidebar(bankAccount.name, bankAccount.id, bankAccount.interestRate != null);
+
+            document.getElementById("name").value = '';
+            document.getElementById("description").value = '';
+            document.getElementById("interestRate").value = '';
+
+            listIds.forEach((listId, index) => {
+                const listElement = document.getElementById(listId);
+
+                listElement.innerHTML = '';
+            });
+        }
+
+    } catch (error) {
+        console.error("There was a problem with the create bank request:", error);
+        showAlert('error', "An unexpected error occurred. Please try again");
+    }
 }
 
 function showHiddenInputs(hiddenInputs) {

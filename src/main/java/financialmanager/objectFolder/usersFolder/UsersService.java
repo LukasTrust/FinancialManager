@@ -1,6 +1,8 @@
 package financialmanager.objectFolder.usersFolder;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,5 +30,17 @@ public class UsersService implements UserDetailsService {
         else{
             throw new UsernameNotFoundException(email);
         }
+    }
+
+    public Users save(Users user) {
+        return usersRepository.save(user);
+    }
+
+    public Optional<Users> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
+
+        return usersRepository.findByEmail(username);
     }
 }

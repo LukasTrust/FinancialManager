@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class UsersController {
 
     private final String subDirectory = "login&signup";
-    private final UsersRepository usersRepository;
+    private final UsersService usersService;
     private final PasswordEncoder passwordEncoder;
     private final LocalizationController localizationController;
 
@@ -57,7 +57,7 @@ public class UsersController {
             user.setPassword(passwordEncoder.encode(password));
 
             // Save user
-            Users savedUser = usersRepository.save(user);
+            Users savedUser = usersService.save(user);
 
             // Success response
             return ResponseEntity.ok(new Response(

@@ -6,6 +6,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load localization messages
     const userLocale = navigator.language || 'en';
     await fetchLocalization("general", userLocale);
+    const bankAccounts = await loadBankAccounts();
+
+    for (const bankAccount of bankAccounts) {
+        addBankAccountToSidebar(bankAccount.name, bankAccount.id, bankAccount.interestRate != null);
+    }
 
     sidebarToggle.addEventListener('click', () => {
         toggleSidebar(sidebar, content);
@@ -31,7 +36,7 @@ function addBankAccountToSidebar(accountName, accountId, isSavings) {
     const sidebar = document.getElementById('topNav');
 
     // Create account item and link
-    const accountItem = createElement('li', 'navItem');
+    const accountItem = createElement('li', 'navItem account');
     const accountLink = createElement('a', 'navLink', '', { href: `/bankAccount/${accountId}` });
     accountItem.appendChild(accountLink);
 
