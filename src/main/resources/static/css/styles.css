@@ -522,9 +522,7 @@ button:hover {
 }
 
 .content {
-    width: 100%;
     margin-left: 300px;
-    padding: 16px;
     transition: 0.4s ease;
 }
 

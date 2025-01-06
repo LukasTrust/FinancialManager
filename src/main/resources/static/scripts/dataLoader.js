@@ -1,3 +1,35 @@
+document.addEventListener('DOMContentLoaded', async () => {
+    const contentArea = document.getElementById('content');  // Where the content will go
+
+    await loadSidebar();
+
+    // Listen for clicks on links (or buttons) to dynamically load content
+    document.querySelectorAll('a[data-ajax="true"]').forEach(link => {
+        link.addEventListener('click', async (event) => {
+            event.preventDefault();  // Prevent the default link behavior
+
+            const url = link.getAttribute('href');
+
+            try {
+                // Fetch the content from the server (just the content fragment)
+                const response = await fetch(url);
+                const html = await response.text();
+
+                // Extract and replace the content (assuming the fragment is inside a div with class "content")
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.getElementById('content');
+
+                // Replace the old content with the new one
+                contentArea.innerHTML = newContent.innerHTML;
+            } catch (error) {
+                console.error("Error loading content:", error);
+            }
+        });
+    });
+});
+
+
 async function loadBankAccounts() {
     try {
         const response = await fetch('/getBankAccountsOfUser');

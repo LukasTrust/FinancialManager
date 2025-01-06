@@ -1,17 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinTrackr</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="scripts/sidebar.js"></script>
-    <script src="scripts/localization.js" defer></script>
-
-</head>
-<body>
 <aside th:fragment="sidebar" class="sidebar">
     <!--Header-->
     <header class="sidebarHeader">
@@ -27,25 +13,25 @@
     <nav class="sidebarNav">
         <ul id="topNav" class="navList primaryNav">
             <li class="navItem">
-                <a id="dashboard" href="#" class="navLink">
+                <a id="dashboard" href="#" data-ajax="true" class="navLink">
                     <span class="bi bi-bar-chart-line-fill"></span>
                     <span class="navLable" data-i18n="dashboard"></span>
                 </a>
                 <span class="navTooltip" data-i18n="dashboard"></span>
             </li>
             <li class="navItem">
-                <a d="addBank" href="/addBank" class="navLink">
+                <a id="addBankAccount" href="/addBankAccount" data-ajax="true" class="navLink">
                     <span class="bi bi-bank2"></span>
-                    <span class="navLable" data-i18n="addBank"></span>
+                    <span class="navLable" data-i18n="addBankAccount"></span>
                 </a>
-                <span class="navTooltip" data-i18n="addBank"></span>
+                <span class="navTooltip" data-i18n="addBankAccount"></span>
             </li>
         </ul>
 
         <!--Bottom list-->
         <ul class="navList secondaryNav">
             <li class="navItem">
-                <a d="settings" href="#" class="navLink">
+                <a d="settings" href="#" data-ajax="true" class="navLink">
                     <span class="bi bi-gear-fill"></span>
                     <span class="navLable" data-i18n="settings"></span>
                 </a>
@@ -61,5 +47,3 @@
         </ul>
     </nav>
 </aside>
-</body>
-</html>
