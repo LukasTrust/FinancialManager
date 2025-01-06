@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -20,4 +21,7 @@ public class BankAccountService {
         return bankAccountRepository.findAllByUsers(users);
     }
 
+    public Optional<BankAccount> findById(Long id){
+        return bankAccountRepository.findById(id);
+    }
 }

@@ -32,12 +32,27 @@ function createElement(type, className, textContent = '', attributes = {}) {
     return element;
 }
 
+function clearIdInFocus() {
+    let accountIdInFocus = localStorage.getItem('accountIdInFocus');
+    accountIdInFocus = null;
+    localStorage.setItem('accountIdInFocus', accountIdInFocus);
+}
+
 function addBankAccountToSidebar(accountName, accountId, isSavings) {
+    let accountIdInFocus = localStorage.getItem('accountIdInFocus') || null;
+
     const sidebar = document.getElementById('topNav');
 
     // Create account item and link
     const accountItem = createElement('li', 'navItem account');
-    const accountLink = createElement('a', 'navLink', '', { href: `/bankAccount/${accountId}` });
+    accountItem.id = accountId;
+    const accountLink = createElement('a', 'navLink', '', { href: `/bankAccountOverview` });
+
+    accountLink.addEventListener("click", () => {
+        accountIdInFocus = accountId;
+        localStorage.setItem('accountIdInFocus', accountIdInFocus);
+    });
+
     accountItem.appendChild(accountLink);
 
     // Add account icon
@@ -53,18 +68,30 @@ function addBankAccountToSidebar(accountName, accountId, isSavings) {
     accountItem.appendChild(toolTip);
 
     // Create sublist
-    const sublist = createElement('ul', 'navSublist hidden');
+    const sublist = createElement('ul', 'navSublist');
+    if (accountId != accountIdInFocus) {
+        sublist.classList.add('hidden');
+    }
+    else {
+        console.log("Else.");
+    }
+
     const subItems = [
-        { name: 'Overview', href: `/bankAccount/${accountId}/overview`, icon: 'bi bi-border-style' },
-        { name: 'Transactions', href: `/bankAccount/${accountId}/transactions`, icon: 'bi bi-receipt' },
-        { name: 'Categories', href: `/bankAccount/${accountId}/categories`, icon: 'bi bi-tag-fill' },
-        { name: 'Counterparties', href: `/bankAccount/${accountId}/counterparties`, icon: 'bi bi-person-fill' },
-        { name: 'Contracts', href: `/bankAccount/${accountId}/contracts`, icon: 'bi bi-file-earmark-fill' }
+        { name: 'Overview', href: `/bankAccountOverview`, icon: 'bi bi-border-style' },
+        { name: 'Transactions', href: `/bankAccount/transactions`, icon: 'bi bi-receipt' },
+        { name: 'Categories', href: `/bankAccount/categories`, icon: 'bi bi-tag-fill' },
+        { name: 'Counterparties', href: `/bankAccount/counterparties`, icon: 'bi bi-person-fill' },
+        { name: 'Contracts', href: `/bankAccount/contracts`, icon: 'bi bi-file-earmark-fill' }
     ];
 
     subItems.forEach(subItem => {
         const subItemElement = createElement('li', 'navSubitem');
         const subItemLink = createElement('a', 'navSublink', '', { href: subItem.href });
+
+        accountLink.addEventListener("click", () => {
+            accountIdInFocus = accountId;
+            localStorage.setItem('accountIdInFocus', accountIdInFocus);
+        });
 
         // Add sub-item icon
         const iconSubItem = createElement('span', subItem.icon);
@@ -81,16 +108,5 @@ function addBankAccountToSidebar(accountName, accountId, isSavings) {
     accountItem.appendChild(sublist);
     sidebar.appendChild(accountItem);
 
-    // Use event delegation to handle sublist toggling
-    sidebar.addEventListener('click', (e) => {
-        if (e.target.closest('.navLink')) {
-            const accountLink = e.target.closest('.navLink');
-            const sublist = accountLink.nextElementSibling;
-            if (sublist && sublist.classList.contains('navSublist')) {
-                e.preventDefault(); // Prevent navigation
-                sublist.classList.toggle('hidden');
-                sublist.classList.toggle('beforeHidden');
-            }
-        }
-    });
+    console.log(accountIdInFocus);
 }

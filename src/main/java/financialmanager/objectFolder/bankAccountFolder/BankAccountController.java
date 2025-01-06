@@ -20,34 +20,65 @@ public class BankAccountController {
     private final UsersService usersService;
     private final BankAccountService bankAccountService;
 
+    private final ResponseEntity<Response> userNotFound = ResponseEntity
+            .status(HttpStatus.NOT_FOUND).body(
+                    new Response(
+                            AlertType.ERROR,
+                            "User not found"
+                    ));
+
     @GetMapping("/getBankAccountsOfUser")
     public ResponseEntity<?> getBankAccountsOfUser() {
-        Optional<Users> user = usersService.getCurrentUser();
-        if (user.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(
+        Optional<Users> userOptional = usersService.getCurrentUser();
+        if (userOptional.isEmpty()) {
+            return userNotFound;
+        }
+
+        List<BankAccount> bankAccounts = bankAccountService.findAllByUsers(userOptional.get());
+
+        return ResponseEntity.ok(bankAccounts);
+    }
+
+    @GetMapping("/bankAccount/{bankAccountId}/data")
+    public ResponseEntity<?> getBankAccountById(@PathVariable Long bankAccountId) {
+        Optional<Users> userOptional = usersService.getCurrentUser();
+        if (userOptional.isEmpty()) {
+            return userNotFound;
+        }
+
+        Optional<BankAccount> bankAccountOptional = bankAccountService.findById(bankAccountId);
+        if (bankAccountOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(
                     AlertType.ERROR,
-                    "User not found"
+                    "Bank account not found"
             ));
         }
 
-        List<BankAccount> bankAccounts = bankAccountService.findAllByUsers(user.get());
+        Users users = userOptional.get();
+        BankAccount bankAccount = bankAccountOptional.get();
 
-        return ResponseEntity.ok(bankAccounts);
+        if (!bankAccount.getUsers().equals(users)) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT).body(
+                            new Response(
+                                    AlertType.ERROR,
+                                    "Bank account doesn't belong to user"
+                            ));
+        }
+
+        return ResponseEntity.ok(bankAccount);
     }
 
     @PostMapping(value = "/addBankAccount", consumes = "application/json", produces = "application/json")
     @ResponseBody
     public ResponseEntity<Response> createBankAccount(@RequestBody BankAccount bankAccount) {
-        Optional<Users> user = usersService.getCurrentUser();
-        if (user.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(
-                    AlertType.ERROR,
-                    "User not found"
-            ));
+        Optional<Users> userOptional = usersService.getCurrentUser();
+        if (userOptional.isEmpty()) {
+            return userNotFound;
         }
 
         // Set the associated user
-        bankAccount.setUsers(user.get());
+        bankAccount.setUsers(userOptional.get());
 
         try {
             BankAccount savedBankAccount = bankAccountService.save(bankAccount);

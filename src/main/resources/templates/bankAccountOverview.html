@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Bank Account Overview</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/alert.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="scripts/sidebar.js"></script>
+  <script src="scripts/alert.js"></script>
+  <script src="scripts/dataLoader.js"></script>
+  <script src="scripts/localization.js" defer></script>
+</head>
+<body>
+<!-- Include the sidebar -->
+<div th:replace="~{sidebar :: sidebar}"></div>
+
+<div class="content" id="dynamic-content">
+  <!-- Initial content or placeholder -->
+  <div th:replace="~{fragments/content :: fragment}"></div>
+</div>
+
+</body>
+</html>
