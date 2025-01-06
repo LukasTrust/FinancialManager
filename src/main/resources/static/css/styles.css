@@ -476,6 +476,46 @@ button:hover {
     width: 100%;
 }
 
+.navSublist {
+    list-style: none;
+    padding: 0 30px; /* Adjust left padding for indentation */
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Space between sub-items */
+}
+
+/* Sub-item styling */
+.navSubItem {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* Sub-link styling */
+.navSublink {
+    color: #ccc; /* Slightly lighter color for distinction */
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 6px;
+    transition: 0.3s ease;
+}
+
+.navSublink:hover {
+    color: #151A2D;
+    background: #fff;
+}
+
+/* Sub-item icon and label alignment */
+.navSublink .navLable {
+    font-size: 0.875rem; /* Slightly smaller font size */
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+}
+
 .content {
     width: 100%;
     margin-left: 300px;
@@ -507,6 +547,8 @@ button:hover {
 .hidden {
     opacity: 0;
     max-height: 0;
+    padding: 0;
+    margin: 0;
     overflow: hidden;
     transition: opacity 0.5s ease, max-height 1s ease;
 }

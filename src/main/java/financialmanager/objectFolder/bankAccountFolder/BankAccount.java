@@ -3,10 +3,9 @@ package financialmanager.objectFolder.bankAccountFolder;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import financialmanager.Utils.JsonStringListConverter;
-import financialmanager.objectFolder.bankAccountFolder.savingsAccountFolder.SavingsBankAccount;
+import financialmanager.objectFolder.bankAccountFolder.savingsBankAccountFolder.SavingsBankAccount;
 import financialmanager.objectFolder.usersFolder.Users;
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,7 +20,6 @@ import java.util.List;
 @Getter
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Data
 @NoArgsConstructor
 public class BankAccount {
 
@@ -29,6 +27,7 @@ public class BankAccount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
     @ManyToOne
     @JoinColumn(name = "userId")
     private Users users;

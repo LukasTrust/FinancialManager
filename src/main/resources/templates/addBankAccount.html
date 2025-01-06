@@ -40,8 +40,8 @@
                            placeholder="Bank Account description (Optional)">
                 </div>
                 <div class="checkboxWrapper">
-                    <input id="isCheckingAccount" type="checkbox" class="switch">
-                    <label for="isCheckingAccount">Bank account is a savings bankAccount</label>
+                    <input id="isSavingsAccount" type="checkbox" class="switch">
+                    <label for="isSavingsAccount">Bank account is a savings bankAccount</label>
                 </div>
 
                 <!--Hidden only for is SavingsAccount-->
@@ -49,8 +49,8 @@
                     <div class="inputbox">
                         <span class="bi bi-piggy-bank"></span>
                         <label for="interestRate"></label>
-                        <input type="text" id="interestRate" name="interestRate"
-                               placeholder="Bank bankAccount interest rate (Optional)">
+                        <input type="number" id="interestRate" name="interestRate"
+                               placeholder="Enter a positive interest rate" min="0" step="any">
                     </div>
 
                     <div class="flexContainerColumn">
@@ -59,7 +59,7 @@
                             <div class="inputbox">
                                 <span class="bi bi-cash-stack"></span>
                                 <label for="inputinterestRateStrings"></label>
-                                <input type="text" id="inputinterestRateStrings" name="interestRateStrings"
+                                <input type="number" id="inputinterestRateStrings" name="interestRateStrings"
                                        placeholder="Interest rate search strings">
                             </div>
                             <button class="addButton" id="addInterestRateStrings" type="button">Add</button>
