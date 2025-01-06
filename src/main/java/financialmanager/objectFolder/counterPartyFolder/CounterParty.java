@@ -1,6 +1,6 @@
 package financialmanager.objectFolder.counterPartyFolder;
 
-import financialmanager.objectFolder.accountFolder.JsonStringListConverter;
+import financialmanager.Utils.JsonStringListConverter;
 import jakarta.persistence.*;
 import lombok.*;
 

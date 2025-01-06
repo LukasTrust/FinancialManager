@@ -1,5 +1,9 @@
-package financialmanager.objectFolder.accountFolder;
+package financialmanager.objectFolder.bankAccountFolder;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import financialmanager.Utils.JsonStringListConverter;
+import financialmanager.objectFolder.bankAccountFolder.savingsAccountFolder.SavingsBankAccount;
 import financialmanager.objectFolder.usersFolder.Users;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -9,19 +13,24 @@ import lombok.Setter;
 
 import java.util.List;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = SavingsBankAccount.class, name = "saving"),
+        @JsonSubTypes.Type(value = BankAccount.class, name = "checking"),
+})
 @Getter
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Data
 @NoArgsConstructor
-public abstract class Account {
+public class BankAccount {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
+    @JoinColumn(name = "userId")
     private Users users;
 
     @Setter
@@ -47,21 +56,4 @@ public abstract class Account {
     @Setter
     @Convert(converter = JsonStringListConverter.class)
     private List<String> amountInBankAfterSearchStrings;
-
-    public Account(Users users, String name) {
-        this.users = users;
-        this.name = name;
-    }
-
-    public Account(Users users, String name, String description, List<String> amountSearchStrings,
-                   List<String> dateSearchStrings, List<String> counterPartySearchStrings,
-                   List<String> amountInBankAfterSearchStrings) {
-        this.users = users;
-        this.name = name;
-        this.description = description;
-        this.amountSearchStrings = amountSearchStrings;
-        this.dateSearchStrings = dateSearchStrings;
-        this.counterPartySearchStrings = counterPartySearchStrings;
-        this.amountInBankAfterSearchStrings = amountInBankAfterSearchStrings;
-    }
 }

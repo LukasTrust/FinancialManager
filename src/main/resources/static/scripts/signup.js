@@ -60,8 +60,8 @@ async function submitSignup(messages) {
         showAlert(responseBody.alertType, responseBody.message);
 
         if (responseBody.alertType.toLowerCase() === 'warning' || responseBody.alertType.toLowerCase() === 'error') {
-            document.getElementById("password").value = '';
-            document.getElementById("confirmPassword").value = '';
+            password.value = '';
+            confirmPassword.value = '';
         }
 
     } catch (error) {

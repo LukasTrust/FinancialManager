@@ -1,6 +1,6 @@
 package financialmanager.objectFolder.transactionFolder;
 
-import financialmanager.objectFolder.accountFolder.Account;
+import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.categoryFolder.Category;
 import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.counterPartyFolder.CounterParty;
@@ -33,8 +33,8 @@ public class Transaction {
     private Double amountInBankAfter;
 
     @ManyToOne
-    @JoinColumn(name = "accountId", nullable = false)
-    private Account account;
+    @JoinColumn(name = "bankaccountId", nullable = false)
+    private BankAccount bankAccount;
 
     @Setter
     @ManyToOne
@@ -51,21 +51,21 @@ public class Transaction {
     @JoinColumn(name = "categoryId")
     private Category category;
 
-    public Transaction(LocalDateTime date, Double amount, Double amountInBankBefore, Double amountInBankAfter, Account account) {
+    public Transaction(LocalDateTime date, Double amount, Double amountInBankBefore, Double amountInBankAfter, BankAccount bankAccount) {
         this.date = date;
         this.amount = amount;
         this.amountInBankBefore = amountInBankBefore;
         this.amountInBankAfter = amountInBankAfter;
-        this.account = account;
+        this.bankAccount = bankAccount;
     }
 
     public Transaction(LocalDateTime date, Double amount, Double amountInBankBefore, Double amountInBankAfter,
-                       Account account, Contract contract, CounterParty counterParty, Category category) {
+                       BankAccount bankAccount, Contract contract, CounterParty counterParty, Category category) {
         this.date = date;
         this.amount = amount;
         this.amountInBankBefore = amountInBankBefore;
         this.amountInBankAfter = amountInBankAfter;
-        this.account = account;
+        this.bankAccount = bankAccount;
         this.contract = contract;
         this.counterParty = counterParty;
         this.category = category;

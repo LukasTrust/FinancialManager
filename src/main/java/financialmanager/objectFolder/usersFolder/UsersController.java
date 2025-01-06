@@ -1,12 +1,9 @@
-package financialmanager.controller;
+package financialmanager.objectFolder.usersFolder;
 
-import financialmanager.configFolder.JsonMessageSource;
+import financialmanager.generalController.LocalizationController;
 import financialmanager.objectFolder.responseFolder.Response;
-import financialmanager.objectFolder.usersFolder.Users;
-import financialmanager.objectFolder.usersFolder.UsersRepository;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import lombok.AllArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +18,12 @@ import java.util.regex.Pattern;
 
 @RestController
 @AllArgsConstructor
-public class SignupController {
+public class UsersController {
 
     private final String subDirectory = "login&signup";
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JsonMessageSource jsonMessageSource;
+    private final LocalizationController localizationController;
 
     private final Pattern passwordPattern =
             Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$");
@@ -42,19 +39,19 @@ public class SignupController {
             if (!isValidEmail(email)) {
                 return ResponseEntity.badRequest().body(new Response(
                         AlertType.WARNING,
-                        jsonMessageSource.getMessageWithSubDirectory(subDirectory, "invalidEmail", locale)
+                        localizationController.getMessage(subDirectory, "invalidEmail", locale)
                 ));
             }
 
             // Validate password
             String password = user.getPassword();
-            String passwordValidationMessage = validatePassword(password, locale);
-            if (passwordValidationMessage != null) {
-                return ResponseEntity.badRequest().body(new Response(
-                        AlertType.WARNING,
-                        passwordValidationMessage
-                ));
-            }
+//            String passwordValidationMessage = validatePassword(password, locale);
+//            if (passwordValidationMessage != null) {
+//                return ResponseEntity.badRequest().body(new Response(
+//                        AlertType.WARNING,
+//                        passwordValidationMessage
+//                ));
+//            }
 
             // Encode password
             user.setPassword(passwordEncoder.encode(password));
@@ -65,18 +62,18 @@ public class SignupController {
             // Success response
             return ResponseEntity.ok(new Response(
                     AlertType.SUCCESS,
-                    jsonMessageSource.getMessageWithSubDirectory(subDirectory, "success", locale),
+                    localizationController.getMessage(subDirectory, "success", locale),
                     savedUser
             ));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(
                     AlertType.ERROR,
-                    jsonMessageSource.getMessageWithSubDirectory(subDirectory, "userExists", locale)
+                    localizationController.getMessage(subDirectory, "userExists", locale)
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(
                     AlertType.ERROR,
-                    jsonMessageSource.getMessageWithSubDirectory(subDirectory, "generic", locale)
+                    localizationController.getMessage(subDirectory, "generic", locale)
             ));
         }
     }
@@ -84,10 +81,10 @@ public class SignupController {
     // Utility method for password validation
     public String validatePassword(String password, Locale locale) {
         if (password.length() < 8) {
-            return jsonMessageSource.getMessageWithSubDirectory(subDirectory, "passwordLength", locale);
+            return localizationController.getMessage(subDirectory, "passwordLength", locale);
         }
         if (!isStrongPassword(password)) {
-            return jsonMessageSource.getMessageWithSubDirectory(subDirectory, "passwordStrength", locale);
+            return localizationController.getMessage(subDirectory, "passwordStrength", locale);
         }
         return null; // Indicates password is valid
     }

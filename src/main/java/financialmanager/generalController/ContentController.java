@@ -1,4 +1,4 @@
-package financialmanager.controller;
+package financialmanager.generalController;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +18,6 @@ public class ContentController {
 
     @GetMapping("/addBank")
     public String getAddBankPage(){
-        return "addBank";
+        return "addBankAccount";
     }
 }
