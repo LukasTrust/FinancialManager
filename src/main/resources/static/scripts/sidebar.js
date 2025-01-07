@@ -1,100 +1,109 @@
 async function loadSidebar() {
-    const sidebar = document.querySelector('.sidebar');
-    const sidebarToggle = document.querySelector('.sidebarToggle');
-    const content = document.querySelector('.content');
+    try {
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggle = document.querySelector('.sidebarToggle');
+        const content = document.querySelector('.content');
+        const topNav = document.getElementById('topNav');
 
-    // Load localization messages
-    const userLocale = navigator.language || 'en';
-    await fetchLocalization("general", userLocale);
+        if (!sidebar || !sidebarToggle || !content || !topNav) {
+            console.error("Required DOM elements for the sidebar are missing.");
+            return;
+        }
 
-    // Check if the bank account data is already in sessionStorage
-    let bankAccounts = sessionStorage.getItem('bankAccounts');
+        initStaticLinks();
 
-    if (!bankAccounts) {
-        // If not, fetch it and store it in sessionStorage
-        bankAccounts = await loadBankAccounts();
-        sessionStorage.setItem('bankAccounts', JSON.stringify(bankAccounts));
-    } else {
-        // Parse the data from sessionStorage if it's already available
-        bankAccounts = JSON.parse(bankAccounts);
+        const userLocale = navigator.language ?? 'en';
+        await fetchLocalization("general", userLocale);
+
+        const bankAccounts = await loadBankAccounts();
+
+        bankAccounts.forEach(bankAccount => {
+            addBankAccountToSidebar(bankAccount, topNav);
+        });
+
+        sidebarToggle.addEventListener('click', () => toggleSidebar(sidebar, content));
+    } catch (error) {
+        console.error("Error loading sidebar:", error);
     }
+}
 
-    // Populate the sidebar with bank accounts
-    for (const bankAccount of bankAccounts) {
-        addBankAccountToSidebar(bankAccount.name, bankAccount.id, bankAccount.interestRate != null);
-    }
+function toggleSidebar(sidebar, content) {
+    sidebar?.classList.toggle("collapsed");
+    content?.classList.toggle("fullScreen");
 
-    sidebarToggle.addEventListener('click', () => {
-        toggleSidebar(sidebar, content);
+    const allSubItems = sidebar?.querySelectorAll('.navSubitem') ?? [];
+    allSubItems.forEach(item => item.classList.toggle('collapsed'));
+}
+
+function addBankAccountToSidebar({name, id, interestRate}, container) {
+    const isSavings = interestRate != null;
+
+    const accountItem = createElement('li', 'navItem account', '', {id});
+    const accountLink = createElement('a', 'navLink', '', {href: '/bankAccountOverview', 'data-ajax': 'true'});
+    accountItem.appendChild(accountLink);
+
+    accountLink.appendChild(createElement('span', isSavings ? 'bi bi-piggy-bank' : 'bi bi-bank'));
+    accountLink.appendChild(createElement('span', 'navLabel', name));
+
+    const toolTip = createElement('span', 'navTooltip', name);
+    accountItem.appendChild(toolTip);
+
+    const sublist = createSublist();
+    accountItem.appendChild(sublist);
+    container.appendChild(accountItem);
+
+    accountLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        toggleSublistVisibility(sublist, container);
     });
 }
 
+function createSublist() {
+    const sublist = createElement('ul', 'navSublist hidden');
 
-function toggleSidebar(sidebar, content) {
-    sidebar.classList.toggle("collapsed");
-    content.classList.toggle("fullScreen");
+    const subItems = [
+        {name: 'Overview', href: '/bankAccountOverview', icon: 'bi bi-border-style'},
+        {name: 'Transactions', href: '/bankAccount/transactions', icon: 'bi bi-receipt'},
+        {name: 'Categories', href: '/bankAccount/categories', icon: 'bi bi-tag-fill'},
+        {name: 'Counterparties', href: '/bankAccount/counterparties', icon: 'bi bi-person-fill'},
+        {name: 'Contracts', href: '/bankAccount/contracts', icon: 'bi bi-file-earmark-fill'}
+    ];
+
+    subItems.forEach(({name, href, icon}) => {
+        const subItem = createElement('li', 'navSubitem');
+        const subItemLink = createElement('a', 'navSublink', '', {href, 'data-ajax': 'true'});
+
+        subItemLink.appendChild(createElement('span', icon));
+        subItemLink.appendChild(createElement('span', 'navLabel', name));
+
+        subItem.appendChild(subItemLink);
+        sublist.appendChild(subItem);
+    });
+
+    return sublist;
+}
+
+function toggleSublistVisibility(sublist, container) {
+    const allSublists = container.querySelectorAll('.navSublist');
+    allSublists.forEach(list => {
+        if (list !== sublist) list.classList.add('hidden');
+    });
+    sublist.classList.toggle('hidden');
+}
+
+function initStaticLinks() {
+    const staticLinks = document.querySelectorAll('.navLink[data-ajax="true"]');
+    staticLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            document.querySelectorAll('.navSublist').forEach(list => list.classList.add('hidden'));
+        });
+    });
 }
 
 function createElement(type, className, textContent = '', attributes = {}) {
     const element = document.createElement(type);
-    element.className = className;
+    if (className) element.className = className;
     if (textContent) element.textContent = textContent;
-    for (const [key, value] of Object.entries(attributes)) {
-        element.setAttribute(key, value);
-    }
+    Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
     return element;
-}
-
-function addBankAccountToSidebar(accountName, accountId, isSavings) {
-    const sidebar = document.getElementById('topNav');
-
-    // Create account item and link
-    const accountItem = createElement('li', 'navItem account');
-    accountItem.id = accountId;
-    const accountLink = createElement('a', 'navLink', '', { href: `/bankAccountOverview` });
-    accountLink.setAttribute('data-ajax', 'true');
-    accountItem.appendChild(accountLink);
-
-    // Add account icon
-    const icon = createElement('span', isSavings ? 'bi bi-piggy-bank' : 'bi bi-bank');
-    accountLink.appendChild(icon);
-
-    // Add account name label
-    const name = createElement('span', 'navLable', accountName);
-    accountLink.appendChild(name);
-
-    // Create tooltip span (optional)
-    const toolTip = createElement('span', 'navTooltip');
-    accountItem.appendChild(toolTip);
-
-    // Create sublist
-    const sublist = createElement('ul', 'navSublist hidden');
-
-    const subItems = [
-        { name: 'Overview', href: `/bankAccountOverview`, icon: 'bi bi-border-style' },
-        { name: 'Transactions', href: `/bankAccount/transactions`, icon: 'bi bi-receipt' },
-        { name: 'Categories', href: `/bankAccount/categories`, icon: 'bi bi-tag-fill' },
-        { name: 'Counterparties', href: `/bankAccount/counterparties`, icon: 'bi bi-person-fill' },
-        { name: 'Contracts', href: `/bankAccount/contracts`, icon: 'bi bi-file-earmark-fill' }
-    ];
-
-    subItems.forEach(subItem => {
-        const subItemElement = createElement('li', 'navSubitem');
-        const subItemLink = createElement('a', 'navSublink', '', { href: subItem.href });
-        subItemLink.setAttribute('data-ajax', 'true');
-
-        // Add sub-item icon
-        const iconSubItem = createElement('span', subItem.icon);
-        subItemLink.appendChild(iconSubItem);
-
-        // Add sub-item name label
-        const nameSubItem = createElement('span', 'navLable', subItem.name);
-        subItemLink.appendChild(nameSubItem);
-
-        subItemElement.appendChild(subItemLink);
-        sublist.appendChild(subItemElement);
-    });
-
-    accountItem.appendChild(sublist);
-    sidebar.appendChild(accountItem);
 }

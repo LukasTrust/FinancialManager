@@ -431,11 +431,16 @@ button:hover {
     background: #fff;
 }
 
-.sidebarNav .navLink .navLable {
+.sidebarNav .navLink .navLabel {
     transition: opacity 0.4s ease;
 }
 
-.sidebar.collapsed .sidebarNav .navLink .navLable {
+.sidebar.collapsed .sidebarNav .navLink .navLabel {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.sidebar.collapsed .navLabel {
     opacity: 0;
     pointer-events: none;
 }
@@ -445,7 +450,6 @@ button:hover {
 }
 
 .account {
-    padding: 0 15px;
     transition: 0.4s ease;
 }
 
@@ -483,7 +487,7 @@ button:hover {
 
 .navSublist {
     list-style: none;
-    padding: 0 30px; /* Adjust left padding for indentation */
+    padding: 0 15px;
     margin: 10px 0;
     display: flex;
     flex-direction: column;
@@ -515,7 +519,7 @@ button:hover {
 }
 
 /* Sub-item icon and label alignment */
-.navSublink .navLable {
+.navSublink .navLabel {
     font-size: 0.875rem; /* Slightly smaller font size */
     white-space: nowrap;
     transition: opacity 0.3s ease;
