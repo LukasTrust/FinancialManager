@@ -8,13 +8,13 @@
   "lastName": "Last Name",
   "noAccount": "Don’t have an account yet?",
   "alreadyAccount": "Already have an account?",
-  "invalidCredentials": "Invalid username or password. Please try again.",
-  "allFieldsRequired": "All fields are required",
-  "invalidEmail": "Please enter a valid email address",
-  "passwordLength": "Password must be at least 8 characters long",
-  "passwordStrength": "Password must contain a mix of upper and lower case letters, numbers, and special characters",
-  "success": "Signup successful!",
-  "userExists": "User with the same email already exists",
-  "generic": "An unexpected error occurred. Please try again",
-  "passwordNotMatch": "Passwords do not match"
+  "error_invalidCredentials": "Invalid username or password. Please try again.",
+  "error_allFieldsRequired": "All fields are required",
+  "error_invalidEmail": "Please enter a valid email address",
+  "error_passwordLength": "Password must be at least 8 characters long",
+  "error_passwordStrength": "Password must contain a mix of upper and lower case letters, numbers, and special characters",
+  "success_signUp": "Signup successful!",
+  "error_userExists": "User with the same email already exists",
+  "error_generic": "An unexpected error occurred. Please try again",
+  "error_passwordNotMatch": "Passwords do not match"
 }

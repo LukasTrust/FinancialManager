@@ -21,18 +21,18 @@ public class ContentController {
     public String index(Model model) {
         model.addAttribute("title", "Add Bank Account");
         model.addAttribute("template", "addBankAccount");
-        return "index";  // Return the layout template
+        return "index";
     }
 
     @GetMapping("/addBankAccount")
     public String getAddBankPage(Model model) {
         model.addAttribute("title", "Add Bank Account");
-        return "addBankAccount";  // Only return the content fragment for this page
+        return "addBankAccount";
     }
 
     @GetMapping("/bankAccountOverview")
     public String getBankAccountOverview(Model model) {
         model.addAttribute("title", "Bank Account Overview");
-        return "bankAccountOverview";  // Only return the content fragment for this page
+        return "bankAccountOverview";
     }
 }

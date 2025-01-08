@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", async () => {
+async function buildAddBankAccount()  {
     const isSavingsAccount = document.getElementById("isSavingsAccount");
     const hiddenInputs = document.getElementById("hiddenInputs");
 
@@ -26,12 +26,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     ];
 
+    const userLocale = navigator.language || 'en';
+    const messages = await fetchLocalization("addBankAccount", userLocale);
+
     const submitButton = document.getElementById("submitButton");
-    submitButton.addEventListener("click", async () => {
+    submitButton.addEventListener("click", async (event) => {
         event.preventDefault();
         // Extract the listIds from the fields array
         const listIds = fields.map(field => field.listId);
-        await submitAddNewBank(isSavingsAccount.checked, listIds);
+        await submitAddNewBank(messages, isSavingsAccount.checked, listIds);
     })
 
     fields.forEach(field => {
@@ -42,22 +45,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         addButton.addEventListener("click", () => {
             const inputValue = inputField.value.trim();
             if (inputValue) {
-                addStringToList(inputValue, stringList);
+                addStringToList(messages, inputValue, stringList);
                 inputField.value = ""; // Clear input field
             } else {
-                showAlert('info', "Please enter a word to add to the search strings");
+                showAlert('info', messages["error_enterWord"]);
             }
         });
     });
-});
+}
 
-async function submitAddNewBank(isSavingsAccount, listIds) {
+async function submitAddNewBank(messages, isSavingsAccount, listIds) {
     const name = document.getElementById("name").value.trim();
     const description = document.getElementById("description").value.trim();
 
     // Check if all fields are filled
     if (!name) {
-        showAlert('warning', "Please enter a name for the bank account");
+        showAlert('warning', messages["error_bankAccountName"]);
         return;
     }
 
@@ -71,7 +74,7 @@ async function submitAddNewBank(isSavingsAccount, listIds) {
         const interestRate = document.getElementById("interestRate").value.trim();
 
         if (!interestRate) {
-            showAlert('warning', "Please enter a interest rate for the savings account");
+            showAlert('warning', messages["error_NoInterestRate"]);
             return;
         }
 
@@ -112,7 +115,7 @@ async function submitAddNewBank(isSavingsAccount, listIds) {
         if (responseBody.alertType.toLowerCase() === 'success') {
             const bankAccount = responseBody.data;
 
-            addBankAccountToSidebar(bankAccount.name, bankAccount.id, bankAccount.interestRate != null);
+            addBankAccountToSidebar(bankAccount);
 
             document.getElementById("name").value = '';
             document.getElementById("description").value = '';
@@ -127,7 +130,7 @@ async function submitAddNewBank(isSavingsAccount, listIds) {
 
     } catch (error) {
         console.error("There was a problem with the create bank request:", error);
-        showAlert('error', "An unexpected error occurred. Please try again");
+        showAlert('error', messages["error_generic"]);
     }
 }
 
@@ -136,11 +139,11 @@ function showHiddenInputs(hiddenInputs) {
 }
 
 // Function to add a string to the list
-function addStringToList(input, stringList) {
+function addStringToList(messages, input, stringList) {
     //Check if the string is already in the list
     const existingItems = Array.from(stringList.children).map(item => item.textContent.trim());
     if (existingItems.includes(input)) {
-        showAlert('Warning', "This string is already in the list!");
+        showAlert('Warning', messages["error_alreadyInList"]);
         return;
     }
 

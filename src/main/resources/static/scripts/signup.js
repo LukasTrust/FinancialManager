@@ -27,13 +27,13 @@ async function submitSignup(messages) {
 
     // Check if all fields are filled
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-        showAlert('warning', messages["allFieldsRequired"]);
+        showAlert('warning', messages["error_allFieldsRequired"]);
         return;
     }
 
     // Check if passwords match
     if (password !== confirmPassword) {
-        showAlert('warning', messages["passwordNotMatch"]);
+        showAlert('warning', messages["error_passwordNotMatch"]);
         return;
     }
 
@@ -66,6 +66,6 @@ async function submitSignup(messages) {
 
     } catch (error) {
         console.error("There was a problem with the signup request:", error);
-        showAlert('error', messages["generic"]);
+        showAlert('error', messages["error_generic"]);
     }
 }

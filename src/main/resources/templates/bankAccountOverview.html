@@ -1,3 +1,25 @@
 <div th:fragment="bankAccountOverview" id="content">
-  <p>Hallo</p>
+    <div class="container">
+        <!-- Main Section -->
+        <div class="mainContent">
+
+        </div>
+
+        <!-- Right Section-->
+        <div class="sideContent">
+            <div class="flexContainerColumn">
+                <h3>Upload bank</h3>
+                <div class="inputContainer">
+                    <div class="inputbox">
+                        <span class="bi bi-card-text"></span>
+                        <label for="inputCounterPartyStrings"></label>
+                        <input type="text" id="inputCounterPartyStrings" name="counterPartyStrings"
+                               placeholder="Counterparty search strings">
+                    </div>
+                    <button class="addButton" id="addCounterPartyStrings" type="button">Add</button>
+                </div>
+                <div id="counterPartySearchStrings" class="listContainer"></div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -39,7 +39,7 @@ public class UsersController {
             if (!isValidEmail(email)) {
                 return ResponseEntity.badRequest().body(new Response(
                         AlertType.WARNING,
-                        localizationController.getMessage(subDirectory, "invalidEmail", locale)
+                        localizationController.getMessage(subDirectory, "error_invalidEmail", locale)
                 ));
             }
 
@@ -48,7 +48,7 @@ public class UsersController {
 //            String passwordValidationMessage = validatePassword(password, locale);
 //            if (passwordValidationMessage != null) {
 //                return ResponseEntity.badRequest().body(new Response(
-//                        AlertType.WARNING,
+//                       AlertType.WARNING,
 //                        passwordValidationMessage
 //                ));
 //            }
@@ -62,18 +62,18 @@ public class UsersController {
             // Success response
             return ResponseEntity.ok(new Response(
                     AlertType.SUCCESS,
-                    localizationController.getMessage(subDirectory, "success", locale),
+                    localizationController.getMessage(subDirectory, "success_signUp", locale),
                     savedUser
             ));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(
                     AlertType.ERROR,
-                    localizationController.getMessage(subDirectory, "userExists", locale)
+                    localizationController.getMessage(subDirectory, "error_userExists", locale)
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(
                     AlertType.ERROR,
-                    localizationController.getMessage(subDirectory, "generic", locale)
+                    localizationController.getMessage(subDirectory, "error_generic", locale)
             ));
         }
     }
@@ -81,10 +81,10 @@ public class UsersController {
     // Utility method for password validation
     public String validatePassword(String password, Locale locale) {
         if (password.length() < 8) {
-            return localizationController.getMessage(subDirectory, "passwordLength", locale);
+            return localizationController.getMessage(subDirectory, "error_passwordLength", locale);
         }
         if (!isStrongPassword(password)) {
-            return localizationController.getMessage(subDirectory, "passwordStrength", locale);
+            return localizationController.getMessage(subDirectory, "error_passwordStrength", locale);
         }
         return null; // Indicates password is valid
     }

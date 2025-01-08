@@ -13,12 +13,12 @@ async function loadSidebar() {
         initStaticLinks();
 
         const userLocale = navigator.language ?? 'en';
-        await fetchLocalization("general", userLocale);
+        await fetchLocalization("sidebar", userLocale);
 
         const bankAccounts = await loadBankAccounts();
 
         bankAccounts.forEach(bankAccount => {
-            addBankAccountToSidebar(bankAccount, topNav);
+            addBankAccountToSidebar(bankAccount);
         });
 
         sidebarToggle.addEventListener('click', () => toggleSidebar(sidebar, content));
@@ -35,7 +35,9 @@ function toggleSidebar(sidebar, content) {
     allSubItems.forEach(item => item.classList.toggle('collapsed'));
 }
 
-function addBankAccountToSidebar({name, id, interestRate}, container) {
+function addBankAccountToSidebar({name, id, interestRate}) {
+    const topNav = document.getElementById('topNav');
+
     const isSavings = interestRate != null;
 
     const accountItem = createElement('li', 'navItem account', '', {id});
@@ -50,11 +52,11 @@ function addBankAccountToSidebar({name, id, interestRate}, container) {
 
     const sublist = createSublist();
     accountItem.appendChild(sublist);
-    container.appendChild(accountItem);
+    topNav.appendChild(accountItem);
 
     accountLink.addEventListener('click', (event) => {
         event.preventDefault();
-        toggleSublistVisibility(sublist, container);
+        toggleSublistVisibility(sublist, topNav);
     });
 }
 

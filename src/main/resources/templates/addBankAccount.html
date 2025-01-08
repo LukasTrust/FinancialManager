@@ -4,25 +4,25 @@
         <div class="mainContent">
             <div class="flexContainer">
                 <h1><span class="bi bi-bank2"></span></h1>
-                <h1>Add New Bank Account</h1>
+                <h1 data-i18n="addBankAccount"></h1>
             </div>
-            <p>Fill in the basic details to create a new bank bankAccount. You can add additional search strings later
+            <p data-i18n="mainContentHeaderText">Fill in the basic details to create a new bank bankAccount. You can add additional search strings later
                 or right now. They can also be changed later.</p>
             <form>
                 <div class="inputbox">
                     <span class="bi bi-card-text"></span>
                     <label for="name"></label>
-                    <input type="text" id="name" name="name" placeholder="Bank account name">
+                    <input type="text" id="name" name="name" data-i18n-placeholder="bankAccountName">
                 </div>
                 <div class="inputbox">
                     <span class="bi bi-card-text"></span>
                     <label for="description"></label>
                     <input type="text" id="description" name="description"
-                           placeholder="Bank Account description (Optional)">
+                           data-i18n-placeholder="bankAccountDescription">
                 </div>
                 <div class="checkboxWrapper">
                     <input id="isSavingsAccount" type="checkbox" class="switch">
-                    <label for="isSavingsAccount">Bank account is a savings bankAccount</label>
+                    <label for="isSavingsAccount" data-i18n="isSavingsAccount"></label>
                 </div>
 
                 <!--Hidden only for is SavingsAccount-->
@@ -31,17 +31,17 @@
                         <span class="bi bi-piggy-bank"></span>
                         <label for="interestRate"></label>
                         <input type="number" id="interestRate" name="interestRate"
-                               placeholder="Enter a positive interest rate" min="0" step="any">
+                               data-i18n-placeholder="positiveInterestRate" min="0" step="any">
                     </div>
 
                     <div class="flexContainerColumn">
-                        <h3>Interest rate search strings</h3>
+                        <h3 data-i18n="interestRateHeader"></h3>
                         <div class="inputContainer">
                             <div class="inputbox">
                                 <span class="bi bi-cash-stack"></span>
                                 <label for="inputinterestRateStrings"></label>
                                 <input type="number" id="inputinterestRateStrings" name="interestRateStrings"
-                                       placeholder="Interest rate search strings">
+                                       data-i18n-placeholder="interestRateSearchStrings">
                             </div>
                             <button class="addButton" id="addInterestRateStrings" type="button">Add</button>
                         </div>
@@ -49,7 +49,7 @@
                     </div>
                 </div>
 
-                <button id="submitButton" type="submit" style="margin-top: 20px">Create Bank Account</button>
+                <button id="submitButton" type="submit" style="margin-top: 20px" data-i18n="createBankAccount"></button>
             </form>
         </div>
 
@@ -57,20 +57,19 @@
         <div class="sideContent">
             <div class="flexContainer">
                 <h2><span class="bi bi-card-text"></span></h2>
-                <h2>Optional Search Strings</h2>
+                <h2 data-i18n="sideContentHeader"></h2>
             </div>
-            <p>These fields are optional and can be added later. They help identify the corresponding data columns in
-                the input data, which are used to create new transactions.</p>
+            <p data-i18n="sideContentHeaderText"></p>
 
             <!-- Counterparty Search Strings -->
             <div class="flexContainerColumn">
-                <h3>Counterparty search strings</h3>
+                <h3 data-i18n="counterpartyHeader"></h3>
                 <div class="inputContainer">
                     <div class="inputbox">
                         <span class="bi bi-card-text"></span>
                         <label for="inputCounterPartyStrings"></label>
                         <input type="text" id="inputCounterPartyStrings" name="counterPartyStrings"
-                               placeholder="Counterparty search strings">
+                               data-i18n-placeholder="counterpartySearchStrings">
                     </div>
                     <button class="addButton" id="addCounterPartyStrings" type="button">Add</button>
                 </div>
@@ -79,13 +78,13 @@
 
             <!-- Amount Search Strings -->
             <div class="flexContainerColumn">
-                <h3>Amount search strings</h3>
+                <h3 data-i18n="amountHeader"></h3>
                 <div class="inputContainer">
                     <div class="inputbox">
                         <span class="bi bi-card-text"></span>
                         <label for="inputAmountStrings"></label>
                         <input type="text" id="inputAmountStrings" name="AmountStrings"
-                               placeholder="Amount search strings">
+                               data-i18n-placeholder="amountSearchStrings">
                     </div>
                     <button class="addButton" id="addAmountStrings" type="button">Add</button>
                 </div>
@@ -94,13 +93,13 @@
 
             <!-- Amount After Transaction Search Strings -->
             <div class="flexContainerColumn">
-                <h3>Amount in bank after transaction search strings</h3>
+                <h3 data-i18n="amountInBankAfterTransactionHeader"></h3>
                 <div class="inputContainer">
                     <div class="inputbox">
                         <span class="bi bi-card-text"></span>
                         <label for="inputAmountAfterStrings"></label>
                         <input type="text" id="inputAmountAfterStrings" name="AmountAfterStrings"
-                               placeholder="Amount in bank after transaction Search Strings">
+                               data-i18n-placeholder="amountInBankAfterTransactionSearchStrings">
                     </div>
                     <button class="addButton" id="addAmountAfterStrings" type="button">Add</button>
                 </div>
@@ -109,12 +108,12 @@
 
             <!-- Date Search Strings -->
             <div class="flexContainerColumn">
-                <h3>Date search strings</h3>
+                <h3 data-i18n="dateHeader"></h3>
                 <div class="inputContainer">
                     <div class="inputbox">
                         <span class="bi bi-card-text"></span>
                         <label for="inputDateStrings"></label>
-                        <input type="text" id="inputDateStrings" name="DateStrings" placeholder="Date search strings">
+                        <input type="text" id="inputDateStrings" name="DateStrings" data-i18n-placeholder=dateSearchStrings>
                     </div>
                     <button class="addButton" id="addDateStrings" type="button">Add</button>
                 </div>

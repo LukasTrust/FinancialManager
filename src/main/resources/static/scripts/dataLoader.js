@@ -1,7 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const contentArea = document.getElementById('content');  // Where the content will go
 
+    // Load sidebar
     await loadSidebar();
+
+    // Load fist page to view
+    await buildAddBankAccount();
 
     // Listen for clicks on links (or buttons) to dynamically load content
     document.querySelectorAll('a[data-ajax="true"]').forEach(link => {
@@ -22,6 +26,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 // Replace the old content with the new one
                 contentArea.innerHTML = newContent.innerHTML;
+
+                switch (url) {
+                    case "/addBankAccount":
+                        await buildAddBankAccount();
+                }
+
             } catch (error) {
                 console.error("Error loading content:", error);
             }
