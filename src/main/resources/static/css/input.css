@@ -1,0 +1,281 @@
+label {
+    margin-left: 10px;
+    color: #fff;
+    font-size: 1rem;
+    pointer-events: none;
+    cursor: default;
+}
+
+.inputbox {
+    display: flex;
+    align-items: center;
+    position: relative;
+    margin: 20px 0;
+    min-width: 350px;
+    width: 100%;
+    border-bottom: 2px solid #fff;
+}
+
+.inputbox input {
+    width: 100%;
+    height: 40px;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    padding: 0 35px 0 5px;
+    color: #fff;
+}
+
+.inputbox span {
+    position: absolute;
+    right: 8px;
+    color: #fff;
+    font-size: 1.2rem;
+    top: 12px;
+}
+
+@supports (-webkit-appearance: none) or (-moz-appearance: none) {
+    .checkboxWrapper input[type=checkbox] {
+        --active: #275EFE;
+        --active-inner: #fff;
+        --focus: 2px rgba(39, 94, 254, .3);
+        --border: #BBC1E1;
+        --border-hover: #275EFE;
+        --background: #fff;
+        --disabled: #F6F8FF;
+        --disabled-inner: #E1E6F9;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        height: 21px;
+        outline: none;
+        display: inline-block;
+        vertical-align: top;
+        position: relative;
+        margin: 0;
+        cursor: pointer;
+        border: 1px solid var(--bc, var(--border));
+        background: var(--b, var(--background));
+        transition: background 0.3s, border-color 0.3s, box-shadow 0.2s;
+    }
+    .checkboxWrapper input[type=checkbox]:after {
+        content: "";
+        display: block;
+        left: 0;
+        top: 0;
+        position: absolute;
+        transition: transform var(--d-t, 0.3s) var(--d-t-e, ease), opacity var(--d-o, 0.2s);
+    }
+    .checkboxWrapper input[type=checkbox]:checked {
+        --b: var(--active);
+        --bc: var(--active);
+        --d-o: .3s;
+        --d-t: .6s;
+        --d-t-e: cubic-bezier(.2, .85, .32, 1.2);
+    }
+    .checkboxWrapper input[type=checkbox]:disabled {
+        --b: var(--disabled);
+        cursor: not-allowed;
+        opacity: 0.9;
+    }
+    .checkboxWrapper input[type=checkbox]:disabled:checked {
+        --b: var(--disabled-inner);
+        --bc: var(--border);
+    }
+    .checkboxWrapper input[type=checkbox]:disabled + label {
+        cursor: not-allowed;
+    }
+    .checkboxWrapper input[type=checkbox]:hover:not(:checked):not(:disabled) {
+        --bc: var(--border-hover);
+    }
+    .checkboxWrapper input[type=checkbox]:focus {
+        box-shadow: 0 0 0 var(--focus);
+    }
+    .checkboxWrapper input[type=checkbox]:not(.switch) {
+        width: 21px;
+    }
+    .checkboxWrapper input[type=checkbox]:not(.switch):after {
+        opacity: var(--o, 0);
+    }
+    .checkboxWrapper input[type=checkbox]:not(.switch):checked {
+        --o: 1;
+    }
+    .checkboxWrapper input[type=checkbox] + label {
+        display: inline-block;
+        vertical-align: middle;
+        cursor: pointer;
+        margin-left: 4px;
+    }
+    .checkboxWrapper input[type=checkbox]:not(.switch) {
+        border-radius: 7px;
+    }
+    .checkboxWrapper input[type=checkbox]:not(.switch):after {
+        width: 5px;
+        height: 9px;
+        border: 2px solid var(--active-inner);
+        border-top: 0;
+        border-left: 0;
+        left: 7px;
+        top: 4px;
+        transform: rotate(var(--r, 20deg));
+    }
+    .checkboxWrapper input[type=checkbox]:not(.switch):checked {
+        --r: 43deg;
+    }
+    .checkboxWrapper input[type=checkbox].switch {
+        width: 38px;
+        border-radius: 11px;
+    }
+    .checkboxWrapper input[type=checkbox].switch:after {
+        left: 2px;
+        top: 2px;
+        border-radius: 50%;
+        width: 17px;
+        height: 17px;
+        background: var(--ab, var(--border));
+        transform: translateX(var(--x, 0));
+    }
+    .checkboxWrapper input[type=checkbox].switch:checked {
+        --ab: var(--active-inner);
+        --x: 17px;
+    }
+    .checkboxWrapper input[type=checkbox].switch:disabled:not(:checked):after {
+        opacity: 0.6;
+    }
+}
+
+.checkboxWrapper * {
+    box-sizing: inherit;
+}
+.checkboxWrapper *:before,
+.checkboxWrapper *:after {
+    box-sizing: inherit;
+}
+
+.fileUploader {
+    width: 800px;
+    background: #fff;
+    border-radius: 5px;
+}
+
+.fileUploader .fileUploaderHeader {
+    display: flex;
+    padding: 20px;
+    background: #5145BA;
+    align-items: center;
+    border-radius: 5px 5px 0 0;
+    justify-content: space-between;
+}
+
+.fileUploaderHeader .fileUploaderTitle {
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.fileUploader .fileList {
+    list-style: none;
+    width: 100%;
+    padding-bottom: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-color: #999 transparent;
+    scrollbar-width: thin;
+}
+
+.fileUploader .fileList:has(li) {
+    padding: 20px;
+}
+
+.fileList .fileListItem {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 23px;
+}
+
+.fileList .fileListItem .fileExtension {
+    height: 50px;
+    width: 50px;
+    color: #fff;
+    display: flex;
+    text-transform: uppercase;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    background: #5145Ba;
+}
+
+.fileList .fileListItem .fileContentWrapper {
+    flex: 1;
+}
+
+.fileList .fileListItem .fileContent {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.fileList .fileListItem .fileName {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.fileList .fileListItem .fileInfo {
+    display: flex;
+    gap: 5px;
+}
+
+.fileList .fileListItem .fileInfo small {
+    color: #5c5c5c;
+    margin-left: 5px;
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.fileList .fileListItem .cancelFileButton {
+    align-self: center;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 1.4rem;
+}
+
+.fileList .fileListItem .cancelFileButton:hover {
+    color: #E3413F;
+}
+
+.fileUploader .fileUploadBox {
+    margin: 10px 20px 20px;
+    border-radius: 5px;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #B1Add4;
+    transition: all 0.2s ease
+}
+
+.fileUploader .fileUploadBox.active {
+    border: 2px solid #5145BA;
+    background: #F3F6FF;
+}
+
+.fileUploader .fileUploadBox .boxTitle {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #626161;
+}
+
+.fileUploader .fileUploadBox.active .boxTitle {
+    pointer-events: none;
+}
+
+.fileUploadBox .boxTitle .fileBrowseButton {
+    color: #5145BA;
+    cursor: pointer;
+}
+
+.fileUploadBox .boxTitle .fileBrowseButton:hover {
+    text-decoration: underline;
+}

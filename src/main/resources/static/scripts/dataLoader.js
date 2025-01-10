@@ -27,9 +27,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Replace the old content with the new one
                 contentArea.innerHTML = newContent.innerHTML;
 
+                console.log(url);
                 switch (url) {
                     case "/addBankAccount":
                         await buildAddBankAccount();
+                        break;
+                    case "/bankAccountOverview":
+                        buildBankAccountOverview();
+                        break;
                 }
 
             } catch (error) {

@@ -1,0 +1,187 @@
+.sidebar {
+    width: 270px;
+    position: fixed;
+    margin: 16px;
+    border-radius: 16px;
+    background: #151A2D;
+    height: calc(100vh - 32px);
+    transition: 0.4s ease;
+}
+
+.sidebar.collapsed {
+    width: 90px;
+}
+
+.sidebarHeader {
+    position: relative;
+    display: flex;
+    padding: 25px 20px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebarHeader .headerLogo img {
+    width: 46px;
+    height: 46px;
+    display: block;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+.sidebarHeader .sidebarToggle {
+    position: absolute;
+    right: 20px;
+    height: 35px;
+    width: 35px;
+    border: none;
+    color: #151A2D;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 8px;
+    background: #fff;
+    transition: 0.4s ease;
+}
+
+.sidebar.collapsed .sidebarHeader .sidebarToggle {
+    transform: translate(-4px, 65px);
+}
+
+.sidebarHeader .sidebarToggle:hover {
+    background: #dde4fb;
+}
+
+.sidebarHeader .sidebarToggle span {
+    font-size: 1.75rem;
+    transition: 0.4s ease;
+}
+
+.sidebar.collapsed .sidebarHeader .sidebarToggle span {
+    transform: rotate(180deg);
+}
+
+.sidebarNav .navList {
+    list-style: none;
+    display: flex;
+    gap: 4px;
+    padding: 0 15px;
+    flex-direction: column;
+    transform: translateY(15px);
+    transition: 0.4s ease;
+}
+
+.sidebar.collapsed .sidebarNav .primaryNav {
+    transform: translateY(65px);
+}
+
+.sidebarNav .navLink {
+    color: #fff;
+    display: flex;
+    gap: 12px;
+    white-space: nowrap;
+    border-radius: 8px;
+    align-items: center;
+    padding: 12px;
+    text-decoration: none;
+    transition: 0.4s ease;
+}
+
+.sidebarNav .navLink:hover {
+    color: #151A2D;
+    background: #fff;
+}
+
+.sidebarNav .navLink .navLabel {
+    transition: opacity 0.4s ease;
+}
+
+.sidebar.collapsed .sidebarNav .navLink .navLabel {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.sidebar.collapsed .navLabel {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.sidebarNav .navItem {
+    position: relative;
+}
+
+.account {
+    transition: 0.4s ease;
+}
+
+.sidebarNav .navTooltip {
+    position: absolute;
+    top: -10px;
+    opacity: 0;
+    display: none;
+    pointer-events: none;
+    left: calc(100% + 25px);
+    color: #151A2D;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: #fff;
+    white-space: nowrap;
+    box-shadow: 0 5px 10px rgb(0, 0, 0, 01);
+}
+
+.sidebar.collapsed .sidebarNav .navTooltip {
+    display: block;
+}
+
+.sidebarNav .navItem:hover .navTooltip {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(50%);
+    transition: 0.4s ease;
+}
+
+.sidebarNav .secondaryNav {
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
+}
+
+.navSublist {
+    list-style: none;
+    padding: 0 15px;
+    display: flex;
+    margin-top: 5px;
+    flex-direction: column;
+    gap: 8px; /* Space between sub-items */
+}
+
+/* Sub-item styling */
+.navSubItem {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+/* Sub-link styling */
+.navSublink {
+    color: #ccc; /* Slightly lighter color for distinction */
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 6px;
+    transition: 0.3s ease;
+}
+
+.navSublink:hover {
+    color: #151A2D;
+    background: #fff;
+}
+
+/* Sub-item icon and label alignment */
+.navSublink .navLabel {
+    font-size: 0.875rem; /* Slightly smaller font size */
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+}

@@ -7,18 +7,18 @@
 
         <!-- Right Section-->
         <div class="sideContent">
-            <div class="flexContainerColumn">
-                <h3>Upload bank</h3>
-                <div class="inputContainer">
-                    <div class="inputbox">
-                        <span class="bi bi-card-text"></span>
-                        <label for="inputCounterPartyStrings"></label>
-                        <input type="text" id="inputCounterPartyStrings" name="counterPartyStrings"
-                               placeholder="Counterparty search strings">
-                    </div>
-                    <button class="addButton" id="addCounterPartyStrings" type="button">Add</button>
+            <div class="fileUploader">
+                <div class="fileUploaderHeader">
+                    <h2 class="fileUploaderTitle">Data upload</h2>
                 </div>
-                <div id="counterPartySearchStrings" class="listContainer"></div>
+                <div class="fileUploadBox">
+                    <h2 class="boxTitle">
+                        <span class="fileInstructions">Drag files here or</span>
+                        <span class="fileBrowseButton">browse</span>
+                    </h2>
+                </div>
+                <input class="fileBrowseInput" type="file" multiple hidden>
+                <ul class="fileList"></ul>
             </div>
         </div>
     </div>
