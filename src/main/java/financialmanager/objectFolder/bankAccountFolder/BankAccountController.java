@@ -1,6 +1,6 @@
 package financialmanager.objectFolder.bankAccountFolder;
 
-import financialmanager.generalController.LocalizationController;
+import financialmanager.controller.LocaleController;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.usersFolder.Users;
@@ -21,82 +21,54 @@ public class BankAccountController {
     private final String subDirectory = "addBankAccount";
     private final UsersService usersService;
     private final BankAccountService bankAccountService;
-    private final LocalizationController localizationController;
+    private final LocaleController localeController;
 
     @GetMapping("/getBankAccountsOfUser")
-    public ResponseEntity<?> getBankAccountsOfUser(Locale locale) {
-        Optional<Users> userOptional = usersService.getCurrentUser();
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(
-                    AlertType.ERROR,
-                    localizationController.getMessage(subDirectory, "error_userNotFound", locale)
-            ));
-        }
+    public ResponseEntity<?> getBankAccountsOfUser() {
+        Users user = usersService.getCurrentUser();
 
-        List<BankAccount> bankAccounts = bankAccountService.findAllByUsers(userOptional.get());
+        List<BankAccount> bankAccounts = bankAccountService.findAllByUsers(user);
 
         return ResponseEntity.ok(bankAccounts);
     }
 
-    @GetMapping("/bankAccount/{bankAccountId}/data")
-    public ResponseEntity<?> getBankAccountById(@PathVariable Long bankAccountId, Locale locale) {
-        Optional<Users> userOptional = usersService.getCurrentUser();
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(
-                    AlertType.ERROR,
-                    localizationController.getMessage(subDirectory, "error_userNotFound", locale)
-            ));
-        }
+    @GetMapping("/bankAccountOverview/{bankAccountId}/data")
+    public ResponseEntity<?> getBankAccountById(@PathVariable Long bankAccountId) {
+        Users user = usersService.getCurrentUser();
 
-        Optional<BankAccount> bankAccountOptional = bankAccountService.findById(bankAccountId);
+        Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, user);
         if (bankAccountOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(
                     AlertType.ERROR,
-                    localizationController.getMessage(subDirectory, "error_bankNotFound", locale)
+                    localeController.getMessage(subDirectory, "error_bankNotFound", user)
             ));
         }
 
-        Users users = userOptional.get();
         BankAccount bankAccount = bankAccountOptional.get();
-
-        if (!bankAccount.getUsers().equals(users)) {
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT).body(
-                            new Response(
-                                    AlertType.ERROR,
-                                    localizationController.getMessage(subDirectory, "error_bankDoesNotBelongToUser", locale)
-                            ));
-        }
 
         return ResponseEntity.ok(bankAccount);
     }
 
     @PostMapping(value = "/addBankAccount", consumes = "application/json", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<Response> createBankAccount(@RequestBody BankAccount bankAccount, Locale locale) {
-        Optional<Users> userOptional = usersService.getCurrentUser();
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(
-                    AlertType.ERROR,
-                    localizationController.getMessage(subDirectory, "error_userNotFound", locale)
-            ));
-        }
+    public ResponseEntity<Response> createBankAccount(@RequestBody BankAccount bankAccount) {
+        Users user = usersService.getCurrentUser();
 
         // Set the associated user
-        bankAccount.setUsers(userOptional.get());
+        bankAccount.setUsers(user);
 
         try {
             BankAccount savedBankAccount = bankAccountService.save(bankAccount);
 
             return ResponseEntity.ok(new Response(
                     AlertType.SUCCESS,
-                    localizationController.getMessage(subDirectory, "success_bankAccountCreated", locale),
+                    localeController.getMessage(subDirectory, "success_bankAccountCreated", user),
                     savedBankAccount
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(
                     AlertType.ERROR,
-                    localizationController.getMessage(subDirectory, "error_failedCreateBankAccount", locale)
+                    localeController.getMessage(subDirectory, "error_failedCreateBankAccount", user)
             ));
         }
     }

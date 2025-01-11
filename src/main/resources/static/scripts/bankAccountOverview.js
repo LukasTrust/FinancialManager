@@ -31,8 +31,9 @@ function buildBankAccountOverview() {
 }
 
 function handleSelectedFiles(files) {
-    Array.from(files).forEach((file) => {
+    const validFiles = [];
 
+    Array.from(files).forEach((file) => {
         const { name, size } = file;
         const extension = name.split(".").pop().toLowerCase();
 
@@ -41,5 +42,33 @@ function handleSelectedFiles(files) {
             showAlert('warning', 'Only csv, txt, pdf and xls files are allowed');
             return null;
         }
+
+        validFiles.push(file); // Collect valid files
     });
+
+    if (validFiles.length > 0) {
+        sendFiles(validFiles); // Send valid files with POST request
+    }
+}
+
+function sendFiles(files) {
+    const formData = new FormData();
+
+    files.forEach((file, index) => {
+        formData.append(`file${index}`, file);
+    });
+
+    fetch('/bankAccountOverview/upload/data', {
+        method: 'POST',
+        body: formData,
+    })
+        .then(response => response.json())
+        .then(data => {
+            showAlert('success', 'Files uploaded successfully');
+            console.log('Server response:', data);
+        })
+        .catch(error => {
+            showAlert('error', 'Error uploading files');
+            console.error('Error:', error);
+        });
 }

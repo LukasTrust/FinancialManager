@@ -18,14 +18,12 @@
   "amountInBankAfterTransactionSearchStrings": "Amount in bank after transaction Search Strings",
   "dateHeader": "Date search strings",
   "dateSearchStrings": "Date search strings",
-  "error_userNotFound": "User not found",
   "error_enterWord": "Please enter a word to add to the search strings",
   "error_bankAccountName": "Please enter a name for the bank account",
   "error_NoInterestRate": "Please enter a interest rate for the savings account",
   "error_generic": "An unexpected error occurred. Please try again",
   "error_alreadyInList": "This string is already in the list!",
   "error_bankNotFound": "Bank account not found",
-  "error_bankDoesNotBelongToUser": "Bank account doesn't belong to user",
   "error_failedCreateBankAccount": "Failed to create Bank Account",
   "success_bankAccountCreated": "Bank Account created"
 }

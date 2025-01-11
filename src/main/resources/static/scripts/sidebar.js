@@ -12,8 +12,7 @@ async function loadSidebar() {
 
         initStaticLinks();
 
-        const userLocale = navigator.language ?? 'en';
-        await fetchLocalization("sidebar", userLocale);
+        await fetchLocalization("sidebar");
 
         const bankAccounts = await loadBankAccounts();
 

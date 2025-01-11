@@ -1,4 +1,4 @@
-package financialmanager.generalController;
+package financialmanager.controller;
 
 import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;

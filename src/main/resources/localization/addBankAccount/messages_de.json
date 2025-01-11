@@ -18,14 +18,12 @@
   "amountInBankAfterTransactionSearchStrings": "Suchbegriffe für den Betrag auf dem Konto nach der Transaktion",
   "dateHeader": "Suchbegriffe für Datum",
   "dateSearchStrings": "Suchbegriffe für Datum",
-  "error_userNotFound": "Benutzer nicht gefunden",
   "error_enterWord": "Bitte geben Sie ein Wort ein, um es den Suchbegriffen hinzuzufügen",
   "error_bankAccountName": "Bitte geben Sie einen Namen für das Bankkonto ein",
   "error_NoInterestRate": "Bitte geben Sie einen Zinssatz für das Sparkonto ein",
   "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut",
   "error_alreadyInList": "Dieser Begriff ist bereits in der Liste!",
   "error_bankNotFound": "Bankkonto nicht gefunden",
-  "error_bankDoesNotBelongToUser": "Das Bankkonto gehört nicht dem Benutzer",
   "error_failedCreateBankAccount": "Das Bankkonto konnte nicht erstellt werden",
   "success_bankAccountCreated": "Bankkonto erstellt"
 }

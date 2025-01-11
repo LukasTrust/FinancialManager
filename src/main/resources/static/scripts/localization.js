@@ -1,5 +1,18 @@
-async function fetchLocalization(subDirectory, language) {
-    const filePath = `/localization/${subDirectory}/messages_${language}.json`;
+async function setLocale() {
+    const locale = navigator.language;
+
+    try {
+        console.log(locale);
+        await fetch(`/localization/update/locale/${locale}`, {
+            method: 'POST',
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function fetchLocalization(subDirectory, locale) {
+    const filePath = `/localization/${subDirectory}/messages/${locale}`;
 
     try {
         const response = await fetch(filePath);
@@ -12,7 +25,7 @@ async function fetchLocalization(subDirectory, language) {
 
             return messages;
         } else {
-            console.warn(`Localization file for ${language} not found in ${subDirectory}. Falling back to default.`);
+            console.warn(`Localization file not found in ${subDirectory}. Falling back to default.`);
         }
     } catch (error) {
         console.error("Error fetching localization file:", error);

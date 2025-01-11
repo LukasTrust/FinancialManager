@@ -1,15 +1,8 @@
 document.addEventListener("DOMContentLoaded",  async () => {
-    // Load localization messages
-    const userLocale = navigator.language || 'en';
-    const messages = await fetchLocalization("login&signup", userLocale);
 
-    const signUpForm = document.querySelector('section');
-    signUpForm.style.opacity = "0";
+    const locale = navigator.language;
 
-    setTimeout(() => {
-        signUpForm.style.transition = "opacity 1s ease-in-out";
-        signUpForm.style.opacity = "1";
-    }, 500);
+    const messages = await fetchLocalization("login&signup", locale);
 
     const submitButton = document.getElementById("submitButton");
     submitButton.addEventListener("click", (event) => {

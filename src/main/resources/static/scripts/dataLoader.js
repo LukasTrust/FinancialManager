@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const contentArea = document.getElementById('content');  // Where the content will go
 
+    await setLocale();
+
     // Load sidebar
     await loadSidebar();
 

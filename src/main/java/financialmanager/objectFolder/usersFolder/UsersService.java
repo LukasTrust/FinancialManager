@@ -36,11 +36,18 @@ public class UsersService implements UserDetailsService {
         return usersRepository.save(user);
     }
 
-    public Optional<Users> getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String username = userDetails.getUsername();
+    public Users getCurrentUser() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String username = userDetails.getUsername();
 
-        return usersRepository.findByEmail(username);
+            Optional<Users> usersOptional = usersRepository.findByEmail(username);
+
+            return usersOptional.orElse(null);
+        }
+        catch (Exception e) {
+            return null;
+        }
     }
 }

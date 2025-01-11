@@ -1,7 +1,9 @@
 document.addEventListener("DOMContentLoaded", async () => {
+
+    const locale = navigator.language;
+
     // Load localization messages
-    const userLocale = navigator.language || 'en';
-    const messages = await fetchLocalization("login&signup", userLocale);
+    const messages = await fetchLocalization("login&signup", locale);
 
     // Check if the error parameter is present in the URL
     const urlParams = new URLSearchParams(window.location.search);

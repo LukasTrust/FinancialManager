@@ -50,24 +50,4 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "categoryId")
     private Category category;
-
-    public Transaction(LocalDateTime date, Double amount, Double amountInBankBefore, Double amountInBankAfter, BankAccount bankAccount) {
-        this.date = date;
-        this.amount = amount;
-        this.amountInBankBefore = amountInBankBefore;
-        this.amountInBankAfter = amountInBankAfter;
-        this.bankAccount = bankAccount;
-    }
-
-    public Transaction(LocalDateTime date, Double amount, Double amountInBankBefore, Double amountInBankAfter,
-                       BankAccount bankAccount, Contract contract, CounterParty counterParty, Category category) {
-        this.date = date;
-        this.amount = amount;
-        this.amountInBankBefore = amountInBankBefore;
-        this.amountInBankAfter = amountInBankAfter;
-        this.bankAccount = bankAccount;
-        this.contract = contract;
-        this.counterParty = counterParty;
-        this.category = category;
-    }
 }
