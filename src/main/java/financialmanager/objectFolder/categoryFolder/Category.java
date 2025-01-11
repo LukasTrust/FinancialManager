@@ -11,7 +11,6 @@ import java.util.List;
 
 @Getter
 @Entity
-@Table(name = "Category")
 @Data
 @NoArgsConstructor
 public class Category {
@@ -35,15 +34,4 @@ public class Category {
     @Setter
     @Convert(converter = JsonStringListConverter.class)
     private List<String> counterPartySearchStrings;
-
-    public Category(String name) {
-        this.name = name;
-    }
-
-    public Category(String name, String description, Double maxSpendingPerMonth, List<String> counterPartySearchStrings) {
-        this.name = name;
-        this.description = description;
-        this.maxSpendingPerMonth = maxSpendingPerMonth;
-        this.counterPartySearchStrings = counterPartySearchStrings;
-    }
 }

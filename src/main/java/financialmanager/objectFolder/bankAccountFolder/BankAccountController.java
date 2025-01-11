@@ -3,12 +3,12 @@ package financialmanager.objectFolder.bankAccountFolder;
 import financialmanager.locale.LocaleController;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
+import financialmanager.objectFolder.responseFolder.ResponseService;
 import financialmanager.objectFolder.usersFolder.Users;
 import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,10 +18,11 @@ import java.util.Optional;
 @AllArgsConstructor
 public class BankAccountController {
 
-    private final String subDirectory = "addBankAccount";
+    private final String SUB_DIRECTORY = "bankAccountMessages";
     private final UsersService usersService;
     private final BankAccountService bankAccountService;
     private final LocaleController localeController;
+    private final ResponseService responseService;
 
     @GetMapping("/getBankAccountsOfUser")
     public ResponseEntity<?> getBankAccountsOfUser() {
@@ -43,16 +44,11 @@ public class BankAccountController {
         try {
             BankAccount savedBankAccount = bankAccountService.save(bankAccount);
 
-            return ResponseEntity.ok(new Response(
-                    AlertType.SUCCESS,
-                    localeController.getMessage(subDirectory, "success_bankAccountCreated", user),
-                    savedBankAccount
-            ));
+            return responseService.createErrorResponseWithData(SUB_DIRECTORY, "success_bankAccountCreated",
+                    "", HttpStatus.CREATED, savedBankAccount);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(
-                    AlertType.ERROR,
-                    localeController.getMessage(subDirectory, "error_failedCreateBankAccount", user)
-            ));
+            return responseService.createErrorResponse(SUB_DIRECTORY, "error_failedCreateBankAccount",
+                    "", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -62,10 +58,7 @@ public class BankAccountController {
 
         Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, user);
         if (bankAccountOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(
-                    AlertType.ERROR,
-                    localeController.getMessage(subDirectory, "error_bankNotFound", user)
-            ));
+            return responseService.createResponse(SUB_DIRECTORY, "error_bankNotFound", AlertType.SUCCESS);
         }
 
         BankAccount bankAccount = bankAccountOptional.get();

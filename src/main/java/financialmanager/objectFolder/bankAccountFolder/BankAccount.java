@@ -29,7 +29,7 @@ public class BankAccount {
 
     @Setter
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private Users users;
 
     @Setter

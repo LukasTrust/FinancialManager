@@ -21,12 +21,6 @@ public class BankAccountService {
         return bankAccountRepository.findAllByUsers(users);
     }
 
-    public boolean checkIfBankAccountBelongsToUser(Long bankAccountId, Users users){
-        Optional<BankAccount> bankAccount = findByIdAndUsers(bankAccountId, users);
-
-        return bankAccount.isPresent();
-    }
-
     public Optional<BankAccount> findByIdAndUsers(Long id, Users users){
         return bankAccountRepository.findByIdAndUsers(id, users);
     }

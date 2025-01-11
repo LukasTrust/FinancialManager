@@ -1,10 +1,9 @@
 package financialmanager.Utils.fileParser;
 
-import financialmanager.objectFolder.transactionFolder.Transaction;
+import financialmanager.objectFolder.responseFolder.Response;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 public interface IFileParser {
-    List<Transaction> createTransactionsFromData(MultipartFile file, Long bankId);
+    ResponseEntity<Response> createTransactionsFromData(MultipartFile file, Long bankId);
 }

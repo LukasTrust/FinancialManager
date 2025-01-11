@@ -25,5 +25,8 @@
   "error_alreadyInList": "Dieser Begriff ist bereits in der Liste!",
   "error_bankNotFound": "Bankkonto nicht gefunden",
   "error_failedCreateBankAccount": "Das Bankkonto konnte nicht erstellt werden",
+  "error_headerNotFound": "Die gesuchten Begriffe konnten nicht in der Datei {} gefunden werden",
+  "error_notAllSearchStringsFound": "Es gibt nicht genug such Begriffe, bitte stellen sie sicher das es einen für: Gegenpartei, Betrag, Betrag auf dem Konto nach der Transaktion und Datum gibt",
+  "error_notfourColumnsFound": "In der Datei konnten nicht alle Begriffe gefunden werden bitte stellen sie sicher das diese auch in der Datei vorhanden sind",
   "success_bankAccountCreated": "Bankkonto erstellt"
 }

@@ -1,6 +1,9 @@
 package financialmanager.Utils.fileParser;
 
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
+import financialmanager.objectFolder.counterPartyFolder.CounterPartyService;
+import financialmanager.objectFolder.responseFolder.ResponseService;
+import financialmanager.objectFolder.transactionFolder.TransactionService;
 import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -15,6 +18,9 @@ public class FileParserFactory {
 
     private final BankAccountService bankAccountService;
     private final UsersService usersService;
+    private final CounterPartyService counterPartyService;
+    private final TransactionService transactionService;
+    private final ResponseService responseService;
 
     public IFileParser getFileParser(MultipartFile file) {
         String contentType = file.getContentType();
@@ -29,7 +35,8 @@ public class FileParserFactory {
             switch (contentType) {
                 case "application/vnd.ms-excel":
                 case "text/csv":
-                    return new CsvFileParser(bankAccountService, usersService, bufferedReader);
+                    return new CsvFileParser(bankAccountService, usersService, counterPartyService,
+                            transactionService, responseService, bufferedReader);
                 default:
                     throw new IllegalArgumentException("Unsupported file type: " + contentType);
             }

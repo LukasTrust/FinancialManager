@@ -4,11 +4,11 @@ import financialmanager.Utils.JsonStringListConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Entity
-@Table(name = "CounterParty")
 @Data
 @NoArgsConstructor
 public class CounterParty {
@@ -31,11 +31,7 @@ public class CounterParty {
 
     public CounterParty(String name) {
         this.name = name;
-    }
-
-    public CounterParty(String name, String description, List<String> counterPartySearchStrings) {
-        this.name = name;
-        this.description = description;
-        this.counterPartySearchStrings = counterPartySearchStrings;
+        this.counterPartySearchStrings = new ArrayList<>();
+        counterPartySearchStrings.add(name);
     }
 }

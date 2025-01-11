@@ -25,5 +25,8 @@
   "error_alreadyInList": "This string is already in the list!",
   "error_bankNotFound": "Bank account not found",
   "error_failedCreateBankAccount": "Failed to create Bank Account",
+  "error_headerNotFound": "The word were not found in the file {}",
+  "error_notAllSearchStringsFound": "Not all words found",
+  "error_notfourColumnsFound": "",
   "success_bankAccountCreated": "Bank Account created"
 }

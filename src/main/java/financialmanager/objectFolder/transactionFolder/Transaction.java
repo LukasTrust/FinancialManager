@@ -11,7 +11,6 @@ import java.time.LocalDate;
 
 @Getter
 @Entity
-//@Table(name = "Transaction")
 @Data
 @NoArgsConstructor
 public class Transaction {
@@ -33,21 +32,31 @@ public class Transaction {
     private Double amountInBankAfter;
 
     @ManyToOne
-    @JoinColumn(name = "bankaccountId", nullable = false)
+    @JoinColumn(name = "bank_account_Id", nullable = false)
     private BankAccount bankAccount;
 
     @Setter
     @ManyToOne
-    @JoinColumn(name = "contractId")
+    @JoinColumn(name = "contract_Id")
     private Contract contract;
 
     @Setter
     @ManyToOne
-    @JoinColumn(name = "counterPartyId")
+    @JoinColumn(name = "counter_Party_Id")
     private CounterParty counterParty;
 
     @Setter
     @ManyToOne
-    @JoinColumn(name = "categoryId")
+    @JoinColumn(name = "category_Id")
     private Category category;
+
+    public Transaction(BankAccount bankAccount, CounterParty counterParty, LocalDate date, Double amount, Double amountInBankAfter,
+                       Double amountInBankBefore) {
+        this.bankAccount = bankAccount;
+        this.counterParty = counterParty;
+        this.date = date;
+        this.amount = amount;
+        this.amountInBankAfter = amountInBankAfter;
+        this.amountInBankBefore = amountInBankBefore;
+    }
 }
