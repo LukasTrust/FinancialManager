@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             event.preventDefault();  // Prevent the default link behavior
 
             const url = link.getAttribute('href');
+            const parentId = link.parentElement.id;
 
             try {
                 // Fetch the content from the server (just the content fragment)
@@ -35,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await buildAddBankAccount();
                         break;
                     case "/bankAccountOverview":
-                        buildBankAccountOverview();
+                        buildBankAccountOverview(parentId);
                         break;
                 }
 

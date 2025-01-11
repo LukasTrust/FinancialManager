@@ -1,4 +1,8 @@
-function buildBankAccountOverview() {
+let bankAccountId;
+
+function buildBankAccountOverview(id) {
+    bankAccountId = id;
+
     const fileBrowsButton = document.querySelector(".fileBrowseButton");
     const fileBrowsInput = document.querySelector(".fileBrowseInput");
     const fileUploadBox = document.querySelector(".fileUploadBox");
@@ -54,11 +58,13 @@ function handleSelectedFiles(files) {
 function sendFiles(files) {
     const formData = new FormData();
 
-    files.forEach((file, index) => {
-        formData.append(`file${index}`, file);
+    files.forEach((file) => {
+        formData.append("files", file);
     });
 
-    fetch('/bankAccountOverview/upload/data', {
+    console.log(bankAccountId);
+
+    fetch(`/bankAccountOverview/${bankAccountId}/upload/data`, {
         method: 'POST',
         body: formData,
     })

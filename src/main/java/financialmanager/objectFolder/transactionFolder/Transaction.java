@@ -7,11 +7,11 @@ import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Entity
-@Table(name = "Transaction")
+//@Table(name = "Transaction")
 @Data
 @NoArgsConstructor
 public class Transaction {
@@ -21,7 +21,7 @@ public class Transaction {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDateTime date;
+    private LocalDate date;
 
     @Column(nullable = false)
     private Double amount;

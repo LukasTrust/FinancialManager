@@ -1,6 +1,6 @@
 package financialmanager.objectFolder.usersFolder;
 
-import financialmanager.controller.LocaleController;
+import financialmanager.locale.LocaleController;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 @RestController

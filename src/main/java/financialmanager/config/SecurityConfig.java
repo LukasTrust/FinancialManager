@@ -1,4 +1,4 @@
-package financialmanager.configFolder;
+package financialmanager.config;
 
 import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;

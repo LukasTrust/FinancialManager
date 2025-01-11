@@ -4,7 +4,7 @@ import financialmanager.Utils.JsonStringListConverter;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -28,10 +28,10 @@ public class Contract {
 
     @Setter
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Setter
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     @Setter
     @Column(nullable = false)
@@ -39,21 +39,21 @@ public class Contract {
 
     @Setter
     @Column(nullable = false)
-    private LocalDateTime lastUpdatedAt;
+    private LocalDate lastUpdatedAt;
 
     @Setter
     @Convert(converter = JsonStringListConverter.class)
     private List<String> contractSearchStrings;
 
-    public Contract(String name, LocalDateTime startDate, Integer monthsBetweenPayments) {
+    public Contract(String name, LocalDate startDate, Integer monthsBetweenPayments) {
         this.name = name;
         this.startDate = startDate;
         this.monthsBetweenPayments = monthsBetweenPayments;
         this.lastUpdatedAt = startDate;
     }
 
-    public Contract(String name, String description, LocalDateTime startDate, LocalDateTime endDate,
-                    Integer monthsBetweenPayments, LocalDateTime lastUpdatedAt, List<String> contractSearchStrings) {
+    public Contract(String name, String description, LocalDate startDate, LocalDate endDate,
+                    Integer monthsBetweenPayments, LocalDate lastUpdatedAt, List<String> contractSearchStrings) {
         this.name = name;
         this.description = description;
         this.startDate = startDate;

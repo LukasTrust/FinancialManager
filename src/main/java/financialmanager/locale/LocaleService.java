@@ -1,4 +1,4 @@
-package financialmanager.services;
+package financialmanager.locale;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -3,7 +3,7 @@ package financialmanager.objectFolder.contractFolder.contractHistoryFolder;
 import financialmanager.objectFolder.contractFolder.Contract;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "ContractHistory")
@@ -23,5 +23,5 @@ public record ContractHistory(
         Double newAmount,
 
         @Column(nullable = false)
-        LocalDateTime changedAt
+        LocalDate changedAt
 ) { }

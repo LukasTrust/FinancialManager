@@ -1,9 +1,8 @@
-package financialmanager.controller;
+package financialmanager.locale;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import financialmanager.objectFolder.usersFolder.Users;
 import financialmanager.objectFolder.usersFolder.UsersService;
-import financialmanager.services.LocaleService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
