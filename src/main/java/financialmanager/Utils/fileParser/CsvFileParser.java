@@ -20,8 +20,8 @@ import java.util.List;
 
 public class CsvFileParser extends FileParser {
 
-    public CsvFileParser(BankAccountService bankAccountService, UsersService usersService, CounterPartyService counterPartyService, TransactionService transactionService, ResponseService responseService, ContractService contractService, BufferedReader bufferedReader) {
-        super(bankAccountService, usersService, counterPartyService, transactionService, responseService, contractService, bufferedReader);
+    public CsvFileParser(BufferedReader bufferedReader, String fileName) {
+        super(bufferedReader, fileName);
     }
 
     public List<String[]> readAllLines() {

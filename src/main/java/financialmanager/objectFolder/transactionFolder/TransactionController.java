@@ -1,6 +1,5 @@
 package financialmanager.objectFolder.transactionFolder;
 
-import financialmanager.Utils.fileParser.FileParser;
 import financialmanager.Utils.fileParser.FileParserFactory;
 import financialmanager.Utils.fileParser.IFileParser;
 import lombok.AllArgsConstructor;
@@ -13,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class TransactionController {
 
     private final FileParserFactory fileParserFactory;
+    private final TransactionProzessingService transactionProzessingService;
 
     @PostMapping(value = "/bankAccountOverview/{bankAccountId}/upload/data")
     @ResponseBody
@@ -22,7 +22,7 @@ public class TransactionController {
         try {
             for (MultipartFile file : files) {
                 IFileParser fileParser = fileParserFactory.getFileParser(file);
-                fileParser.createTransactionsFromData(file, bankAccountId);
+                var test = transactionProzessingService.createTransactionsFromData(fileParser, bankAccountId);
             }
             return ResponseEntity.ok("Files processed successfully");
         } catch (Exception e) {

@@ -37,8 +37,7 @@ public class FileParserFactory {
             switch (contentType) {
                 case "application/vnd.ms-excel":
                 case "text/csv":
-                    return new CsvFileParser(bankAccountService, usersService, counterPartyService,
-                            transactionService, responseService, contractService, bufferedReader);
+                    return new CsvFileParser(bufferedReader, file.getName());
                 default:
                     throw new IllegalArgumentException("Unsupported file type: " + contentType);
             }
