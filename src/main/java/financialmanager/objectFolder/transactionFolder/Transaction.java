@@ -31,6 +31,9 @@ public class Transaction {
     @Column(nullable = false)
     private Double amountInBankAfter;
 
+    @Column(nullable = false)
+    private String originalCounterParty;
+
     @ManyToOne
     @JoinColumn(name = "bank_account_Id", nullable = false)
     private BankAccount bankAccount;
@@ -54,9 +57,17 @@ public class Transaction {
                        Double amountInBankBefore) {
         this.bankAccount = bankAccount;
         this.counterParty = counterParty;
+        this.originalCounterParty = counterParty.getName();
         this.date = date;
         this.amount = amount;
         this.amountInBankAfter = amountInBankAfter;
         this.amountInBankBefore = amountInBankBefore;
+    }
+
+    public boolean compare(Transaction transaction) {
+        return this.date.isEqual(transaction.getDate()) &&
+                this.amount.equals(transaction.getAmount()) &&
+                this.amountInBankAfter.equals(transaction.getAmountInBankAfter()) &&
+                this.amountInBankBefore.equals(transaction.getAmountInBankBefore());
     }
 }

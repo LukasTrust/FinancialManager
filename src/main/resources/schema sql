@@ -50,9 +50,11 @@ create table if not exists contract
         primary key,
     last_updated_at         timestamp(6) not null,
     start_date              timestamp(6) not null,
+    last_payment_date       timestamp(6) not null,
     contract_search_strings varchar(255),
     description             varchar(255),
-    name                    varchar(255) not null
+    name                    varchar(255) not null,
+    amount double precision not null
 );
 
 
@@ -104,6 +106,7 @@ create table if not exists transaction
     amount                double precision not null,
     amount_in_bank_after  double precision not null,
     amount_in_bank_before double precision not null,
+    original_counter_party varchar(255) not null,
     bank_account_id            bigint           not null
         constraint transaction_to_bank_account
             references bank_account,

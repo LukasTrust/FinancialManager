@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -36,6 +37,13 @@ public class Contract {
     @Column(nullable = false)
     private Integer monthsBetweenPayments;
 
+    @Column(nullable = false)
+    private Double amount;
+
+    @Setter
+    @Column(nullable = false)
+    private LocalDate lastPaymentDate;
+
     @Setter
     @Column(nullable = false)
     private LocalDate lastUpdatedAt;
@@ -43,4 +51,15 @@ public class Contract {
     @Setter
     @Convert(converter = JsonStringListConverter.class)
     private List<String> contractSearchStrings;
+
+    public Contract(String name, LocalDate startDate, LocalDate lastPaymentDate, Integer monthsBetweenPayments, Double amount) {
+        this.name = name;
+        this.startDate = startDate;
+        this.lastUpdatedAt = startDate;
+        this.lastPaymentDate = lastPaymentDate;
+        this.monthsBetweenPayments = monthsBetweenPayments;
+        this.amount = amount;
+        this.contractSearchStrings = new ArrayList<>();
+        this.contractSearchStrings.add(name);
+    }
 }

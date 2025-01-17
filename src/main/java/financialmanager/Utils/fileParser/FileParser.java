@@ -2,7 +2,7 @@ package financialmanager.Utils.fileParser;
 
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
-import financialmanager.objectFolder.counterPartyFolder.CounterParty;
+import financialmanager.objectFolder.contractFolder.ContractService;
 import financialmanager.objectFolder.counterPartyFolder.CounterPartyService;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -31,21 +30,22 @@ public abstract class FileParser implements IFileParser {
     private final CounterPartyService counterPartyService;
     private final TransactionService transactionService;
     private final ResponseService responseService;
+    private final ContractService contractService;
 
     private static final String SUB_DIRECTORY = "bankAccountMessages";
-    private static final String DATA = "date";
-    private static final String AMOUNT = "amount";
-    private static final String AMOUNT_AFTER_TRANSACTION = "amountAfterTransaction";
-    private static final String COUNTER_PARTY = "counterParty";
 
     protected final BufferedReader bufferedReader;
+
+    public abstract String[] getNextLineOfData();
+
+    public abstract List<String[]> readAllLines();
 
     @Override
     public ResponseEntity<Response> createTransactionsFromData(MultipartFile file, Long bankAccountId) {
         Users user = usersService.getCurrentUser();
 
         try {
-            String[] header = getNextLineOfData(file);
+            String[] header = getNextLineOfData();
             if (header == null) {
                 return responseService.createErrorResponse(SUB_DIRECTORY, "error_headerNotFound", file.getName(), HttpStatus.NOT_FOUND);
             }
@@ -58,110 +58,110 @@ public abstract class FileParser implements IFileParser {
 
             BankAccount bankAccount = bankAccountOptional.get();
 
-            Map<String, List<String>> searchStrings = getSearchStrings(bankAccount);
-            if (searchStrings.size() != 4) {
-                return responseService.createErrorResponse(SUB_DIRECTORY, "error_notAllSearchStringsFound", null, HttpStatus.NOT_FOUND);
+            DataColumns dataColumns = findColumnsInData(header, bankAccount);
+            if (!dataColumns.checkIfAllAreFound()) {
+                return responseService.createErrorResponse(SUB_DIRECTORY, "error_notFourColumnsFound", null, HttpStatus.NOT_FOUND);
             }
 
-            Map<String, Integer> columnsInData = findColumnsInData(header, searchStrings);
-            if (!areAllRequiredColumnsPresent(columnsInData)) {
-                return responseService.createErrorResponse(SUB_DIRECTORY, "error_notAllSearchStringsFound", null, HttpStatus.NOT_FOUND);
-            }
-            
-            List<Transaction> newTransactions = parseTransactions(file, bankAccount, columnsInData);
+            List<Transaction> newTransactions = parseTransactions(bankAccount, dataColumns);
             if (newTransactions.isEmpty()) {
                 return responseService.createErrorResponse(SUB_DIRECTORY, "error_noValidTransactions", null, HttpStatus.BAD_REQUEST);
             }
 
+            newTransactions = transactionService.checkIfTransactionsAlreadyExist(newTransactions, bankAccountId);
+            if (newTransactions.isEmpty()) {
+                return responseService.createResponse(SUB_DIRECTORY, "info_noNewTransactionsFound", AlertType.INFO);
+            }
+
+            counterPartyService.createOrUpdateCounterParty(newTransactions);
+            contractService.checkIfTransactionsBelongToContract(newTransactions);
+
             transactionService.saveAll(newTransactions);
-            return responseService.createResponse("SUB_DIRECTORY", "success_filesProcessed",  AlertType.SUCCESS);
+            return responseService.createResponse("SUB_DIRECTORY", "success_filesProcessed", AlertType.SUCCESS);
 
         } catch (Exception e) {
             return responseService.createErrorResponse(SUB_DIRECTORY, "error_generic", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private List<Transaction> parseTransactions(MultipartFile file, BankAccount bankAccount, Map<String, Integer> columns) throws IOException {
+    private boolean findDirectionOfLines(List<String[]> lines, DataColumns columns) {
+        int dataColumn = columns.dateColumn();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
+        // Check if there are at least two lines to compare
+        if (lines.size() < 2) {
+            return true; // No need to determine direction with less than 2 rows
+        }
+
+        // Iterate over the lines and compare the current line with the next line
+        for (int currentRow = 0; currentRow < lines.size() - 1; currentRow++) {
+            String[] currentLine = lines.get(currentRow);
+            String[] nextLine = lines.get(currentRow + 1);
+
+            // Parse the dates from the current and next line
+            String date1 = currentLine[dataColumn];
+            String date2 = nextLine[dataColumn];
+
+            // Parse the dates into LocalDate objects
+            LocalDate localDate1 = LocalDate.parse(date1, formatter);
+            LocalDate localDate2 = LocalDate.parse(date2, formatter);
+
+            // Check if the dates are not equal
+            if (!localDate1.isEqual(localDate2)) {
+                // If the current date is after the next date, we know the order is descending
+                return localDate1.isBefore(localDate2); // If date1 is before date2, return true (ascending), otherwise false (descending)
+            }
+        }
+
+        // If no different dates are found, assume the list is in ascending order
+        return true;
+    }
+
+    private List<Transaction> parseTransactions(BankAccount bankAccount, DataColumns columns) throws IOException {
         List<Transaction> newTransactions = new ArrayList<>();
-        List<Transaction> existingTransactions = transactionService.findByBankAccountId(bankAccount.getId());
-        List<CounterParty> counterParties = transactionService.findDistinctCounterPartiesByBankAccountId(bankAccount.getId());
+        List<String[]> lines = readAllLines();
 
-        String[] line;
-        while ((line = getNextLineOfData(file)) != null) {
+        // Determine the direction of the lines
+        boolean directionOfLine = findDirectionOfLines(lines, columns);
+
+        // If the direction is bottom-to-top, reverse the lines
+        if (!directionOfLine) {
+            Collections.reverse(lines);
+        }
+
+        // Iterate over the lines in the correct direction
+        for (String[] line : lines) {
             try {
-                Transaction transaction = parseTransactionLine(line, columns, bankAccount,
-                        counterParties, existingTransactions, newTransactions);
+                // Create and add a transaction for each line
+                Transaction transaction = transactionService.createTransactionFromLine(line, columns, bankAccount, newTransactions);
                 newTransactions.add(transaction);
-
             } catch (Exception e) {
                 System.err.println("Error parsing line: " + Arrays.toString(line) + " - " + e.getMessage());
             }
         }
+
         return newTransactions;
     }
 
-    private Transaction parseTransactionLine(String[] line, Map<String, Integer> columns, BankAccount bankAccount,
-                                             List<CounterParty> counterParties, List<Transaction> existingTransactions,
-                                             List<Transaction> newTransactions) throws Exception {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        NumberFormat numberFormat = NumberFormat.getInstance(Locale.GERMANY);
+    private DataColumns findColumnsInData(String[] header, BankAccount bankAccount) {
+        int counterPartyColumn = 0, amountColumn = 0, amountAfterTransactionColumn = 0, dateColumn = 0;
 
-        LocalDate date = LocalDate.parse(line[columns.get(DATA)], formatter);
-        Double amount = numberFormat.parse(line[columns.get(AMOUNT)]).doubleValue();
-        Double amountAfterTransaction = numberFormat.parse(line[columns.get(AMOUNT_AFTER_TRANSACTION)]).doubleValue();
-        String counterPartyName = line[columns.get(COUNTER_PARTY)];
-
-        // Find or create the CounterParty
-        CounterParty counterParty = counterParties.stream()
-                .filter(cp -> cp.getName().equals(counterPartyName))
-                .findFirst()
-                .orElseGet(() -> {
-                    CounterParty newCounterParty = counterPartyService.save(new CounterParty(counterPartyName));
-                    counterParties.add(newCounterParty); // Add the newly created CounterParty to the list
-                    return newCounterParty;
-                });
-
-        Double amountBeforeTransaction = !newTransactions.isEmpty()
-                ? newTransactions.getLast().getAmountInBankAfter()
-                : (existingTransactions.isEmpty() ? 0.0 : existingTransactions.getLast().getAmountInBankAfter());
-
-        return new Transaction(bankAccount, counterParty, date, amount, amountAfterTransaction, amountBeforeTransaction);
-    }
-
-    private boolean areAllRequiredColumnsPresent(Map<String, Integer> columnsInData) {
-        return columnsInData.containsKey(DATA) &&
-                columnsInData.containsKey(AMOUNT) &&
-                columnsInData.containsKey(AMOUNT_AFTER_TRANSACTION) &&
-                columnsInData.containsKey(COUNTER_PARTY);
-    }
-
-    public abstract String[] getNextLineOfData(MultipartFile file);
-
-    private Map<String, Integer> findColumnsInData(String[] header, Map<String, List<String>> listOfSearchStrings) {
-        Map<String, Integer> columnsInData = new HashMap<>();
-        for (Map.Entry<String, List<String>> entry : listOfSearchStrings.entrySet()) {
-            for (String searchString : entry.getValue()) {
-                int index = Arrays.asList(header).indexOf(searchString);
-                if (index != -1) {
-                    columnsInData.put(entry.getKey(), index);
-                }
+        for (int i = 0; i < header.length; i++) {
+            String headerLine = header[i];
+            if (bankAccount.getCounterPartySearchStrings().contains(headerLine)) {
+                counterPartyColumn = i;
+            }
+            if (bankAccount.getAmountSearchStrings().contains(headerLine)) {
+                amountColumn = i;
+            }
+            if (bankAccount.getDateSearchStrings().contains(headerLine)) {
+                dateColumn = i;
+            }
+            if (bankAccount.getAmountInBankAfterSearchStrings().contains(headerLine)) {
+                amountAfterTransactionColumn = i;
             }
         }
-        return columnsInData;
-    }
 
-    private Map<String, List<String>> getSearchStrings(BankAccount bankAccount) {
-        Map<String, List<String>> searchStrings = new HashMap<>();
-        addIfNotEmpty(searchStrings, COUNTER_PARTY, bankAccount.getCounterPartySearchStrings());
-        addIfNotEmpty(searchStrings, AMOUNT, bankAccount.getAmountSearchStrings());
-        addIfNotEmpty(searchStrings, AMOUNT_AFTER_TRANSACTION, bankAccount.getAmountInBankAfterSearchStrings());
-        addIfNotEmpty(searchStrings, DATA, bankAccount.getDateSearchStrings());
-        return searchStrings;
-    }
-
-    private void addIfNotEmpty(Map<String, List<String>> map, String key, List<String> values) {
-        if (values != null && !values.isEmpty()) {
-            map.put(key, values);
-        }
+        return new DataColumns(counterPartyColumn, amountColumn, amountAfterTransactionColumn, dateColumn);
     }
 }

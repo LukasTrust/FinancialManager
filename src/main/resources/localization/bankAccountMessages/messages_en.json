@@ -26,7 +26,9 @@
   "error_bankNotFound": "Bank account not found",
   "error_failedCreateBankAccount": "Failed to create Bank Account",
   "error_headerNotFound": "The word were not found in the file {}",
-  "error_notAllSearchStringsFound": "Not all words found",
-  "error_notfourColumnsFound": "",
+  "error_notFourColumnsFound": "In der Datei konnten nicht alle Begriffe gefunden werden bitte stellen sie sicher das diese auch in der Datei vorhanden sind",
+  "error_noValidTransactions": "Could not read in the data correctly and create transaction from it",
+  "info_noNewTransactionsFound": "In the given data no new transactions were found",
+  "success_filesProcessed": "In the file where {} new Transactions. Other data has been added or updated as well",
   "success_bankAccountCreated": "Bank Account created"
 }
