@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class TransactionController {
 
     private final FileParserFactory fileParserFactory;
-    private final TransactionProzessingService transactionProzessingService;
+    private final TransactionProcessingService transactionProcessingService;
 
     @PostMapping(value = "/bankAccountOverview/{bankAccountId}/upload/data")
     @ResponseBody
@@ -22,7 +22,7 @@ public class TransactionController {
         try {
             for (MultipartFile file : files) {
                 IFileParser fileParser = fileParserFactory.getFileParser(file);
-                var test = transactionProzessingService.createTransactionsFromData(fileParser, bankAccountId);
+                var test = transactionProcessingService.createTransactionsFromData(fileParser, bankAccountId);
             }
             return ResponseEntity.ok("Files processed successfully");
         } catch (Exception e) {

@@ -23,7 +23,7 @@ import java.util.*;
 
 @Service
 @AllArgsConstructor
-public class TransactionProzessingService {
+public class TransactionProcessingService {
 
     private final BankAccountService bankAccountService;
     private final UsersService usersService;
