@@ -1,6 +1,7 @@
 package financialmanager.objectFolder.categoryFolder;
 
 import financialmanager.Utils.JsonStringListConverter;
+import financialmanager.objectFolder.usersFolder.Users;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -18,6 +19,10 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private Users users;
 
     @Setter
     @Column(nullable = false)

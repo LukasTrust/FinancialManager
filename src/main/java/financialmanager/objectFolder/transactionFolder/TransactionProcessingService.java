@@ -4,7 +4,8 @@ import financialmanager.Utils.fileParser.DataColumns;
 import financialmanager.Utils.fileParser.IFileParser;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
-import financialmanager.objectFolder.contractFolder.ContractService;
+import financialmanager.objectFolder.contractFolder.ContractProcessingService;
+import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import financialmanager.objectFolder.counterPartyFolder.CounterPartyService;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -30,7 +32,7 @@ public class TransactionProcessingService {
     private final CounterPartyService counterPartyService;
     private final TransactionService transactionService;
     private final ResponseService responseService;
-    private final ContractService contractService;
+    private final ContractProcessingService contractProcessingService;
     private static final String SUB_DIRECTORY = "bankAccountMessages";
 
     public ResponseEntity<Response> createTransactionsFromData(IFileParser fileParser, Long bankAccountId) {
@@ -60,13 +62,13 @@ public class TransactionProcessingService {
                 return responseService.createErrorResponse(SUB_DIRECTORY, "error_noValidTransactions", null, HttpStatus.BAD_REQUEST);
             }
 
-            newTransactions = transactionService.checkIfTransactionsAlreadyExist(newTransactions, bankAccountId);
+            newTransactions = checkIfTransactionsAlreadyExist(newTransactions, bankAccountId);
             if (newTransactions.isEmpty()) {
                 return responseService.createResponse(SUB_DIRECTORY, "info_noNewTransactionsFound", AlertType.INFO);
             }
 
             counterPartyService.createOrUpdateCounterParty(newTransactions);
-            contractService.checkIfTransactionsBelongToContract(newTransactions);
+            contractProcessingService.checkIfTransactionsBelongToContract(newTransactions);
 
             transactionService.saveAll(newTransactions);
             return responseService.createResponse("SUB_DIRECTORY", "success_filesProcessed", AlertType.SUCCESS);
@@ -98,6 +100,17 @@ public class TransactionProcessingService {
         return new DataColumns(counterPartyColumn, amountColumn, amountAfterTransactionColumn, dateColumn);
     }
 
+    private List<Transaction> checkIfTransactionsAlreadyExist(List<Transaction> transactions, Long bankAccountId) {
+        List<Transaction> existingTransactions = transactionService.findByBankAccountId(bankAccountId);
+        Set<Transaction> existingTransactionSet = new HashSet<>(existingTransactions);
+
+        // Filter out transactions that already exist
+        return transactions.stream()
+                .filter(transaction -> existingTransactionSet.stream()
+                        .noneMatch(transaction::compare))
+                .toList();
+    }
+
     private List<Transaction> parseTransactions(IFileParser fileParser, BankAccount bankAccount, DataColumns columns) throws IOException {
         List<Transaction> newTransactions = new ArrayList<>();
         List<String[]> lines = fileParser.readAllLines();
@@ -114,7 +127,7 @@ public class TransactionProcessingService {
         for (String[] line : lines) {
             try {
                 // Create and add a transaction for each line
-                Transaction transaction = transactionService.createTransactionFromLine(line, columns, bankAccount, newTransactions);
+                Transaction transaction = createTransactionFromLine(line, columns, bankAccount, newTransactions);
                 newTransactions.add(transaction);
             } catch (Exception e) {
                 System.err.println("Error parsing line: " + Arrays.toString(line) + " - " + e.getMessage());
@@ -155,5 +168,41 @@ public class TransactionProcessingService {
 
         // If no different dates are found, assume the list is in ascending order
         return true;
+    }
+
+    private Transaction createTransactionFromLine(String[] line, DataColumns columns, BankAccount bankAccount,
+                                                 List<Transaction> newTransactions) throws Exception {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.GERMANY);
+
+        LocalDate date = LocalDate.parse(line[columns.dateColumn()], formatter);
+        Double amount = numberFormat.parse(line[columns.amountColumn()]).doubleValue();
+        Double amountAfterTransaction = numberFormat.parse(line[columns.amountAfterTransactionColumn()]).doubleValue();
+        String counterPartyName = line[columns.counterPartyColumn()];
+
+        CounterParty counterParty = new CounterParty(counterPartyName);
+
+        Double amountBeforeTransaction = findAmountBeforeDate(date, bankAccount.getId(), newTransactions);
+
+        if (amountBeforeTransaction == 0.0) {
+            amountBeforeTransaction = amountAfterTransaction - amount;
+        }
+
+        return new Transaction(bankAccount, counterParty, date, amount, amountAfterTransaction, amountBeforeTransaction);
+    }
+
+    private Double findAmountBeforeDate(LocalDate date, Long accountId, List<Transaction> newTransactions) {
+        List<Transaction> transactions = transactionService.findByBankAccountId(accountId);
+        newTransactions.addAll(transactions);
+
+        Optional<Transaction> transactionBefore = newTransactions.stream()
+                .filter(transaction -> transaction.getDate().isBefore(date))
+                .max(Comparator.comparing(Transaction::getDate));
+
+        if (transactionBefore.isPresent()) {
+            return transactionBefore.get().getAmountInBankAfter();
+        }
+
+        return 0.0;
     }
 }

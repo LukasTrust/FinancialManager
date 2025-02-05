@@ -1,6 +1,7 @@
 package financialmanager.objectFolder.counterPartyFolder;
 
 import financialmanager.Utils.JsonStringListConverter;
+import financialmanager.objectFolder.usersFolder.Users;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +17,10 @@ public class CounterParty {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private Users users;
 
     @Setter
     @Column(nullable = false)
