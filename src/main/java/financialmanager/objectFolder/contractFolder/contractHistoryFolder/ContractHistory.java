@@ -24,4 +24,8 @@ public record ContractHistory(
 
         @Column(nullable = false)
         LocalDate changedAt
-) { }
+) {
+        public ContractHistory(Contract contract, Double newAmount, LocalDate changedAt) {
+                this(null, contract, contract.getAmount(), newAmount, changedAt);
+        }
+}

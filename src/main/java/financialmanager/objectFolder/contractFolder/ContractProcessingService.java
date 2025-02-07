@@ -1,5 +1,7 @@
 package financialmanager.objectFolder.contractFolder;
 
+import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistory;
+import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistoryService;
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
 import lombok.AllArgsConstructor;
@@ -16,31 +18,57 @@ public class ContractProcessingService {
 
     private final ContractService contractService;
     private final TransactionService transactionService;
+    private final ContractHistoryService contractHistoryService;
 
     public void checkIfTransactionsBelongToContract(List<Transaction> transactions) {
         Long bankAccountId = transactions.getFirst().getBankAccount().getId();
         List<Contract> contracts = contractService.findByBankAccountId(bankAccountId);
 
         // Add transactions without contracts found in the database
-        transactions.addAll(transactionService.findByBankAccountIdAndNoContract(bankAccountId));
+        List<Transaction> foundTransactions = transactionService.findByBankAccountIdAndNoContract(bankAccountId);
+        if (!foundTransactions.isEmpty()) {
+            transactions.addAll(foundTransactions);
+        }
 
         assignTransactionsToExistingContracts(transactions, contracts);
 
         List<Transaction> transactionsWithoutContract = getTransactionsWithoutContract(transactions);
 
+        // Find contracts that have changed
+        contracts.addAll(checkIfExistingContractsChanged(transactionsWithoutContract, contracts));
+
+        // Find new contracts
         contracts.addAll(tryToFindNewContracts(transactionsWithoutContract));
+
         contractService.saveAll(contracts);
     }
 
-    private void checkIfExistingContractsChanged(List<Transaction> transactionsWithOutContract, List<Contract> contracts) {
+    private List<Contract> checkIfExistingContractsChanged(List<Transaction> transactionsWithOutContract, List<Contract> contracts) {
+        List<Contract> changedContracts = new ArrayList<>();
+        List<ContractHistory> contractHistories = new ArrayList<>();
+
         for (Contract contract : contracts) {
             List<Transaction> possibleMatches = transactionsWithOutContract.stream().filter(
                     transaction -> isTransactionValidForContract(transaction, contract, false)).toList();
 
             if (possibleMatches.size() > 2) {
-                
+                Transaction transaction = possibleMatches.getFirst();
+                contractHistories.add(new ContractHistory(contract,
+                        transaction.getAmount(), transaction.getDate()));
+
+                contract.setAmount(transaction.getAmount());
+                contract.setLastPaymentDate(transaction.getDate());
+                contract.setLastUpdatedAt(transaction.getDate());
+
+                changedContracts.add(contract);
             }
         }
+
+        if (!changedContracts.isEmpty()) {
+            contractHistoryService.saveAll(contractHistories);
+        }
+
+        return changedContracts;
     }
 
     private void assignTransactionsToExistingContracts(List<Transaction> transactions, List<Contract> contracts) {
@@ -87,13 +115,13 @@ public class ContractProcessingService {
 
         List<Contract> potentialContracts = new ArrayList<>();
 
-        groupedByAmount.forEach((amount, amountTransactions) -> {
+        groupedByAmount.forEach((_, amountTransactions) -> {
             Map<String, List<Transaction>> groupedByCounterparty = amountTransactions.stream()
                     .collect(Collectors.groupingBy(Transaction::getOriginalCounterParty));
 
             groupedByCounterparty.forEach((counterparty, counterpartyTransactions) -> {
                 if (counterpartyTransactions.size() > 2) {
-                    tryToIdentifyPattern(counterpartyTransactions, amount)
+                    tryToIdentifyPattern(counterpartyTransactions)
                             .ifPresent(potentialContracts::add);
                 }
             });
@@ -102,10 +130,11 @@ public class ContractProcessingService {
         return potentialContracts;
     }
 
-    private Optional<Contract> tryToIdentifyPattern(List<Transaction> transactions, Double amount) {
+    private Optional<Contract> tryToIdentifyPattern(List<Transaction> transactions) {
         transactions.sort(Comparator.comparing(Transaction::getDate));
 
         List<Long> intervals = calculateIntervalsBetweenTransactions(transactions);
+        Double amount = transactions.getFirst().getAmount();
 
         if (isConsistentInterval(intervals)) {
             int monthsBetweenPayments = calculateMonthsFromDays(intervals.getFirst());

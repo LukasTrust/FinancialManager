@@ -23,12 +23,4 @@ public class TransactionService {
     public void saveAll(List<Transaction> transactions) {
         transactionRepository.saveAll(transactions);
     }
-
-    public List<CounterParty> findDistinctCounterPartiesByBankAccountId(Long accountId) {
-        return transactionRepository.findDistinctCounterPartiesByBankAccountId(accountId);
-    }
-
-    public List<Contract> findDistinctContractsByBankAccountId(Long accountId) {
-        return transactionRepository.findDistinctContractsByBankAccountId(accountId);
-    }
 }

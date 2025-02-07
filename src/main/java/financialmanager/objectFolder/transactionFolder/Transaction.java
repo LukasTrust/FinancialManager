@@ -53,11 +53,10 @@ public class Transaction {
     @JoinColumn(name = "category_Id")
     private Category category;
 
-    public Transaction(BankAccount bankAccount, CounterParty counterParty, LocalDate date, Double amount, Double amountInBankAfter,
+    public Transaction(BankAccount bankAccount, String counterParty, LocalDate date, Double amount, Double amountInBankAfter,
                        Double amountInBankBefore) {
         this.bankAccount = bankAccount;
-        this.counterParty = counterParty;
-        this.originalCounterParty = counterParty.getName();
+        this.originalCounterParty = counterParty;
         this.date = date;
         this.amount = amount;
         this.amountInBankAfter = amountInBankAfter;

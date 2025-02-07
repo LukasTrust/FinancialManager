@@ -2,6 +2,7 @@ package financialmanager.objectFolder.counterPartyFolder;
 
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
+import financialmanager.objectFolder.usersFolder.Users;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +19,7 @@ public class CounterPartyService {
         counterPartyRepository.saveAll(counterParties);
     }
 
-
-    public List<CounterParty> findAllCounterPartiesOfBankAccount(Long bankAccountId) {
-        return transactionService.findDistinctCounterPartiesByBankAccountId(bankAccountId);
-    }
-
-    public void createOrUpdateCounterParty(List<Transaction> transactions) {
-
+    public List<CounterParty> findByUsers(Users user) {
+        return counterPartyRepository.findByUsers(user);
     }
 }

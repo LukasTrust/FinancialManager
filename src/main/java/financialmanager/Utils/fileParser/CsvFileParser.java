@@ -1,24 +1,16 @@
 package financialmanager.Utils.fileParser;
 
-import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
-import financialmanager.objectFolder.contractFolder.ContractService;
-import financialmanager.objectFolder.counterPartyFolder.CounterPartyService;
-import financialmanager.objectFolder.responseFolder.ResponseService;
-import financialmanager.objectFolder.transactionFolder.Transaction;
-import financialmanager.objectFolder.transactionFolder.TransactionService;
-import financialmanager.objectFolder.usersFolder.UsersService;
-import lombok.experimental.SuperBuilder;
-import org.springframework.web.multipart.MultipartFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class CsvFileParser extends FileParser {
+
+    private static final Logger log = LoggerFactory.getLogger(CsvFileParser.class);
 
     public CsvFileParser(BufferedReader bufferedReader, String fileName) {
         super(bufferedReader, fileName);
@@ -27,14 +19,24 @@ public class CsvFileParser extends FileParser {
     public List<String[]> readAllLines() {
         List<String[]> lines = new ArrayList<>();
         String[] line;
+        int lineNumber = 0;
+        int errorCount = 0;
 
         // Read lines and handle potential parsing errors
         while ((line = getNextLineOfData()) != null) {
-            try {
-                lines.add(line);
-            } catch (Exception e) {
+            if (line.length == 0) {
+                errorCount++;
+                log.error("Error in reading line {}", lineNumber);
+                continue;
             }
+
+            lineNumber++;
+            lines.add(line);
         }
+
+        log.info("Total {} lines read", lineNumber);
+        log.info("Successfully read {} lines without errors", lineNumber - errorCount);
+        log.info("Encountered errors in {} lines", errorCount);
 
         return lines;
     }
@@ -42,13 +44,15 @@ public class CsvFileParser extends FileParser {
     public String[] getNextLineOfData() {
         try {
             String line = bufferedReader.readLine();
-            if (line != null) {
-                // Split by commas and trim spaces
-                return line.split(";");
+            if (line == null) {
+                return null;
             }
+
+            // Split by commas and trim spaces
+            return line.split(";");
         } catch (IOException e) {
-            throw new RuntimeException("Error reading CSV file", e);
+            log.error("Error in reading data", e);
+            return new String[0];
         }
-        return null;
     }
 }

@@ -34,7 +34,8 @@ public class CounterParty {
     @Convert(converter = JsonStringListConverter.class)
     private List<String> counterPartySearchStrings;
 
-    public CounterParty(String name) {
+    public CounterParty(Users users, String name) {
+        this.users = users;
         this.name = name;
         this.counterPartySearchStrings = new ArrayList<>();
         counterPartySearchStrings.add(name);

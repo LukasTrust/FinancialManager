@@ -6,6 +6,7 @@ import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.contractFolder.ContractProcessingService;
 import financialmanager.objectFolder.counterPartyFolder.CounterParty;
+import financialmanager.objectFolder.counterPartyFolder.CounterPartyProcessingService;
 import financialmanager.objectFolder.counterPartyFolder.CounterPartyService;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
@@ -32,11 +33,12 @@ public class TransactionProcessingService {
     private final CounterPartyService counterPartyService;
     private final TransactionService transactionService;
     private final ResponseService responseService;
+    private final CounterPartyProcessingService counterPartyProcessingService;
     private final ContractProcessingService contractProcessingService;
     private static final String SUB_DIRECTORY = "bankAccountMessages";
 
     public ResponseEntity<Response> createTransactionsFromData(IFileParser fileParser, Long bankAccountId) {
-        Users user = usersService.getCurrentUser();
+        Users currentUser = usersService.getCurrentUser();
 
         try {
             String[] header = fileParser.getNextLineOfData();
@@ -44,7 +46,7 @@ public class TransactionProcessingService {
                 return responseService.createErrorResponse(SUB_DIRECTORY, "error_headerNotFound", fileParser.getFileName(), HttpStatus.NOT_FOUND);
             }
 
-            Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, user);
+            Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, currentUser);
 
             if (bankAccountOptional.isEmpty()) {
                 return responseService.createErrorResponse(SUB_DIRECTORY, "error_bankNotFound", null, HttpStatus.NOT_FOUND);
@@ -67,7 +69,7 @@ public class TransactionProcessingService {
                 return responseService.createResponse(SUB_DIRECTORY, "info_noNewTransactionsFound", AlertType.INFO);
             }
 
-            counterPartyService.createOrUpdateCounterParty(newTransactions);
+            counterPartyProcessingService.setCounterCounterParties(currentUser, newTransactions);
             contractProcessingService.checkIfTransactionsBelongToContract(newTransactions);
 
             transactionService.saveAll(newTransactions);
@@ -180,15 +182,13 @@ public class TransactionProcessingService {
         Double amountAfterTransaction = numberFormat.parse(line[columns.amountAfterTransactionColumn()]).doubleValue();
         String counterPartyName = line[columns.counterPartyColumn()];
 
-        CounterParty counterParty = new CounterParty(counterPartyName);
-
         Double amountBeforeTransaction = findAmountBeforeDate(date, bankAccount.getId(), newTransactions);
 
         if (amountBeforeTransaction == 0.0) {
             amountBeforeTransaction = amountAfterTransaction - amount;
         }
 
-        return new Transaction(bankAccount, counterParty, date, amount, amountAfterTransaction, amountBeforeTransaction);
+        return new Transaction(bankAccount, counterPartyName, date, amount, amountAfterTransaction, amountBeforeTransaction);
     }
 
     private Double findAmountBeforeDate(LocalDate date, Long accountId, List<Transaction> newTransactions) {
