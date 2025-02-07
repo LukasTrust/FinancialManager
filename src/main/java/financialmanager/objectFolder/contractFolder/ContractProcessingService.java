@@ -2,8 +2,8 @@ package financialmanager.objectFolder.contractFolder;
 
 import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistory;
 import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistoryService;
+import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import financialmanager.objectFolder.transactionFolder.Transaction;
-import financialmanager.objectFolder.transactionFolder.TransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,87 +17,140 @@ import java.util.stream.Collectors;
 public class ContractProcessingService {
 
     private final ContractService contractService;
-    private final TransactionService transactionService;
     private final ContractHistoryService contractHistoryService;
 
     public void checkIfTransactionsBelongToContract(List<Transaction> transactions) {
+        Optional<Transaction> lastTransaction = transactions.stream().max(Comparator.comparing(Transaction::getDate));
+
+        LocalDate lastTransactionDate = LocalDate.now();
+
+        if (lastTransaction.isPresent()) {
+            lastTransactionDate = lastTransaction.get().getDate();
+        }
+
         Long bankAccountId = transactions.getFirst().getBankAccount().getId();
         List<Contract> contracts = contractService.findByBankAccountId(bankAccountId);
 
-        // Add transactions without contracts found in the database
-        List<Transaction> foundTransactions = transactionService.findByBankAccountIdAndNoContract(bankAccountId);
-        if (!foundTransactions.isEmpty()) {
-            transactions.addAll(foundTransactions);
-        }
-
         assignTransactionsToExistingContracts(transactions, contracts);
 
-        List<Transaction> transactionsWithoutContract = getTransactionsWithoutContract(transactions);
-
         // Find contracts that have changed
-        contracts.addAll(checkIfExistingContractsChanged(transactionsWithoutContract, contracts));
+        checkIfExistingContractsChanged(transactions, contracts);
 
         // Find new contracts
-        contracts.addAll(tryToFindNewContracts(transactionsWithoutContract));
+        List<Contract> newContracts = tryToFindNewContracts(transactions);
+
+        if (newContracts != null && !newContracts.isEmpty()) {
+            contracts.addAll(newContracts);
+        }
+
+        closeContracts(lastTransactionDate, contracts);
 
         contractService.saveAll(contracts);
     }
 
-    private List<Contract> checkIfExistingContractsChanged(List<Transaction> transactionsWithOutContract, List<Contract> contracts) {
+    private void checkIfExistingContractsChanged(List<Transaction> transactionsWithOutContract, List<Contract> contracts) {
         List<Contract> changedContracts = new ArrayList<>();
         List<ContractHistory> contractHistories = new ArrayList<>();
 
         for (Contract contract : contracts) {
-            List<Transaction> possibleMatches = transactionsWithOutContract.stream().filter(
-                    transaction -> isTransactionValidForContract(transaction, contract, false)).toList();
+            List<Transaction> possibleMatches = new ArrayList<>(transactionsWithOutContract.stream().filter(transaction ->
+                    isTransactionValidForContract(transaction, contract, false)).toList());
 
             if (possibleMatches.size() > 2) {
-                Transaction transaction = possibleMatches.getFirst();
-                contractHistories.add(new ContractHistory(contract,
-                        transaction.getAmount(), transaction.getDate()));
+                possibleMatches.sort(Comparator.comparing(Transaction::getDate));
+                Transaction firstTransaction = possibleMatches.getFirst();
 
-                contract.setAmount(transaction.getAmount());
-                contract.setLastPaymentDate(transaction.getDate());
-                contract.setLastUpdatedAt(transaction.getDate());
+                ContractHistory contractHistory = new ContractHistory(contract, firstTransaction.getAmount(), firstTransaction.getDate());
+                contractHistories.add(contractHistory);
+
+                contract.setAmount(firstTransaction.getAmount());
+                contract.setLastUpdatedAt(firstTransaction.getDate());
+                contract.setLastPaymentDate(possibleMatches.getLast().getDate());
 
                 changedContracts.add(contract);
+
+                setContractForTransactions(contract, possibleMatches);
+
+                // Remove transactions that new have a contract
+                transactionsWithOutContract.removeAll(possibleMatches);
             }
         }
 
         if (!changedContracts.isEmpty()) {
             contractHistoryService.saveAll(contractHistories);
         }
-
-        return changedContracts;
     }
 
     private void assignTransactionsToExistingContracts(List<Transaction> transactions, List<Contract> contracts) {
+        // Group transactions by contract for lookup
+        Map<Contract, List<Transaction>> contractTransactionsLookUp = new HashMap<>();
         for (Contract contract : contracts) {
-            transactions.stream()
-                    .filter(transaction -> isTransactionValidForContract(transaction, contract, true))
-                    .forEach(transaction -> {
-                        transaction.setContract(contract);
-                        if (contract.getLastPaymentDate().isBefore(transaction.getDate()))
-                            contract.setLastPaymentDate(transaction.getDate());
-                    });
+            for (Transaction transaction : transactions) {
+                if (isTransactionValidForContract(transaction, contract, true)) {
+                    contractTransactionsLookUp.computeIfAbsent(contract, _ -> new ArrayList<>()).add(transaction);
+                }
+            }
         }
+
+        // Assign transactions and update last payment date
+        contractTransactionsLookUp.forEach((contract, transactionList) -> {
+            setContractForTransactions(contract, transactionList);
+            updateLastPaymentDate(contract, transactionList);
+            updateStartDate(contract, transactionList);
+        });
+
+        // Remove all transactions that have new a contract
+        transactions = new ArrayList<>(transactions);
+        Set<Transaction> transactionsToRemove = contractTransactionsLookUp.values()
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet()); // Use Set for better performance
+
+        transactions.removeAll(transactionsToRemove);
     }
 
-    private List<Transaction> getTransactionsWithoutContract(List<Transaction> transactions) {
-        return transactions.stream()
-                .filter(transaction -> transaction.getContract() == null)
-                .toList();
+    private void updateLastPaymentDate(Contract contract, List<Transaction> transactions) {
+        Optional<Transaction> lastTransaction = transactions.stream().max(Comparator.comparing(Transaction::getDate));
+
+        lastTransaction.ifPresent(transaction -> {
+            if (contract.getLastPaymentDate().isBefore(transaction.getDate())) {
+                contract.setLastPaymentDate(transaction.getDate());
+            }
+        });
+    }
+
+    private void updateStartDate(Contract contract, List<Transaction> transactions) {
+        Optional<Transaction> firstDate = transactions.stream().min(Comparator.comparing(Transaction::getDate));
+
+        firstDate.ifPresent(transaction -> {
+            if (contract.getStartDate().isAfter(transaction.getDate())) {
+                contract.setStartDate(transaction.getDate());
+            }
+        });
+    }
+
+    private void closeContracts(LocalDate lastTransactionDate, List<Contract> contracts) {
+        for (Contract contract : contracts) {
+            LocalDate lastPaymentDate = contract.getLastPaymentDate();
+
+            // Add extra time to be sure the contract has stopped
+            LocalDate lastTransactionDateAndExtra = lastTransactionDate.plusMonths(contract.getMonthsBetweenPayments() * 2L);
+
+            if (lastPaymentDate.isAfter(lastTransactionDateAndExtra)) {
+                contract.setEndDate(lastPaymentDate);
+            }
+        }
     }
 
     private boolean isTransactionValidForContract(Transaction transaction, Contract contract, boolean checkAmount) {
         if (checkAmount) {
-            return contract.getAmount().equals(transaction.getAmount())
-                    && contract.getContractSearchStrings().contains(transaction.getOriginalCounterParty())
-                    && isValidTransactionDate(transaction.getDate(), contract.getStartDate(), contract.getMonthsBetweenPayments());
+            return contract.getAmount().equals(transaction.getAmount()) &&
+                    contract.getCounterParty().equals(transaction.getCounterParty()) &&
+                    isValidTransactionDate(transaction.getDate(), contract.getStartDate(), contract.getMonthsBetweenPayments());
         }
 
-        return contract.getContractSearchStrings().contains(transaction.getOriginalCounterParty())
-                && isValidTransactionDate(transaction.getDate(), contract.getStartDate(), contract.getMonthsBetweenPayments());
+        return contract.getCounterParty().equals(transaction.getCounterParty()) &&
+                isValidTransactionDate(transaction.getDate(), contract.getStartDate(), contract.getMonthsBetweenPayments());
     }
 
     private boolean isValidTransactionDate(LocalDate transactionDate, LocalDate startDate, int monthsBetweenPayments) {
@@ -106,8 +159,8 @@ public class ContractProcessingService {
     }
 
     private List<Contract> tryToFindNewContracts(List<Transaction> transactionsWithOutContract) {
-        if (transactionsWithOutContract == null || transactionsWithOutContract.isEmpty()) {
-            return new ArrayList<>();
+        if (transactionsWithOutContract.isEmpty()) {
+            return null;
         }
 
         Map<Double, List<Transaction>> groupedByAmount = transactionsWithOutContract.stream()
@@ -116,13 +169,12 @@ public class ContractProcessingService {
         List<Contract> potentialContracts = new ArrayList<>();
 
         groupedByAmount.forEach((_, amountTransactions) -> {
-            Map<String, List<Transaction>> groupedByCounterparty = amountTransactions.stream()
-                    .collect(Collectors.groupingBy(Transaction::getOriginalCounterParty));
+            Map<CounterParty, List<Transaction>> groupedByCounterParty = amountTransactions.stream()
+                    .collect(Collectors.groupingBy(Transaction::getCounterParty));
 
-            groupedByCounterparty.forEach((counterparty, counterpartyTransactions) -> {
-                if (counterpartyTransactions.size() > 2) {
-                    tryToIdentifyPattern(counterpartyTransactions)
-                            .ifPresent(potentialContracts::add);
+            groupedByCounterParty.forEach((_, possibleMatches) -> {
+                if (possibleMatches.size() > 2) {
+                    tryToIdentifyPattern(possibleMatches).ifPresent(potentialContracts::add);
                 }
             });
         });
@@ -134,12 +186,11 @@ public class ContractProcessingService {
         transactions.sort(Comparator.comparing(Transaction::getDate));
 
         List<Long> intervals = calculateIntervalsBetweenTransactions(transactions);
-        Double amount = transactions.getFirst().getAmount();
 
         if (isConsistentInterval(intervals)) {
             int monthsBetweenPayments = calculateMonthsFromDays(intervals.getFirst());
 
-            Contract newContract = createContractFromTransactions(transactions, amount, monthsBetweenPayments);
+            Contract newContract = createContractFromTransactions(transactions, monthsBetweenPayments);
 
             return Optional.of(newContract);
         }
@@ -150,10 +201,7 @@ public class ContractProcessingService {
     private List<Long> calculateIntervalsBetweenTransactions(List<Transaction> transactions) {
         List<Long> intervals = new ArrayList<>();
         for (int i = 1; i < transactions.size(); i++) {
-            long daysBetween = ChronoUnit.DAYS.between(
-                    transactions.get(i - 1).getDate(),
-                    transactions.get(i).getDate()
-            );
+            long daysBetween = ChronoUnit.DAYS.between(transactions.get(i - 1).getDate(), transactions.get(i).getDate());
             intervals.add(daysBetween);
         }
         return intervals;
@@ -164,33 +212,28 @@ public class ContractProcessingService {
         final long TOLERANCE = 10;
 
         // Calculate the average interval
-        double averageInterval = intervals.stream()
-                .mapToLong(Long::longValue)
-                .average()
-                .orElse(0);
+        double averageInterval = intervals.stream().mapToLong(Long::longValue).average().orElse(0);
 
         // Check if all intervals are within the tolerance of the average
-        return intervals.stream()
-                .allMatch(interval -> Math.abs(interval - averageInterval) <= TOLERANCE);
+        return intervals.stream().allMatch(interval -> Math.abs(interval - averageInterval) <= TOLERANCE);
     }
 
     private int calculateMonthsFromDays(long days) {
         return (int) Math.round((double) days / 30);
     }
 
-    private Contract createContractFromTransactions(List<Transaction> transactions, Double amount, int monthsBetweenPayments) {
+    private Contract createContractFromTransactions(List<Transaction> transactions, int monthsBetweenPayments) {
         Transaction firstTransaction = transactions.getFirst();
 
-        Contract newContract = new Contract(
-                firstTransaction.getOriginalCounterParty(),
-                firstTransaction.getDate(),
-                transactions.getLast().getDate(),
-                monthsBetweenPayments,
-                amount
-        );
+        Contract newContract = new Contract(firstTransaction.getDate(), transactions.getLast().getDate(), monthsBetweenPayments,
+                firstTransaction.getAmount(), firstTransaction.getCounterParty());
 
-        transactions.forEach(transaction -> transaction.setContract(newContract));
+       setContractForTransactions(newContract, transactions);
 
         return newContract;
+    }
+
+    private void setContractForTransactions(Contract contract, List<Transaction> transactions) {
+        transactions.forEach(transaction -> transaction.setContract(contract));
     }
 }

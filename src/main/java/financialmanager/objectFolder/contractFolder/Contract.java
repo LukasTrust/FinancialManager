@@ -1,12 +1,10 @@
 package financialmanager.objectFolder.contractFolder;
 
-import financialmanager.Utils.JsonStringListConverter;
+import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Entity
@@ -49,17 +47,18 @@ public class Contract {
     private LocalDate lastUpdatedAt;
 
     @Setter
-    @Convert(converter = JsonStringListConverter.class)
-    private List<String> contractSearchStrings;
+    @ManyToOne
+    @JoinColumn(name = "counter_party_id")
+    private CounterParty counterParty;
 
-    public Contract(String name, LocalDate startDate, LocalDate lastPaymentDate, Integer monthsBetweenPayments, Double amount) {
-        this.name = name;
+    public Contract(LocalDate startDate, LocalDate lastPaymentDate, Integer monthsBetweenPayments, Double amount,
+                    CounterParty counterParty) {
+        this.name = counterParty.getName();
         this.startDate = startDate;
         this.lastUpdatedAt = startDate;
         this.lastPaymentDate = lastPaymentDate;
         this.monthsBetweenPayments = monthsBetweenPayments;
         this.amount = amount;
-        this.contractSearchStrings = new ArrayList<>();
-        this.contractSearchStrings.add(name);
+        this.counterParty = counterParty;
     }
 }

@@ -1,6 +1,4 @@
 package financialmanager.objectFolder.transactionFolder;
-import financialmanager.objectFolder.contractFolder.Contract;
-import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +12,6 @@ public class TransactionService {
 
     public List<Transaction> findByBankAccountId(Long bankAccountId) {
         return transactionRepository.findByBankAccountId(bankAccountId);
-    }
-
-    public List<Transaction> findByBankAccountIdAndNoContract(Long bankAccountId) {
-        return transactionRepository.findByBankAccountIdAndContractIsNull(bankAccountId);
     }
 
     public void saveAll(List<Transaction> transactions) {

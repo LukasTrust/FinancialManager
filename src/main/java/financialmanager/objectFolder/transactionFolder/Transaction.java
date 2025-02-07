@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Getter
 @Entity
@@ -63,10 +64,18 @@ public class Transaction {
         this.amountInBankBefore = amountInBankBefore;
     }
 
-    public boolean compare(Transaction transaction) {
-        return this.date.isEqual(transaction.getDate()) &&
-                this.amount.equals(transaction.getAmount()) &&
-                this.amountInBankAfter.equals(transaction.getAmountInBankAfter()) &&
-                this.amountInBankBefore.equals(transaction.getAmountInBankBefore());
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transaction that = (Transaction) o;
+        return Objects.equals(date, that.date) &&
+                Objects.equals(amount, that.amount) &&
+                Objects.equals(originalCounterParty, that.originalCounterParty);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(date, amount, originalCounterParty);
     }
 }
