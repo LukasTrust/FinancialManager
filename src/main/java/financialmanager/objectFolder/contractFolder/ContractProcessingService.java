@@ -34,7 +34,7 @@ public class ContractProcessingService {
         assignTransactionsToExistingContracts(transactions, contracts);
 
         // Find contracts that have changed
-        checkIfExistingContractsChanged(transactions, contracts);
+        transactions = checkIfExistingContractsChanged(transactions, contracts);
 
         // Find new contracts
         List<Contract> newContracts = tryToFindNewContracts(transactions);
@@ -48,9 +48,10 @@ public class ContractProcessingService {
         contractService.saveAll(contracts);
     }
 
-    private void checkIfExistingContractsChanged(List<Transaction> transactionsWithOutContract, List<Contract> contracts) {
+    private List<Transaction> checkIfExistingContractsChanged(List<Transaction> transactionsWithOutContract, List<Contract> contracts) {
         List<Contract> changedContracts = new ArrayList<>();
         List<ContractHistory> contractHistories = new ArrayList<>();
+        List<Transaction> newTransactions = new ArrayList<>(transactionsWithOutContract);
 
         for (Contract contract : contracts) {
             List<Transaction> possibleMatches = new ArrayList<>(transactionsWithOutContract.stream().filter(transaction ->
@@ -72,13 +73,15 @@ public class ContractProcessingService {
                 setContractForTransactions(contract, possibleMatches);
 
                 // Remove transactions that new have a contract
-                transactionsWithOutContract.removeAll(possibleMatches);
+                newTransactions.removeAll(possibleMatches);
             }
         }
 
         if (!changedContracts.isEmpty()) {
             contractHistoryService.saveAll(contractHistories);
         }
+
+        return newTransactions;
     }
 
     private void assignTransactionsToExistingContracts(List<Transaction> transactions, List<Contract> contracts) {

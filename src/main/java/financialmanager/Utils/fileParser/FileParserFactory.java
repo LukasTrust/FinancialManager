@@ -39,7 +39,7 @@ public class FileParserFactory {
         }
 
         return switch (contentType) {
-            case "application/vnd.ms-excel", "text/csv" -> new CsvFileParser(bufferedReader, file.getName());
+            case "application/vnd.ms-excel", "text/csv" -> new CsvFileParser(bufferedReader, file.getOriginalFilename());
             default -> throw new IllegalArgumentException("Unsupported file type: " + contentType);
         };
     }

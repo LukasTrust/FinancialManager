@@ -1,8 +1,11 @@
 package financialmanager.objectFolder.counterPartyFolder;
 
 import financialmanager.objectFolder.transactionFolder.Transaction;
+import financialmanager.objectFolder.transactionFolder.TransactionProcessingService;
 import financialmanager.objectFolder.usersFolder.Users;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

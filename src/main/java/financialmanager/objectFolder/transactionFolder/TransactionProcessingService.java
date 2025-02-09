@@ -13,6 +13,8 @@ import financialmanager.objectFolder.responseFolder.ResponseService;
 import financialmanager.objectFolder.usersFolder.Users;
 import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -34,61 +36,70 @@ public class TransactionProcessingService {
     private final CounterPartyProcessingService counterPartyProcessingService;
     private final ContractProcessingService contractProcessingService;
     private final CategoryProcessingService categoryProcessingService;
+    private static final Logger log = LoggerFactory.getLogger(TransactionProcessingService.class);
     private static final String SUB_DIRECTORY = "bankAccountMessages";
 
     public ResponseEntity<Response> createTransactionsFromData(IFileParser fileParser, Long bankAccountId) {
         Users currentUser = usersService.getCurrentUser();
+        String fileName = fileParser.getFileName();
+        String[] header = fileParser.getNextLineOfData();
 
-        try {
-            String[] header = fileParser.getNextLineOfData();
-            if (header == null) {
-                return responseService.createErrorResponse(SUB_DIRECTORY, "error_headerNotFound", fileParser.getFileName(), HttpStatus.NOT_FOUND);
-            }
-
-            Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, currentUser);
-
-            if (bankAccountOptional.isEmpty()) {
-                return responseService.createErrorResponse(SUB_DIRECTORY, "error_bankNotFound", null, HttpStatus.NOT_FOUND);
-            }
-
-            BankAccount bankAccount = bankAccountOptional.get();
-
-            DataColumns dataColumns = findColumnsInData(header, bankAccount);
-            if (!dataColumns.checkIfAllAreFound()) {
-                return responseService.createErrorResponse(SUB_DIRECTORY, "error_notFourColumnsFound", null, HttpStatus.NOT_FOUND);
-            }
-
-            List<Transaction> newTransactions = parseTransactions(fileParser, bankAccount, dataColumns);
-            if (newTransactions.isEmpty()) {
-                return responseService.createErrorResponse(SUB_DIRECTORY, "error_noValidTransactions", null, HttpStatus.BAD_REQUEST);
-            }
-
-            List<Transaction> transactions = transactionService.findByBankAccountId(bankAccountId);
-
-            newTransactions = checkIfTransactionsAlreadyExist(newTransactions, transactions);
-            if (newTransactions.isEmpty()) {
-                return responseService.createResponse(SUB_DIRECTORY, "info_noNewTransactionsFound", AlertType.INFO);
-            }
-
-            // Create or set counterparties for the new transactions
-            counterPartyProcessingService.setCounterCounterParties(currentUser, newTransactions);
-
-            // Now add the existing transactions
-            transactions.addAll(newTransactions);
-
-            categoryProcessingService.addTransactionsToCategories(currentUser, transactions);
-
-            // Filter transactions that have a contract
-            transactions = getTransactionsWithoutContract(transactions);
-
-            contractProcessingService.checkIfTransactionsBelongToContract(transactions);
-
-            transactionService.saveAll(transactions);
-            return responseService.createResponse("SUB_DIRECTORY", "success_filesProcessed", AlertType.SUCCESS);
-
-        } catch (Exception e) {
-            return responseService.createErrorResponse(SUB_DIRECTORY, "error_generic", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        if (header == null) {
+            log.error("{} no header line found", fileName);
+            return responseService.createErrorResponse(SUB_DIRECTORY, "error_headerNotFound", fileName, HttpStatus.NOT_FOUND);
         }
+
+        Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, currentUser);
+
+        if (bankAccountOptional.isEmpty()) {
+            log.error("bankAccount not found");
+            return responseService.createErrorResponse(SUB_DIRECTORY, "error_bankNotFound", null, HttpStatus.NOT_FOUND);
+        }
+
+        BankAccount bankAccount = bankAccountOptional.get();
+
+        DataColumns dataColumns = findColumnsInData(header, bankAccount);
+        if (!dataColumns.checkIfAllAreFound()) {
+            log.error("{} could not find the date columns", fileName);
+            log.error("Header line: {}", Arrays.toString(header));
+            return responseService.createErrorResponse(SUB_DIRECTORY, "error_notFourColumnsFound", null, HttpStatus.NOT_FOUND);
+        }
+
+        List<Transaction> newTransactions = parseTransactions(fileParser, bankAccount, dataColumns);
+        if (newTransactions.isEmpty()) {
+            log.error("{} could not find any transactions", fileName);
+            return responseService.createErrorResponse(SUB_DIRECTORY, "error_noValidTransactions", null, HttpStatus.BAD_REQUEST);
+        }
+
+        List<Transaction> transactions = transactionService.findByBankAccountId(bankAccountId);
+
+        newTransactions = checkIfTransactionsAlreadyExist(newTransactions, transactions);
+        if (newTransactions.isEmpty()) {
+            log.info("{} could not find any transactions", fileName);
+            return responseService.createResponse(SUB_DIRECTORY, "info_noNewTransactionsFound", AlertType.INFO, Collections.singletonList(fileName));
+        }
+
+        // Create or set counterparties for the new transactions
+        counterPartyProcessingService.setCounterCounterParties(currentUser, newTransactions);
+
+        // Now add the existing transactions
+        transactions.addAll(newTransactions);
+
+        categoryProcessingService.addTransactionsToCategories(currentUser, transactions);
+
+        // Filter transactions that have a contract
+        transactions = getTransactionsWithoutContract(transactions);
+
+        contractProcessingService.checkIfTransactionsBelongToContract(transactions);
+
+        transactionService.saveAll(transactions);
+
+        List<String> placeholders = new ArrayList<>();
+        placeholders.add(fileParser.getFileName());
+        placeholders.add(String.valueOf(newTransactions.size()));
+
+        log.info("{} transactions found", newTransactions.size());
+        return responseService.createResponse(SUB_DIRECTORY, "success_filesProcessed", AlertType.SUCCESS, placeholders);
     }
 
     private List<Transaction> getTransactionsWithoutContract(List<Transaction> transactions) {
@@ -139,7 +150,8 @@ public class TransactionProcessingService {
                 Transaction transaction = createTransactionFromLine(line, columns, bankAccount, newTransactions);
                 newTransactions.add(transaction);
             } catch (Exception e) {
-                System.err.println("Error parsing line: " + Arrays.toString(line) + " - " + e.getMessage());
+                log.error(e.getMessage());
+                log.error("Error parsing line: {}", Arrays.toString(line));
             }
         }
 
@@ -187,7 +199,7 @@ public class TransactionProcessingService {
     }
 
     private Transaction createTransactionFromLine(String[] line, DataColumns columns, BankAccount bankAccount,
-                                                 List<Transaction> newTransactions) throws Exception {
+                                                  List<Transaction> newTransactions) throws Exception {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         NumberFormat numberFormat = NumberFormat.getInstance(Locale.GERMANY);
 

@@ -8,9 +8,9 @@ function buildBankAccountOverview(id) {
     const fileUploadBox = document.querySelector(".fileUploadBox");
     const fileInstructions = document.querySelector(".fileInstructions");
 
-    fileUploadBox.addEventListener("drop", (event) => {
+    fileUploadBox.addEventListener("drop", async (event) => {
         event.preventDefault();
-        handleSelectedFiles(event.dataTransfer.files);
+        await handleSelectedFiles(event.dataTransfer.files);
     });
 
     fileUploadBox.addEventListener("dragover", (event) => {
@@ -29,12 +29,12 @@ function buildBankAccountOverview(id) {
         fileBrowsInput.click();
     });
 
-    fileBrowsInput.addEventListener("change", (event) => {
-        handleSelectedFiles(event.target.files);
+    fileBrowsInput.addEventListener("change", async (event) => {
+        await handleSelectedFiles(event.target.files);
     });
 }
 
-function handleSelectedFiles(files) {
+async function handleSelectedFiles(files) {
     const validFiles = [];
 
     Array.from(files).forEach((file) => {
@@ -51,30 +51,27 @@ function handleSelectedFiles(files) {
     });
 
     if (validFiles.length > 0) {
-        sendFiles(validFiles); // Send valid files with POST request
+        await sendFiles(validFiles); // Send valid files with POST request
     }
 }
 
-function sendFiles(files) {
+async function sendFiles(files) {
     const formData = new FormData();
 
     files.forEach((file) => {
         formData.append("files", file);
     });
 
-    console.log(bankAccountId);
-
-    fetch(`/bankAccountOverview/${bankAccountId}/upload/data`, {
+    const response = await fetch(`/bankAccountOverview/${bankAccountId}/upload/data`, {
         method: 'POST',
         body: formData,
-    })
-        .then(response => response.json())
-        .then(data => {
-            showAlert('success', 'Files uploaded successfully');
-            console.log('Server response:', data);
-        })
-        .catch(error => {
-            showAlert('error', 'Error uploading files');
-            console.error('Error:', error);
-        });
+    });
+
+    const responseBody = await response.json();
+
+    for (let count = 0; count < responseBody.length; count++) {
+        const responseOfFile = responseBody[count].body;
+        console.log(responseOfFile);
+        showAlert(responseOfFile.alertType, responseOfFile.message);
+    }
 }

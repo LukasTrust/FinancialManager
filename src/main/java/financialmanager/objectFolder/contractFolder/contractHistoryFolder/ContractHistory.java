@@ -2,30 +2,40 @@ package financialmanager.objectFolder.contractFolder.contractHistoryFolder;
 
 import financialmanager.objectFolder.contractFolder.Contract;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "ContractHistory")
-public record ContractHistory(
+@Getter
+@NoArgsConstructor
+public class ContractHistory {
+
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        Long id,
+        private Long id;
 
-        @OneToOne
+        @ManyToOne
         @JoinColumn(name = "contractId", nullable = false)
-        Contract contract,
+        private Contract contract;
 
         @Column(nullable = false)
-        Double previousAmount,
+        private Double previousAmount;
 
         @Column(nullable = false)
-        Double newAmount,
+        private Double newAmount;
 
         @Column(nullable = false)
-        LocalDate changedAt
-) {
+        private LocalDate changedAt;
+
         public ContractHistory(Contract contract, Double newAmount, LocalDate changedAt) {
-                this(null, contract, contract.getAmount(), newAmount, changedAt);
+                this.contract = contract;
+                this.previousAmount = contract.getAmount();
+                this.newAmount = newAmount;
+                this.changedAt = changedAt;
         }
 }
