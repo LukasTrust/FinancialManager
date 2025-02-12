@@ -6,7 +6,7 @@ label {
     cursor: default;
 }
 
-.inputbox {
+.inputBox {
     display: flex;
     align-items: center;
     position: relative;
@@ -16,7 +16,7 @@ label {
     border-bottom: 2px solid #fff;
 }
 
-.inputbox input {
+.inputBox input {
     width: 100%;
     height: 40px;
     background: transparent;
@@ -27,7 +27,7 @@ label {
     color: #fff;
 }
 
-.inputbox span {
+.inputBox span {
     position: absolute;
     right: 8px;
     color: #fff;
@@ -209,4 +209,41 @@ label {
 
 .fileUploadBox .boxTitle .fileBrowseButton:hover {
     text-decoration: underline;
+}
+
+.inputDate {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+}
+
+.inputDate.startDate {
+    align-items: flex-start;
+}
+
+.inputDate.startDate {
+    align-items: flex-start;
+}
+
+.inputDate label {
+    margin-left: 0;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.inputDate input[type="date"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 180px;
+    transition: border-color 0.3s ease;
+}
+
+.inputDate input[type="date"]:focus {
+    border-color: #007bff;
+    outline: none;
 }

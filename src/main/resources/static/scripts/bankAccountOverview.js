@@ -6,8 +6,36 @@ async function buildBankAccountOverview(id) {
     const messages = await fetchLocalization("bankAccountOverview");
 
     handleFileBrowser(messages);
-    await loadLineChart(messages);
-    await loadKeyFigures(messages);
+    handleDateRangeSelection(messages);
+    await updateVisuals(messages);
+}
+
+async function updateVisuals(messages, startDate = null, endDate = null) {
+    await loadLineChart(messages, startDate, endDate);
+    await loadKeyFigures(messages, startDate, endDate);
+}
+
+function handleDateRangeSelection(messages) {
+    const startDate = document.getElementById("startDate");
+    const endDate = document.getElementById("endDate");
+    const clearDateButton = document.getElementById("clearDateButton");
+
+    startDate.addEventListener("input", async () => await checkDates(messages, startDate, endDate));
+    endDate.addEventListener("input", async () => await checkDates(messages, startDate, endDate));
+    clearDateButton.addEventListener("click", async () => {
+        startDate.value = '';
+        endDate.value = '';
+        await updateVisuals(messages);
+    });
+}
+
+async function checkDates(messages, startDate, endDate) {
+    const startValue = startDate.value.trim() || null;
+    const endValue = endDate.value.trim() || null;
+
+    if (startValue || endValue) {
+        await updateVisuals(messages, startValue, endValue);
+    }
 }
 
 function handleFileBrowser(messages) {
@@ -131,8 +159,7 @@ async function handleSelectedFiles(messages, files) {
         const newDate = await sendFiles(messages, validFiles);
 
         if (newDate) {
-            await loadLineChart(messages);
-            await loadKeyFigures(messages);
+            await updateVisuals(messages);
         }
     }
 }

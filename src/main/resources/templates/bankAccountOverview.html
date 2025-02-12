@@ -1,16 +1,43 @@
 <div th:fragment="bankAccountOverview" id="content">
     <div class="flexContainerColumn">
         <!--Header section-->
-        <div class="flexContainer">
-            <h1><span class="bi bi-bank2"></span></h1>
-            <h1 id="bankName"></h1>
+        <div class="flexContainerSpaced">
+            <div class="flexContainer">
+                <h1><span class="bi bi-bank2"></span></h1>
+                <h1 id="bankName"></h1>
+            </div>
+            <div class="flexContainer">
+                <div class="inputDate startDate">
+                    <div class="textHeader">
+                        <label for="startDate">
+                            <span id="startDateText" data-i18n="startDateText"></span>
+                        </label>
+                        <div class="tooltip tooltipBottom bi bi-info">
+                            <span class="tooltipText" data-i18n="startDateTooltip"></span>
+                        </div>
+                    </div>
+                    <input type="date" id="startDate" name="startDate">
+                </div>
+                <div class="inputDate endDate">
+                    <div class="textHeader">
+                        <label for="endDate">
+                            <span id="endDateText" data-i18n="endDateText"></span>
+                        </label>
+                        <div class="tooltip tooltipBottom bi bi-info">
+                            <span class="tooltipText" data-i18n="endDateTooltip"></span>
+                        </div>
+                    </div>
+                    <input type="date" id="endDate" name="endDate">
+                </div>
+                <button style="margin-top: 30px" class="removeButton" id="clearDateButton"
+                        data-i18n="clearDateButton"></button>
+            </div>
         </div>
 
         <!--Chart section-->
         <div class="chartContainer">
             <canvas id="lineChart"></canvas>
         </div>
-
 
         <!--Key figures section-->
         <div class="flexContainerSpaced">

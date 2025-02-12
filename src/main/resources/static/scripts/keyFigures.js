@@ -34,7 +34,7 @@ function createKeyFigures(keyFigures) {
 
         const keyFigureText = createElement("span", "");
         keyFigureText.style.margin = "20px";
-        keyFigureText.innerHTML = keyFigure.value
+        keyFigureText.innerHTML = keyFigure.value + " €"
 
         valueContainer.appendChild(icon);
         valueContainer.appendChild(keyFigureText);

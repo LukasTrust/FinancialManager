@@ -6,5 +6,10 @@
   "error_loadingLineChart": "Ein Fehler ist beim Laden des Liniendiagramms aufgetreten",
   "error_loadingKeyFigures": "Ein Fehler ist beim Laden der Kennzahlen aufgetreten",
   "browseFiles": "Dateien durchsuchen",
-  "uploadData": "Datei hochladen"
+  "uploadData": "Datei hochladen",
+  "startDateText": "Startdatum:",
+  "startDateTooltip": "Wählen Sie ein Startdatum aus, um die Transaktionen entsprechend zu filtern",
+  "endDateText": "Enddatum:",
+  "endDateTooltip": "Wählen Sie ein Enddatum aus, um die Transaktionen entsprechend zu filtern",
+  "clearDateButton": "Daten löschen"
 }

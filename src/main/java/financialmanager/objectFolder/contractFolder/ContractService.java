@@ -33,7 +33,7 @@ public class ContractService {
 
         // Filter contracts that fall within the date range (inclusive)
         return contracts.stream()
-                .filter(contract -> !contract.getStartDate().isBefore(finalStartDate) && contract.getEndDate() == null || !contract.getEndDate().isAfter(finalEndDate))
+                .filter(contract -> !contract.getStartDate().isBefore(finalStartDate) && (contract.getEndDate() == null || !contract.getEndDate().isAfter(finalEndDate)))
                 .toList();
     }
 

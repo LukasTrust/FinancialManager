@@ -21,7 +21,7 @@ async function buildAddBankAccount()  {
         {addButtonId: "addDateStrings", inputId: "inputDateStrings", listId: "dateSearchStrings"},
         {
             addButtonId: "addInterestRateStrings",
-            inputId: "inputinterestRateStrings",
+            inputId: "inputInterestRateStrings",
             listId: "interestRateSearchStrings"
         }
     ];

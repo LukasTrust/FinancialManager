@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -64,8 +65,8 @@ public class ChartService {
 
         if (bankAccountOptional.isPresent()) {
             BankAccount bankAccount = bankAccountOptional.get();
-            List<Transaction> transactions = transactionService.findByBankAccountIdBetweenDates(bankAccount.getId(),
-                    startDate, endDate);
+            List<Transaction> transactions = new ArrayList<>(transactionService.findByBankAccountIdBetweenDates(
+                    bankAccount.getId(), startDate, endDate));
 
             transactions.sort(Comparator.comparing(Transaction::getDate));
 
