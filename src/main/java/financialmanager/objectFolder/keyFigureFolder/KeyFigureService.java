@@ -41,10 +41,11 @@ public class KeyFigureService {
 
         List<Transaction> allTransactions = new ArrayList<>();
 
-        double average = 0;
-        double netGainLoss = 0;
+        double average;
+        double netGainLoss;
         double discrepancy = 0;
         double contractCostPerMonth = 0;
+        boolean isSavingsAccount = false;
 
         for (Long bankAccountId : bankAccountIds) {
             Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, currentUser);
@@ -55,6 +56,7 @@ public class KeyFigureService {
 
                 if (bankAccountOptional.get() instanceof SavingsBankAccount) {
                     discrepancy += getDiscrepancy(bankAccountTransactions);
+                    isSavingsAccount = true;
                 }
                 else {
                     List<Contract> contracts = contractService.findByBankAccountIdBetweenDates(bankAccountId, start, end);
@@ -67,26 +69,32 @@ public class KeyFigureService {
         }
 
         if (allTransactions.isEmpty()) {
-            return createBankAccountKeyFigures(currentUser,0,0,0,0);
+            return createBankAccountKeyFigures(currentUser,0,0,isSavingsAccount,0);
         }
 
         average = getAverage(allTransactions);
         netGainLoss = getNetGainLoss(allTransactions);
+        double lastValue = isSavingsAccount ? Utils.roundToTwoDecimals(discrepancy) : Utils.roundToTwoDecimals(contractCostPerMonth);
 
         return createBankAccountKeyFigures(currentUser,
                 Utils.roundToTwoDecimals(average),
                 Utils.roundToTwoDecimals(netGainLoss),
-                Utils.roundToTwoDecimals(discrepancy),
-                Utils.roundToTwoDecimals(contractCostPerMonth));
+                isSavingsAccount,
+                lastValue);
     }
 
-    private List<KeyFigure> createBankAccountKeyFigures(Users currentUser, double average, double netGainLoss, double discrepancy, double contractCostPerMonth) {
+    private List<KeyFigure> createBankAccountKeyFigures(Users currentUser, double average, double netGainLoss,
+                                                        boolean isSavingsBankAccount, double lastValue) {
         List<KeyFigure> keyFigures = new ArrayList<>();
 
         keyFigures.add(createKeyFigure(currentUser, "average", "averageTooltip", average));
         keyFigures.add(createKeyFigure(currentUser, "netGainLoss", "netGainLossTooltip", netGainLoss));
-        keyFigures.add(createKeyFigure(currentUser, "discrepancy", "discrepancyTooltip", discrepancy));
-        keyFigures.add(createKeyFigure(currentUser, "contractCostPerMonth", "contractCostPerMonthTooltip", contractCostPerMonth));
+        if (isSavingsBankAccount){
+            keyFigures.add(createKeyFigure(currentUser, "discrepancy", "discrepancyTooltip", lastValue));
+        }
+        else {
+            keyFigures.add(createKeyFigure(currentUser, "contractCostPerMonth", "contractCostPerMonthTooltip", lastValue));
+        }
 
         return keyFigures;
     }

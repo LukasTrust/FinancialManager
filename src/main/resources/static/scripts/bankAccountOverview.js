@@ -129,11 +129,13 @@ async function handleSelectedFiles(messages, files) {
     });
 
     if (validFiles.length > 0) {
-        await sendFiles(messages, validFiles); // Send valid files with POST request
-    }
+        const newDate = await sendFiles(messages, validFiles);
 
-    await loadLineChart(messages);
-    await loadKeyFigures(messages);
+        if (newDate) {
+            await loadLineChart(messages);
+            await loadKeyFigures(messages);
+        }
+    }
 }
 
 async function sendFiles(messages, files) {
@@ -151,10 +153,17 @@ async function sendFiles(messages, files) {
 
         const responseBody = await response.json();
 
+        let newDate = false;
+
         for (let count = 0; count < responseBody.length; count++) {
             const responseOfFile = responseBody[count].body;
             showAlert(responseOfFile.alertType, responseOfFile.message);
+            if (responseOfFile.alertType === "SUCCESS") {
+                newDate = true;
+            }
         }
+
+        return newDate;
     } catch (error) {
         error("ERROR", messages["error_generic"]);
         console.error("Error loading chart:", error);

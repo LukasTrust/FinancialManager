@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -67,6 +68,8 @@ public class ChartService {
             BankAccount bankAccount = bankAccountOptional.get();
             List<Transaction> transactions = transactionService.findByBankAccountIdBetweenDates(bankAccount.getId(),
                     startDate, endDate);
+
+            transactions.sort(Comparator.comparing(Transaction::getDate));
 
             List<DataPoint> dataPoints = getDataPoints(currentUser, transactions);
 

@@ -1,6 +1,6 @@
 package financialmanager.Utils;
 
-import src.fakeDataCreator.FakeObjectCreator;
+import fakeDataCreator.FakeObjectCreator;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import financialmanager.objectFolder.usersFolder.Users;

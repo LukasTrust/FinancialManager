@@ -89,16 +89,16 @@ public class TransactionProcessingService {
 
     private void processAndSaveTransactions(Users currentUser, List<Transaction> newTransactions, List<Transaction> existingTransactions) {
         counterPartyProcessingService.setCounterCounterParties(currentUser, newTransactions);
-        existingTransactions.addAll(newTransactions);
-        categoryProcessingService.addTransactionsToCategories(currentUser, existingTransactions);
+        categoryProcessingService.addTransactionsToCategories(currentUser, newTransactions);
 
-        List<Transaction> transactionsWithoutContract = getTransactionsWithoutContract(existingTransactions);
-        contractProcessingService.checkIfTransactionsBelongToContract(transactionsWithoutContract);
-        transactionService.saveAll(existingTransactions);
+        newTransactions.addAll(getTransactionsWithoutContract(existingTransactions));
+
+        contractProcessingService.checkIfTransactionsBelongToContract(newTransactions);
+        transactionService.saveAll(newTransactions);
     }
 
-    private List<Transaction> getTransactionsWithoutContract(List<Transaction> transactions) {
-        return transactions.stream()
+    private List<Transaction> getTransactionsWithoutContract(List<Transaction> existingTransactions) {
+        return existingTransactions.stream()
                 .filter(transaction -> transaction.getContract() == null)
                 .toList();
     }

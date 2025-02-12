@@ -1,4 +1,4 @@
-package src.fakeDataCreator;
+package fakeDataCreator;
 
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.savingsBankAccountFolder.SavingsBankAccount;

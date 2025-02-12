@@ -10,7 +10,7 @@ function createKeyFigures(keyFigures) {
         if (!keyFigure) continue; // Skip invalid entries
 
         // Create Key Figure Box
-        const keyFigureBox = createElement("div", "keyFigureBox");
+        const keyFigureBox = createElement("div", "boxContainer");
 
         // Create Header
         const keyFigureHeader = createElement("div", "keyFigureHeader");

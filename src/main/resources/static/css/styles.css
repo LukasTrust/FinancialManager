@@ -135,7 +135,7 @@ button:hover {
     display: flex;
     height: 40px;
     flex-wrap: wrap;
-    gap: 10px; /* Space between the items */
+    gap: 10px;
     margin-left: 10px;
     margin-right: 10px;
     margin-bottom: 10px;
@@ -144,6 +144,15 @@ button:hover {
 .flexContainer {
     display: flex;
     align-items: center;
+    padding-bottom: 20px;
+    min-width: 350px;
+    gap: 10px;
+}
+
+.flexContainerSpaced {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding-bottom: 20px;
     min-width: 350px;
     gap: 10px;
@@ -244,7 +253,7 @@ button:hover {
     height: 100% !important;
 }
 
-.keyFigureBox {
+.boxContainer {
     background: white;
     border-radius: 16px;
     width: 200px;
@@ -256,7 +265,7 @@ button:hover {
     transition: transform 0.2s ease-in-out;
 }
 
-.keyFigureBox:hover {
+.boxContainer:hover {
     transform: translateY(-5px);
 }
 
@@ -282,6 +291,7 @@ button:hover {
     cursor: pointer;
     font-size: 16px;
     color: gray;
+    display: inline-block;
 }
 
 .tooltipText {
@@ -298,7 +308,7 @@ button:hover {
     max-width: 220px;
     width: max-content;
     opacity: 0;
-    z-index: 10;
+    z-index: 1000;
     transition: opacity 0.3s ease-in-out;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
     white-space: normal;

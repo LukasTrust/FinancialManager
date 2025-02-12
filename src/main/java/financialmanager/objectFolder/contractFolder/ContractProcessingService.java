@@ -21,6 +21,7 @@ public class ContractProcessingService {
 
     public void checkIfTransactionsBelongToContract(List<Transaction> transactions) {
         Optional<Transaction> lastTransaction = transactions.stream().max(Comparator.comparing(Transaction::getDate));
+        List<Transaction> changeableList = new ArrayList<>(transactions);
 
         LocalDate lastTransactionDate = LocalDate.now();
 
@@ -28,16 +29,16 @@ public class ContractProcessingService {
             lastTransactionDate = lastTransaction.get().getDate();
         }
 
-        Long bankAccountId = transactions.getFirst().getBankAccount().getId();
+        Long bankAccountId = changeableList.getFirst().getBankAccount().getId();
         List<Contract> contracts = contractService.findByBankAccountId(bankAccountId);
 
-        assignTransactionsToExistingContracts(transactions, contracts);
+        assignTransactionsToExistingContracts(changeableList, contracts);
 
         // Find contracts that have changed
-        transactions = checkIfExistingContractsChanged(transactions, contracts);
+        changeableList = checkIfExistingContractsChanged(changeableList, contracts);
 
         // Find new contracts
-        List<Contract> newContracts = tryToFindNewContracts(transactions);
+        List<Contract> newContracts = tryToFindNewContracts(changeableList);
 
         if (newContracts != null && !newContracts.isEmpty()) {
             contracts.addAll(newContracts);
