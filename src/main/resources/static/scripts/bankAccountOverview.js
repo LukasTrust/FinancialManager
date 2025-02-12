@@ -116,8 +116,7 @@ async function handleSelectedFiles(messages, files) {
     const validFiles = [];
 
     Array.from(files).forEach((file) => {
-        const {name, size} = file;
-        const extension = name.split(".").pop().toLowerCase();
+        const extension = file.split(".").pop().toLowerCase();
 
         // Filter unsupported file types
         if (!["csv", "txt", "pdf", "xls"].includes(extension)) {
@@ -125,7 +124,7 @@ async function handleSelectedFiles(messages, files) {
             return null;
         }
 
-        validFiles.push(file); // Collect valid files
+        validFiles.push(file);
     });
 
     if (validFiles.length > 0) {
