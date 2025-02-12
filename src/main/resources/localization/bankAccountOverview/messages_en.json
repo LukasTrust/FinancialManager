@@ -6,5 +6,5 @@
   "error_loadingLineChart": "An error occurred while loading the line chart",
   "error_loadingKeyFigures": "An error occurred while loading the key figures",
   "browseFiles": "Browse files",
-  "uploadDate": "Upload date"
+  "uploadData": "Upload file"
 }

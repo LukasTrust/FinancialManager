@@ -11,7 +11,7 @@ import java.util.List;
 public class Utils {
     public static double getDifferenceInTransaction(Transaction transaction) {
         double calculatedAmountAfter = roundToTwoDecimals(transaction.getAmount() + transaction.getAmountInBankBefore());
-        return Math.abs(calculatedAmountAfter - transaction.getAmountInBankAfter());
+        return roundToTwoDecimals(calculatedAmountAfter - transaction.getAmountInBankAfter());
     }
 
     public static double roundToTwoDecimals(double value) {

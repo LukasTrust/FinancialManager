@@ -246,35 +246,41 @@ button:hover {
 
 .keyFigureBox {
     background: white;
-    border-radius: 12px;
-    width: 10%;
-    height: 120px;
+    border-radius: 16px;
+    width: 200px;
+    height: 140px;
     padding: 20px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
     text-align: center;
     position: relative;
+    transition: transform 0.2s ease-in-out;
+}
+
+.keyFigureBox:hover {
+    transform: translateY(-5px);
 }
 
 .keyFigureHeader {
     display: flex;
     justify-content: space-between;
-    font-size: 16px;
+    align-items: center;
+    font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
     height: 40px;
 }
 
 .keyFigureValue {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: bold;
-    margin: 10px 0;
+    margin-top: 15px;
     color: #333;
 }
 
 .tooltip {
     position: relative;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     color: gray;
 }
 
@@ -283,20 +289,19 @@ button:hover {
     background-color: black;
     color: white;
     text-align: center;
-    padding: 5px;
-    border-radius: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
     position: absolute;
-    bottom: 120%;
+    bottom: 130%;
     left: 50%;
     transform: translateX(-50%);
-    max-width: 200px;
+    max-width: 220px;
     width: max-content;
     opacity: 0;
-    transition: opacity 0.3s;
     z-index: 10;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    transition: opacity 0.3s ease-in-out;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
     white-space: normal;
-    word-wrap: break-word;
 }
 
 .tooltip:hover .tooltipText {
@@ -305,11 +310,17 @@ button:hover {
 }
 
 .positive {
-    background: #d4edda;
-    color: #155724;
+    background: #e3fcef;
+    color: #0f5132;
+    border: 2px solid #0f5132;
+    border-radius: 10px;
+    padding: 10px;
 }
 
 .negative {
-    background: #f8d7da;
-    color: #721c24;
+    background: #fde2e4;
+    color: #842029;
+    border: 2px solid #842029;
+    border-radius: 10px;
+    padding: 10px;
 }

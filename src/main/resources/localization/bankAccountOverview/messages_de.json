@@ -6,5 +6,5 @@
   "error_loadingLineChart": "Ein Fehler ist beim Laden des Liniendiagramms aufgetreten",
   "error_loadingKeyFigures": "Ein Fehler ist beim Laden der Kennzahlen aufgetreten",
   "browseFiles": "Dateien durchsuchen",
-  "uploadDate": "Upload-Datum"
+  "uploadData": "Datei hochladen"
 }
