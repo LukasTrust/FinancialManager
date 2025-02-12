@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await buildAddBankAccount();
                         break;
                     case "/bankAccountOverview":
-                        buildBankAccountOverview(parentId);
+                        await buildBankAccountOverview(parentId);
                         break;
                 }
 

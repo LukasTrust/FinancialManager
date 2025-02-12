@@ -1,25 +1,33 @@
 <div th:fragment="bankAccountOverview" id="content">
-    <div class="container">
-        <!-- Main Section -->
-        <div class="mainContent">
-
+    <div class="flexContainerColumn">
+        <!--Header section-->
+        <div class="flexContainer">
+            <h1><span class="bi bi-bank2"></span></h1>
+            <h1 id="bankName"></h1>
         </div>
 
-        <!-- Right Section-->
-        <div class="sideContent">
-            <div class="fileUploader">
-                <div class="fileUploaderHeader">
-                    <h2 class="fileUploaderTitle">Data upload</h2>
-                </div>
-                <div class="fileUploadBox">
-                    <h2 class="boxTitle">
-                        <span class="fileInstructions">Drag files here or</span>
-                        <span class="fileBrowseButton">browse</span>
-                    </h2>
-                </div>
-                <input class="fileBrowseInput" type="file" multiple hidden>
-                <ul class="fileList"></ul>
+        <!--Chart section-->
+        <div class="chartContainer">
+            <canvas id="lineChart"></canvas>
+        </div>
+
+
+        <!--Key figures section-->
+        <div id="keyFiguresContainer" class="flexContainer">
+        </div>
+
+        <div class="fileUploader">
+            <div class="fileUploaderHeader">
+                <h2 class="fileUploaderTitle" data-i18n="uploadDate"></h2>
             </div>
+            <div class="fileUploadBox">
+                <h2 class="boxTitle">
+                    <span class="fileInstructions" data-i18n="fileUploadDrag"></span>
+                    <span class="fileBrowseButton" data-i18n="browseFiles"></span>
+                </h2>
+            </div>
+            <input class="fileBrowseInput" type="file" multiple hidden>
+            <ul class="fileList"></ul>
         </div>
     </div>
 </div>

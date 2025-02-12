@@ -1,0 +1,10 @@
+{
+  "fileUploadDrop": "Loslassen zum Hochladen oder",
+  "fileUploadDrag": "Dateien hierher ziehen oder",
+  "warning_WrongFileFormat": "Nur CSV-, TXT-, PDF- und XLS-Dateien sind erlaubt",
+  "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+  "error_loadingLineChart": "Ein Fehler ist beim Laden des Liniendiagramms aufgetreten",
+  "error_loadingKeyFigures": "Ein Fehler ist beim Laden der Kennzahlen aufgetreten",
+  "browseFiles": "Dateien durchsuchen",
+  "uploadDate": "Upload-Datum"
+}

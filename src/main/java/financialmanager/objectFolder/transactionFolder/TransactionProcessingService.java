@@ -37,69 +37,64 @@ public class TransactionProcessingService {
     private final ContractProcessingService contractProcessingService;
     private final CategoryProcessingService categoryProcessingService;
     private static final Logger log = LoggerFactory.getLogger(TransactionProcessingService.class);
-    private static final String SUB_DIRECTORY = "bankAccountMessages";
+    private static final String SUB_DIRECTORY = "addBankAccountMessages";
 
     public ResponseEntity<Response> createTransactionsFromData(IFileParser fileParser, Long bankAccountId) {
         Users currentUser = usersService.getCurrentUser();
         String fileName = fileParser.getFileName();
-        String[] header = fileParser.getNextLineOfData();
-
-        if (header == null) {
-            log.error("{} no header line found", fileName);
-            return responseService.createErrorResponse(SUB_DIRECTORY, "error_headerNotFound", fileName, HttpStatus.NOT_FOUND);
-        }
+        String[] header;
 
         Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, currentUser);
 
         if (bankAccountOptional.isEmpty()) {
             log.error("bankAccount not found");
-            return responseService.createErrorResponse(SUB_DIRECTORY, "error_bankNotFound", null, HttpStatus.NOT_FOUND);
+            return responseService.createResponse(HttpStatus.NOT_FOUND, SUB_DIRECTORY, "error_bankNotFound", AlertType.ERROR);
+        }
+
+        header = fileParser.getNextLineOfData();
+
+        if (header == null) {
+            log.error("{} no header line found", fileName);
+            return responseService.createResponseWithPlaceHolders(HttpStatus.NOT_FOUND, SUB_DIRECTORY, "error_headerNotFound",
+                    AlertType.ERROR, Collections.singletonList(fileName));
         }
 
         BankAccount bankAccount = bankAccountOptional.get();
-
         DataColumns dataColumns = findColumnsInData(header, bankAccount);
         if (!dataColumns.checkIfAllAreFound()) {
             log.error("{} could not find the date columns", fileName);
             log.error("Header line: {}", Arrays.toString(header));
-            return responseService.createErrorResponse(SUB_DIRECTORY, "error_notFourColumnsFound", null, HttpStatus.NOT_FOUND);
+            return responseService.createResponse(HttpStatus.NOT_FOUND, SUB_DIRECTORY, "error_notFourColumnsFound", AlertType.ERROR);
         }
 
         List<Transaction> newTransactions = parseTransactions(fileParser, bankAccount, dataColumns);
         if (newTransactions.isEmpty()) {
             log.error("{} could not find any transactions", fileName);
-            return responseService.createErrorResponse(SUB_DIRECTORY, "error_noValidTransactions", null, HttpStatus.BAD_REQUEST);
+            return responseService.createResponse(HttpStatus.BAD_REQUEST, SUB_DIRECTORY, "error_noValidTransactions", AlertType.ERROR);
         }
 
-        List<Transaction> transactions = transactionService.findByBankAccountId(bankAccountId);
-
-        newTransactions = checkIfTransactionsAlreadyExist(newTransactions, transactions);
+        List<Transaction> existingTransactions  = transactionService.findByBankAccountId(bankAccountId);
+        newTransactions = filterNewTransactions(newTransactions, existingTransactions );
         if (newTransactions.isEmpty()) {
             log.info("{} could not find any transactions", fileName);
-            return responseService.createResponse(SUB_DIRECTORY, "info_noNewTransactionsFound", AlertType.INFO, Collections.singletonList(fileName));
+            return responseService.createResponseWithPlaceHolders(HttpStatus.NOT_FOUND, SUB_DIRECTORY, "info_noNewTransactionsFound", AlertType.INFO, Collections.singletonList(fileName));
         }
 
-        // Create or set counterparties for the new transactions
-        counterPartyProcessingService.setCounterCounterParties(currentUser, newTransactions);
-
-        // Now add the existing transactions
-        transactions.addAll(newTransactions);
-
-        categoryProcessingService.addTransactionsToCategories(currentUser, transactions);
-
-        // Filter transactions that have a contract
-        transactions = getTransactionsWithoutContract(transactions);
-
-        contractProcessingService.checkIfTransactionsBelongToContract(transactions);
-
-        transactionService.saveAll(transactions);
-
-        List<String> placeholders = new ArrayList<>();
-        placeholders.add(fileParser.getFileName());
-        placeholders.add(String.valueOf(newTransactions.size()));
+        processAndSaveTransactions(currentUser, newTransactions, existingTransactions);
 
         log.info("{} transactions found", newTransactions.size());
-        return responseService.createResponse(SUB_DIRECTORY, "success_filesProcessed", AlertType.SUCCESS, placeholders);
+        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, SUB_DIRECTORY, "success_filesProcessed",
+                AlertType.SUCCESS, Arrays.asList(fileName, String.valueOf(newTransactions.size())));
+    }
+
+    private void processAndSaveTransactions(Users currentUser, List<Transaction> newTransactions, List<Transaction> existingTransactions) {
+        counterPartyProcessingService.setCounterCounterParties(currentUser, newTransactions);
+        existingTransactions.addAll(newTransactions);
+        categoryProcessingService.addTransactionsToCategories(currentUser, existingTransactions);
+
+        List<Transaction> transactionsWithoutContract = getTransactionsWithoutContract(existingTransactions);
+        contractProcessingService.checkIfTransactionsBelongToContract(transactionsWithoutContract);
+        transactionService.saveAll(existingTransactions);
     }
 
     private List<Transaction> getTransactionsWithoutContract(List<Transaction> transactions) {
@@ -143,11 +138,14 @@ public class TransactionProcessingService {
             Collections.reverse(lines);
         }
 
+        Double amountBeforeTransaction = 0.0;
+
         // Iterate over the lines in the correct direction
         for (String[] line : lines) {
             try {
                 // Create and add a transaction for each line
-                Transaction transaction = createTransactionFromLine(line, columns, bankAccount, newTransactions);
+                Transaction transaction = createTransactionFromLine(line, columns, bankAccount, amountBeforeTransaction);
+                amountBeforeTransaction = transaction.getAmountInBankAfter();
                 newTransactions.add(transaction);
             } catch (Exception e) {
                 log.error(e.getMessage());
@@ -158,8 +156,8 @@ public class TransactionProcessingService {
         return newTransactions;
     }
 
-    private List<Transaction> checkIfTransactionsAlreadyExist(List<Transaction> newTransactions,
-                                                              List<Transaction> existingTransactions) {
+    private List<Transaction> filterNewTransactions(List<Transaction> newTransactions,
+                                                    List<Transaction> existingTransactions) {
         return newTransactions.stream()
                 .filter(transaction -> !existingTransactions.contains(transaction))
                 .collect(Collectors.toList());
@@ -199,7 +197,7 @@ public class TransactionProcessingService {
     }
 
     private Transaction createTransactionFromLine(String[] line, DataColumns columns, BankAccount bankAccount,
-                                                  List<Transaction> newTransactions) throws Exception {
+                                                  Double amountBeforeTransaction) throws Exception {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         NumberFormat numberFormat = NumberFormat.getInstance(Locale.GERMANY);
 
@@ -208,24 +206,11 @@ public class TransactionProcessingService {
         Double amountAfterTransaction = numberFormat.parse(line[columns.amountAfterTransactionColumn()]).doubleValue();
         String counterPartyName = line[columns.counterPartyColumn()];
 
-        Double amountBeforeTransaction = findAmountBeforeDate(date, newTransactions);
 
         if (amountBeforeTransaction == 0.0) {
-            amountBeforeTransaction = amountAfterTransaction - amount;
+            amountBeforeTransaction = Math.round((amountAfterTransaction - amount) * 100) / 100.0;
         }
 
         return new Transaction(bankAccount, counterPartyName, date, amount, amountAfterTransaction, amountBeforeTransaction);
-    }
-
-    private Double findAmountBeforeDate(LocalDate date, List<Transaction> newTransactions) {
-        Optional<Transaction> transactionBefore = newTransactions.stream()
-                .filter(transaction -> transaction.getDate().isBefore(date))
-                .max(Comparator.comparing(Transaction::getDate));
-
-        if (transactionBefore.isPresent()) {
-            return transactionBefore.get().getAmountInBankAfter();
-        }
-
-        return 0.0;
     }
 }

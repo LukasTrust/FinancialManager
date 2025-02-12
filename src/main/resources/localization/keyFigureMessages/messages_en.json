@@ -1,0 +1,10 @@
+{
+  "netGainLoss": "Net gain/loss",
+  "netGainLossTooltip": "The total profit or loss after accounting for all expenses and income.",
+  "contractCostPerMonth": "Fixed costs per month",
+  "contractCostPerMonthTooltip": "The total monthly expenses for contracts, including recurring and one-time costs.",
+  "discrepancy": "Total profit/loss",
+  "discrepancyTooltip": "The final difference between revenue and expenses, representing the total profit or loss.",
+  "average": "Average",
+  "averageTooltip": "The mean value calculated based on relevant data points over a given period."
+}

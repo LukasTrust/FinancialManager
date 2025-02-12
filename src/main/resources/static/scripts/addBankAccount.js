@@ -26,7 +26,7 @@ async function buildAddBankAccount()  {
         }
     ];
 
-    const messages = await fetchLocalization("bankAccountMessages");
+    const messages = await fetchLocalization("addBankAccountMessages");
 
     const submitButton = document.getElementById("submitButton");
     submitButton.addEventListener("click", async (event) => {

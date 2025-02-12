@@ -1,8 +1,16 @@
 let bankAccountId;
 
-function buildBankAccountOverview(id) {
+async function buildBankAccountOverview(id) {
     bankAccountId = id;
 
+    const messages = await fetchLocalization("bankAccountOverview");
+
+    handleFileBrowser(messages);
+    await loadLineChart(messages);
+    await loadKeyFigures(messages);
+}
+
+function handleFileBrowser(messages) {
     const fileBrowsButton = document.querySelector(".fileBrowseButton");
     const fileBrowsInput = document.querySelector(".fileBrowseInput");
     const fileUploadBox = document.querySelector(".fileUploadBox");
@@ -16,13 +24,13 @@ function buildBankAccountOverview(id) {
     fileUploadBox.addEventListener("dragover", (event) => {
         event.preventDefault();
         fileUploadBox.classList.add("active");
-        fileInstructions.innerText = "Release to upload or";
+        fileInstructions.innerText = messages["fileUploadDrop"];
     });
 
     fileUploadBox.addEventListener("dragleave", (event) => {
         event.preventDefault();
         fileUploadBox.classList.remove("active");
-        fileInstructions.innerText = "Drag files here or";
+        fileInstructions.innerText = messages["fileUploadDrag"];
     });
 
     fileBrowsButton.addEventListener("click", () => {
@@ -30,20 +38,90 @@ function buildBankAccountOverview(id) {
     });
 
     fileBrowsInput.addEventListener("change", async (event) => {
-        await handleSelectedFiles(event.target.files);
+        await handleSelectedFiles(messages, event.target.files);
     });
 }
 
-async function handleSelectedFiles(files) {
+async function loadLineChart(messages, startDate = null, endDate = null) {
+    try {
+        let url = `/bankAccountOverview/${bankAccountId}/data/lineChart`;
+        const params = new URLSearchParams();
+
+        if (startDate) params.append("startDate", startDate);
+        if (endDate) params.append("endDate", endDate);
+
+        if (params.toString()) {
+            url += `?${params.toString()}`;
+        }
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            showAlert("ERROR", messages["error_loadingLineChart"]);
+            return;
+        }
+
+        const responseBody = await response.json();
+
+        const bankName = document.getElementById("bankName");
+
+        bankName.innerText = responseBody.seriesList[0].name;
+
+        createLineChart(responseBody);
+    } catch (error) {
+        showAlert("ERROR", messages["error_generic"]);
+        console.error("Error loading chart:", error);
+    }
+}
+
+async function loadKeyFigures(messages, startDate = null, endDate = null) {
+    try {
+        let url = `/bankAccountOverview/${bankAccountId}/data/keyFigures`;
+        const params = new URLSearchParams();
+
+        if (startDate) params.append("startDate", startDate);
+        if (endDate) params.append("endDate", endDate);
+
+        if (params.toString()) {
+            url += `?${params.toString()}`;
+        }
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            showAlert("ERROR", messages["error_loadingKeyFigures"]);
+            return;
+        }
+
+        const responseBody = await response.json();
+
+        createKeyFigures(responseBody)
+    } catch (error) {
+        showAlert("ERROR", messages["error_generic"]);
+        console.error("Error loading key figures", error);
+    }
+}
+
+async function handleSelectedFiles(messages, files) {
     const validFiles = [];
 
     Array.from(files).forEach((file) => {
-        const { name, size } = file;
+        const {name, size} = file;
         const extension = name.split(".").pop().toLowerCase();
 
         // Filter unsupported file types
-        if (!['csv', 'txt', 'pdf', 'xls'].includes(extension)) {
-            showAlert('warning', 'Only csv, txt, pdf and xls files are allowed');
+        if (!["csv", "txt", "pdf", "xls"].includes(extension)) {
+            showAlert("WARNING", messages["warning_WrongFileFormat"]);
             return null;
         }
 
@@ -51,27 +129,34 @@ async function handleSelectedFiles(files) {
     });
 
     if (validFiles.length > 0) {
-        await sendFiles(validFiles); // Send valid files with POST request
+        await sendFiles(messages, validFiles); // Send valid files with POST request
     }
+
+    await loadLineChart(messages);
+    await loadKeyFigures(messages);
 }
 
-async function sendFiles(files) {
-    const formData = new FormData();
+async function sendFiles(messages, files) {
+    try {
+        const formData = new FormData();
 
-    files.forEach((file) => {
-        formData.append("files", file);
-    });
+        files.forEach((file) => {
+            formData.append("files", file);
+        });
 
-    const response = await fetch(`/bankAccountOverview/${bankAccountId}/upload/data`, {
-        method: 'POST',
-        body: formData,
-    });
+        const response = await fetch(`/bankAccountOverview/${bankAccountId}/upload/data`, {
+            method: 'POST',
+            body: formData,
+        });
 
-    const responseBody = await response.json();
+        const responseBody = await response.json();
 
-    for (let count = 0; count < responseBody.length; count++) {
-        const responseOfFile = responseBody[count].body;
-        console.log(responseOfFile);
-        showAlert(responseOfFile.alertType, responseOfFile.message);
+        for (let count = 0; count < responseBody.length; count++) {
+            const responseOfFile = responseBody[count].body;
+            showAlert(responseOfFile.alertType, responseOfFile.message);
+        }
+    } catch (error) {
+        error("ERROR", messages["error_generic"]);
+        console.error("Error loading chart:", error);
     }
 }

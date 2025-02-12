@@ -1,0 +1,10 @@
+{
+  "fileUploadDrop": "Release to upload or",
+  "fileUploadDrag": "Drag files here or",
+  "warning_WrongFileFormat": "Only CSV, TXT, PDF, and XLS files are allowed",
+  "error_generic": "An unexpected error has occurred. Please try again.",
+  "error_loadingLineChart": "An error occurred while loading the line chart",
+  "error_loadingKeyFigures": "An error occurred while loading the key figures",
+  "browseFiles": "Browse files",
+  "uploadDate": "Upload date"
+}

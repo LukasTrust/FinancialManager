@@ -1,0 +1,10 @@
+{
+  "netGainLoss": "Netto-Gewinn/Verlust",
+  "netGainLossTooltip": "Der Gesamtgewinn oder -verlust nach Berücksichtigung aller Ausgaben und Einnahmen.",
+  "contractCostPerMonth": "Feste Kosten pro Monat",
+  "contractCostPerMonthTooltip": "Die gesamten monatlichen Ausgaben für Verträge, einschließlich wiederkehrender und einmaliger Kosten.",
+  "discrepancy": "Gesamter Gewinn/Verlust",
+  "discrepancyTooltip": "Die endgültige Differenz zwischen Einnahmen und Ausgaben, die den gesamten Gewinn oder Verlust darstellt.",
+  "average": "Durchschnitt",
+  "averageTooltip": "Der Mittelwert, berechnet auf Basis relevanter Datenpunkte über einen bestimmten Zeitraum."
+}

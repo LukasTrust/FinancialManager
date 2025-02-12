@@ -2,7 +2,6 @@ async function setLocale() {
     const locale = navigator.language;
 
     try {
-        console.log(locale);
         await fetch(`/localization/update/locale/${locale}`, {
             method: 'POST',
         });

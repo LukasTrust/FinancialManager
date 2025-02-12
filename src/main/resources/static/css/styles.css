@@ -152,13 +152,17 @@ button:hover {
 .flexContainerColumn {
     display: flex;
     flex-direction: column;
+    margin: 20px;
+    overflow-y: auto;
+}
+
+.flexContainerColumnSmall {
+    display: flex;
+    flex-direction: column;
     margin-bottom: 20px;
     overflow-y: auto;
     border-radius: 20px;
     border: 1px solid #ccc;
-}
-
-.flexContainerColumn {
     min-height: 20%;
     max-height: 20%;
 }
@@ -184,6 +188,7 @@ button:hover {
 }
 
 .content {
+    width: 100%;
     margin-left: 300px;
     transition: 0.4s ease;
 }
@@ -217,4 +222,94 @@ button:hover {
     margin: 0;
     overflow: hidden;
     transition: opacity 0.5s ease, max-height 1s ease;
+}
+
+.chartContainer {
+    width: 100%;
+    max-height: 500px;
+    display: flex;
+    height: auto;
+    margin: 20px auto;
+    padding: 15px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ensure the canvas resizes properly */
+.chartContainer canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.keyFigureBox {
+    background: white;
+    border-radius: 12px;
+    width: 10%;
+    height: 120px;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative;
+}
+
+.keyFigureHeader {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    height: 40px;
+}
+
+.keyFigureValue {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+    color: #333;
+}
+
+.tooltip {
+    position: relative;
+    cursor: pointer;
+    font-size: 14px;
+    color: gray;
+}
+
+.tooltipText {
+    visibility: hidden;
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 5px;
+    border-radius: 6px;
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 200px;
+    width: max-content;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 10;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.tooltip:hover .tooltipText {
+    visibility: visible;
+    opacity: 1;
+}
+
+.positive {
+    background: #d4edda;
+    color: #155724;
+}
+
+.negative {
+    background: #f8d7da;
+    color: #721c24;
 }

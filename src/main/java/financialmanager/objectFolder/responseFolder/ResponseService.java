@@ -1,11 +1,11 @@
 package financialmanager.objectFolder.responseFolder;
 
-import financialmanager.locale.LocaleController;
+import financialmanager.locale.LocaleService;
 import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -13,44 +13,30 @@ import java.util.List;
 @AllArgsConstructor
 public class ResponseService {
 
-    private final LocaleController localeController;
+    private final LocaleService localeService;
     private final UsersService usersService;
 
-    public ResponseEntity<Response> createResponse(String subDirectory, String key, AlertType alertType) {
-        String message = localeController.getMessage(subDirectory, key, usersService.getCurrentUser());
+    private ResponseEntity<Response> buildResponse(HttpStatus status, String subDirectory, String key, AlertType alertType, Object data, List<String> placeholders) {
+        String message = (placeholders == null || placeholders.isEmpty())
+                ? localeService.getMessage(subDirectory, key, usersService.getCurrentUser())
+                : localeService.getMessageWithPlaceHolder(subDirectory, key, usersService.getCurrentUser(), placeholders);
 
-        return ResponseEntity.ok(new Response(alertType, message));
+        return ResponseEntity.status(status).body(new Response(alertType, message, data));
     }
 
-    public ResponseEntity<Response> createResponse(String subDirectory, String key, AlertType alertType, List<String> placeholders) {
-        String rawMessage = localeController.getMessage(subDirectory, key, usersService.getCurrentUser());
-        String message = formatMessage(rawMessage, placeholders);
-
-        return ResponseEntity.ok(new Response(alertType, message));
+    public ResponseEntity<Response> createResponse(HttpStatus status, String subDirectory, String key, AlertType alertType) {
+        return buildResponse(status, subDirectory, key, alertType, null, null);
     }
 
-    private String formatMessage(String rawMessage, List<String> placeholders) {
-        for (String placeholder : placeholders) {
-            rawMessage = rawMessage.replaceFirst("\\{\\}", placeholder);
-        }
-        return rawMessage;
+    public ResponseEntity<Response> createResponseWithPlaceHolders(HttpStatus status, String subDirectory, String key, AlertType alertType, List<String> placeholders) {
+        return buildResponse(status, subDirectory, key, alertType, null, placeholders);
     }
 
-    public ResponseEntity<Response> createErrorResponse(String subDirectory, String errorKey, String additionalInfo,
-                                                        HttpStatus status) {
-        String message = localeController.getMessage(subDirectory, errorKey, usersService.getCurrentUser());
-        if (additionalInfo != null) {
-            message = message.replace("{}", additionalInfo);
-        }
-        return ResponseEntity.status(status).body(new Response(AlertType.ERROR, message));
+    public ResponseEntity<Response> createResponseWithData(HttpStatus status, String subDirectory, String key, AlertType alertType, Object data) {
+        return buildResponse(status, subDirectory, key, alertType, data, null);
     }
 
-    public ResponseEntity<Response> createErrorResponseWithData(String subDirectory, String errorKey, String additionalInfo,
-                                                        HttpStatus status, Object data) {
-        String message = localeController.getMessage(subDirectory, errorKey, usersService.getCurrentUser());
-        if (additionalInfo != null) {
-            message = message.replace("{}", additionalInfo);
-        }
-        return ResponseEntity.status(status).body(new Response(AlertType.ERROR, message, data));
+    public ResponseEntity<Response> createResponseWithDataAndPlaceHolders(HttpStatus status, String subDirectory, String key, AlertType alertType, Object data, List<String> placeholders) {
+        return buildResponse(status, subDirectory, key, alertType, data, placeholders);
     }
 }

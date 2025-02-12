@@ -1,6 +1,6 @@
 package financialmanager.objectFolder.usersFolder;
 
-import financialmanager.locale.LocaleController;
+import financialmanager.locale.LocaleService;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ public class UsersController {
     private final String subDirectory = "login&signup";
     private final UsersService usersService;
     private final PasswordEncoder passwordEncoder;
-    private final LocaleController localeController;
+    private final LocaleService localeService;
 
     private final Pattern passwordPattern =
             Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$");
@@ -38,7 +38,7 @@ public class UsersController {
             if (!isValidEmail(email)) {
                 return ResponseEntity.badRequest().body(new Response(
                         AlertType.WARNING,
-                        localeController.getMessage(subDirectory, "error_invalidEmail", user)
+                        localeService.getMessage(subDirectory, "error_invalidEmail", user)
                 ));
             }
 
@@ -61,18 +61,18 @@ public class UsersController {
             // Success response
             return ResponseEntity.ok(new Response(
                     AlertType.SUCCESS,
-                    localeController.getMessage(subDirectory, "success_signUp", user),
+                    localeService.getMessage(subDirectory, "success_signUp", user),
                     savedUser
             ));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(
                     AlertType.ERROR,
-                    localeController.getMessage(subDirectory, "error_userExists", user)
+                    localeService.getMessage(subDirectory, "error_userExists", user)
             ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(
                     AlertType.ERROR,
-                    localeController.getMessage(subDirectory, "error_generic", user)
+                    localeService.getMessage(subDirectory, "error_generic", user)
             ));
         }
     }
@@ -80,10 +80,10 @@ public class UsersController {
     // Utility method for password validation
     public String validatePassword(String password, Users user) {
         if (password.length() < 8) {
-            return localeController.getMessage(subDirectory, "error_passwordLength", user);
+            return localeService.getMessage(subDirectory, "error_passwordLength", user);
         }
         if (!isStrongPassword(password)) {
-            return localeController.getMessage(subDirectory, "error_passwordStrength", user);
+            return localeService.getMessage(subDirectory, "error_passwordStrength", user);
         }
         return null; // Indicates password is valid
     }
