@@ -30,7 +30,6 @@ public class TransactionsController {
     @GetMapping("/{bankAccountId}/data/keyFigures")
     public ResponseEntity<?> getTransactionsForBankAccount(@PathVariable Long bankAccountId) {
         Users currentUser = usersService.getCurrentUser();
-
         Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, currentUser);
 
         if (bankAccountOptional.isPresent()) {

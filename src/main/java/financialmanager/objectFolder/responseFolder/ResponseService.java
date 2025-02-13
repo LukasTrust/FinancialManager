@@ -18,8 +18,8 @@ public class ResponseService {
 
     private ResponseEntity<Response> buildResponse(HttpStatus status, String key, AlertType alertType, Object data, List<String> placeholders) {
         String message = (placeholders == null || placeholders.isEmpty())
-                ? localeService.getMessage(key, alertType.toString().toLowerCase(), usersService.getCurrentUser())
-                : localeService.getMessageWithPlaceHolder(key, alertType.toString().toLowerCase(), usersService.getCurrentUser(), placeholders);
+                ? localeService.getMessage(alertType.toString().toLowerCase(),key, usersService.getCurrentUser())
+                : localeService.getMessageWithPlaceHolder(alertType.toString().toLowerCase(), key, usersService.getCurrentUser(), placeholders);
 
         return ResponseEntity.status(status).body(new Response(alertType, message, data));
     }

@@ -70,7 +70,7 @@ async function handleSelectedFiles(messages, files) {
     const validFiles = [];
 
     Array.from(files).forEach((file) => {
-        const extension = file.split(".").pop().toLowerCase();
+        const extension = file.name.split(".").pop().toLowerCase();
 
         // Filter unsupported file types
         if (!["csv", "txt", "pdf", "xls"].includes(extension)) {
@@ -109,6 +109,7 @@ async function sendFiles(messages, files) {
 
         for (let count = 0; count < responseBody.length; count++) {
             const responseOfFile = responseBody[count].body;
+            console.log(responseOfFile.message);
             showAlert(responseOfFile.alertType, responseOfFile.message);
             if (responseOfFile.alertType === "SUCCESS") {
                 newDate = true;

@@ -35,6 +35,10 @@ public class Transaction {
     @Column(nullable = false)
     private String originalCounterParty;
 
+    @Setter
+    @Column(nullable = false)
+    private boolean isHidden;
+
     @ManyToOne
     @JoinColumn(name = "bank_account_Id", nullable = false)
     private BankAccount bankAccount;
