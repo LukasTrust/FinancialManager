@@ -28,7 +28,6 @@ public class ChartService {
     private final BankAccountService bankAccountService;
     private final UsersService usersService;
     private final LocaleService localeService;
-    private static final String SUB_DIRECTORY = "chartMessages";
     private static final Logger log = LoggerFactory.getLogger(ChartService.class);
 
     public ChartData getTransactionDate(List<Long> bankAccountIds, LocalDate startDate, LocalDate endDate) {
@@ -68,7 +67,7 @@ public class ChartService {
             List<Transaction> transactions = new ArrayList<>(transactionService.findByBankAccountIdBetweenDates(
                     bankAccount.getId(), startDate, endDate));
 
-            transactions.sort(Comparator.comparing(Transaction::getDate));
+            transactions.sort(Comparator.comparing(financialmanager.objectFolder.transactionFolder.Transaction::getDate));
 
             List<DataPoint> dataPoints = getDataPoints(currentUser, transactions);
 
@@ -97,7 +96,6 @@ public class ChartService {
 
         String info = (pointStyle == PointStyle.NORMAL) ? null
                 : localeService.getMessageWithPlaceHolder(
-                SUB_DIRECTORY,
                 pointStyle == PointStyle.BAD ? "lessAmountAfter" : "moreAmountAfter",
                 currentUser,
                 List.of(String.valueOf(difference))

@@ -11,19 +11,20 @@ async function setLocale() {
 }
 
 async function fetchLocalization(subDirectory, locale) {
-    const filePath = `/localization/${subDirectory}/messages/${locale}`;
+    const filePath = `/localization/clientSide/${subDirectory}/messages/${locale}`;
 
     try {
-        const response = await fetch(filePath);
+        const responseBody = await fetch(filePath);
 
-        if (response.ok) {
-            const messages = await response.json();
+        if (responseBody.ok) {
+            const messages = await responseBody.json();
 
             // Apply translations to the page
             applyTranslations(messages);
 
             return messages;
         } else {
+            showAlert(responseBody.alertType, responseBody.message);
             console.warn(`Localization file not found in ${subDirectory}. Falling back to default.`);
         }
     } catch (error) {

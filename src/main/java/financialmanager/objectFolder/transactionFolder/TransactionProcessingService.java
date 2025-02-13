@@ -37,7 +37,6 @@ public class TransactionProcessingService {
     private final ContractProcessingService contractProcessingService;
     private final CategoryProcessingService categoryProcessingService;
     private static final Logger log = LoggerFactory.getLogger(TransactionProcessingService.class);
-    private static final String SUB_DIRECTORY = "addBankAccountMessages";
 
     public ResponseEntity<Response> createTransactionsFromData(IFileParser fileParser, Long bankAccountId) {
         Users currentUser = usersService.getCurrentUser();
@@ -48,14 +47,14 @@ public class TransactionProcessingService {
 
         if (bankAccountOptional.isEmpty()) {
             log.error("bankAccount not found");
-            return responseService.createResponse(HttpStatus.NOT_FOUND, SUB_DIRECTORY, "error_bankNotFound", AlertType.ERROR);
+            return responseService.createResponse(HttpStatus.NOT_FOUND, "bankNotFound", AlertType.ERROR);
         }
 
         header = fileParser.getNextLineOfData();
 
         if (header == null) {
             log.error("{} no header line found", fileName);
-            return responseService.createResponseWithPlaceHolders(HttpStatus.NOT_FOUND, SUB_DIRECTORY, "error_headerNotFound",
+            return responseService.createResponseWithPlaceHolders(HttpStatus.NOT_FOUND, "headerNotFound",
                     AlertType.ERROR, Collections.singletonList(fileName));
         }
 
@@ -64,26 +63,27 @@ public class TransactionProcessingService {
         if (!dataColumns.checkIfAllAreFound()) {
             log.error("{} could not find the date columns", fileName);
             log.error("Header line: {}", Arrays.toString(header));
-            return responseService.createResponse(HttpStatus.NOT_FOUND, SUB_DIRECTORY, "error_notFourColumnsFound", AlertType.ERROR);
+            return responseService.createResponse(HttpStatus.NOT_FOUND, "notFourColumnsFound", AlertType.ERROR);
         }
 
         List<Transaction> newTransactions = parseTransactions(fileParser, bankAccount, dataColumns);
         if (newTransactions.isEmpty()) {
             log.error("{} could not find any transactions", fileName);
-            return responseService.createResponse(HttpStatus.BAD_REQUEST, SUB_DIRECTORY, "error_noValidTransactions", AlertType.ERROR);
+            return responseService.createResponse(HttpStatus.BAD_REQUEST, "noValidTransactions", AlertType.ERROR);
         }
 
         List<Transaction> existingTransactions  = transactionService.findByBankAccountId(bankAccountId);
         newTransactions = filterNewTransactions(newTransactions, existingTransactions );
         if (newTransactions.isEmpty()) {
             log.info("{} could not find any transactions", fileName);
-            return responseService.createResponseWithPlaceHolders(HttpStatus.NOT_FOUND, SUB_DIRECTORY, "info_noNewTransactionsFound", AlertType.INFO, Collections.singletonList(fileName));
+            return responseService.createResponseWithPlaceHolders(HttpStatus.NOT_FOUND, "noNewTransactionsFound",
+                    AlertType.INFO, Collections.singletonList(fileName));
         }
 
         processAndSaveTransactions(currentUser, newTransactions, existingTransactions);
 
         log.info("{} transactions found", newTransactions.size());
-        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, SUB_DIRECTORY, "success_filesProcessed",
+        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "filesProcessed",
                 AlertType.SUCCESS, Arrays.asList(fileName, String.valueOf(newTransactions.size())));
     }
 

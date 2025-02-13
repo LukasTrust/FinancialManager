@@ -1,7 +1,6 @@
 package financialmanager.objectFolder.contractFolder;
 
 import financialmanager.Utils.Utils;
-import financialmanager.objectFolder.transactionFolder.Transaction;
 import financialmanager.objectFolder.transactionFolder.TransactionRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

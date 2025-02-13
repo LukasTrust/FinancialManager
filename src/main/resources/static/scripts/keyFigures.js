@@ -1,3 +1,36 @@
+async function loadKeyFigures(messages, startDate = null, endDate = null) {
+    try {
+        let url = `/bankAccountOverview/${bankAccountId}/data/keyFigures`;
+        const params = new URLSearchParams();
+
+        if (startDate) params.append("startDate", startDate);
+        if (endDate) params.append("endDate", endDate);
+
+        if (params.toString()) {
+            url += `?${params.toString()}`;
+        }
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            showAlert("ERROR", messages["error_loadingKeyFigures"]);
+            return;
+        }
+
+        const responseBody = await response.json();
+
+        createKeyFigures(responseBody)
+    } catch (error) {
+        showAlert("ERROR", messages["error_generic"]);
+        console.error("Error loading key figures", error);
+    }
+}
+
 function createKeyFigures(keyFigures) {
     const keyFiguresContainer = document.getElementById("keyFiguresContainer");
     keyFiguresContainer.innerHTML = '';

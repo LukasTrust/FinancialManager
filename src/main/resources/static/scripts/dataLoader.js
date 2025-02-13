@@ -1,3 +1,5 @@
+let bankAccountId;
+
 document.addEventListener('DOMContentLoaded', async () => {
     const contentArea = document.getElementById('content');  // Where the content will go
 
@@ -15,7 +17,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             event.preventDefault();  // Prevent the default link behavior
 
             const url = link.getAttribute('href');
-            const parentId = link.parentElement.id;
+
+            if (link.parentElement.id) {
+                bankAccountId = link.parentElement.id;
+            }
 
             try {
                 // Fetch the content from the server (just the content fragment)
@@ -36,7 +41,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         await buildAddBankAccount();
                         break;
                     case "/bankAccountOverview":
-                        await buildBankAccountOverview(parentId);
+                        await buildBankAccountOverview();
+                        break;
+                    case "/transactions":
+                        await buildTransactions();
                         break;
                 }
 
@@ -46,7 +54,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 });
-
 
 async function loadBankAccounts() {
     try {

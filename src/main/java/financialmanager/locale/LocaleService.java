@@ -44,7 +44,16 @@ public class LocaleService {
     // Method to fetch a specific message by key
     public String getMessage(String subDirectory, String key, Users user) {
         try {
-            Map<String, String> messages = loadMessages(subDirectory, user, null);
+            Map<String, String> messages = loadMessages("serverSide", subDirectory, user, null);
+            return messages.getOrDefault(key, key);
+        } catch (IOException e) {
+            return key; // Return the key itself as a fallback
+        }
+    }
+
+    public String getMessage(String key, Users user) {
+        try {
+            Map<String, String> messages = loadMessages("serverSide", "info", user, null);
             return messages.getOrDefault(key, key);
         } catch (IOException e) {
             return key; // Return the key itself as a fallback
@@ -53,7 +62,22 @@ public class LocaleService {
 
     public String getMessageWithPlaceHolder(String subDirectory, String key, Users user, List<String> placeHolders){
         try {
-            Map<String, String> messages = loadMessages(subDirectory, user, null);
+            Map<String, String> messages = loadMessages("serverSide", subDirectory, user, null);
+
+            String message = messages.getOrDefault(key, key);
+
+            for (String placeholder : placeHolders) {
+                message = message.replaceFirst("\\{\\}", placeholder);
+            }
+            return message;
+        } catch (IOException e) {
+            return key; // Return the key itself as a fallback
+        }
+    }
+
+    public String getMessageWithPlaceHolder(String key, Users user, List<String> placeHolders){
+        try {
+            Map<String, String> messages = loadMessages("serverSide", "info", user, null);
 
             String message = messages.getOrDefault(key, key);
 
@@ -67,8 +91,8 @@ public class LocaleService {
     }
 
     // Shared method to load JSON content
-    public Map<String, String> loadMessages(String subDirectory, Users user, Locale locale) throws IOException {
-        String filePath = "localization/" + subDirectory + "/messages_";
+    public Map<String, String> loadMessages(String mainDirectory, String subDirectory, Users user, Locale locale) throws IOException {
+        String filePath = "localization/" + mainDirectory + "/" + subDirectory + "/messages_";
         filePath += locale != null ? locale.getLanguage() : getCurrentLocale(user.getId());
         filePath += ".json";
         Resource resource = new ClassPathResource(filePath);

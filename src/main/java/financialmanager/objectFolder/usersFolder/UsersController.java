@@ -3,6 +3,7 @@ package financialmanager.objectFolder.usersFolder;
 import financialmanager.locale.LocaleService;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.AlertType;
+import financialmanager.objectFolder.responseFolder.ResponseService;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -19,10 +20,9 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 public class UsersController {
 
-    private final String subDirectory = "login&signup";
     private final UsersService usersService;
     private final PasswordEncoder passwordEncoder;
-    private final LocaleService localeService;
+    private final ResponseService responseService;
 
     private final Pattern passwordPattern =
             Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$");
@@ -36,20 +36,14 @@ public class UsersController {
             // Validate email
             String email = user.getEmail();
             if (!isValidEmail(email)) {
-                return ResponseEntity.badRequest().body(new Response(
-                        AlertType.WARNING,
-                        localeService.getMessage(subDirectory, "error_invalidEmail", user)
-                ));
+                return responseService.createResponse(HttpStatus.BAD_REQUEST, "invalidEmail", AlertType.WARNING);
             }
 
             // Validate password
             String password = user.getPassword();
 //            String passwordValidationMessage = validatePassword(password, user);
 //            if (passwordValidationMessage != null) {
-//                return ResponseEntity.badRequest().body(new Response(
-//                       AlertType.WARNING,
-//                        passwordValidationMessage
-//                ));
+//                return responseService.createResponse(HttpStatus.BAD_REQUEST, passwordValidationMessage, AlertType.WARNING);
 //            }
 
             // Encode password
@@ -59,31 +53,22 @@ public class UsersController {
             Users savedUser = usersService.save(user);
 
             // Success response
-            return ResponseEntity.ok(new Response(
-                    AlertType.SUCCESS,
-                    localeService.getMessage(subDirectory, "success_signUp", user),
-                    savedUser
-            ));
+            return responseService.createResponse(HttpStatus.CREATED, "signUp", AlertType.SUCCESS);
+
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new Response(
-                    AlertType.ERROR,
-                    localeService.getMessage(subDirectory, "error_userExists", user)
-            ));
+            return responseService.createResponse(HttpStatus.CONFLICT, "userExists", AlertType.ERROR);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Response(
-                    AlertType.ERROR,
-                    localeService.getMessage(subDirectory, "error_generic", user)
-            ));
+            return responseService.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, "generic", AlertType.ERROR);
         }
     }
 
     // Utility method for password validation
     public String validatePassword(String password, Users user) {
         if (password.length() < 8) {
-            return localeService.getMessage(subDirectory, "error_passwordLength", user);
+            return "passwordLength";
         }
         if (!isStrongPassword(password)) {
-            return localeService.getMessage(subDirectory, "error_passwordStrength", user);
+            return "error_passwordStrength";
         }
         return null; // Indicates password is valid
     }

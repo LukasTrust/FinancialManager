@@ -64,7 +64,7 @@ function createSublist() {
 
     const subItems = [
         {name: 'Overview', href: '/bankAccountOverview', icon: 'bi bi-border-style'},
-        {name: 'Transactions', href: '/bankAccount/transactions', icon: 'bi bi-receipt'},
+        {name: 'Transactions', href: '/transactions', icon: 'bi bi-receipt'},
         {name: 'Categories', href: '/bankAccount/categories', icon: 'bi bi-tag-fill'},
         {name: 'Counterparties', href: '/bankAccount/counterparties', icon: 'bi bi-person-fill'},
         {name: 'Contracts', href: '/bankAccount/contracts', icon: 'bi bi-file-earmark-fill'}
@@ -72,7 +72,7 @@ function createSublist() {
 
     subItems.forEach(({name, href, icon}) => {
         const subItem = createElement('li', 'navSubitem');
-        const subItemLink = createElement('a', 'navSublink', '', {href, 'data-ajax': 'true'});
+        const subItemLink = createElement('a', 'navSubLink', '', {href, 'data-ajax': 'true'});
 
         subItemLink.appendChild(createElement('span', icon));
         subItemLink.appendChild(createElement('span', 'navLabel', name));
@@ -85,8 +85,8 @@ function createSublist() {
 }
 
 function toggleSublistVisibility(sublist, container) {
-    const allSublists = container.querySelectorAll('.navSublist');
-    allSublists.forEach(list => {
+    const allSublist = container.querySelectorAll('.navSublist');
+    allSublist.forEach(list => {
         if (list !== sublist) list.classList.add('hidden');
     });
     sublist.classList.toggle('hidden');
@@ -99,12 +99,4 @@ function initStaticLinks() {
             document.querySelectorAll('.navSublist').forEach(list => list.classList.add('hidden'));
         });
     });
-}
-
-function createElement(type, className, textContent = '', attributes = {}) {
-    const element = document.createElement(type);
-    if (className) element.className = className;
-    if (textContent) element.textContent = textContent;
-    Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
-    return element;
 }

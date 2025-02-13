@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("bankAccountOverview")
 public class BankAccountOverviewController {
 
     private final FileParserFactory fileParserFactory;
@@ -30,7 +31,7 @@ public class BankAccountOverviewController {
     private final ChartService chartService;
     private final KeyFigureService keyFigureService;
 
-    @RequestMapping("bankAccountOverview/{bankAccountId}/data/keyFigures")
+    @GetMapping("/{bankAccountId}/data/keyFigures")
     public ResponseEntity<List<KeyFigure>> getKeyFigures(
             @PathVariable("bankAccountId") Long bankAccountId,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -41,7 +42,7 @@ public class BankAccountOverviewController {
         return ResponseEntity.ok(keyFigureService.getKeyFiguresOfBankAccounts(bankAccountIds, startDate, endDate));
     }
 
-    @RequestMapping("bankAccountOverview/{bankAccountId}/data/lineChart")
+    @GetMapping("/{bankAccountId}/data/lineChart")
     public ResponseEntity<ChartData> getLineChart(
             @PathVariable("bankAccountId") Long bankAccountId,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -52,8 +53,7 @@ public class BankAccountOverviewController {
         return ResponseEntity.ok(chartService.getTransactionDate(bankAccountIds, startDate, endDate));
     }
 
-
-    @PostMapping(value = "bankAccountOverview/{bankAccountId}/upload/data")
+    @PostMapping(value = "/{bankAccountId}/upload/data")
     @ResponseBody
     public ResponseEntity<?> uploadDataForTransactions(@PathVariable Long bankAccountId, @RequestParam("files") MultipartFile[] files) {
         List<CompletableFuture<ResponseEntity<Response>>> futures = new ArrayList<>();
@@ -65,8 +65,7 @@ public class BankAccountOverviewController {
         List<ResponseEntity<Response>> responses = futures.stream()
                 .map(CompletableFuture::join)
                 .collect(Collectors.toList());
-
-
+        
         return ResponseEntity.ok(responses);
     }
 

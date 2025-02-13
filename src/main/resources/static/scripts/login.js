@@ -25,14 +25,14 @@ async function submitSignIn(messages) {
 
     // Check if all fields are filled
     if (!email || !password) {
-        showAlert('warning', messages["error_allFieldsRequired"]);
+        showAlert('WARNING', messages["error_allFieldsRequired"]);
         return;
     }
 
     // Check if email is in valid format
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     if (!emailRegex.test(email)) {
-        showAlert('error', messages["error_invalidEmail"]);
+        showAlert('ERROR', messages["error_invalidEmail"]);
         return;
     }
 

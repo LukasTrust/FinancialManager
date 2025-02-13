@@ -35,4 +35,10 @@ public class ContentController {
         model.addAttribute("title", "Bank Account Overview");
         return "bankAccountOverview";
     }
+
+    @GetMapping("/transactions")
+    public String getTransactions(Model model) {
+        model.addAttribute("title", "Transactions");
+        return "transactions";
+    }
 }

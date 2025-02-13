@@ -1,11 +1,8 @@
 package financialmanager.objectFolder.counterPartyFolder;
 
 import financialmanager.objectFolder.transactionFolder.Transaction;
-import financialmanager.objectFolder.transactionFolder.TransactionProcessingService;
 import financialmanager.objectFolder.usersFolder.Users;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -35,7 +32,7 @@ public class CounterPartyProcessingService {
 
         // Group transactions by counterparty
         Map<String, List<Transaction>> transactionsByCounterParty = transactions.stream()
-                .collect(Collectors.groupingBy(Transaction::getOriginalCounterParty));
+                .collect(Collectors.groupingBy(financialmanager.objectFolder.transactionFolder.Transaction::getOriginalCounterParty));
 
         for (Map.Entry<String, List<Transaction>> entry : transactionsByCounterParty.entrySet()) {
             String counterPartyName = entry.getKey();

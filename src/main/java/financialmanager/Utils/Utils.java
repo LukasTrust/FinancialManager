@@ -32,10 +32,10 @@ public class Utils {
     }
 
     public static Transaction getFirstTransaction(List<Transaction> transactions) {
-        return transactions.stream().min(Comparator.comparing(Transaction::getDate)).orElse(null);
+        return transactions.stream().min(Comparator.comparing(financialmanager.objectFolder.transactionFolder.Transaction::getDate)).orElse(null);
     }
 
     public static Transaction getLastTransaction(List<Transaction> transactions) {
-        return transactions.stream().max(Comparator.comparing(Transaction::getDate)).orElse(null);
+        return transactions.stream().max(Comparator.comparing(financialmanager.objectFolder.transactionFolder.Transaction::getDate)).orElse(null);
     }
 }

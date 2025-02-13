@@ -28,15 +28,14 @@ public class AddBankAccountController {
         // Set the associated currentUser
         bankAccount.setUsers(currentUser);
 
-        String SUB_DIRECTORY = "addBankAccountMessages";
         try {
             BankAccount savedBankAccount = bankAccountService.save(bankAccount);
 
-            return responseService.createResponseWithData(HttpStatus.CREATED, SUB_DIRECTORY, "success_bankAccountCreated",
+            return responseService.createResponseWithData(HttpStatus.CREATED, "bankAccountCreated",
                     AlertType.SUCCESS, savedBankAccount);
         } catch (Exception e) {
-            return responseService.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, SUB_DIRECTORY,
-                    "error_failedCreateBankAccount", AlertType.ERROR);
+            return responseService.createResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "failedCreateBankAccount", AlertType.ERROR);
         }
     }
 }

@@ -1,0 +1,10 @@
+{
+  "bankNotFound": "Bankkonto nicht gefunden.",
+  "failedCreateBankAccount": "Fehler beim Erstellen des Bankkontos.",
+  "headerNotFound": "Die angegebenen Begriffe wurden in der Datei nicht gefunden: {}",
+  "notFourColumnsFound": "Nicht alle erforderlichen Begriffe wurden in der Datei gefunden. Bitte stellen Sie sicher, dass sie vorhanden sind.",
+  "noValidTransactions": "Die Daten konnten nicht korrekt gelesen und Transaktionen erstellt werden.",
+  "userExists": "Benutzer mit der gleichen E-Mail-Adresse existiert bereits",
+  "generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut",
+  "localizationNotFound": "Die Lokalisierung Datei wurde nicht gefunden"
+}

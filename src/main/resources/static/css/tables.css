@@ -1,0 +1,124 @@
+.tableContainer {
+    background: transparent;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.filters {
+    display: flex;
+    gap: 8px;
+    height: 42px;
+}
+
+.filters select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.searchBar {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    max-width: 300px;
+}
+
+.searchBar input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    height: 42px;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.searchBar button {
+    background: #007bff;
+    border: none;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.searchBar button:hover {
+    background: #0056b3;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background-color: #007bff;
+    color: #fff;
+}
+
+th, td {
+    padding: 12px 16px;
+    text-align: left;
+}
+
+th {
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+}
+
+th i {
+    margin-left: 8px;
+    font-size: 12px;
+}
+
+tbody tr {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    transition: background 0.3s ease;
+}
+
+tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.pagination button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.pagination button.disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.pagination .currentPage {
+    font-size: 16px;
+    margin: 0 10px;
+}
+
+.pagination select {
+    padding: 10px;
+    margin-left: 10px;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    background-color: white;
+    color: #007bff;
+    cursor: pointer;
+}

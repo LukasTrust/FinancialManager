@@ -1,8 +1,4 @@
-let bankAccountId;
-
-async function buildBankAccountOverview(id) {
-    bankAccountId = id;
-
+async function buildBankAccountOverview() {
     const messages = await fetchLocalization("bankAccountOverview");
 
     handleFileBrowser(messages);
@@ -68,76 +64,6 @@ function handleFileBrowser(messages) {
     fileBrowsInput.addEventListener("change", async (event) => {
         await handleSelectedFiles(messages, event.target.files);
     });
-}
-
-async function loadLineChart(messages, startDate = null, endDate = null) {
-    try {
-        let url = `/bankAccountOverview/${bankAccountId}/data/lineChart`;
-        const params = new URLSearchParams();
-
-        if (startDate) params.append("startDate", startDate);
-        if (endDate) params.append("endDate", endDate);
-
-        if (params.toString()) {
-            url += `?${params.toString()}`;
-        }
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            showAlert("ERROR", messages["error_loadingLineChart"]);
-            return;
-        }
-
-        const responseBody = await response.json();
-
-        const bankName = document.getElementById("bankName");
-
-        bankName.innerText = responseBody.seriesList[0].name;
-
-        createLineChart(responseBody);
-    } catch (error) {
-        showAlert("ERROR", messages["error_generic"]);
-        console.error("Error loading chart:", error);
-    }
-}
-
-async function loadKeyFigures(messages, startDate = null, endDate = null) {
-    try {
-        let url = `/bankAccountOverview/${bankAccountId}/data/keyFigures`;
-        const params = new URLSearchParams();
-
-        if (startDate) params.append("startDate", startDate);
-        if (endDate) params.append("endDate", endDate);
-
-        if (params.toString()) {
-            url += `?${params.toString()}`;
-        }
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            showAlert("ERROR", messages["error_loadingKeyFigures"]);
-            return;
-        }
-
-        const responseBody = await response.json();
-
-        createKeyFigures(responseBody)
-    } catch (error) {
-        showAlert("ERROR", messages["error_generic"]);
-        console.error("Error loading key figures", error);
-    }
 }
 
 async function handleSelectedFiles(messages, files) {

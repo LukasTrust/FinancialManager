@@ -1,6 +1,8 @@
 package financialmanager.controller;
 
 import financialmanager.locale.LocaleService;
+import financialmanager.objectFolder.responseFolder.AlertType;
+import financialmanager.objectFolder.responseFolder.ResponseService;
 import financialmanager.objectFolder.usersFolder.Users;
 import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.Map;
 public class LocaleController {
 
     private LocaleService localeService;
+    private ResponseService responseService;
     private final UsersService usersService;
 
     @PostMapping("/update/locale/{locale}")
@@ -32,7 +35,7 @@ public class LocaleController {
     }
 
     // Endpoint for fetching localization files
-    @GetMapping("/{subDirectory}/messages/{locale}")
+    @GetMapping("/clientSide/{subDirectory}/messages/{locale}")
     public ResponseEntity<?> getLocalization(@PathVariable String subDirectory, @PathVariable(required = false) Locale locale) {
         if (locale.getLanguage().equals("undefined")) {
             locale = null;
@@ -40,12 +43,12 @@ public class LocaleController {
 
         Users user = usersService.getCurrentUser();
         try {
-            Map<String, String> messages = localeService.loadMessages(subDirectory, user, locale);
+            Map<String, String> messages = localeService.loadMessages("clientSide", subDirectory, user, locale);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(messages);
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Localization file not found");
+            return responseService.createResponse(HttpStatus.NOT_FOUND, "localizationNotFound", AlertType.ERROR);
         }
     }
 }

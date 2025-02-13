@@ -1,5 +1,42 @@
 let existingChart = null;
 
+async function loadLineChart(messages, startDate = null, endDate = null) {
+    try {
+        let url = `/bankAccountOverview/${bankAccountId}/data/lineChart`;
+        const params = new URLSearchParams();
+
+        if (startDate) params.append("startDate", startDate);
+        if (endDate) params.append("endDate", endDate);
+
+        if (params.toString()) {
+            url += `?${params.toString()}`;
+        }
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            showAlert("ERROR", messages["error_loadingLineChart"]);
+            return;
+        }
+
+        const responseBody = await response.json();
+
+        const bankName = document.getElementById("bankName");
+
+        bankName.innerText = responseBody.seriesList[0].name;
+
+        createLineChart(responseBody);
+    } catch (error) {
+        showAlert("ERROR", messages["error_generic"]);
+        console.error("Error loading chart:", error);
+    }
+}
+
 function createLineChart(responseBody) {
     const chartId = "lineChart";
 

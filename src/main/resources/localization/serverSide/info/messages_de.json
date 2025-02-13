@@ -1,4 +1,13 @@
 {
+  "noNewTransactionsFound": "In den bereitgestellten Daten wurden keine neuen Transaktionen gefunden.",
+
+
+
+  "moreAmountAfter": "Profit: {} €",
+  "lessAmountAfter": "Loss: {} €",
+
+
+
   "netGainLoss": "Netto-Gewinn/Verlust",
   "netGainLossTooltip": "Der Gesamtgewinn oder -verlust nach Berücksichtigung aller Ausgaben und Einnahmen.",
   "contractCostPerMonth": "Feste Kosten pro Monat",

@@ -30,7 +30,6 @@ public class KeyFigureService {
     private final UsersService usersService;
     private final LocaleService localeService;
 
-    private static final String SUB_DIRECTORY = "keyFigureMessages";
     private static final Logger log = LoggerFactory.getLogger(KeyFigureService.class);
 
     public List<KeyFigure> getKeyFiguresOfBankAccounts(List<Long> bankAccountIds, LocalDate startDate, LocalDate endDate) {
@@ -100,15 +99,15 @@ public class KeyFigureService {
     }
 
     private double getAverage(List<Transaction> transactions) {
-        double sum = transactions.stream().mapToDouble(Transaction::getAmount).sum();
+        double sum = transactions.stream().mapToDouble(financialmanager.objectFolder.transactionFolder.Transaction::getAmount).sum();
         return transactions.isEmpty() ? 0 : sum / transactions.size(); // Avoid division by zero
     }
 
     private double getNetGainLoss(List<Transaction> transactions) {
         double firstBalance = Optional.ofNullable(Utils.getFirstTransaction(transactions))
-                .map(Transaction::getAmountInBankAfter).orElse(0.0);
+                .map(financialmanager.objectFolder.transactionFolder.Transaction::getAmountInBankAfter).orElse(0.0);
         double lastBalance = Optional.ofNullable(Utils.getLastTransaction(transactions))
-                .map(Transaction::getAmountInBankAfter).orElse(0.0);
+                .map(financialmanager.objectFolder.transactionFolder.Transaction::getAmountInBankAfter).orElse(0.0);
         return lastBalance - firstBalance;
     }
 
@@ -124,8 +123,8 @@ public class KeyFigureService {
 
     private KeyFigure createKeyFigure(Users currentUser, String key, String tooltipKey, double value) {
         return new KeyFigure(
-                localeService.getMessage(SUB_DIRECTORY, key, currentUser),
-                localeService.getMessage(SUB_DIRECTORY, tooltipKey, currentUser),
+                localeService.getMessage(key, currentUser),
+                localeService.getMessage(tooltipKey, currentUser),
                 value
         );
     }

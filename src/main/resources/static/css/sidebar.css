@@ -163,7 +163,7 @@
 }
 
 /* Sub-link styling */
-.navSublink {
+.navSubLink {
     color: #ccc; /* Slightly lighter color for distinction */
     text-decoration: none;
     display: flex;
@@ -174,13 +174,13 @@
     transition: 0.3s ease;
 }
 
-.navSublink:hover {
+.navSubLink:hover {
     color: #151A2D;
     background: #fff;
 }
 
 /* Sub-item icon and label alignment */
-.navSublink .navLabel {
+.navSubLink .navLabel {
     font-size: 0.875rem; /* Slightly smaller font size */
     white-space: nowrap;
     transition: opacity 0.3s ease;

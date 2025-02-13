@@ -22,13 +22,5 @@
   "error_bankAccountName": "Bitte geben Sie einen Namen für das Bankkonto ein.",
   "error_NoInterestRate": "Bitte geben Sie einen Zinssatz für das Sparkonto ein.",
   "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-  "error_alreadyInList": "Dieser Begriff ist bereits in der Liste!",
-  "error_bankNotFound": "Bankkonto nicht gefunden.",
-  "error_failedCreateBankAccount": "Fehler beim Erstellen des Bankkontos.",
-  "error_headerNotFound": "Die angegebenen Begriffe wurden in der Datei nicht gefunden: {}",
-  "error_notFourColumnsFound": "Nicht alle erforderlichen Begriffe wurden in der Datei gefunden. Bitte stellen Sie sicher, dass sie vorhanden sind.",
-  "error_noValidTransactions": "Die Daten konnten nicht korrekt gelesen und Transaktionen erstellt werden.",
-  "info_noNewTransactionsFound": "In den bereitgestellten Daten wurden keine neuen Transaktionen gefunden.",
-  "success_filesProcessed": "In der Datei '{}' wurden {} neue Transaktionen gefunden. Andere Daten wurden ebenfalls hinzugefügt oder aktualisiert.",
-  "success_bankAccountCreated": "Bankkonto erfolgreich erstellt."
+  "error_alreadyInList": "Dieser Begriff ist bereits in der Liste!"
 }
