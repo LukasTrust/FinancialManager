@@ -1,6 +1,5 @@
 package financialmanager.objectFolder.usersFolder;
 
-import financialmanager.locale.LocaleService;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.ResponseService;
@@ -41,7 +40,7 @@ public class UsersController {
 
             // Validate password
             String password = user.getPassword();
-//            String passwordValidationMessage = validatePassword(password, user);
+//            String passwordValidationMessage = validatePassword(password);
 //            if (passwordValidationMessage != null) {
 //                return responseService.createResponse(HttpStatus.BAD_REQUEST, passwordValidationMessage, AlertType.WARNING);
 //            }
@@ -50,7 +49,7 @@ public class UsersController {
             user.setPassword(passwordEncoder.encode(password));
 
             // Save user
-            Users savedUser = usersService.save(user);
+            usersService.save(user);
 
             // Success response
             return responseService.createResponse(HttpStatus.CREATED, "signUp", AlertType.SUCCESS);
@@ -63,7 +62,7 @@ public class UsersController {
     }
 
     // Utility method for password validation
-    public String validatePassword(String password, Users user) {
+    public String validatePassword(String password) {
         if (password.length() < 8) {
             return "passwordLength";
         }

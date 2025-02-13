@@ -1,12 +1,9 @@
 package financialmanager.controller;
 
-import financialmanager.locale.LocaleService;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.ResponseService;
-import financialmanager.objectFolder.transactionFolder.Transaction;
-import financialmanager.objectFolder.transactionFolder.TransactionProcessingService;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
 import financialmanager.objectFolder.usersFolder.Users;
 import financialmanager.objectFolder.usersFolder.UsersService;

@@ -32,8 +32,8 @@ public class UsersService implements UserDetailsService {
         }
     }
 
-    public Users save(Users user) {
-        return usersRepository.save(user);
+    public void save(Users user) {
+        usersRepository.save(user);
     }
 
     public Users getCurrentUser() {
