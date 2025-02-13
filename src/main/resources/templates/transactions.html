@@ -2,7 +2,7 @@
     <div class="flexContainerColumn">
         <div class="flexContainer">
             <h1><span class="bi bi-receipt"></span></h1>
-            <h1>Transactions</h1>
+            <h1 data-i18n="transactions"></h1>
         </div>
 
         <div class="tableContainer">
@@ -10,7 +10,7 @@
             <div style="padding: 0" class="flexContainerSpaced">
                 <div style="padding-left: 5px" class="container checkboxWrapper">
                     <input id="showHidden" type="checkbox" class="switch">
-                    <label for="showHidden">Show Hidden Transactions</label>
+                    <label for="showHidden" data-i18n="showHiddenTransactions"></label>
                 </div>
                 <div style="padding-right: 0" class="container">
                     <div class="filters">
@@ -19,11 +19,12 @@
                     </div>
                     <div class="searchBar">
                         <label>
-                            <input type="text" placeholder="Search...">
+                            <input type="text" data-i18n-placeholder="searchText">
                         </label>
                         <button><i class="bi bi-search"></i></button>
                     </div>
-                    <button style="margin-right: 0" class="addButton"><i class="bi bi-download"></i> Export</button>
+                    <button style="margin-right: 0" class="addButton"><i class="bi bi-download"></i><span
+                            data-i18n="export"></span></button>
                 </div>
             </div>
 
@@ -32,27 +33,50 @@
                 <thead>
                 <tr>
                     <th><label for="selectAll"></label><input type="checkbox" id="selectAll"></th>
-                    <th>Counterparty <i class="bi bi-arrows-expand"></i></th>
-                    <th>Contract <i class="bi bi-arrows-expand"></i></th>
-                    <th data-sort="amountInBankBefore">Amount in bank before <i class="bi bi-arrows-expand"></i></th>
-                    <th data-sort="amount">Amount <i class="bi bi-arrows-expand"></i></th>
-                    <th data-sort="amountInBankAfter">Amount in bank after <i class="bi bi-arrows-expand"></i></th>
-                    <th data-sort="date">Date <i class="bi bi-arrows-expand"></i></th>
-                    <th>Category <i class="bi bi-arrows-expand"></i></th>
+                    <th>
+                        <span data-i18n="counterParty"></span>
+                        <i class="bi bi-arrows-expand"></i>
+                    </th>
+                    <th>
+                        <span data-i18n="contract"></span>
+                        <i class="bi bi-arrows-expand"></i>
+                    </th>
+                    <th>
+                        <span data-i18n="amountInBankBefore"></span>
+                        <i class="bi bi-arrows-expand"></i>
+                    </th>
+                    <th>
+                        <span data-i18n="amount"></span>
+                        <i class="bi bi-arrows-expand"></i>
+                    </th>
+                    <th>
+                        <span data-i18n="amountInBankAfter"></span>
+                        <i class="bi bi-arrows-expand"></i>
+                    </th>
+                    <th>
+                        <span data-i18n="date"></span>
+                        <i class="bi bi-arrows-expand"></i>
+                    </th>
+                    <th>
+                        <span data-i18n="category"></span>
+                        <i class="bi bi-arrows-expand"></i>
+                    </th>
                 </tr>
                 </thead>
+                <tbody id="transactionTableBody">
+                </tbody>
             </table>
 
             <!-- Pagination -->
             <div class="pagination">
-                <button class="disabled" id="previousButton">Previous</button>
-                <span class="currentPage" id="currentPage">Page 1 of 5</span>
-                <button id="nextButton">Next</button>
+                <button class="disabled" id="previousButton" data-i18n="previous"></button>
+                <span class="currentPage" id="currentPage" data-i18n="pageText"></span>
+                <button id="nextButton" data-i18n="next"></button>
                 <label for="itemsPerPage"></label><select id="itemsPerPage">
-                    <option value="20">20 per page</option>
-                    <option value="50">50 per page</option>
-                    <option value="100">100 per page</option>
-                </select>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
             </div>
         </div>
     </div>

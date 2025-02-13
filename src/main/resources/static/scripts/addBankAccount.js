@@ -47,7 +47,7 @@ async function buildAddBankAccount()  {
                 addStringToList(messages, inputValue, stringList);
                 inputField.value = ""; // Clear input field
             } else {
-                showAlert('info', messages["error_enterWord"]);
+                showAlert("info", messages["error_enterWord"]);
             }
         });
     });
@@ -59,7 +59,7 @@ async function submitAddNewBank(messages, isSavingsAccount, listIds) {
 
     // Check if all fields are filled
     if (!name) {
-        showAlert('warning', messages["error_bankAccountName"]);
+        showAlert("warning", messages["error_bankAccountName"]);
         return;
     }
 
@@ -73,7 +73,7 @@ async function submitAddNewBank(messages, isSavingsAccount, listIds) {
         const interestRate = document.getElementById("interestRate").value.trim();
 
         if (!interestRate) {
-            showAlert('warning', messages["error_NoInterestRate"]);
+            showAlert("warning", messages["error_NoInterestRate"]);
             return;
         }
 
@@ -98,11 +98,11 @@ async function submitAddNewBank(messages, isSavingsAccount, listIds) {
     });
 
     try {
-        const response = await fetch('/addBankAccount', {
-            method: 'POST',
+        const response = await fetch("/addBankAccount", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
+                "Content-Type": "application/json",
+                "Accept": "application/json",
             },
             body: JSON.stringify(data),
         });
@@ -111,25 +111,25 @@ async function submitAddNewBank(messages, isSavingsAccount, listIds) {
         showAlert(responseBody.alertType, responseBody.message);
 
         // Clear when successful
-        if (responseBody.alertType.toLowerCase() === 'success') {
+        if (responseBody.alertType.toLowerCase() === "success") {
             const bankAccount = responseBody.data;
 
             addBankAccountToSidebar(bankAccount);
 
-            document.getElementById("name").value = '';
-            document.getElementById("description").value = '';
-            document.getElementById("interestRate").value = '';
+            document.getElementById("name").value = "";
+            document.getElementById("description").value = "";
+            document.getElementById("interestRate").value = "";
 
             listIds.forEach((listId, index) => {
                 const listElement = document.getElementById(listId);
 
-                listElement.innerHTML = '';
+                listElement.innerHTML = "";
             });
         }
 
     } catch (error) {
-        console.error("There was a problem with the create bank request:", error);
-        showAlert('error', messages["error_generic"]);
+        console.error("There was an error the create bank request:", error);
+        showAlert("error", messages["error_generic"]);
     }
 }
 
@@ -142,23 +142,23 @@ function addStringToList(messages, input, stringList) {
     //Check if the string is already in the list
     const existingItems = Array.from(stringList.children).map(item => item.textContent.trim());
     if (existingItems.includes(input)) {
-        showAlert('Warning', messages["error_alreadyInList"]);
+        showAlert("Warning", messages["error_alreadyInList"]);
         return;
     }
 
     // Create a new list item
-    const newString = document.createElement("div");
-    newString.textContent = input;
-    newString.className = "listItem";
+    const newString = createElement("div", "listItem");
+
+    const textItem = createElement("span", "item", input);
 
     // Create a remove button
-    const removeButton = document.createElement("button");
-    removeButton.className = "removeButton bi bi-x-square";
+    const removeButton = createElement("button", "removeButton bi bi-x-lg");
     removeButton.addEventListener("click", () => {
         removeStringFromList(newString, stringList);
     });
 
     // Append the button to the list item and the item to the list
+    newString.appendChild(textItem);
     newString.appendChild(removeButton);
     stringList.appendChild(newString);
 }

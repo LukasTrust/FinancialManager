@@ -1,0 +1,19 @@
+{
+  "showHiddenTransactions": "Zeige verborgene Transaktionen",
+  "counterParty": "Andere Person",
+  "contract": "Vertrag",
+  "transactions": "Transaktionen",
+  "searchText": "Suche...",
+  "export": "Export",
+  "amountInBankBefore": "Kontostand vorher",
+  "amount": "Betrag",
+  "amountInBankAfter": "Kontostand nachher",
+  "date": "Datum",
+  "category": "Kategory",
+  "previous": "Vorher",
+  "pageText": "Seite {} von {}",
+  "next": "Nächste",
+  "perPage": "pro Seite",
+  "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut",
+  "error_loadingTransactions": "ein unerwarteter Fehler ist beim laden der Transaktionen aufgeteten"
+}

@@ -27,7 +27,7 @@ public class TransactionsController {
     private final UsersService usersService;
     private final ResponseService responseService;
 
-    @GetMapping("/{bankAccountId}/data/keyFigures")
+    @GetMapping("/{bankAccountId}/data")
     public ResponseEntity<?> getTransactionsForBankAccount(@PathVariable Long bankAccountId) {
         Users currentUser = usersService.getCurrentUser();
         Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, currentUser);
