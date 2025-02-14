@@ -56,16 +56,27 @@ async function buildAddBankAccount()  {
 async function submitAddNewBank(messages, isSavingsAccount, listIds) {
     const name = document.getElementById("name").value.trim();
     const description = document.getElementById("description").value.trim();
+    const currencySymbols = ["$", "€", "£", "¥", "₣", "₱", "₹", "₽", "₩", "₪", "₫", "₺"];
+    const currencySymbol = document.getElementById("currencySymbol").value.trim();
 
     // Check if all fields are filled
     if (!name) {
         showAlert("warning", messages["error_bankAccountName"]);
         return;
     }
+    if (!currencySymbol) {
+        showAlert("warning", messages["error_currencySymbol"]);
+        return;
+    }
+    if (!currencySymbols.includes(currencySymbol)) {
+        showAlert("warning", messages["error_unknownCurrencySymbol"]);
+        return;
+    }
 
     const data = {
         name,
         description,
+        currencySymbol,
         type: isSavingsAccount ? "saving" : "checking"
     };
 

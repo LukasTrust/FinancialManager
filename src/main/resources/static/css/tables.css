@@ -1,54 +1,55 @@
 .tableContainer {
-    background: transparent;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
+    border-radius: 12px; /* Slightly larger radius for a softer look */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); /* Deeper shadow for a floating effect */
     overflow: hidden;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px); /* Increased blur for a frosted glass effect */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for depth */
+    /* Add padding for better spacing */
+    padding: 0 16px 16px;
 }
 
 .filters {
     display: flex;
-    gap: 8px;
-    height: 42px;
+    gap: 12px; /* Increased gap for better spacing */
 }
 
 .filters select {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 10px; /* Slightly larger padding */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Lighter border */
+    border-radius: 6px; /* Rounded corners */
     font-size: 14px;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    color: #333; /* Darker text for better contrast */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.filters select:hover {
+    border-color: #007bff; /* Highlight on hover */
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.2); /* Subtle glow */
 }
 
 .searchBar {
     display: flex;
-    gap: 8px;
     flex: 1;
-    max-width: 300px;
+    max-width: 400px; /* Slightly wider */
 }
 
 .searchBar input {
     flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 10px 16px; /* Larger padding */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Lighter border */
+    border-radius: 6px; /* Rounded corners */
     font-size: 14px;
-    height: 42px;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    color: #333; /* Darker text */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.searchBar button {
-    background: #007bff;
-    border: none;
-    color: #fff;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.searchBar button:hover {
-    background: #0056b3;
+.searchBar input:focus {
+    border-color: #007bff; /* Highlight on focus */
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.2); /* Subtle glow */
+    outline: none; /* Remove default outline */
 }
 
 table {
@@ -57,20 +58,25 @@ table {
 }
 
 thead {
-    background-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.9); /* Semi-transparent header */
     color: #fff;
 }
 
 th, td {
-    padding: 12px 16px;
+    padding: 14px 20px; /* Larger padding */
     text-align: left;
-    color: #fff;
+    color: #fff; /* White text for contrast */
 }
 
 th {
     font-weight: bold;
     cursor: pointer;
     user-select: none;
+    transition: background 0.3s ease;
+}
+
+th:hover {
+    background-color: rgba(0, 123, 255, 0.8); /* Darker on hover */
 }
 
 th i {
@@ -79,47 +85,142 @@ th i {
 }
 
 tbody tr {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Lighter border */
     transition: background 0.3s ease;
+    height: 60px;
 }
 
 tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(255, 255, 255, 0.05); /* Subtle hover effect */
 }
 
 .pagination {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 20px 0;
+    margin: 24px 0; /* Increased margin */
 }
 
 .pagination button {
-    padding: 10px 20px;
-    margin: 0 10px;
+    padding: 12px 24px; /* Larger padding */
+    margin: 0 12px; /* Increased margin */
     border: none;
     background-color: #007bff;
     color: white;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 6px; /* Rounded corners */
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.pagination button:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px); /* Slight lift on hover */
+}
+
+.pagination button:active {
+    transform: translateY(0); /* Reset on click */
 }
 
 .pagination button.disabled {
-    background-color: #cccccc;
+    background-color: rgba(204, 204, 204, 0.5); /* Semi-transparent disabled state */
     cursor: not-allowed;
 }
 
 .pagination .currentPage {
     font-size: 16px;
-    margin: 0 10px;
+    margin: 0 12px; /* Increased margin */
+    color: #fff; /* White text for contrast */
 }
 
 .pagination select {
-    padding: 10px;
-    margin-left: 10px;
+    padding: 12px; /* Larger padding */
+    margin-left: 12px; /* Increased margin */
     border: 1px solid #007bff;
-    border-radius: 5px;
-    background-color: white;
+    border-radius: 6px; /* Rounded corners */
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
     color: #007bff;
     cursor: pointer;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pagination select:hover {
+    border-color: #0056b3; /* Darker border on hover */
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.2); /* Subtle glow */
+}
+
+.tableCheckbox {
+    appearance: none; /* Remove default appearance */
+    width: 18px;
+    height: 18px;
+    border: 2px solid #4a90e2; /* Border color */
+    border-radius: 4px; /* Slightly rounded corners */
+    background-color: white;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+/* Checked state */
+.tableCheckbox:checked {
+    background-color: #4a90e2; /* Background color when checked */
+    border-color: #4a90e2;
+}
+
+/* Checkmark (hidden by default) */
+.tableCheckbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Hover effect */
+.tableCheckbox:hover {
+    border-color: #357abd; /* Darker border on hover */
+}
+
+/* Focus state for accessibility */
+.tableCheckbox:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3); /* Subtle focus ring */
+}
+
+.rightAligned {
+    text-align: end;
+}
+
+.highlightCell {
+    display: inline-block; /* Shrink to fit content */
+    border-radius: 8px; /* Rounded corners */
+    padding: 8px 12px; /* Padding for better spacing */
+    transition: background-color 0.3s ease; /* Smooth transition */
+    color: white; /* White text color */
+    font-weight: bold; /* Bold text for better readability */
+    cursor: pointer;
+}
+
+.highlightCellTeal {
+    background-color: #26a69a; /* Teal */
+}
+
+.highlightCellOrange {
+    background-color: #ffa726; /* Orange */
+}
+
+.highlightCellPink {
+    background-color: #ec407a; /* Pink */
+}
+
+.highlightCellPurple {
+    background-color: #ab47bc; /* Purple */
+}
+
+/* Optional: Add hover effect */
+.highlightCell:hover {
+    filter: brightness(95%); /* Slightly darken on hover */
 }

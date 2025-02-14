@@ -1,5 +1,6 @@
 {
   "addBankAccount": "Bankkonto hinzufügen",
+  "currencySymbol": "Währung Symbol",
   "mainContentHeaderText": "Füllen Sie die grundlegenden Details aus, um ein neues Bankkonto zu erstellen. Sie können zusätzliche Suchbegriffe jetzt oder später hinzufügen. Diese können jederzeit geändert werden.",
   "bankAccountName": "Name des Bankkontos",
   "bankAccountDescription": "Beschreibung des Bankkontos (Optional)",
@@ -13,7 +14,7 @@
   "counterpartyHeader": "Suchbegriffe für Gegenparteien",
   "counterpartySearchStrings": "Suchbegriffe für Gegenparteien",
   "amountHeader": "Suchbegriffe für Beträge",
-  "amountSearchStrings": "Suchbegriffe für Beträge",
+  "amountStrings": "Suchbegriffe für Beträge",
   "amountInBankAfterTransactionHeader": "Suchbegriffe für Kontostand nach Transaktion",
   "amountInBankAfterTransactionSearchStrings": "Suchbegriffe für Kontostand nach Transaktion",
   "dateHeader": "Suchbegriffe für Datum",
@@ -22,5 +23,7 @@
   "error_bankAccountName": "Bitte geben Sie einen Namen für das Bankkonto ein.",
   "error_NoInterestRate": "Bitte geben Sie einen Zinssatz für das Sparkonto ein.",
   "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-  "error_alreadyInList": "Dieser Begriff ist bereits in der Liste!"
+  "error_alreadyInList": "Dieser Begriff ist bereits in der Liste!",
+  "error_currencySymbol": "Bitte geben Sie eine Währung Symbol ein",
+  "error_unknownCurrencySymbol": "Bitte geben Sie ein bekannte Währungs Symbol ein"
 }

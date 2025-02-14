@@ -1,8 +1,8 @@
 async function setLocale() {
-    const locale = navigator.language;
+    currentLanguage = navigator.language;
 
     try {
-        await fetch(`/localization/update/locale/${locale}`, {
+        await fetch(`/localization/update/locale/${currentLanguage}`, {
             method: 'POST',
         });
     } catch (error) {
@@ -10,8 +10,8 @@ async function setLocale() {
     }
 }
 
-async function fetchLocalization(subDirectory, locale) {
-    const filePath = `/localization/clientSide/${subDirectory}/messages/${locale}`;
+async function fetchLocalization(subDirectory) {
+    const filePath = `/localization/clientSide/${subDirectory}/messages/${currentLanguage}`;
 
     try {
         const responseBody = await fetch(filePath);

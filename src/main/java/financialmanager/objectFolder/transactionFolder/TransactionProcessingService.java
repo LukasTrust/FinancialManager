@@ -206,11 +206,11 @@ public class TransactionProcessingService {
         Double amountAfterTransaction = numberFormat.parse(line[columns.amountAfterTransactionColumn()]).doubleValue();
         String counterPartyName = line[columns.counterPartyColumn()];
 
-
         if (amountBeforeTransaction == 0.0) {
             amountBeforeTransaction = Math.round((amountAfterTransaction - amount) * 100) / 100.0;
         }
 
-        return new Transaction(bankAccount, counterPartyName, date, amount, amountAfterTransaction, amountBeforeTransaction);
+        return new Transaction(bankAccount, counterPartyName, date, amount, amountAfterTransaction,
+                amountBeforeTransaction);
     }
 }

@@ -39,6 +39,8 @@ function createKeyFigures(keyFigures) {
 
     const fragment = document.createDocumentFragment(); // Batch DOM updates
 
+    const currency = getCurrentCurrencySymbol();
+
     for (const keyFigure of keyFigures) {
         if (!keyFigure) continue; // Skip invalid entries
 
@@ -65,9 +67,8 @@ function createKeyFigures(keyFigures) {
         const iconClass = keyFigure.value >= 0 ? "bi bi-arrow-up" : "bi bi-arrow-down";
         const icon = createElement("i", iconClass);
 
-        const keyFigureText = createElement("span", "");
+        const keyFigureText = createElement("span", "", formatNumber(keyFigure.value, currency));
         keyFigureText.style.margin = "20px";
-        keyFigureText.innerHTML = keyFigure.value + " €"
 
         valueContainer.appendChild(icon);
         valueContainer.appendChild(keyFigureText);

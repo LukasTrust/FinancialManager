@@ -8,9 +8,33 @@
         <div class="tableContainer">
             <!-- Controls -->
             <div style="padding: 0" class="flexContainerSpaced">
-                <div style="padding-left: 5px" class="container checkboxWrapper">
-                    <input id="showHidden" type="checkbox" class="switch">
-                    <label for="showHidden" data-i18n="showHiddenTransactions"></label>
+                <div class="container">
+                    <div class="checkboxWrapper">
+                        <input id="showHidden" type="checkbox" class="switch">
+                        <label for="showHidden" data-i18n="showHiddenTransactions"></label>
+                    </div>
+                </div>
+                <div class="container">
+                    <button class="iconButton tooltip tooltipBottom" id="changeHiddenButton">
+                        <i class="bi bi-eye"></i>
+                        <span class="normalSpan" data-i18n="changeHiddenButton"></span>
+                        <span class="tooltipText" data-i18n="changeHiddenButtonTooltip"></span>
+                    </button>
+                    <button class="iconButton tooltip tooltipBottom" id="changeContractButton">
+                        <i class="bi bi-file-earmark-fill"></i>
+                        <span class="normalSpan" data-i18n="changeContractButton"></span>
+                        <span class="tooltipText" data-i18n="changeContractButtonTooltip"></span>
+                    </button>
+                    <button class="iconButton tooltip tooltipBottom" id="changeCategoryButton">
+                        <i class="bi bi-tag-fill"></i>
+                        <span class="normalSpan" data-i18n="changeCategoryButton"></span>
+                        <span class="tooltipText" data-i18n="changeCategoryButtonTooltip"></span>
+                    </button>
+                    <button class="iconButton tooltip tooltipBottom" id="changeCounterPartyButton">
+                        <i class="bi bi-person-fill"></i>
+                        <span class="normalSpan" data-i18n="changeCounterPartyButton"></span>
+                        <span class="tooltipText" data-i18n="changeCounterPartyButtonTooltip"></span>
+                    </button>
                 </div>
                 <div style="padding-right: 0" class="container">
                     <div class="filters">
@@ -18,13 +42,16 @@
                     </select>
                     </div>
                     <div class="searchBar">
-                        <label>
-                            <input type="text" data-i18n-placeholder="searchText">
-                        </label>
-                        <button><i class="bi bi-search"></i></button>
+                        <label for="searchBarInput"></label>
+                        <input type="text" id="searchBarInput" data-i18n-placeholder="searchText">
+                        <button style="padding: 10px" class="iconButton">
+                            <i class="bi bi-search"></i>
+                        </button>
                     </div>
-                    <button style="margin-right: 0" class="addButton"><i class="bi bi-download"></i><span
-                            data-i18n="export"></span></button>
+                    <button style="margin-right: 0" class="iconButton">
+                        <i class="bi bi-download"></i>
+                        <span class="normalSpan" data-i18n="export"></span>
+                    </button>
                 </div>
             </div>
 
@@ -32,7 +59,7 @@
             <table>
                 <thead>
                 <tr>
-                    <th><label for="selectAll"></label><input type="checkbox" id="selectAll"></th>
+                    <th><label for="selectAll"></label><input class="tableCheckbox" type="checkbox" id="selectAll"></th>
                     <th>
                         <span data-i18n="counterParty"></span>
                         <i class="bi bi-arrows-expand"></i>

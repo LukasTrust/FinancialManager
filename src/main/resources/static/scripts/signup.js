@@ -1,8 +1,9 @@
 document.addEventListener("DOMContentLoaded",  async () => {
+    if (!currentLanguage) {
+        currentLanguage = navigator.language;
+    }
 
-    const locale = navigator.language;
-
-    const messages = await fetchLocalization("login&signup", locale);
+    const messages = await fetchLocalization("login&signup");
 
     const submitButton = document.getElementById("submitButton");
     submitButton.addEventListener("click", (event) => {

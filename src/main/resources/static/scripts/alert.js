@@ -1,5 +1,3 @@
-let alerts = [];
-
 function showAlert(type, message, duration = 5000) {
     // Create alert container
     let classType = type.toLowerCase();

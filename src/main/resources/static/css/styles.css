@@ -377,3 +377,26 @@ button:hover {
     border-radius: 10px;
     padding: 10px;
 }
+
+.normalSpan {
+    font-size: 1rem;
+    color: #fff;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+.iconButton {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    background-color: #1e3c72;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: auto;
+}

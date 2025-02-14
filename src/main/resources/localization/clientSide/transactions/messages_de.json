@@ -1,6 +1,6 @@
 {
   "showHiddenTransactions": "Zeige verborgene Transaktionen",
-  "counterParty": "Andere Person",
+  "counterParty": "Gegenpartei",
   "contract": "Vertrag",
   "transactions": "Transaktionen",
   "searchText": "Suche...",
@@ -9,11 +9,20 @@
   "amount": "Betrag",
   "amountInBankAfter": "Kontostand nachher",
   "date": "Datum",
-  "category": "Kategory",
-  "previous": "Vorher",
+  "category": "Kategorie",
+  "previous": "Vorherige",
   "pageText": "Seite {} von {}",
   "next": "Nächste",
   "perPage": "pro Seite",
-  "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut",
-  "error_loadingTransactions": "ein unerwarteter Fehler ist beim laden der Transaktionen aufgeteten"
+  "changeHiddenButton": "Verstecken/Sichtbar",
+  "changeHiddenButtonTooltip": "Verborgene Transaktionen ein- oder ausblenden",
+  "changeContractButton": "Vertrag anpassen",
+  "changeContractButtonTooltip": "Vertrag für diese Transaktion ändern",
+  "changeCategoryButton": "Kategorie anpassen",
+  "changeCategoryButtonTooltip": "Kategorie dieser Transaktion ändern",
+  "changeCounterPartyButton": "Gegenpartei anpassen",
+  "changeCounterPartyButtonTooltip": "Gegenpartei dieser Transaktion ändern",
+  "monthAbbreviations": "'Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'",
+  "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.",
+  "error_loadingTransactions": "Ein unerwarteter Fehler ist beim Laden der Transaktionen aufgetreten."
 }

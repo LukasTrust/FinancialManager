@@ -17,6 +17,7 @@ async function loadSidebar() {
         const bankAccounts = await loadBankAccounts();
 
         bankAccounts.forEach(bankAccount => {
+            bankAccountSymbols[bankAccount.id] = bankAccount.currencySymbol;
             addBankAccountToSidebar(bankAccount);
         });
 

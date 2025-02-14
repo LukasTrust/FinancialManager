@@ -41,6 +41,10 @@ public class BankAccount {
     private String description;
 
     @Setter
+    @Column(nullable = false)
+    private String currencySymbol;
+
+    @Setter
     @Convert(converter = JsonStringListConverter.class)
     private List<String> amountSearchStrings;
 

@@ -1,6 +1,10 @@
 async function buildTransactions() {
     const messages = await fetchLocalization("transactions");
 
+    monthAbbreviations = messages["monthAbbreviations"]
+        .split("', '") // Split by ', ' to separate the months
+        .map(month => month.replace(/'/g, ''));
+
     await loadTransactions(messages);
 }
 
@@ -31,42 +35,53 @@ async function loadTransactions(messages) {
 function addRowsToTable(data) {
     const tableBody = document.getElementById("transactionTableBody");
 
+    const currency = getCurrentCurrencySymbol();
+
     data.forEach(transaction => {
         const newRow = createElement("tr");
 
         const trCheckBox = createElement("td");
-        const checkBox = createElement("input", "", "", transaction.id);
-        checkBox.type = "checkbox";
+
+        const checkBox = createElement("input", "tableCheckbox", "", transaction.id);
+        checkBox.type = "checkbox"
+        checkBox.style.marginLeft = "10px";
         trCheckBox.appendChild(checkBox);
 
         const counterParty = createElement("td", "", transaction.counterParty.name);
+        counterParty.style.fontWeight = "bold";
 
-        let contract;
+        let contract = createElement("td");
 
         if (transaction.contract) {
-            contract = createElement("td", "", transaction.contract.name);
-        } else {
-            contract = createElement("td");
+            const contractText = createElement("span", "highlightCell highlightCellPink", transaction.contract.name);
+            contract.appendChild(contractText);
         }
 
-        const amountInBankBefore = createElement("td", "", transaction.amountInBankBefore);
+        const amountInBankBefore = createElement("td", "rightAligned",
+            formatNumber(transaction.amountInBankBefore, currency));
 
-        const amount = createElement("td", "", transaction.amount);
+        const amount = createElement("td", "rightAligned");
 
-        const amountInBankAfter = createElement("td", "", transaction.amountInBankAfter);
+        const amountClass = transaction.amount >= 0 ? "positive" : "negative";
 
-        const date = createElement("td", "", transaction.date);
+        const amountText = createElement("span", "rightAligned " + amountClass,
+            formatNumber(transaction.amount, currency))
 
-        let category;
+        amount.appendChild(amountText);
+
+        const amountInBankAfter = createElement("td", "rightAligned",
+            formatNumber(transaction.amountInBankAfter, currency));
+
+        const date = createElement("td", "rightAligned", formatDateString(transaction.date));
+
+        let category = createElement("td");
 
         if (transaction.category){
-            category = createElement("td", "", transaction.category.name);
-        }
-        else{
-            category = createElement("td");
+            const categoryText = createElement("span", "highlightCell highlightCellOrange", transaction.contract.name);
+            category.appendChild(categoryText);
         }
 
-        newRow.appendChild(checkBox);
+        newRow.appendChild(trCheckBox);
         newRow.appendChild(counterParty);
         newRow.appendChild(contract);
         newRow.appendChild(amountInBankBefore);

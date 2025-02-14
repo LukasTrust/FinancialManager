@@ -1,5 +1,3 @@
-let existingChart = null;
-
 async function loadLineChart(messages, startDate = null, endDate = null) {
     try {
         let url = `/bankAccountOverview/${bankAccountId}/data/lineChart`;
@@ -55,6 +53,8 @@ function createLineChart(responseBody) {
 
     const chartData = transformChartData(responseBody);
 
+    const currency = getCurrentCurrencySymbol();
+
     existingChart = new Chart(ctx, {
         type: 'line',
         data: chartData,
@@ -62,7 +62,21 @@ function createLineChart(responseBody) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: true }
+                legend: { display: true },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += formatNumber(context.parsed.y, currency);
+                            }
+                            return label;
+                        }
+                    }
+                }
             },
             scales: {
                 x: {
