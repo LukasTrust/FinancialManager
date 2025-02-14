@@ -45,7 +45,6 @@ function addBankAccountToSidebar({name, id, interestRate}) {
 
     createAndAppendElement(accountLink,'span', isSavings ? 'bi bi-piggy-bank' : 'bi bi-bank');
     createAndAppendElement(accountLink,'span', 'navLabel', name)
-
     createAndAppendElement(accountItem,'span', 'navTooltip', name);
 
     const sublist = createSublist(accountItem);

@@ -49,7 +49,7 @@ function createKeyFigures(keyFigures) {
 
         // Create Header
         const keyFigureHeader = createAndAppendElement(keyFigureBox,"div", "keyFigureHeader");
-        const name = createAndAppendElement(keyFigureHeader,"span", "", keyFigure.name);
+        createAndAppendElement(keyFigureHeader,"span", "", keyFigure.name);
 
         // Tooltip
         const keyFigureTooltip = createAndAppendElement(keyFigureHeader,"div", "tooltip bi bi-info");
@@ -57,14 +57,14 @@ function createKeyFigures(keyFigures) {
 
         // Value Container
         const classForValue = keyFigure.value >= 0 ? "positive" : "negative";
-        const valueContainer = createAndAppendElement(keyFigureBox,"div", classForValue);
-        valueContainer.style.padding = "10px";
+        const valueContainer = createAndAppendElement(keyFigureBox,"div", classForValue,
+            null,{ style: "padding: 10px"});
 
         const iconClass = keyFigure.value >= 0 ? "bi bi-arrow-up" : "bi bi-arrow-down";
-        const icon = createAndAppendElement(valueContainer,"i", iconClass);
+        createAndAppendElement(valueContainer,"i", iconClass);
 
-        const keyFigureText = createAndAppendElement(valueContainer,"span", "", formatNumber(keyFigure.value, currency));
-        keyFigureText.style.margin = "20px";
+        createAndAppendElement(valueContainer,"span", "",
+            formatNumber(keyFigure.value, currency), {style: "margin: 20px"});
     }
 
     keyFiguresContainer.appendChild(fragment);

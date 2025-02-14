@@ -1,8 +1,9 @@
-function createAndAppendElement(parent, type, className, textContent = null, attributes = {}) {
+function createAndAppendElement(parent, type, className = null, textContent = null, attributes = {}, eventListeners = {}) {
     const element = document.createElement(type);
     if (className) element.className = className;
     if (textContent) element.textContent = textContent;
     Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
+    Object.entries(eventListeners).forEach(([event, handler]) => element.addEventListener(event, handler));
     parent.appendChild(element);
     return element;
 }

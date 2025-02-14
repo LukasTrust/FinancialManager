@@ -1,8 +1,7 @@
 function showAlert(type, message, duration = 5000) {
     // Create alert container
     let classType = type.toLowerCase();
-    const alert = createAndAppendElement(document.body,"div");
-    alert.className = `alert ${classType} show`;
+    const alert = createAndAppendElement(document.body,"div", `alert ${classType} show`);
 
     // Create icon
     const icon = createAndAppendElement(alert,"i");
@@ -29,12 +28,8 @@ function showAlert(type, message, duration = 5000) {
     // Create close button
     const closeButton = createAndAppendElement(alert,"span", "button-alert");
 
-    createAndAppendElement(closeButton,"span", "bi bi-x-circle-fill");
-
-    // Close alert on button click
-    closeButton.addEventListener("click", () => {
-        removeAlert(alert);
-    });
+    createAndAppendElement(closeButton,"span", "bi bi-x-circle-fill", null, {},
+        {click: () => {removeAlert(alert);}});
 
     // Add alert to the stack
     alerts.push(alert);

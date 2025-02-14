@@ -163,10 +163,8 @@ function addStringToList(messages, input, stringList) {
     createAndAppendElement(newString,"span", "item", input);
 
     // Create a remove button
-    const removeButton = createAndAppendElement(newString,"button", "removeButton bi bi-x-lg");
-    removeButton.addEventListener("click", () => {
-        removeStringFromList(newString, stringList);
-    });
+    createAndAppendElement(newString,"button", "removeButton bi bi-x-lg",
+        null, {}, {click: () => removeStringFromList(newString, stringList)});
 }
 
 // Function to remove a string from the list

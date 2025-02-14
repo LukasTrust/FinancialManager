@@ -42,12 +42,11 @@ function addRowsToTable(data) {
 
         const trCheckBox = createAndAppendElement(newRow,"td");
 
-        const checkBox = createAndAppendElement(trCheckBox,"input", "tableCheckbox", "", transaction.id);
-        checkBox.type = "checkbox"
-        checkBox.style.marginLeft = "10px";
+        createAndAppendElement(trCheckBox,"input", "tableCheckbox", "",
+            { type: "checkbox", id: transaction.id, style: "margin-left: 10px;" });
 
-        const counterParty = createAndAppendElement(newRow,"td", "", transaction.counterParty.name);
-        counterParty.style.fontWeight = "bold";
+        createAndAppendElement(newRow,"td", "",
+            transaction.counterParty.name,{ style: "font-weight: bold;" });
 
         let contract = createAndAppendElement(newRow,"td");
 
