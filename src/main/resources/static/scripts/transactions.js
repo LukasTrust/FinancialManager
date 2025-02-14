@@ -38,58 +38,42 @@ function addRowsToTable(data) {
     const currency = getCurrentCurrencySymbol();
 
     data.forEach(transaction => {
-        const newRow = createElement("tr");
+        const newRow = createAndAppendElement(tableBody,"tr");
 
-        const trCheckBox = createElement("td");
+        const trCheckBox = createAndAppendElement(newRow,"td");
 
-        const checkBox = createElement("input", "tableCheckbox", "", transaction.id);
+        const checkBox = createAndAppendElement(trCheckBox,"input", "tableCheckbox", "", transaction.id);
         checkBox.type = "checkbox"
         checkBox.style.marginLeft = "10px";
-        trCheckBox.appendChild(checkBox);
 
-        const counterParty = createElement("td", "", transaction.counterParty.name);
+        const counterParty = createAndAppendElement(newRow,"td", "", transaction.counterParty.name);
         counterParty.style.fontWeight = "bold";
 
-        let contract = createElement("td");
+        let contract = createAndAppendElement(newRow,"td");
 
         if (transaction.contract) {
-            const contractText = createElement("span", "highlightCell highlightCellPink", transaction.contract.name);
-            contract.appendChild(contractText);
+            createAndAppendElement(contract,"span", "highlightCell highlightCellPink", transaction.contract.name);
         }
 
-        const amountInBankBefore = createElement("td", "rightAligned",
+        createAndAppendElement(newRow,"td", "rightAligned",
             formatNumber(transaction.amountInBankBefore, currency));
 
-        const amount = createElement("td", "rightAligned");
+        const amount = createAndAppendElement(newRow,"td", "rightAligned");
 
         const amountClass = transaction.amount >= 0 ? "positive" : "negative";
 
-        const amountText = createElement("span", "rightAligned " + amountClass,
+        createAndAppendElement(amount,"span", "rightAligned " + amountClass,
             formatNumber(transaction.amount, currency))
 
-        amount.appendChild(amountText);
-
-        const amountInBankAfter = createElement("td", "rightAligned",
+        createAndAppendElement(newRow,"td", "rightAligned",
             formatNumber(transaction.amountInBankAfter, currency));
 
-        const date = createElement("td", "rightAligned", formatDateString(transaction.date));
+        createAndAppendElement(newRow,"td", "rightAligned", formatDateString(transaction.date));
 
-        let category = createElement("td");
+        let category = createAndAppendElement(newRow,"td");
 
         if (transaction.category){
-            const categoryText = createElement("span", "highlightCell highlightCellOrange", transaction.contract.name);
-            category.appendChild(categoryText);
+            createAndAppendElement(category,"span", "highlightCell highlightCellOrange", transaction.contract.name);
         }
-
-        newRow.appendChild(trCheckBox);
-        newRow.appendChild(counterParty);
-        newRow.appendChild(contract);
-        newRow.appendChild(amountInBankBefore);
-        newRow.appendChild(amount);
-        newRow.appendChild(amountInBankAfter);
-        newRow.appendChild(date);
-        newRow.appendChild(category);
-
-        tableBody.appendChild(newRow);
     });
 }

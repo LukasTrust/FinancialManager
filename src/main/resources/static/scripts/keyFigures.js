@@ -45,38 +45,26 @@ function createKeyFigures(keyFigures) {
         if (!keyFigure) continue; // Skip invalid entries
 
         // Create Key Figure Box
-        const keyFigureBox = createElement("div", "boxContainer");
+        const keyFigureBox = createAndAppendElement(fragment,"div", "boxContainer");
 
         // Create Header
-        const keyFigureHeader = createElement("div", "keyFigureHeader");
-        const name = createElement("span", "", keyFigure.name);
+        const keyFigureHeader = createAndAppendElement(keyFigureBox,"div", "keyFigureHeader");
+        const name = createAndAppendElement(keyFigureHeader,"span", "", keyFigure.name);
 
         // Tooltip
-        const keyFigureTooltip = createElement("div", "tooltip bi bi-info");
-        const keyFigureTooltipText = createElement("span", "tooltipText", keyFigure.tooltip);
-        keyFigureTooltip.appendChild(keyFigureTooltipText);
-
-        keyFigureHeader.append(name, keyFigureTooltip);
-        keyFigureBox.appendChild(keyFigureHeader);
+        const keyFigureTooltip = createAndAppendElement(keyFigureHeader,"div", "tooltip bi bi-info");
+        createAndAppendElement(keyFigureTooltip,"span", "tooltipText", keyFigure.tooltip);
 
         // Value Container
         const classForValue = keyFigure.value >= 0 ? "positive" : "negative";
-        const valueContainer = createElement("div", classForValue);
+        const valueContainer = createAndAppendElement(keyFigureBox,"div", classForValue);
         valueContainer.style.padding = "10px";
 
         const iconClass = keyFigure.value >= 0 ? "bi bi-arrow-up" : "bi bi-arrow-down";
-        const icon = createElement("i", iconClass);
+        const icon = createAndAppendElement(valueContainer,"i", iconClass);
 
-        const keyFigureText = createElement("span", "", formatNumber(keyFigure.value, currency));
+        const keyFigureText = createAndAppendElement(valueContainer,"span", "", formatNumber(keyFigure.value, currency));
         keyFigureText.style.margin = "20px";
-
-        valueContainer.appendChild(icon);
-        valueContainer.appendChild(keyFigureText);
-
-        keyFigureBox.appendChild(valueContainer);
-
-        // Append the Key Figure Box to Fragment
-        fragment.appendChild(keyFigureBox);
     }
 
     keyFiguresContainer.appendChild(fragment);

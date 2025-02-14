@@ -1,11 +1,11 @@
 function showAlert(type, message, duration = 5000) {
     // Create alert container
     let classType = type.toLowerCase();
-    const alert = createElement("div");
+    const alert = createAndAppendElement(document.body,"div");
     alert.className = `alert ${classType} show`;
 
     // Create icon
-    const icon = createElement("i");
+    const icon = createAndAppendElement(alert,"i");
     switch (type) {
         case "SUCCESS":
             icon.className = "bi bi-check-circle-fill";
@@ -24,26 +24,17 @@ function showAlert(type, message, duration = 5000) {
     }
 
     // Create message span
-    const messageSpan = createElement("span", "message", message);
+    createAndAppendElement(alert,"span", "message", message);
 
     // Create close button
-    const closeButton = createElement("span", "button-alert");
+    const closeButton = createAndAppendElement(alert,"span", "button-alert");
 
-    const closeIcon = createElement("span", "bi bi-x-circle-fill");
-    closeButton.appendChild(closeIcon);
+    createAndAppendElement(closeButton,"span", "bi bi-x-circle-fill");
 
     // Close alert on button click
     closeButton.addEventListener("click", () => {
         removeAlert(alert);
     });
-
-    // Append children to alert
-    alert.appendChild(icon);
-    alert.appendChild(messageSpan);
-    alert.appendChild(closeButton);
-
-    // Append alert to body
-    document.body.appendChild(alert);
 
     // Add alert to the stack
     alerts.push(alert);

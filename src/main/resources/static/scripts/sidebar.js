@@ -40,19 +40,15 @@ function addBankAccountToSidebar({name, id, interestRate}) {
 
     const isSavings = interestRate != null;
 
-    const accountItem = createElement('li', 'navItem account', '', {id});
-    const accountLink = createElement('a', 'navLink', '', {href: '/bankAccountOverview', 'data-ajax': 'true'});
-    accountItem.appendChild(accountLink);
+    const accountItem = createAndAppendElement(topNav,'li', 'navItem account', '', {id});
+    const accountLink = createAndAppendElement(accountItem,'a', 'navLink', '', {href: '/bankAccountOverview', 'data-ajax': 'true'});
 
-    accountLink.appendChild(createElement('span', isSavings ? 'bi bi-piggy-bank' : 'bi bi-bank'));
-    accountLink.appendChild(createElement('span', 'navLabel', name));
+    createAndAppendElement(accountLink,'span', isSavings ? 'bi bi-piggy-bank' : 'bi bi-bank');
+    createAndAppendElement(accountLink,'span', 'navLabel', name)
 
-    const toolTip = createElement('span', 'navTooltip', name);
-    accountItem.appendChild(toolTip);
+    createAndAppendElement(accountItem,'span', 'navTooltip', name);
 
-    const sublist = createSublist();
-    accountItem.appendChild(sublist);
-    topNav.appendChild(accountItem);
+    const sublist = createSublist(accountItem);
 
     accountLink.addEventListener('click', (event) => {
         event.preventDefault();
@@ -60,8 +56,8 @@ function addBankAccountToSidebar({name, id, interestRate}) {
     });
 }
 
-function createSublist() {
-    const sublist = createElement('ul', 'navSublist hidden');
+function createSublist(parent) {
+    const sublist = createAndAppendElement(parent,'ul', 'navSublist hidden');
 
     const subItems = [
         {name: 'Overview', href: '/bankAccountOverview', icon: 'bi bi-border-style'},
@@ -72,14 +68,11 @@ function createSublist() {
     ];
 
     subItems.forEach(({name, href, icon}) => {
-        const subItem = createElement('li', 'navSubitem');
-        const subItemLink = createElement('a', 'navSubLink', '', {href, 'data-ajax': 'true'});
+        const subItem = createAndAppendElement(sublist,'li', 'navSubitem');
+        const subItemLink = createAndAppendElement(subItem,'a', 'navSubLink', '', {href, 'data-ajax': 'true'});
 
-        subItemLink.appendChild(createElement('span', icon));
-        subItemLink.appendChild(createElement('span', 'navLabel', name));
-
-        subItem.appendChild(subItemLink);
-        sublist.appendChild(subItem);
+        createAndAppendElement(subItemLink,'span', icon);
+        createAndAppendElement(subItemLink,'span', 'navLabel', name);
     });
 
     return sublist;

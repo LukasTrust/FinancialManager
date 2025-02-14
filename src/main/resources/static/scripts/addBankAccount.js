@@ -158,20 +158,15 @@ function addStringToList(messages, input, stringList) {
     }
 
     // Create a new list item
-    const newString = createElement("div", "listItem");
+    const newString = createAndAppendElement(stringList,"div", "listItem");
 
-    const textItem = createElement("span", "item", input);
+    createAndAppendElement(newString,"span", "item", input);
 
     // Create a remove button
-    const removeButton = createElement("button", "removeButton bi bi-x-lg");
+    const removeButton = createAndAppendElement(newString,"button", "removeButton bi bi-x-lg");
     removeButton.addEventListener("click", () => {
         removeStringFromList(newString, stringList);
     });
-
-    // Append the button to the list item and the item to the list
-    newString.appendChild(textItem);
-    newString.appendChild(removeButton);
-    stringList.appendChild(newString);
 }
 
 // Function to remove a string from the list
