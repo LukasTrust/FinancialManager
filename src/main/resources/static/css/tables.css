@@ -67,6 +67,10 @@ thead {
     transition: background-color 0.2s ease-in-out; /* Smooth transition */
 }
 
+.thHeader {
+    cursor: default;
+}
+
 th, td {
     padding: 14px 20px; /* Larger padding */
     text-align: left;
@@ -229,4 +233,10 @@ tbody tr:hover {
 /* Optional: Add hover effect */
 .highlightCell:hover {
     filter: brightness(95%); /* Slightly darken on hover */
+}
+
+.iconColor {
+    color: #FFD700;
+    font-size: 1.2rem;
+    cursor: pointer;
 }

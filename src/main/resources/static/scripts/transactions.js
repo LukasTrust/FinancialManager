@@ -6,6 +6,8 @@ async function buildTransactions() {
         .map(month => month.replace(/'/g, ''));
 
     await loadTransactions(messages);
+
+    setUpSorting();
 }
 
 async function loadTransactions(messages) {
@@ -34,7 +36,7 @@ async function loadTransactions(messages) {
 
 function addRowsToTable(data, messages) {
     try {
-        const tableBody = document.getElementById("transactionTableBody");
+        const tableBody = document.getElementById("tableBody");
         if (!tableBody) {
             showAlert("ERROR", messages["error_tableNotFound"])
             console.error("Error: Table body element with ID 'transactionTableBody' not found.");
