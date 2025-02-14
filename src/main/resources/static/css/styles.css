@@ -368,6 +368,7 @@ button:hover {
     border: 2px solid #0f5132;
     border-radius: 10px;
     padding: 10px;
+    cursor: pointer;
 }
 
 .negative {
@@ -376,6 +377,7 @@ button:hover {
     border: 2px solid #842029;
     border-radius: 10px;
     padding: 10px;
+    cursor: pointer;
 }
 
 .normalSpan {
@@ -390,8 +392,8 @@ button:hover {
     align-items: center;
     justify-content: space-between;
     margin-left: 10px;
-    padding-left: 5px;
-    padding-right: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
     background-color: #1e3c72;
     color: white;
     border: none;

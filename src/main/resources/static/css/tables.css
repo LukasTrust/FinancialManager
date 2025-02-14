@@ -62,10 +62,16 @@ thead {
     color: #fff;
 }
 
+.selectedRow {
+    background-color: rgba(0, 123, 255, 0.2) !important; /* Light blue background matching the thead */
+    transition: background-color 0.2s ease-in-out; /* Smooth transition */
+}
+
 th, td {
     padding: 14px 20px; /* Larger padding */
     text-align: left;
     color: #fff; /* White text for contrast */
+    cursor: pointer;
 }
 
 th {
