@@ -4,3 +4,4 @@ let bankAccountId;
 let bankAccountSymbols= {}
 let currentLanguage;
 let monthAbbreviations;
+let transactionData;

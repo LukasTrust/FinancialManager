@@ -25,16 +25,16 @@ async function loadTransactions(messages) {
             return;
         }
 
-        const responseBody = await response.json();
+        transactionData = await response.json();
 
-        addRowsToTable(responseBody, messages);
+        splitDateIntoPages(messages, "transaction");
     } catch (error) {
         console.error("There was a error the create bank request:", error);
         showAlert('error', messages["error_generic"]);
     }
 }
 
-function addRowsToTable(data, messages) {
+function addRowsToTransactionTable(data, messages) {
     try {
         const tableBody = document.getElementById("tableBody");
         if (!tableBody) {
@@ -70,47 +70,47 @@ function addRowsToTable(data, messages) {
             });
 
             // Counterparty cell
-            createAndAppendElement(newRow, "td", "", transaction.counterParty?.name, {
+            let counterparty = createAndAppendElement(newRow, "td", "");
+            createAndAppendElement(counterparty, "span", "tdMargin", transaction.counterParty?.name, {
                 style: "font-weight: bold;",
             });
 
             // Contract cell
             let contract = createAndAppendElement(newRow, "td");
             if (transaction.contract?.name) {
-                createAndAppendElement(contract, "span", "highlightCell highlightCellPink",
+                createAndAppendElement(contract, "span", "tdMargin highlightCell highlightCellPink",
                     transaction.contract.name);
             }
-
-            // Amount before cell
-            createAndAppendElement(newRow, "td", "rightAligned",
-                formatNumber(transaction.amountInBankBefore, currency)
-            );
-
-            // Amount cell with positive/negative styling
-            const amount = createAndAppendElement(newRow, "td", "rightAligned");
-            const amountClass = transaction.amount >= 0 ? "positive" : "negative";
-            createAndAppendElement(amount, "span", `rightAligned ${amountClass}`,
-                formatNumber(transaction.amount, currency)
-            );
-
-            // Amount after cell
-            createAndAppendElement(newRow, "td", "rightAligned",
-                formatNumber(transaction.amountInBankAfter, currency)
-            );
-
-            // Date cell
-            createAndAppendElement(newRow, "td", "rightAligned",
-                formatDateString(transaction.date)
-            );
 
             // Category cell
             let category = createAndAppendElement(newRow, "td");
             if (transaction.category?.name) {
-                createAndAppendElement(category, "span", "highlightCell highlightCellOrange", transaction.category.name);
+                createAndAppendElement(category, "span", "tdMargin highlightCell highlightCellOrange", transaction.category.name);
             }
+
+            // Date cell
+            let date = createAndAppendElement(newRow, "td", "rightAligned");
+            createAndAppendElement(date, "span", "tdMargin",  formatDateString(transaction.date));
+
+            // Amount before cell
+            let amountBefore = createAndAppendElement(newRow, "td", "rightAligned");
+            createAndAppendElement(amountBefore, "span", "tdMargin", formatNumber(transaction.amountInBankBefore, currency));
+
+            // Amount cell with positive/negative styling
+            const amount = createAndAppendElement(newRow, "td", "rightAligned");
+            const amountClass = transaction.amount >= 0 ? "positive" : "negative";
+            createAndAppendElement(amount, "span", `tdMargin rightAligned ${amountClass}`,
+                formatNumber(transaction.amount, currency)
+            );
+
+            // Amount after cell
+            let amountInBankAfter = createAndAppendElement(newRow, "td", "rightAligned");
+
+            createAndAppendElement(amountInBankAfter, "span", "tdMargin",
+                formatNumber(transaction.amountInBankAfter, currency) , {style: "margin-right: 20px;"});
         });
     } catch (error) {
-        console.error("Unexpected error in addRowsToTable:", error);
+        console.error("Unexpected error in addRowsToTransactionTable:", error);
         showAlert('error', messages["error_generic"]);
     }
 }

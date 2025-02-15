@@ -1,5 +1,5 @@
 <div th:fragment="transactions" id="content">
-    <div class="flexContainerColumn">
+    <div style="height: 98%" class="flexContainerColumn">
         <div class="flexContainer">
             <h1><span class="bi bi-receipt"></span></h1>
             <h1 data-i18n="transactions"></h1>
@@ -7,8 +7,8 @@
 
         <div class="tableContainer">
             <!-- Controls -->
-            <div style="padding: 0" class="flexContainerSpaced">
-                <div class="container">
+            <div style="padding: 0"  class="flexContainerSpaced">
+                <div style="padding-left: 5px" class="container">
                     <div class="checkboxWrapper">
                         <input id="showHidden" type="checkbox" class="switch">
                         <label for="showHidden" data-i18n="showHiddenTransactions"></label>
@@ -44,9 +44,6 @@
                     <div class="searchBar">
                         <label for="searchBarInput"></label>
                         <input type="text" id="searchBarInput" data-i18n-placeholder="searchText">
-                        <button style="padding: 10px" class="iconButton">
-                            <i class="bi bi-search"></i>
-                        </button>
                     </div>
                     <button style="margin-right: 0" class="iconButton">
                         <i class="bi bi-download"></i>
@@ -59,34 +56,37 @@
             <table>
                 <thead>
                 <tr>
-                    <th class="thHeader"><label for="selectAll"></label><input class="tableCheckbox" type="checkbox" id="selectAll"></th>
-                    <th class="thHeader">
+                    <th style="width: 5%" class="thHeader">
+                        <label for="selectAll"></label>
+                        <input style="margin-top: 2px;" class="tableCheckbox" type="checkbox" id="selectAll">
+                    </th>
+                    <th style="width: 25%" class="thHeader">
                         <span data-i18n="counterParty"></span>
                         <i data-type="string" data-index="1" class="iconColor bi bi-arrows-expand"></i>
                     </th>
-                    <th class="thHeader">
+                    <th style="width: 15%" class="thHeader">
                         <span data-i18n="contract"></span>
                         <i data-type="string" data-index="2" class="iconColor bi bi-arrows-expand"></i>
                     </th>
-                    <th class="thHeader">
+                    <th style="width: 15%" class="thHeader">
+                        <span data-i18n="category"></span>
+                        <i data-type="string" data-index="3" class="iconColor bi bi-arrows-expand"></i>
+                    </th>
+                    <th style="width: 10%" class="rightAligned thHeader">
+                        <span data-i18n="date"></span>
+                        <i data-type="date" data-index="4" class="iconColor bi bi-arrows-expand"></i>
+                    </th>
+                    <th style="width: 10%" class="rightAligned thHeader">
                         <span data-i18n="amountInBankBefore"></span>
-                        <i data-type="number" data-index="3" class="iconColor bi bi-arrows-expand"></i>
-                    </th>
-                    <th class="thHeader">
-                        <span data-i18n="amount"></span>
-                        <i data-type="number" data-index="4" class="iconColor bi bi-arrows-expand"></i>
-                    </th>
-                    <th class="thHeader">
-                        <span data-i18n="amountInBankAfter"></span>
                         <i data-type="number" data-index="5" class="iconColor bi bi-arrows-expand"></i>
                     </th>
-                    <th class="thHeader">
-                        <span data-i18n="date"></span>
-                        <i data-type="date" data-index="6" class="iconColor bi bi-arrows-expand"></i>
+                    <th style="width: 10%" class="rightAligned thHeader">
+                        <span data-i18n="amount"></span>
+                        <i data-type="number" data-index="6" class="iconColor bi bi-arrows-expand"></i>
                     </th>
-                    <th class="thHeader">
-                        <span data-i18n="category"></span>
-                        <i data-type="string" data-index="7" class="iconColor bi bi-arrows-expand"></i>
+                    <th style="width: 10%" class="rightAligned thHeader">
+                        <span data-i18n="amountInBankAfter"></span>
+                        <i style="margin-right: 10px" data-type="number" data-index="7" class="iconColor bi bi-arrows-expand"></i>
                     </th>
                 </tr>
                 </thead>
@@ -97,9 +97,15 @@
             <!-- Pagination -->
             <div class="pagination">
                 <button class="disabled" id="previousButton" data-i18n="previous"></button>
-                <span class="currentPage" id="currentPage" data-i18n="pageText"></span>
+                <div style="max-width: 200px; min-width: 200px" class="container">
+                    <span class="normalSpan" data-i18n="page"></span>
+                    <span class="normalSpan" data-index="1" id="currentPage"></span>
+                    <span class="normalSpan" data-i18n="of"></span>
+                    <span class="normalSpan" id="numberOfPages"></span>
+                </div>
                 <button id="nextButton" data-i18n="next"></button>
                 <label for="itemsPerPage"></label><select id="itemsPerPage">
+                <option value="10">10</option>
                 <option value="20">20</option>
                 <option value="50">50</option>
                 <option value="100">100</option>

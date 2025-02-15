@@ -1,4 +1,6 @@
 .tableContainer {
+    display: flex;
+    flex-direction: column;
     background: rgba(255, 255, 255, 0.1); /* Semi-transparent background */
     border-radius: 12px; /* Slightly larger radius for a softer look */
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); /* Deeper shadow for a floating effect */
@@ -7,6 +9,8 @@
     border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border for depth */
     /* Add padding for better spacing */
     padding: 0 16px 16px;
+    height: inherit;
+    margin-bottom: 20px;
 }
 
 .filters {
@@ -54,12 +58,22 @@
 
 table {
     width: 100%;
+    height: inherit;
     border-collapse: collapse;
 }
 
 thead {
     background-color: rgba(0, 123, 255, 0.9); /* Semi-transparent header */
     color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+thead, tbody tr {
+    display: table; /* Make rows behave like a table */
+    width: 100%; /* Ensure full width */
+    table-layout: fixed; /* Ensure consistent column widths */
 }
 
 .selectedRow {
@@ -69,13 +83,20 @@ thead {
 
 .thHeader {
     cursor: default;
+    font-size: 1.2rem;
 }
 
 th, td {
-    padding: 14px 20px; /* Larger padding */
+    padding-top: 14px;
+    padding-bottom: 14px;
     text-align: left;
     color: #fff; /* White text for contrast */
     cursor: pointer;
+}
+
+.tdMargin {
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 th {
@@ -94,10 +115,33 @@ th i {
     font-size: 12px;
 }
 
+tbody {
+    display: block;
+    max-height: 670px;
+    overflow-y: auto;
+}
+
+tbody::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+}
+
+tbody::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Track color */
+}
+
+tbody::-webkit-scrollbar-thumb {
+    background: #888; /* Thumb color */
+    border-radius: 4px; /* Rounded corners */
+}
+
+tbody::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Thumb color on hover */
+}
+
 tbody tr {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Lighter border */
     transition: background 0.3s ease;
-    height: 60px;
+    height: 65px;
 }
 
 tbody tr:hover {
@@ -108,7 +152,7 @@ tbody tr:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 24px 0; /* Increased margin */
+    margin: 24px 0 0;
 }
 
 .pagination button {
@@ -134,12 +178,6 @@ tbody tr:hover {
 .pagination button.disabled {
     background-color: rgba(204, 204, 204, 0.5); /* Semi-transparent disabled state */
     cursor: not-allowed;
-}
-
-.pagination .currentPage {
-    font-size: 16px;
-    margin: 0 12px; /* Increased margin */
-    color: #fff; /* White text for contrast */
 }
 
 .pagination select {
