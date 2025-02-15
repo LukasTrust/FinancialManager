@@ -5,6 +5,7 @@
   "transactions": "Transaktionen",
   "searchText": "Suche...",
   "export": "Export",
+  "exportTooltip": "Exportiere alle Transaktionen oder die gerade angezeigten als PDF",
   "amountInBankBefore": "Saldo alt",
   "amount": "Betrag",
   "amountInBankAfter": "Saldo neu",

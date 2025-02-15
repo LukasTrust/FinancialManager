@@ -54,7 +54,7 @@ function addRowsToTransactionTable(data, messages) {
             const newRow = createAndAppendElement(tableBody, "tr");
 
             // Checkbox cell
-            const trCheckBox = createAndAppendElement(newRow, "td");
+            const trCheckBox = createAndAppendElement(newRow, "td", "", "", {style: "width: 5%"});
             const checkBox = createAndAppendElement(trCheckBox, "input", "tableCheckbox", "", {
                 type: "checkbox",
                 id: transaction.id,
@@ -70,44 +70,44 @@ function addRowsToTransactionTable(data, messages) {
             });
 
             // Counterparty cell
-            let counterparty = createAndAppendElement(newRow, "td", "");
+            let counterparty = createAndAppendElement(newRow, "td", "", "", {style: "width: 25%"});
             createAndAppendElement(counterparty, "span", "tdMargin", transaction.counterParty?.name, {
                 style: "font-weight: bold;",
             });
 
             // Contract cell
-            let contract = createAndAppendElement(newRow, "td");
+            let contract = createAndAppendElement(newRow, "td", "", "", {style: "width: 15%"});
             if (transaction.contract?.name) {
                 createAndAppendElement(contract, "span", "tdMargin highlightCell highlightCellPink",
                     transaction.contract.name);
             }
 
             // Category cell
-            let category = createAndAppendElement(newRow, "td");
+            let category = createAndAppendElement(newRow, "td", "", "", {style: "width: 15%"});
             if (transaction.category?.name) {
                 createAndAppendElement(category, "span", "tdMargin highlightCell highlightCellOrange", transaction.category.name);
             }
 
             // Date cell
-            let date = createAndAppendElement(newRow, "td", "rightAligned");
+            let date = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
             createAndAppendElement(date, "span", "tdMargin",  formatDateString(transaction.date));
 
             // Amount before cell
-            let amountBefore = createAndAppendElement(newRow, "td", "rightAligned");
+            let amountBefore = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
             createAndAppendElement(amountBefore, "span", "tdMargin", formatNumber(transaction.amountInBankBefore, currency));
 
             // Amount cell with positive/negative styling
-            const amount = createAndAppendElement(newRow, "td", "rightAligned");
+            const amount = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
             const amountClass = transaction.amount >= 0 ? "positive" : "negative";
             createAndAppendElement(amount, "span", `tdMargin rightAligned ${amountClass}`,
                 formatNumber(transaction.amount, currency)
             );
 
             // Amount after cell
-            let amountInBankAfter = createAndAppendElement(newRow, "td", "rightAligned");
+            let amountInBankAfter = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
 
             createAndAppendElement(amountInBankAfter, "span", "tdMargin",
-                formatNumber(transaction.amountInBankAfter, currency) , {style: "margin-right: 20px;"});
+                formatNumber(transaction.amountInBankAfter, currency) , {style: "margin-right: 30px;"});
         });
     } catch (error) {
         console.error("Unexpected error in addRowsToTransactionTable:", error);
