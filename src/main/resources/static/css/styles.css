@@ -97,7 +97,8 @@ button:hover {
 }
 
 .removeButton {
-    margin-left: 12px;
+    width: auto;
+    margin-left: auto;
     padding: 12px;
     height: 40px;
     background-color: #ff4757;
@@ -143,6 +144,45 @@ button:hover {
     margin-left: 10px;
     margin-right: 10px;
     margin-bottom: 10px;
+}
+
+.listContainerHeader {
+    border: 2px solid #1e3c72;
+    background: linear-gradient(135deg, #1e3c72 0%, #162447 100%);
+    border-radius: 10px;
+    color: #ffffff; /* Text color */
+    min-height: 300px;
+    max-height: 300px;
+    overflow-y: auto; /* Enable vertical scrolling */
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+}
+
+.listContainerHeader::-webkit-scrollbar {
+    width: 8px; /* Scrollbar width */
+}
+
+.listContainerHeader::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1); /* Scrollbar track color */
+    border-radius: 5px;
+}
+
+.listContainerHeader::-webkit-scrollbar-thumb {
+    background: #1e3c72;
+    border-radius: 5px;
+}
+
+.listContainerHeader::-webkit-scrollbar-thumb:hover {
+    background: #162447;
+}
+
+.listContainerColumn {
+    display: flex;
+    flex-direction: column; /* Forces items into a single column */
+    gap: 10px; /* Space between items */
+    padding: 15px; /* Padding inside the list container */
+    flex-grow: 1; /* Allow the list to take up remaining space */
 }
 
 .flexContainer {
@@ -401,4 +441,33 @@ button:hover {
     cursor: pointer;
     transition: background-color 0.3s;
     width: auto;
+}
+
+dialog {
+    width: 700px;
+    height: 600px;
+    padding: 20px;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    background: linear-gradient(135deg, #2a4365 0%, #1e3c72 100%);
+    color: #f8f9fa;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+
+    position: fixed;
+    inset: 0;
+    margin: auto;
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+}
+
+dialog[open] {
+    opacity: 1;
+    transform: translateY(0);
 }

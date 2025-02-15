@@ -44,7 +44,7 @@ async function buildAddBankAccount()  {
         addButton.addEventListener("click", () => {
             const inputValue = inputField.value.trim();
             if (inputValue) {
-                addStringToList(messages, inputValue, stringList);
+                addStringToList(messages, stringList, inputValue);
                 inputField.value = ""; // Clear input field
             } else {
                 showAlert("info", messages["error_enterWord"]);
@@ -149,25 +149,13 @@ function showHiddenInputs(hiddenInputs) {
 }
 
 // Function to add a string to the list
-function addStringToList(messages, input, stringList) {
+function addStringToList(messages, stringList, text) {
     //Check if the string is already in the list
     const existingItems = Array.from(stringList.children).map(item => item.textContent.trim());
-    if (existingItems.includes(input)) {
+    if (existingItems.includes(text)) {
         showAlert("Warning", messages["error_alreadyInList"]);
         return;
     }
 
-    // Create a new list item
-    const newString = createAndAppendElement(stringList,"div", "listItem");
-
-    createAndAppendElement(newString,"span", "item", input);
-
-    // Create a remove button
-    createAndAppendElement(newString,"button", "removeButton bi bi-x-lg",
-        null, {}, {click: () => removeStringFromList(newString, stringList)});
-}
-
-// Function to remove a string from the list
-function removeStringFromList(item, stringList) {
-    stringList.removeChild(item);
+    createListElement(stringList, text);
 }

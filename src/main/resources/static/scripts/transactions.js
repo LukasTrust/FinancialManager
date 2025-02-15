@@ -13,6 +13,11 @@ async function buildTransactions() {
     searchBarInput.addEventListener("input", () => {
         searchTable(messages, "transaction");
     });
+
+    const changeHiddenButton = document.getElementById("changeHiddenButton");
+    changeHiddenButton.addEventListener("click", () => {
+        showChangeHiddenButton(messages);
+    });
 }
 
 async function loadTransactions(messages) {
@@ -57,17 +62,19 @@ function addRowsToTransactionTable(data, messages) {
                 return;
             }
 
-            const newRow = createAndAppendElement(tableBody, "tr");
+            const newRow = createAndAppendElement(tableBody, "tr", null, null, {id: transaction.id});
 
             // Checkbox cell
-            const trCheckBox = createAndAppendElement(newRow, "td", "", "", {style: "width: 5%"});
+            const trCheckBox = createAndAppendElement(newRow, "td", null, "", {style: "width: 5%"});
             const checkBox = createAndAppendElement(trCheckBox, "input", "tableCheckbox", "", {
                 type: "checkbox",
                 id: transaction.id,
                 style: "margin-left: 10px;",
             });
 
-            checkBox.addEventListener("change", () => { updateRowStyle(newRow, checkBox)});
+            checkBox.addEventListener("change", () => {
+                updateRowStyle(newRow, checkBox)
+            });
 
             newRow.addEventListener("click", (event) => {
                 if (event.target.type === "checkbox") return; // Don't toggle when clicking checkbox
@@ -96,7 +103,7 @@ function addRowsToTransactionTable(data, messages) {
 
             // Date cell
             let date = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
-            createAndAppendElement(date, "span", "tdMargin",  formatDateString(transaction.date));
+            createAndAppendElement(date, "span", "tdMargin", formatDateString(transaction.date));
 
             // Amount before cell
             let amountBefore = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
@@ -113,7 +120,7 @@ function addRowsToTransactionTable(data, messages) {
             let amountInBankAfter = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
 
             createAndAppendElement(amountInBankAfter, "span", "tdMargin",
-                formatNumber(transaction.amountInBankAfter, currency) , {style: "margin-right: 30px;"});
+                formatNumber(transaction.amountInBankAfter, currency), {style: "margin-right: 30px;"});
         });
     } catch (error) {
         console.error("Unexpected error in addRowsToTransactionTable:", error);
@@ -142,4 +149,65 @@ function filterTransactions(messages, searchString) {
         console.error("Unexpected error in filterTransactions:", error);
         showAlert("ERROR", messages["error_generic"]);
     }
+}
+
+function showChangeHiddenButton(messages) {
+    const currentTableBody = document.getElementById("tableBody");
+
+    if (!currentTableBody) {
+        console.error("Table body not found");
+        return;
+    }
+
+    // Get checked rows
+    const checkedRows = Array.from(currentTableBody.querySelectorAll("tr td input[type='checkbox']:checked"))
+        .map(checkbox => Number(checkbox.closest("tr").id));
+
+
+    // Categorize transactions based on hidden status
+    const alreadyHiddenTransactions = transactionData.filter(transaction =>
+            checkedRows.includes(transaction.id) && transaction.isHidden
+    );
+
+    const notHiddenTransactions = transactionData.filter(transaction =>
+        checkedRows.includes(transaction.id) && !transaction.isHidden
+    );
+
+    // Create UI container
+    const flexContainerColumn = createAndAppendElement("", "div", "flexContainerColumn");
+    const header = createAndAppendElement(flexContainerColumn, "h2", "flexContainer");
+    createAndAppendElement(header, "i", "bi bi-eye");
+    createAndAppendElement(header, "span", "", messages["changeHiddenHeader"])
+
+    // Create lists
+    const listContainer = createAndAppendElement(flexContainerColumn, "div", "flexContainerSpaced");
+
+    const leftContainer = createAndAppendElement(listContainer, "div", "flexContainerColumn");
+
+    const leftList = createAndAppendElement(leftContainer, "div", "listContainerHeader");
+    createAndAppendElement(leftList, "h3", "", messages["alreadyHiddenHeader"]);
+    createListContainer(leftList, alreadyHiddenTransactions);
+
+    const rightContainer = createAndAppendElement(listContainer, "div", "flexContainerColumn");
+
+    const rightList = createAndAppendElement(rightContainer, "div", "listContainerHeader");
+    createAndAppendElement(rightList, "h3", "", messages["notHiddenHeader"]);
+    createListContainer(rightList, notHiddenTransactions);
+
+    const leftButton = createAndAppendElement(leftContainer, "button", "iconButton", "", {style: "margin-top: 20px"});
+    createAndAppendElement(leftButton, "i", "bi bi-eye");
+    createAndAppendElement(leftButton, "span", "", messages["unHide"]);
+
+    const rightButton = createAndAppendElement(rightContainer, "button", "iconButton", "", {style: "margin-top: 20px"});
+    createAndAppendElement(rightButton, "i", "bi bi-eye-slash");
+    createAndAppendElement(rightButton, "span", "", messages["hide"]);
+
+    const closeButton = createAndAppendElement(flexContainerColumn, "button", "iconButton", "",
+        {style: "margin-left: auto; margin-top: 10px; margin-bottom: 0"});
+
+    createAndAppendElement(closeButton, "i", "bi bi-x-lg", "",
+        {style: "color: red; margin-right: 10px"});
+    createAndAppendElement(closeButton, "span", "", messages["closeDialog"]);
+
+    createModal(flexContainerColumn, closeButton);
 }

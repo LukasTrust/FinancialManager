@@ -1,10 +1,48 @@
+function createModal(contentHTML, closeButton) {
+    // Create the dialog element
+    const modal = document.createElement("dialog");
+    modal.appendChild(contentHTML);
+    document.body.appendChild(modal);
+
+    // Add event listener to close the modal
+    if (closeButton) {
+        closeButton.addEventListener("click", () => modal.close());
+    } else {
+        console.error("Close button not found in createModal!");
+    }
+
+    // Show the modal
+    modal.showModal();
+}
+
+function createListElement(parent, text, attributes = {}) {
+    // Create a new list item
+    const item = createAndAppendElement(parent,"div", "listItem");
+
+    createAndAppendElement(item,"span", "item", text, attributes);
+
+    // Create a remove button
+    createAndAppendElement(item,"button", "removeButton bi bi-x-lg",
+        null, {}, {click: () => parent.removeChild(item)});
+
+    return item;
+}
+
+function createListContainer(parent, transactions) {
+    const listContainer = createAndAppendElement(parent, "div", "listContainerColumn");
+    transactions.forEach(transaction => {
+        createListElement(listContainer, transaction.counterParty.name, { id: transaction.id });
+    });
+    return listContainer;
+}
+
 function createAndAppendElement(parent, type, className = null, textContent = null, attributes = {}, eventListeners = {}) {
     const element = document.createElement(type);
     if (className) element.className = className;
     if (textContent) element.textContent = textContent;
     Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
     Object.entries(eventListeners).forEach(([event, handler]) => element.addEventListener(event, handler));
-    parent.appendChild(element);
+    if (parent) parent.appendChild(element);
     return element;
 }
 
