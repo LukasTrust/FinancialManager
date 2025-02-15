@@ -1,4 +1,40 @@
-function splitDateIntoPages(messages, type) {
+function searchTable(messages, type) {
+    const searchBarInput = document.getElementById("searchBarInput");
+
+    if (!searchBarInput) {
+        console.error("Search bar input element not found!");
+        return;
+    }
+
+    // Add debounced event listener for input
+    searchBarInput.addEventListener("input", debounce(() => {
+        const inputText = searchBarInput.value.trim().toLowerCase();
+
+        if (inputText.length <= 2) {
+            // Reset to original data if search input is too short
+            if (type === "transaction") {
+                filteredTransactionData = transactionData;
+                splitDataIntoPages(messages, type, transactionData);
+            }
+            return;
+        }
+
+        // Filter transactions based on search input
+        if (type === "transaction") {
+            filterTransactions(messages, inputText);
+        }
+    }, 300)); // 300ms debounce delay
+}
+
+function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+function splitDataIntoPages(messages, type, data) {
     const itemsPerPageSelection = document.getElementById("itemsPerPage");
     const nextButton = document.getElementById("nextButton");
     const previousButton = document.getElementById("previousButton");
@@ -6,7 +42,6 @@ function splitDateIntoPages(messages, type) {
 
     let currentPageIndex = 1; // Track the current page index
     let itemsPerPage = parseInt(itemsPerPageSelection.value); // Initial items per page
-    let data = getDataByType(type); // Get data based on type
     let numberOfPages = calculateNumberOfPages(data.length, itemsPerPage); // Calculate total pages
 
     // Initialize the UI
@@ -35,16 +70,6 @@ function splitDateIntoPages(messages, type) {
             updateUI(data, currentPageIndex, itemsPerPage, numberOfPages, messages, type, currentTableBody);
         }
     });
-}
-
-// Helper function to get data based on type
-function getDataByType(type) {
-    switch (type) {
-        case "transaction":
-            return transactionData; // Replace with your actual data source
-        default:
-            return [];
-    }
 }
 
 // Helper function to calculate the number of pages
@@ -105,21 +130,6 @@ function clearTable(currentTableBody) {
     if (currentTableBody) {
         currentTableBody.innerHTML = ""; // Clear all rows
     }
-}
-
-function searchTable() {
-    const searchBarInput = document.getElementById("searchBarInput");
-    const currentTableBody = document.getElementById("tableBody");
-
-    searchBarInput.addEventListener("change", () => {
-        const inputText = searchBarInput.innerText;
-
-        if (inputText.length <= 2) {
-            return;
-        }
-
-        let rowsToDisplay
-    });
 }
 
 function setUpSorting() {

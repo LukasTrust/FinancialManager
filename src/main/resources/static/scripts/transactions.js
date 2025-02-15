@@ -8,6 +8,11 @@ async function buildTransactions() {
     await loadTransactions(messages);
 
     setUpSorting();
+
+    const searchBarInput = document.getElementById("searchBarInput");
+    searchBarInput.addEventListener("input", () => {
+        searchTable(messages, "transaction");
+    });
 }
 
 async function loadTransactions(messages) {
@@ -26,8 +31,9 @@ async function loadTransactions(messages) {
         }
 
         transactionData = await response.json();
+        filteredTransactionData = transactionData;
 
-        splitDateIntoPages(messages, "transaction");
+        splitDataIntoPages(messages, "transaction", transactionData);
     } catch (error) {
         console.error("There was a error the create bank request:", error);
         showAlert('error', messages["error_generic"]);
@@ -71,7 +77,7 @@ function addRowsToTransactionTable(data, messages) {
 
             // Counterparty cell
             let counterparty = createAndAppendElement(newRow, "td", "", "", {style: "width: 25%"});
-            createAndAppendElement(counterparty, "span", "tdMargin", transaction.counterParty?.name, {
+            createAndAppendElement(counterparty, "span", "tdMargin", transaction.counterParty.name, {
                 style: "font-weight: bold;",
             });
 
@@ -111,10 +117,29 @@ function addRowsToTransactionTable(data, messages) {
         });
     } catch (error) {
         console.error("Unexpected error in addRowsToTransactionTable:", error);
-        showAlert('error', messages["error_generic"]);
+        showAlert("ERROR", messages["error_generic"]);
     }
 }
 
 function updateRowStyle(newRow, checkBox) {
     newRow.classList.toggle("selectedRow", checkBox.checked);
+}
+
+function filterTransactions(messages, searchString) {
+    try {
+        filteredTransactionData = transactionData.filter(transaction =>
+            transaction.counterParty?.name?.toLowerCase().includes(searchString) ||
+            transaction.contract?.name?.toLowerCase().includes(searchString) ||
+            transaction.category?.name?.toLowerCase().includes(searchString) ||
+            transaction.date?.toLowerCase().includes(searchString) ||
+            transaction.amountInBankBefore?.toString().toLowerCase().includes(searchString) ||
+            transaction.amount?.toString().toLowerCase().includes(searchString) ||
+            transaction.amountInBankAfter?.toString().toLowerCase().includes(searchString)
+        );
+
+        splitDataIntoPages(messages, "transaction", filteredTransactionData);
+    } catch (error) {
+        console.error("Unexpected error in filterTransactions:", error);
+        showAlert("ERROR", messages["error_generic"]);
+    }
 }
