@@ -1,13 +1,7 @@
 {
   "noNewTransactionsFound": "In den bereitgestellten Daten wurden keine neuen Transaktionen gefunden.",
-
-
-
   "moreAmountAfter": "Profit: {} €",
   "lessAmountAfter": "Loss: {} €",
-
-
-
   "netGainLoss": "Netto-Gewinn/Verlust",
   "netGainLossTooltip": "Der Gesamtgewinn oder -verlust nach Berücksichtigung aller Ausgaben und Einnahmen.",
   "contractCostPerMonth": "Feste Kosten pro Monat",
@@ -15,5 +9,6 @@
   "discrepancy": "Gesamter Gewinn/Verlust",
   "discrepancyTooltip": "Die endgültige Differenz zwischen Einnahmen und Ausgaben, die den gesamten Gewinn oder Verlust darstellt.",
   "average": "Durchschnitt",
-  "averageTooltip": "Der Mittelwert, berechnet auf Basis relevanter Datenpunkte über einen bestimmten Zeitraum."
+  "averageTooltip": "Der Mittelwert, berechnet auf Basis relevanter Datenpunkte über einen bestimmten Zeitraum.",
+  "noTransactionsUpdated": "Keine Transaktion wurde geupdated"
 }

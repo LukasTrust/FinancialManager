@@ -4,19 +4,31 @@ async function buildTransactions() {
     monthAbbreviations = messages["monthAbbreviations"]
         .split("', '") // Split by ', ' to separate the months
         .map(month => month.replace(/'/g, ''));
+    transactionsHiddenToggle = false;
 
     await loadTransactions(messages);
 
     setUpSorting();
 
     const searchBarInput = document.getElementById("searchBarInput");
-    searchBarInput.addEventListener("input", () => {
-        searchTable(messages, "transaction");
-    });
+    searchBarInput.addEventListener("input", () => searchTable(messages, "transaction"));
 
     const changeHiddenButton = document.getElementById("changeHiddenButton");
-    changeHiddenButton.addEventListener("click", () => {
-        showChangeHiddenButton(messages);
+    changeHiddenButton.addEventListener("click", () => showChangeHiddenDialog(messages));
+
+    const showHiddenRows = document.getElementById("showHiddenRows");
+    showHiddenRows.addEventListener("change", () => changeRowVisibility());
+
+    const selectAll = document.getElementById("selectAll");
+    selectAll.addEventListener("change", () => {
+        const tableBody = getCurrentTableBody();
+
+        const checkboxes = Array.from(tableBody.querySelectorAll('tr:not(.hidden) td input[type="checkbox"]'));
+
+        // Check or uncheck all based on the state of the 'showHiddenRows' checkbox
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = selectAll.checked;
+        });
     });
 }
 
@@ -31,11 +43,15 @@ async function loadTransactions(messages) {
         });
 
         if (!response.ok) {
+            const responseBody = await response.json();
+            showAlert(responseBody.alertType, responseBody.message);
+
             showAlert("ERROR", messages["error_loadingTransactions"]);
             return;
         }
 
         transactionData = await response.json();
+
         filteredTransactionData = transactionData;
 
         splitDataIntoPages(messages, "transaction", transactionData);
@@ -47,12 +63,7 @@ async function loadTransactions(messages) {
 
 function addRowsToTransactionTable(data, messages) {
     try {
-        const tableBody = document.getElementById("tableBody");
-        if (!tableBody) {
-            showAlert("ERROR", messages["error_tableNotFound"])
-            console.error("Error: Table body element with ID 'transactionTableBody' not found.");
-            return;
-        }
+        const tableBody = getCurrentTableBody();
 
         const currency = getCurrentCurrencySymbol();
 
@@ -62,7 +73,16 @@ function addRowsToTransactionTable(data, messages) {
                 return;
             }
 
-            const newRow = createAndAppendElement(tableBody, "tr", null, null, {id: transaction.id});
+            let rowClass = null;
+
+            if (transaction.hidden) {
+                rowClass = "hiddenRow";
+                if (transactionsHiddenToggle === false){
+                    rowClass += " hidden";
+                }
+            }
+
+            const newRow = createAndAppendElement(tableBody, "tr", rowClass, null, {id: transaction.id});
 
             // Checkbox cell
             const trCheckBox = createAndAppendElement(newRow, "td", null, "", {style: "width: 5%"});
@@ -72,9 +92,7 @@ function addRowsToTransactionTable(data, messages) {
                 style: "margin-left: 10px;",
             });
 
-            checkBox.addEventListener("change", () => {
-                updateRowStyle(newRow, checkBox)
-            });
+            checkBox.addEventListener("change", () => updateRowStyle(newRow, checkBox));
 
             newRow.addEventListener("click", (event) => {
                 if (event.target.type === "checkbox") return; // Don't toggle when clicking checkbox
@@ -151,63 +169,103 @@ function filterTransactions(messages, searchString) {
     }
 }
 
-function showChangeHiddenButton(messages) {
-    const currentTableBody = document.getElementById("tableBody");
+function showChangeHiddenDialog(messages) {
+    const checkedRows = new Set(getCheckedRows());
+    const alreadyHiddenTransactions = [];
+    const notHiddenTransactions = [];
 
-    if (!currentTableBody) {
-        console.error("Table body not found");
-        return;
-    }
+    filteredTransactionData.forEach(transaction => {
+        if (checkedRows.has(transaction.id)) {
+            transaction.hidden
+                ? alreadyHiddenTransactions.push(transaction)
+                : notHiddenTransactions.push(transaction);
+        }
+    });
 
-    // Get checked rows
-    const checkedRows = Array.from(currentTableBody.querySelectorAll("tr td input[type='checkbox']:checked"))
-        .map(checkbox => Number(checkbox.closest("tr").id));
-
-
-    // Categorize transactions based on hidden status
-    const alreadyHiddenTransactions = transactionData.filter(transaction =>
-            checkedRows.includes(transaction.id) && transaction.isHidden
-    );
-
-    const notHiddenTransactions = transactionData.filter(transaction =>
-        checkedRows.includes(transaction.id) && !transaction.isHidden
-    );
-
-    // Create UI container
     const flexContainerColumn = createAndAppendElement("", "div", "flexContainerColumn");
-    const header = createAndAppendElement(flexContainerColumn, "h2", "flexContainer");
-    createAndAppendElement(header, "i", "bi bi-eye");
-    createAndAppendElement(header, "span", "", messages["changeHiddenHeader"])
-
-    // Create lists
+    const header = createDialogHeader(flexContainerColumn, messages["changeHiddenHeader"], "bi bi-eye");
     const listContainer = createAndAppendElement(flexContainerColumn, "div", "flexContainerSpaced");
 
-    const leftContainer = createAndAppendElement(listContainer, "div", "flexContainerColumn");
+    // Close Button
+    const closeButton = createAndAppendElement(header, "button", "iconButton", "",
+        {style: "margin-left: auto; margin-right: -10px; margin-top: -20px"});
+    createAndAppendElement(closeButton, "i", "bi bi-x-lg", "", {
+        style: "color: red; font-size: 1.5rem"
+    });
 
-    const leftList = createAndAppendElement(leftContainer, "div", "listContainerHeader");
-    createAndAppendElement(leftList, "h3", "", messages["alreadyHiddenHeader"]);
-    createListContainer(leftList, alreadyHiddenTransactions);
+    const model = createModal(flexContainerColumn, closeButton);
 
-    const rightContainer = createAndAppendElement(listContainer, "div", "flexContainerColumn");
+    // Left Side: Already Hidden Transactions
+    const leftContainer = createListSection(
+        listContainer,
+        messages["alreadyHiddenHeader"],
+        alreadyHiddenTransactions
+    );
 
-    const rightList = createAndAppendElement(rightContainer, "div", "listContainerHeader");
-    createAndAppendElement(rightList, "h3", "", messages["notHiddenHeader"]);
-    createListContainer(rightList, notHiddenTransactions);
+    createDialogButton(
+        leftContainer,
+        "bi bi-eye",
+        messages["unHide"],
+        "left",
+        async () => await updateTransactionVisibility(messages, model, leftContainer, false)
+    );
 
-    const leftButton = createAndAppendElement(leftContainer, "button", "iconButton", "", {style: "margin-top: 20px"});
-    createAndAppendElement(leftButton, "i", "bi bi-eye");
-    createAndAppendElement(leftButton, "span", "", messages["unHide"]);
+    // Right Side: Not Hidden Transactions
+    const rightContainer = createListSection(
+        listContainer,
+        messages["notHiddenHeader"],
+        notHiddenTransactions
+    );
 
-    const rightButton = createAndAppendElement(rightContainer, "button", "iconButton", "", {style: "margin-top: 20px"});
-    createAndAppendElement(rightButton, "i", "bi bi-eye-slash");
-    createAndAppendElement(rightButton, "span", "", messages["hide"]);
+    createDialogButton(
+        rightContainer,
+        "bi bi-eye-slash",
+        messages["hide"],
+        "right",
+        async () => await updateTransactionVisibility(messages, model, rightContainer, true)
+    );
+}
 
-    const closeButton = createAndAppendElement(flexContainerColumn, "button", "iconButton", "",
-        {style: "margin-left: auto; margin-top: 10px; margin-bottom: 0"});
+async function updateTransactionVisibility(messages, model, listContainer, hide) {
+    try {
+        const ids = Array.from(listContainer.querySelectorAll("div span"))
+            .map(span => Number(span.closest("span").id));
 
-    createAndAppendElement(closeButton, "i", "bi bi-x-lg", "",
-        {style: "color: red; margin-right: 10px"});
-    createAndAppendElement(closeButton, "span", "", messages["closeDialog"]);
+        if (ids.length === 0) return;
 
-    createModal(flexContainerColumn, closeButton);
+        const endpoint = hide ? "hideTransactions" : "unHideTransactions";
+        const response = await fetch(`/transactions/${bankAccountId}/data/${endpoint}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(ids)
+        });
+
+        const responseBody = await response.json();
+
+        showAlert(responseBody.alertType, responseBody.message, model);
+
+        updateCashedTransactionsAndUI(messages, ids);
+    } catch (error) {
+        console.error("Unexpected error in updateTransactionVisibility:", error);
+        showAlert("ERROR", messages["error_generic"], model);
+    }
+}
+
+function updateCashedTransactionsAndUI(messages, ids) {
+    filteredTransactionData.forEach(transaction => {
+        if (ids.includes(transaction.id)) {
+            transaction.hidden = !transaction.hidden;
+        }
+    });
+
+    splitDataIntoPages(messages, "transaction", filteredTransactionData);
+}
+
+function changeRowVisibility() {
+    const currentTableBody = getCurrentTableBody();
+
+    const rows = Array.from(currentTableBody.querySelectorAll("tr.hiddenRow"));
+
+    transactionsHiddenToggle = !transactionsHiddenToggle;
+    rows.forEach(row => row.classList.toggle("hidden"));
 }

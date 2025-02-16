@@ -4,6 +4,28 @@
     box-sizing: border-box;
 }
 
+/* Apply to all scrollable elements */
+::-webkit-scrollbar {
+    width: 10px; /* Slightly wider scrollbar for better visibility */
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Track color */
+    border-radius: 6px; /* Rounded corners for the track */
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888; /* Thumb color */
+    border-radius: 6px; /* Rounded corners for the thumb */
+    border: 2px solid #f1f1f1; /* Adds a border around the thumb */
+    transition: background 0.3s ease; /* Smooth transition for hover effect */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #666; /* Darker thumb color on hover */
+    border: 2px solid #e1e1e1; /* Slightly darker border on hover */
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     display: flex;
@@ -116,10 +138,13 @@ button:hover {
 
 .item {
     color: #fff;
-    font-size: 14px;
+    font-size: 16px;
     padding-left: 12px;
-    margin: 8px;
     font-weight: 500;
+    text-wrap: auto;
+    margin: 8px auto 8px 8px;
+    padding-right: 20px;
+    overflow: hidden;
 }
 
 .listItem {
@@ -151,34 +176,14 @@ button:hover {
     background: linear-gradient(135deg, #1e3c72 0%, #162447 100%);
     border-radius: 10px;
     color: #ffffff; /* Text color */
-    min-height: 300px;
-    max-height: 300px;
-    overflow-y: auto; /* Enable vertical scrolling */
     display: flex;
     flex-direction: column;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Subtle shadow */
 }
 
-.listContainerHeader::-webkit-scrollbar {
-    width: 8px; /* Scrollbar width */
-}
-
-.listContainerHeader::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1); /* Scrollbar track color */
-    border-radius: 5px;
-}
-
-.listContainerHeader::-webkit-scrollbar-thumb {
-    background: #1e3c72;
-    border-radius: 5px;
-}
-
-.listContainerHeader::-webkit-scrollbar-thumb:hover {
-    background: #162447;
-}
-
 .listContainerColumn {
     display: flex;
+    overflow-y: auto;
     flex-direction: column; /* Forces items into a single column */
     gap: 10px; /* Space between items */
     padding: 15px; /* Padding inside the list container */
@@ -197,16 +202,15 @@ button:hover {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 20px;
-    min-width: 350px;
     gap: 10px;
 }
 
 .flexContainerColumn {
     display: flex;
     flex-direction: column;
-    margin: 20px;
+    padding: 20px 20px 0;
     overflow-y: auto;
+    height: 100%;
 }
 
 .flexContainerColumnSmall {
@@ -274,7 +278,7 @@ button:hover {
     padding: 0;
     margin: 0;
     overflow: hidden;
-    transition: opacity 0.5s ease, max-height 1s ease;
+    transition: opacity 2s ease, max-height 2s ease;
 }
 
 .chartContainer {
@@ -432,8 +436,7 @@ button:hover {
     align-items: center;
     justify-content: space-between;
     margin-left: 10px;
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 5px 10px;
     background-color: #1e3c72;
     color: white;
     border: none;
@@ -443,10 +446,19 @@ button:hover {
     width: auto;
 }
 
+.iconButton:hover {
+    background-color: #2a5298; /* Lighter blue on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+.iconButton:active {
+    transform: translateY(0); /* Reset lift effect when clicked */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Smaller shadow when active */
+}
+
 dialog {
-    width: 700px;
-    height: 600px;
-    padding: 20px;
+    width: 80%;
+    height: 65%;
     border: none;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
@@ -456,6 +468,7 @@ dialog {
     opacity: 0;
     transform: translateY(-20px);
     transition: opacity 0.3s ease, transform 0.3s ease;
+    overflow: hidden;
 
     position: fixed;
     inset: 0;

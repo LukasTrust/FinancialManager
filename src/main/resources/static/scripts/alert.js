@@ -1,7 +1,7 @@
-function showAlert(type, message, duration = 5000) {
+function showAlert(type, message, parent = document.body, duration = 5000) {
     // Create alert container
     let classType = type.toLowerCase();
-    const alert = createAndAppendElement(document.body,"div", `alert ${classType} show`);
+    const alert = createAndAppendElement(parent,"div", `alert ${classType} show`);
 
     // Create icon
     const icon = createAndAppendElement(alert,"i");

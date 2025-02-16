@@ -13,6 +13,8 @@ function createModal(contentHTML, closeButton) {
 
     // Show the modal
     modal.showModal();
+
+    return modal;
 }
 
 function createListElement(parent, text, attributes = {}) {
@@ -26,14 +28,6 @@ function createListElement(parent, text, attributes = {}) {
         null, {}, {click: () => parent.removeChild(item)});
 
     return item;
-}
-
-function createListContainer(parent, transactions) {
-    const listContainer = createAndAppendElement(parent, "div", "listContainerColumn");
-    transactions.forEach(transaction => {
-        createListElement(listContainer, transaction.counterParty.name, { id: transaction.id });
-    });
-    return listContainer;
 }
 
 function createAndAppendElement(parent, type, className = null, textContent = null, attributes = {}, eventListeners = {}) {

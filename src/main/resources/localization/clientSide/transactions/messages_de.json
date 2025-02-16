@@ -19,7 +19,6 @@
   "changeHiddenHeader": "Verändere Sichtbarkeit von Transaktionen",
   "unHide": "Transaktionen sichtbar machen",
   "hide": "Transaktionen verbesergen",
-  "closeDialog": "Schließen",
   "alreadyHiddenHeader": "Bereits verborgene Transaktionen",
   "notHiddenHeader": "Noch nicht verborgene Transaktionen",
   "changeHiddenButton": "Verstecken/Sichtbar",

@@ -6,3 +6,4 @@ let currentLanguage;
 let monthAbbreviations;
 let transactionData;
 let filteredTransactionData;
+let transactionsHiddenToggle;

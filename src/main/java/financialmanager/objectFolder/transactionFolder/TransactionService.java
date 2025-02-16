@@ -16,6 +16,10 @@ public class TransactionService {
         return transactionRepository.findByBankAccountId(bankAccountId);
     }
 
+    public List<Transaction> findAllByListOfId(List<Long> ids) {
+        return transactionRepository.findAllById(ids);
+    }
+
     public List<Transaction> findByBankAccountIdBetweenDates(Long bankAccountId, LocalDate startDate, LocalDate endDate) {
         List<Transaction> transactions = findByBankAccountId(bankAccountId);
 

@@ -1,3 +1,21 @@
+function getCurrentTableBody() {
+    const currentTableBody = document.getElementById("tableBody");
+
+    if (!currentTableBody) {
+        console.error("Table body not found");
+        return;
+    }
+
+    return currentTableBody;
+}
+
+function getCheckedRows() {
+    const currentTableBody = getCurrentTableBody();
+
+    return Array.from(currentTableBody.querySelectorAll("tr td input[type='checkbox']:checked"))
+        .map(checkbox => Number(checkbox.closest("tr").id));
+}
+
 function searchTable(messages, type) {
     const searchBarInput = document.getElementById("searchBarInput");
 
@@ -38,10 +56,13 @@ function splitDataIntoPages(messages, type, data) {
     const itemsPerPageSelection = document.getElementById("itemsPerPage");
     const nextButton = document.getElementById("nextButton");
     const previousButton = document.getElementById("previousButton");
-    const currentTableBody = document.getElementById("tableBody");
+    const currentTableBody = getCurrentTableBody();
 
     let currentPageIndex = 1; // Track the current page index
-    let itemsPerPage = parseInt(itemsPerPageSelection.value); // Initial items per page
+    let itemsPerPage = parseInt(itemsPerPageSelection.value);
+    if (itemsPerPage === 0) {
+        itemsPerPage = data.length;
+    }
     let numberOfPages = calculateNumberOfPages(data.length, itemsPerPage); // Calculate total pages
 
     // Initialize the UI
@@ -50,6 +71,9 @@ function splitDataIntoPages(messages, type, data) {
     // Event listener for items per page change
     itemsPerPageSelection.addEventListener("change", () => {
         itemsPerPage = parseInt(itemsPerPageSelection.value);
+        if (itemsPerPage === 0) {
+            itemsPerPage = data.length;
+        }
         numberOfPages = calculateNumberOfPages(data.length, itemsPerPage);
         currentPageIndex = 1; // Reset to the first page
         updateUI(data, currentPageIndex, itemsPerPage, numberOfPages, messages, type, currentTableBody);
@@ -97,7 +121,6 @@ function updateUI(data, currentPageIndex, itemsPerPage, numberOfPages, messages,
 
     // Update the current page display
     const currentPage = document.getElementById("currentPage");
-    console.log("&nbsp;".repeat(lengthDifference) + currentPageIndex);
     currentPage.textContent = "&nbsp;".repeat(lengthDifference) + currentPageIndex;
 
     const numberOfPagesElement = document.getElementById("numberOfPages");
@@ -133,7 +156,7 @@ function clearTable(currentTableBody) {
 }
 
 function setUpSorting() {
-    const currentTableBody = document.getElementById("tableBody");
+    const currentTableBody = getCurrentTableBody();
     const columnIcons = document.querySelectorAll(".iconColor");
 
     columnIcons.forEach(columnIcon => {
