@@ -470,21 +470,24 @@ button:hover {
 }
 
 .removeButton {
-    width: auto;
-    margin-left: auto;
-    padding: 12px;
-    height: 40px;
-    background-color: #ff4757;
-    color: white;
+    width: 40px; /* Fixed width for a square button */
+    margin-left: auto; /* Push to the right */
+    padding: 0; /* Remove padding to ensure the icon is centered */
+    background-color: #ff4757; /* Red color */
+    color: white; /* White icon color */
     border: none;
-    border-radius: 8px;
+    border-radius: 0 8px 8px 0; /* Rounded corners only on the right side */
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 1.2rem; /* Slightly larger icon */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .removeButton:hover {
-    background-color: #fc3040;
+    background-color: #fc3040; /* Slightly darker red on hover */
+    transform: scale(1.05); /* Slightly enlarge on hover */
 }
 
 dialog {

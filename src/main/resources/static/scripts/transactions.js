@@ -87,7 +87,7 @@ function addRowsToTransactionTable(data, messages) {
             checkBox.addEventListener("change", () => updateRowStyle(newRow, checkBox));
 
             newRow.addEventListener("click", (event) => {
-                if (event.target.type === "checkbox") return; // Don't toggle when clicking checkbox
+                if (event.target.type === "checkbox") return;
                 checkBox.checked = !checkBox.checked;
                 updateRowStyle(newRow, checkBox);
             });
