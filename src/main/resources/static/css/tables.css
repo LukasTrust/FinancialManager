@@ -68,6 +68,13 @@ thead, tbody tr {
     transition: opacity 0.5s ease, max-height 0.5s ease, padding 0.5s ease, margin 0.5s ease;
 }
 
+:is(.hiddenRow.selectedRow) {
+    background-color: rgba(0, 123, 255, 0.3) !important; /* Slightly darker blue for combined state */
+    filter: grayscale(50%); /* Less desaturated than .hiddenRow alone */
+    opacity: 0.9; /* Less transparent than .hiddenRow alone */
+    transition: opacity 0.5s ease, max-height 0.5s ease, padding 0.5s ease, margin 0.5s ease, background-color 0.2s ease-in-out;
+}
+
 .hiddenRow.hidden {
     display: none;
     transition: opacity 2s ease, max-height 2s ease, padding 2s ease, margin 2s ease;

@@ -18,18 +18,6 @@ async function buildTransactions() {
 
     const showHiddenRows = document.getElementById("showHiddenRows");
     showHiddenRows.addEventListener("change", () => changeRowVisibility());
-
-    const selectAll = document.getElementById("selectAll");
-    selectAll.addEventListener("change", () => {
-        const tableBody = getCurrentTableBody();
-
-        const checkboxes = Array.from(tableBody.querySelectorAll('tr:not(.hidden) td input[type="checkbox"]'));
-
-        // Check or uncheck all based on the state of the 'showHiddenRows' checkbox
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = selectAll.checked;
-        });
-    });
 }
 
 async function loadTransactions(messages) {
@@ -91,6 +79,10 @@ function addRowsToTransactionTable(data, messages) {
                 id: transaction.id,
                 style: "margin-left: 10px;",
             });
+
+            if (rowClass !== null) {
+                createAndAppendElement(trCheckBox, "span", "bi bi-eye-slashh");
+            }
 
             checkBox.addEventListener("change", () => updateRowStyle(newRow, checkBox));
 
@@ -187,11 +179,8 @@ function showChangeHiddenDialog(messages) {
     const listContainer = createAndAppendElement(flexContainerColumn, "div", "flexContainerSpaced");
 
     // Close Button
-    const closeButton = createAndAppendElement(header, "button", "iconButton", "",
-        {style: "margin-left: auto; margin-right: -10px; margin-top: -20px"});
-    createAndAppendElement(closeButton, "i", "bi bi-x-lg", "", {
-        style: "color: red; font-size: 1.5rem"
-    });
+    const closeButton = createAndAppendElement(header, "button", "closeButton", "");
+    createAndAppendElement(closeButton, "i", "bi bi-x-lg", "");
 
     const model = createModal(flexContainerColumn, closeButton);
 

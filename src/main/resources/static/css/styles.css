@@ -101,39 +101,33 @@ button:hover {
     background-color: rgb(255, 255, 255, 0.5);
 }
 
-.addButton {
-    padding: 10px 15px;
-    margin-left: 10px;
-    margin-right: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
+.closeButton {
+    background: transparent; /* Transparent background */
+    border: none; /* Remove default border */
+    color: #ff4d4d; /* Red color for the "X" icon */
+    font-size: 24px; /* Adjust size as needed */
     cursor: pointer;
-    transition: background-color 0.3s;
-    width: auto;
-}
-
-.addButton:hover {
-    background-color: #0056b3;
-}
-
-.removeButton {
-    width: auto;
-    margin-left: auto;
-    padding: 12px;
+    transition: color 0.3s ease, transform 0.2s ease;
+    padding: 8px; /* Add padding for better click area */
+    border-radius: 50%; /* Circular shape for a modern look */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* Fixed width and height for consistency */
     height: 40px;
-    background-color: #ff4757;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background 0.3s ease, transform 0.2s ease;
+    margin-left: auto;
+    position: absolute; /* Position it in the top-right corner */
+    top: 10px;
+    right: 10px;
 }
 
-.removeButton:hover {
-    background-color: #fc3040;
+.closeButton:hover {
+    color: #ff1a1a; /* Brighter red on hover */
+    transform: scale(1.1); /* Slightly enlarge on hover */
+}
+
+.closeButton:active {
+    transform: scale(0.9); /* Slightly shrink when clicked */
 }
 
 .item {
@@ -150,15 +144,16 @@ button:hover {
 .listItem {
     display: flex;
     align-items: center;
-    background: #0056b3;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #2a4365 0%, #1e3c72 100%);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     border-radius: 12px;
     cursor: default;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .listItem:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .listContainer {
@@ -175,10 +170,10 @@ button:hover {
     border: 2px solid #1e3c72;
     background: linear-gradient(135deg, #1e3c72 0%, #162447 100%);
     border-radius: 10px;
-    color: #ffffff; /* Text color */
+    color: #f8f9fa;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
 }
 
 .listContainerColumn {
@@ -240,7 +235,6 @@ button:hover {
 .inputContainer {
     display: flex;
     align-items: center;
-    padding-left: 10px;
     width: 100%;
 }
 
@@ -452,8 +446,45 @@ button:hover {
 }
 
 .iconButton:active {
-    transform: translateY(0); /* Reset lift effect when clicked */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Smaller shadow when active */
+}
+
+.iconOnlyButton {
+    background: transparent; /* Transparent background */
+    border: none; /* Remove default border */
+    color: white; /* White color for the icon */
+    font-size: 1.5em; /* Slightly larger than normal text */
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.2s ease;
+    padding: 10px; /* Add padding for better click area */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* Fixed width and height for consistency */
+    height: 40px;
+    margin: 5px;
+}
+
+.iconOnlyButton:active {
+    transform: scale(0.9); /* Slightly shrink when clicked */
+}
+
+.removeButton {
+    width: auto;
+    margin-left: auto;
+    padding: 12px;
+    height: 40px;
+    background-color: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.removeButton:hover {
+    background-color: #fc3040;
 }
 
 dialog {
@@ -463,7 +494,7 @@ dialog {
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     text-align: center;
-    background: linear-gradient(135deg, #2a4365 0%, #1e3c72 100%);
+    background: linear-gradient(135deg, #3a5a80 0%, #2a4365 100%);
     color: #f8f9fa;
     opacity: 0;
     transform: translateY(-20px);

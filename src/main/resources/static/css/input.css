@@ -10,7 +10,7 @@ label {
     display: flex;
     align-items: center;
     position: relative;
-    margin: 20px 0;
+    margin: 20px 10px 20px 0;
     min-width: 350px;
     width: 100%;
     border-bottom: 2px solid #fff;
