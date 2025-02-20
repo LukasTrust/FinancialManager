@@ -161,6 +161,14 @@ button:hover {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.listItem.selected {
+    background: linear-gradient(135deg, #4a69bd 0%, #2c3e50 100%);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+    font-weight: bold;
+    border: 2px solid #ffffff;
+}
+
 .listItem:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);

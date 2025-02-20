@@ -1,7 +1,14 @@
 package financialmanager.controller;
 
+import financialmanager.Utils.Result.Result;
+import financialmanager.objectFolder.bankAccountFolder.BankAccount;
+import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.contractFolder.ContractService;
+import financialmanager.objectFolder.responseFolder.Response;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,16 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class ContractController {
 
     private final ContractService contractService;
+    private final BankAccountService bankAccountService;
 
-//    @GetMapping("")
-//    public ResponseEntity<?> getContractsForBankAccount(@PathVariable Long bankAccountId) {
-//        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = validationService.getBankAccountOrErrorResponse(bankAccountId);
-//
-//        if (bankAccountResponse.isErr()) {
-//            return bankAccountResponse.getError();
-//        }
-//
-//        return ResponseEntity.ok(contractService.findByBankAccountId(bankAccountId));
-//
-//    }
+    @GetMapping("")
+    public ResponseEntity<?> getContractsForBankAccount(@PathVariable Long bankAccountId) {
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
+
+        if (bankAccountResponse.isErr()) {
+            return bankAccountResponse.getError();
+        }
+
+        return ResponseEntity.ok(contractService.findByBankAccountId(bankAccountId));
+    }
 }

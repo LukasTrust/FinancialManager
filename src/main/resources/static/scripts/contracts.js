@@ -16,7 +16,6 @@ async function loadContracts(messages) {
         }
 
         contractData = await response.json();
-
     } catch (error) {
         console.error("There was an error loading the contracts:", error);
         showAlert('error', messages["error_generic"]);

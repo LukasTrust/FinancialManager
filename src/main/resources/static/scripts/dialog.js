@@ -15,6 +15,31 @@ function createListSection(parent, title, transactions) {
     return container;
 }
 
+function createListSectionWithPicker(parent, title, contracts) {
+    const container = createAndAppendElement(parent, "div", "flexContainerColumn", "",
+        { style: "width: 45%" });
+    const header = createAndAppendElement(container, "div", "listContainerHeader");
+    createAndAppendElement(header, "h2", "", title, { style: "margin: 10px" });
+
+    const listContainer = createAndAppendElement(header, "div", "listContainerColumn",
+        "", { style: "min-height: 420px; max-height: 420px;" });
+
+    contracts.forEach(contract => {
+        const listElement = createListElement(listContainer, contract.name, { id: contract.id }, false);
+
+        listElement.addEventListener("click", () => {
+            // Remove 'selected' class from all elements
+            listContainer.querySelectorAll(".selected").forEach(el => el.classList.remove("selected"));
+
+            // Add 'selected' class to the clicked element
+            listElement.classList.add("selected");
+        });
+    });
+
+    return container;
+}
+
+
 function createListContainer(parent, transactions) {
     const listContainer = createAndAppendElement(parent, "div", "listContainerColumn",
         "",{style: "min-height: 420px; max-height: 420px;"});

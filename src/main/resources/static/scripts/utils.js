@@ -17,15 +17,17 @@ function createModal(contentHTML, closeButton) {
     return modal;
 }
 
-function createListElement(parent, text, attributes = {}) {
+function createListElement(parent, text, attributes = {}, addRemove = true) {
     // Create a new list item
     const item = createAndAppendElement(parent,"div", "listItem");
 
     createAndAppendElement(item,"span", "item", text, attributes);
 
     // Create a remove button
-    createAndAppendElement(item,"button", "removeButton bi bi-x-lg",
-        null, {}, {click: () => parent.removeChild(item)});
+    if (addRemove) {
+        createAndAppendElement(item,"button", "removeButton bi bi-x-lg",
+            null, {}, {click: () => parent.removeChild(item)});
+    }
 
     return item;
 }

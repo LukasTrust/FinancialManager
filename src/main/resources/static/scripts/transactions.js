@@ -7,17 +7,22 @@ async function buildTransactions() {
     transactionsHiddenToggle = false;
 
     await loadTransactions(messages);
-
+    splitDataIntoPages(messages, "transaction", transactionData);
     setUpSorting();
 
-    const searchBarInput = document.getElementById("searchBarInput");
-    searchBarInput.addEventListener("input", () => searchTable(messages, "transaction"));
+    document.getElementById("searchBarInput")
+        .addEventListener("input", () => searchTable(messages, "transaction"));
 
-    const changeHiddenButton = document.getElementById("changeHiddenButton");
-    changeHiddenButton.addEventListener("click", () => showChangeHiddenDialog(messages));
+    document.getElementById("changeHiddenButton")
+        .addEventListener("click", () => showChangeHiddenDialog(messages));
 
-    const showHiddenRows = document.getElementById("showHiddenRows");
-    showHiddenRows.addEventListener("change", () => changeRowVisibility());
+    document.getElementById("changeContractButton")
+        .addEventListener("click", () => showChangeContract(messages));
+
+    document.getElementById("showHiddenRows")
+        .addEventListener("change", () => changeRowVisibility());
+
+    loadContracts();
 }
 
 async function loadTransactions(messages) {
@@ -38,10 +43,7 @@ async function loadTransactions(messages) {
         }
 
         transactionData = await response.json();
-
         filteredTransactionData = transactionData;
-
-        splitDataIntoPages(messages, "transaction", transactionData);
     } catch (error) {
         console.error("There was an error loading the transactions:", error);
         showAlert('error', messages["error_generic"]);
@@ -178,8 +180,8 @@ function showChangeHiddenDialog(messages) {
     const listContainer = createAndAppendElement(flexContainerColumn, "div", "flexContainerSpaced");
 
     // Close Button
-    const closeButton = createAndAppendElement(header, "button", "closeButton", "");
-    createAndAppendElement(closeButton, "i", "bi bi-x-lg", "");
+    const closeButton = createAndAppendElement(header, "button", "closeButton");
+    createAndAppendElement(closeButton, "i", "bi bi-x-lg");
 
     const model = createModal(flexContainerColumn, closeButton);
 
@@ -223,6 +225,38 @@ function showChangeContract(messages) {
             transactions.push(transaction);
         }
     });
+
+    const flexContainerColumn = createAndAppendElement("", "div", "flexContainerColumn");
+    const header = createDialogHeader(flexContainerColumn, messages["changeContractHeader"], "bi bi-file-earmark-fill");
+    const listContainer = createAndAppendElement(flexContainerColumn, "div", "flexContainerSpaced");
+
+    // Close Button
+    const closeButton = createAndAppendElement(header, "button", "closeButton");
+    createAndAppendElement(closeButton, "i", "bi bi-x-lg");
+
+    const model = createModal(flexContainerColumn, closeButton);
+
+    // Left Side: Contracts
+    createListSectionWithPicker(
+        listContainer,
+        messages["contracts"],
+        contractData
+    );
+
+    // Right Side: Transactions
+    createListSection(
+        listContainer,
+        messages["notHiddenHeader"],
+        transactions
+    );
+
+    const contractButton =  createDialogButton(
+        flexContainerColumn,
+        "bi bi-eye-slash",
+        messages["addContractsToTransactions"],
+        "center"
+    );
+    contractButton.style.marginRight = "20px";
 }
 
 async function updateTransactionVisibility(messages, model, listContainer, hide) {
