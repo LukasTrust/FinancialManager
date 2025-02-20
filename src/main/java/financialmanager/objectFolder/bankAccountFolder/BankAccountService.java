@@ -3,12 +3,15 @@ package financialmanager.objectFolder.bankAccountFolder;
 import financialmanager.Utils.Result.Err;
 import financialmanager.Utils.Result.Ok;
 import financialmanager.Utils.Result.Result;
+import financialmanager.objectFolder.keyFigureFolder.KeyFigureService;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.ResponseService;
 import financialmanager.objectFolder.usersFolder.Users;
 import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -24,16 +27,14 @@ public class BankAccountService {
     private final BankAccountRepository bankAccountRepository;
     private final ResponseService responseService;
 
+    private static final Logger log = LoggerFactory.getLogger(BankAccountService.class);
+
     public BankAccount save(BankAccount bankAccount) {
         return bankAccountRepository.save(bankAccount);
     }
 
     public List<BankAccount> findAllByUsers(Users users){
         return bankAccountRepository.findAllByUsers(users);
-    }
-
-    public Optional<BankAccount> findByIdAndUsers(Long id, Users users){
-        return bankAccountRepository.findByIdAndUsers(id, users);
     }
 
     public Result<BankAccount, ResponseEntity<Response>> findById(Long bankAccountId) {
@@ -50,6 +51,8 @@ public class BankAccountService {
         if (bankAccountResponse.isPresent())  {
             return new Ok<>(bankAccountResponse.get());
         }
+
+        log.warn("User {} does not own the bank account {}", currentUser, bankAccountId);
 
         return new Err<>(responseService.createResponse(HttpStatus.NOT_FOUND, "bankNotFound", AlertType.ERROR));
     }

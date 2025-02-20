@@ -11,8 +11,6 @@ import financialmanager.objectFolder.contractFolder.ContractService;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
-import financialmanager.objectFolder.usersFolder.Users;
-import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,19 +28,11 @@ public class KeyFigureService {
     private final TransactionService transactionService;
     private final ContractService contractService;
     private final BankAccountService bankAccountService;
-    private final UsersService usersService;
     private final LocaleService localeService;
 
     private static final Logger log = LoggerFactory.getLogger(KeyFigureService.class);
 
     public List<KeyFigure> getKeyFiguresOfBankAccounts(List<Long> bankAccountIds, LocalDate startDate, LocalDate endDate) {
-        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
-
-        if (currentUserResponse.isErr()) {
-            return null;
-        }
-
-        Users currentUser = currentUserResponse.getValue();
         LocalDate[] dates = Utils.normalizeDateRange(startDate, endDate);
         LocalDate start = dates[0];
         LocalDate end = dates[1];
@@ -56,28 +46,26 @@ public class KeyFigureService {
         boolean isSavingsAccount = false;
 
         for (Long bankAccountId : bankAccountIds) {
-            Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, currentUser);
+            Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
 
-            if (bankAccountOptional.isPresent()) {
-                List<Transaction> bankAccountTransactions = transactionService.findByBankAccountIdBetweenDates(bankAccountId, start, end);
-                allTransactions.addAll(bankAccountTransactions);
-
-                if (bankAccountOptional.get() instanceof SavingsBankAccount) {
-                    discrepancy += getDiscrepancy(bankAccountTransactions);
-                    isSavingsAccount = true;
-                }
-                else {
-                    List<Contract> contracts = contractService.findByBankAccountIdBetweenDates(bankAccountId, start, end);
-                    contractCostPerMonth += getContractCostPerMonth(contracts);
-                }
+            if (bankAccountResponse.isErr()) {
+                continue;
             }
-            else {
-                log.warn("User {} does not own the bank account {}", currentUser, bankAccountId);
+
+            List<Transaction> bankAccountTransactions = transactionService.findByBankAccountIdBetweenDates(bankAccountId, start, end);
+            allTransactions.addAll(bankAccountTransactions);
+
+            if (bankAccountResponse.getValue() instanceof SavingsBankAccount) {
+                discrepancy += getDiscrepancy(bankAccountTransactions);
+                isSavingsAccount = true;
+            } else {
+                List<Contract> contracts = contractService.findByBankAccountIdBetweenDates(bankAccountId, start, end);
+                contractCostPerMonth += getContractCostPerMonth(contracts);
             }
         }
 
         if (allTransactions.isEmpty()) {
-            return createBankAccountKeyFigures(0,0,isSavingsAccount,0);
+            return createBankAccountKeyFigures(0, 0, isSavingsAccount, 0);
         }
 
         average = getAverage(allTransactions);
@@ -97,10 +85,9 @@ public class KeyFigureService {
 
         keyFigures.add(createKeyFigure("average", "averageTooltip", average));
         keyFigures.add(createKeyFigure("netGainLoss", "netGainLossTooltip", netGainLoss));
-        if (isSavingsBankAccount){
+        if (isSavingsBankAccount) {
             keyFigures.add(createKeyFigure("discrepancy", "discrepancyTooltip", lastValue));
-        }
-        else {
+        } else {
             keyFigures.add(createKeyFigure("contractCostPerMonth", "contractCostPerMonthTooltip", lastValue));
         }
 

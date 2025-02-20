@@ -8,11 +8,7 @@ import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
-import financialmanager.objectFolder.usersFolder.Users;
-import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -29,19 +25,9 @@ public class ChartService {
 
     private final TransactionService transactionService;
     private final BankAccountService bankAccountService;
-    private final UsersService usersService;
     private final LocaleService localeService;
-    private static final Logger log = LoggerFactory.getLogger(ChartService.class);
 
     public ChartData getTransactionDate(List<Long> bankAccountIds, LocalDate startDate, LocalDate endDate) {
-        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
-
-        if (currentUserResponse.isErr()) {
-            return null;
-        }
-
-        Users currentUser = currentUserResponse.getValue();
-
         LocalDate[] dates = Utils.normalizeDateRange(startDate, endDate);
         LocalDate start = dates[0];
         LocalDate end = dates[1];
@@ -49,7 +35,7 @@ public class ChartService {
         String title = buildTitle(start, end);
 
         List<ChartSeries> chartSeries = bankAccountIds.stream()
-                .map(bankAccountId -> getChartSeries(currentUser, bankAccountId, start, end))
+                .map(bankAccountId -> getChartSeries(bankAccountId, start, end))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
@@ -69,12 +55,13 @@ public class ChartService {
         }
     }
 
-    private Optional<ChartSeries> getChartSeries(Users currentUser, Long bankAccountId, LocalDate startDate, LocalDate endDate) {
-        Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, currentUser);
-        Optional<ChartSeries> chartSeriesOptional;
+    private Optional<ChartSeries> getChartSeries(Long bankAccountId, LocalDate startDate, LocalDate endDate) {
+        Optional<ChartSeries> chartSeriesOptional = Optional.empty();
 
-        if (bankAccountOptional.isPresent()) {
-            BankAccount bankAccount = bankAccountOptional.get();
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
+
+        if (bankAccountResponse.isOk()) {
+            BankAccount bankAccount = bankAccountResponse.getValue();
             List<Transaction> transactions = new ArrayList<>(transactionService.findByBankAccountIdBetweenDates(
                     bankAccount.getId(), startDate, endDate));
 
@@ -84,8 +71,6 @@ public class ChartService {
 
             ChartSeries chartSeries = new ChartSeries(bankAccount.getName(), dataPoints);
             chartSeriesOptional = Optional.of(chartSeries);
-        } else {
-            chartSeriesOptional = Optional.empty();
         }
 
         return chartSeriesOptional;

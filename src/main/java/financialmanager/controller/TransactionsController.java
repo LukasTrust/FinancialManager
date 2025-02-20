@@ -8,15 +8,12 @@ import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.ResponseService;
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
-import financialmanager.objectFolder.usersFolder.Users;
-import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -25,22 +22,14 @@ public class TransactionsController {
 
     private final TransactionService transactionService;
     private final BankAccountService bankAccountService;
-    private final UsersService usersService;
     private final ResponseService responseService;
 
     @GetMapping("")
     public ResponseEntity<?> getTransactionsForBankAccount(@PathVariable Long bankAccountId) {
-        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
 
-        if (currentUserResponse.isErr()) {
-            return currentUserResponse.getError();
-        }
-
-        Users currentUser = currentUserResponse.getValue();
-        Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, currentUser);
-
-        if (bankAccountOptional.isEmpty()) {
-            return responseService.createResponse(HttpStatus.NOT_FOUND, "bankNotFound", AlertType.ERROR);
+        if (bankAccountResponse.isErr()) {
+            return bankAccountResponse.getError();
         }
 
         return ResponseEntity.ok(transactionService.findByBankAccountId(bankAccountId));
@@ -57,20 +46,13 @@ public class TransactionsController {
     }
 
     private ResponseEntity<?> updateTransactionVisibility(Long bankAccountId, List<Long> ids, boolean hide) {
-        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
 
-        if (currentUserResponse.isErr()) {
-            return currentUserResponse.getError();
+        if (bankAccountResponse.isErr()) {
+            return bankAccountResponse.getError();
         }
 
-        Users currentUser = currentUserResponse.getValue();
-
-        Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, currentUser);
-        if (bankAccountOptional.isEmpty()) {
-            return responseService.createResponse(HttpStatus.NOT_FOUND, "bankNotFound", AlertType.ERROR);
-        }
-
-        BankAccount bankAccount = bankAccountOptional.get();
+        BankAccount bankAccount = bankAccountResponse.getValue();
         List<Transaction> transactions = transactionService.findAllByListOfId(ids).stream()
                 .filter(transaction -> transaction.getBankAccount().equals(bankAccount) &&
                         transaction.isHidden() != hide)
