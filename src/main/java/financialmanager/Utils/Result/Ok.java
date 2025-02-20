@@ -1,5 +1,8 @@
 package financialmanager.Utils.Result;
 
+/**
+ * Represents a successful result.
+ */
 public record Ok<T, E>(T value) implements Result<T, E> {
     @Override
     public boolean isOk() {

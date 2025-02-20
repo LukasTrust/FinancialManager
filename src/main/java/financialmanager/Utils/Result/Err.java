@@ -1,5 +1,8 @@
 package financialmanager.Utils.Result;
 
+/**
+ * Represents an error result.
+ */
 public record Err<T, E>(E error) implements Result<T, E> {
     @Override
     public boolean isOk() {
@@ -13,7 +16,7 @@ public record Err<T, E>(E error) implements Result<T, E> {
 
     @Override
     public T getValue() {
-        throw new UnsupportedOperationException("Err does not contain an value");
+        throw new UnsupportedOperationException("Err does not contain a value");
     }
 
     @Override
