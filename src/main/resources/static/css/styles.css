@@ -6,24 +6,34 @@
 
 /* Apply to all scrollable elements */
 ::-webkit-scrollbar {
-    width: 10px; /* Slightly wider scrollbar for better visibility */
+    width: 12px; /* Slightly wider scrollbar for better visibility */
 }
 
+/* Apply to all scrollable elements */
+::-webkit-scrollbar {
+    width: 12px; /* Slightly wider scrollbar for better visibility */
+}
+
+/* Default track background */
 ::-webkit-scrollbar-track {
-    background: #f1f1f1; /* Track color */
+    background: #f1f1f1; /* Default track color */
     border-radius: 6px; /* Rounded corners for the track */
-}
-
-::-webkit-scrollbar-thumb {
-    background: #888; /* Thumb color */
-    border-radius: 6px; /* Rounded corners for the thumb */
-    border: 2px solid #f1f1f1; /* Adds a border around the thumb */
     transition: background 0.3s ease; /* Smooth transition for hover effect */
 }
 
-::-webkit-scrollbar-thumb:hover {
+/* Default thumb style */
+::-webkit-scrollbar-thumb {
+    background: #888; /* Default thumb color */
+    border-radius: 6px; /* Rounded corners for the thumb */
+    border: 2px solid #f1f1f1; /* Adds a border around the thumb */
+    transition: background 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/* Change thumb style when the scrollbar is hovered */
+:hover::-webkit-scrollbar-thumb {
     background: #666; /* Darker thumb color on hover */
     border: 2px solid #e1e1e1; /* Slightly darker border on hover */
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for a modern look */
 }
 
 body {

@@ -21,7 +21,6 @@ async function buildTransactions() {
 }
 
 async function loadTransactions(messages) {
-
     try {
         const response = await fetch(`/transactions/${bankAccountId}/data`, {
             method: 'GET',
@@ -44,7 +43,7 @@ async function loadTransactions(messages) {
 
         splitDataIntoPages(messages, "transaction", transactionData);
     } catch (error) {
-        console.error("There was a error the create bank request:", error);
+        console.error("There was an error loading the transactions:", error);
         showAlert('error', messages["error_generic"]);
     }
 }
@@ -65,7 +64,7 @@ function addRowsToTransactionTable(data, messages) {
 
             if (transaction.hidden) {
                 rowClass = "hiddenRow";
-                if (transactionsHiddenToggle === false){
+                if (transactionsHiddenToggle === false) {
                     rowClass += " hidden";
                 }
             }
@@ -213,6 +212,17 @@ function showChangeHiddenDialog(messages) {
         "right",
         async () => await updateTransactionVisibility(messages, model, rightContainer, true)
     );
+}
+
+function showChangeContract(messages) {
+    const checkedRows = new Set(getCheckedRows());
+    let transactions = [];
+
+    filteredTransactionData.forEach(transaction => {
+        if (checkedRows.has(transaction.id)) {
+            transactions.push(transaction);
+        }
+    });
 }
 
 async function updateTransactionVisibility(messages, model, listContainer, hide) {
