@@ -1,9 +1,11 @@
 package financialmanager.objectFolder.chartFolder;
 
+import financialmanager.Utils.Result.Result;
 import financialmanager.Utils.Utils;
 import financialmanager.locale.LocaleService;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
+import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
 import financialmanager.objectFolder.usersFolder.Users;
@@ -11,6 +13,7 @@ import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -31,6 +34,14 @@ public class ChartService {
     private static final Logger log = LoggerFactory.getLogger(ChartService.class);
 
     public ChartData getTransactionDate(List<Long> bankAccountIds, LocalDate startDate, LocalDate endDate) {
+        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+
+        if (currentUserResponse.isErr()) {
+            return null;
+        }
+
+        Users currentUser = currentUserResponse.getValue();
+
         LocalDate[] dates = Utils.normalizeDateRange(startDate, endDate);
         LocalDate start = dates[0];
         LocalDate end = dates[1];
@@ -38,7 +49,7 @@ public class ChartService {
         String title = buildTitle(start, end);
 
         List<ChartSeries> chartSeries = bankAccountIds.stream()
-                .map(bankAccountId -> getChartSeries(usersService.getCurrentUser(), bankAccountId, start, end))
+                .map(bankAccountId -> getChartSeries(currentUser, bankAccountId, start, end))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
@@ -69,25 +80,24 @@ public class ChartService {
 
             transactions.sort(Comparator.comparing(financialmanager.objectFolder.transactionFolder.Transaction::getDate));
 
-            List<DataPoint> dataPoints = getDataPoints(currentUser, transactions);
+            List<DataPoint> dataPoints = getDataPoints(transactions);
 
             ChartSeries chartSeries = new ChartSeries(bankAccount.getName(), dataPoints);
             chartSeriesOptional = Optional.of(chartSeries);
         } else {
-            log.warn("User {} does not own the bank account {}", currentUser, bankAccountId);
             chartSeriesOptional = Optional.empty();
         }
 
         return chartSeriesOptional;
     }
 
-    private List<DataPoint> getDataPoints(Users currentUser, List<Transaction> transactions) {
+    private List<DataPoint> getDataPoints(List<Transaction> transactions) {
         return transactions.stream()
-                .map(transaction -> createDataPoint(transaction, currentUser))
+                .map(this::createDataPoint)
                 .collect(Collectors.toList());
     }
 
-    private DataPoint createDataPoint(Transaction transaction, Users currentUser) {
+    private DataPoint createDataPoint(Transaction transaction) {
         double difference = Utils.getDifferenceInTransaction(transaction);
 
         PointStyle pointStyle = difference == 0 ? PointStyle.NORMAL
@@ -97,7 +107,6 @@ public class ChartService {
         String info = (pointStyle == PointStyle.NORMAL) ? null
                 : localeService.getMessageWithPlaceHolder(
                 pointStyle == PointStyle.BAD ? "lessAmountAfter" : "moreAmountAfter",
-                currentUser,
                 List.of(String.valueOf(difference))
         );
 

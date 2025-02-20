@@ -1,5 +1,6 @@
 package financialmanager.objectFolder.keyFigureFolder;
 
+import financialmanager.Utils.Result.Result;
 import financialmanager.Utils.Utils;
 import financialmanager.locale.LocaleService;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
@@ -7,6 +8,7 @@ import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.bankAccountFolder.savingsBankAccountFolder.SavingsBankAccount;
 import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.contractFolder.ContractService;
+import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
 import financialmanager.objectFolder.usersFolder.Users;
@@ -14,6 +16,7 @@ import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -33,7 +36,13 @@ public class KeyFigureService {
     private static final Logger log = LoggerFactory.getLogger(KeyFigureService.class);
 
     public List<KeyFigure> getKeyFiguresOfBankAccounts(List<Long> bankAccountIds, LocalDate startDate, LocalDate endDate) {
-        Users currentUser = usersService.getCurrentUser();
+        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+
+        if (currentUserResponse.isErr()) {
+            return null;
+        }
+
+        Users currentUser = currentUserResponse.getValue();
         LocalDate[] dates = Utils.normalizeDateRange(startDate, endDate);
         LocalDate start = dates[0];
         LocalDate end = dates[1];
@@ -68,31 +77,31 @@ public class KeyFigureService {
         }
 
         if (allTransactions.isEmpty()) {
-            return createBankAccountKeyFigures(currentUser,0,0,isSavingsAccount,0);
+            return createBankAccountKeyFigures(0,0,isSavingsAccount,0);
         }
 
         average = getAverage(allTransactions);
         netGainLoss = getNetGainLoss(allTransactions);
         double lastValue = isSavingsAccount ? Utils.roundToTwoDecimals(discrepancy) : Utils.roundToTwoDecimals(contractCostPerMonth);
 
-        return createBankAccountKeyFigures(currentUser,
+        return createBankAccountKeyFigures(
                 Utils.roundToTwoDecimals(average),
                 Utils.roundToTwoDecimals(netGainLoss),
                 isSavingsAccount,
                 lastValue);
     }
 
-    private List<KeyFigure> createBankAccountKeyFigures(Users currentUser, double average, double netGainLoss,
+    private List<KeyFigure> createBankAccountKeyFigures(double average, double netGainLoss,
                                                         boolean isSavingsBankAccount, double lastValue) {
         List<KeyFigure> keyFigures = new ArrayList<>();
 
-        keyFigures.add(createKeyFigure(currentUser, "average", "averageTooltip", average));
-        keyFigures.add(createKeyFigure(currentUser, "netGainLoss", "netGainLossTooltip", netGainLoss));
+        keyFigures.add(createKeyFigure("average", "averageTooltip", average));
+        keyFigures.add(createKeyFigure("netGainLoss", "netGainLossTooltip", netGainLoss));
         if (isSavingsBankAccount){
-            keyFigures.add(createKeyFigure(currentUser, "discrepancy", "discrepancyTooltip", lastValue));
+            keyFigures.add(createKeyFigure("discrepancy", "discrepancyTooltip", lastValue));
         }
         else {
-            keyFigures.add(createKeyFigure(currentUser, "contractCostPerMonth", "contractCostPerMonthTooltip", lastValue));
+            keyFigures.add(createKeyFigure("contractCostPerMonth", "contractCostPerMonthTooltip", lastValue));
         }
 
         return keyFigures;
@@ -121,10 +130,10 @@ public class KeyFigureService {
                 .sum();
     }
 
-    private KeyFigure createKeyFigure(Users currentUser, String key, String tooltipKey, double value) {
+    private KeyFigure createKeyFigure(String key, String tooltipKey, double value) {
         return new KeyFigure(
-                localeService.getMessage(key, currentUser),
-                localeService.getMessage(tooltipKey, currentUser),
+                localeService.getMessage(key),
+                localeService.getMessage(tooltipKey),
                 value
         );
     }

@@ -1,6 +1,13 @@
 package financialmanager.objectFolder.usersFolder;
 
+import financialmanager.Utils.Result.Err;
+import financialmanager.Utils.Result.Result;
+import financialmanager.Utils.Result.Ok;
+import financialmanager.objectFolder.responseFolder.AlertType;
+import financialmanager.objectFolder.responseFolder.Response;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -36,7 +43,7 @@ public class UsersService implements UserDetailsService {
         usersRepository.save(user);
     }
 
-    public Users getCurrentUser() {
+    public Result<Users, ResponseEntity<Response>> getCurrentUser() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
@@ -44,10 +51,13 @@ public class UsersService implements UserDetailsService {
 
             Optional<Users> usersOptional = usersRepository.findByEmail(username);
 
-            return usersOptional.orElse(null);
-        }
-        catch (Exception e) {
-            return null;
+            if (usersOptional.isPresent()) {
+                return new Ok<>(usersOptional.get());
+            }
+
+            return new Err<>(ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(AlertType.ERROR, "User not found", null)));
+        } catch (Exception e) {
+            return new Err<>(ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(AlertType.ERROR, "Internal server error", null)));
         }
     }
 }

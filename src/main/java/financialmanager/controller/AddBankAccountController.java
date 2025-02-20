@@ -1,5 +1,6 @@
 package financialmanager.controller;
 
+import financialmanager.Utils.Result.Result;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.responseFolder.AlertType;
@@ -23,7 +24,13 @@ public class AddBankAccountController {
     @PostMapping(value = "/addBankAccount", consumes = "application/json", produces = "application/json")
     @ResponseBody
     public ResponseEntity<Response> createBankAccount(@RequestBody BankAccount bankAccount) {
-        Users currentUser = usersService.getCurrentUser();
+        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+
+        if (currentUserResponse.isErr()) {
+            return currentUserResponse.getError();
+        }
+
+        Users currentUser = currentUserResponse.getValue();
 
         // Set the associated currentUser
         bankAccount.setUsers(currentUser);

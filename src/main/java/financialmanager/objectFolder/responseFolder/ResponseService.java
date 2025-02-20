@@ -1,6 +1,8 @@
 package financialmanager.objectFolder.responseFolder;
 
+import financialmanager.Utils.Result.Result;
 import financialmanager.locale.LocaleService;
+import financialmanager.objectFolder.usersFolder.Users;
 import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,12 +16,11 @@ import java.util.List;
 public class ResponseService {
 
     private final LocaleService localeService;
-    private final UsersService usersService;
 
     private ResponseEntity<Response> buildResponse(HttpStatus status, String key, AlertType alertType, Object data, List<String> placeholders) {
         String message = (placeholders == null || placeholders.isEmpty())
-                ? localeService.getMessage(alertType.toString().toLowerCase(),key, usersService.getCurrentUser())
-                : localeService.getMessageWithPlaceHolder(alertType.toString().toLowerCase(), key, usersService.getCurrentUser(), placeholders);
+                ? localeService.getMessage(alertType.toString().toLowerCase(),key)
+                : localeService.getMessageWithPlaceHolder(alertType.toString().toLowerCase(), key, placeholders);
 
         return ResponseEntity.status(status).body(new Response(alertType, message, data));
     }

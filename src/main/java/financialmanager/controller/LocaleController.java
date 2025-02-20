@@ -5,6 +5,7 @@ import financialmanager.Utils.Result.Ok;
 import financialmanager.Utils.Result.Result;
 import financialmanager.locale.LocaleService;
 import financialmanager.objectFolder.responseFolder.AlertType;
+import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.ResponseService;
 import financialmanager.objectFolder.usersFolder.Users;
 import financialmanager.objectFolder.usersFolder.UsersService;
@@ -29,11 +30,18 @@ public class LocaleController {
 
     @PostMapping("/update/locale/{locale}")
     public void updateLocale(@PathVariable Locale locale) {
-        Users user = usersService.getCurrentUser();
+        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+
+        if (currentUserResponse.isErr()) {
+            return;
+        }
+
+        Users currentUser = currentUserResponse.getValue();
+
         if (locale != Locale.ENGLISH && locale != Locale.GERMAN) {
-            localeService.setCurrentLocale(Locale.ENGLISH, user.getId());
+            localeService.setCurrentLocale(Locale.ENGLISH, currentUser.getId());
         } else {
-            localeService.setCurrentLocale(locale, user.getId());
+            localeService.setCurrentLocale(locale, currentUser.getId());
         }
     }
 
@@ -44,9 +52,8 @@ public class LocaleController {
             locale = null;
         }
 
-        Users user = usersService.getCurrentUser();
         try {
-            Map<String, String> messages = localeService.loadMessages("clientSide", subDirectory, user, locale);
+            Map<String, String> messages = localeService.loadMessages("clientSide", subDirectory, locale);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(messages);

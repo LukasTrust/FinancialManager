@@ -24,7 +24,7 @@ async function fetchLocalization(subDirectory) {
 
             return messages;
         } else {
-            showAlert(responseBody.alertType, responseBody.message);
+            showAlert("Error", "Error loading localization");
             console.warn(`Localization file not found in ${subDirectory}. Falling back to default.`);
         }
     } catch (error) {

@@ -1,5 +1,6 @@
 package financialmanager.objectFolder.transactionFolder;
 
+import financialmanager.Utils.Result.Result;
 import financialmanager.Utils.fileParser.DataColumns;
 import financialmanager.Utils.fileParser.IFileParser;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
@@ -39,7 +40,13 @@ public class TransactionProcessingService {
     private static final Logger log = LoggerFactory.getLogger(TransactionProcessingService.class);
 
     public ResponseEntity<Response> createTransactionsFromData(IFileParser fileParser, Long bankAccountId) {
-        Users currentUser = usersService.getCurrentUser();
+        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+
+        if (currentUserResponse.isErr()) {
+            return currentUserResponse.getError();
+        }
+
+        Users currentUser = currentUserResponse.getValue();
         String fileName = fileParser.getFileName();
         String[] header;
 

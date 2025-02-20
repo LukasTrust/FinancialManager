@@ -1,8 +1,10 @@
 package financialmanager.controller;
 
+import financialmanager.Utils.Result.Result;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.responseFolder.AlertType;
+import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.ResponseService;
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
@@ -28,7 +30,13 @@ public class TransactionsController {
 
     @GetMapping("")
     public ResponseEntity<?> getTransactionsForBankAccount(@PathVariable Long bankAccountId) {
-        Users currentUser = usersService.getCurrentUser();
+        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+
+        if (currentUserResponse.isErr()) {
+            return currentUserResponse.getError();
+        }
+
+        Users currentUser = currentUserResponse.getValue();
         Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, currentUser);
 
         if (bankAccountOptional.isEmpty()) {
@@ -49,7 +57,13 @@ public class TransactionsController {
     }
 
     private ResponseEntity<?> updateTransactionVisibility(Long bankAccountId, List<Long> ids, boolean hide) {
-        Users currentUser = usersService.getCurrentUser();
+        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+
+        if (currentUserResponse.isErr()) {
+            return currentUserResponse.getError();
+        }
+
+        Users currentUser = currentUserResponse.getValue();
 
         Optional<BankAccount> bankAccountOptional = bankAccountService.findByIdAndUsers(bankAccountId, currentUser);
         if (bankAccountOptional.isEmpty()) {

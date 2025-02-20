@@ -1,7 +1,9 @@
 package financialmanager.controller;
 
+import financialmanager.Utils.Result.Result;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
+import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.usersFolder.Users;
 import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
@@ -20,9 +22,15 @@ public class SidebarController {
 
     @GetMapping("/getBankAccountsOfUser")
     public ResponseEntity<?> getBankAccountsOfUser() {
-        Users user = usersService.getCurrentUser();
+        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
 
-        List<BankAccount> bankAccounts = bankAccountService.findAllByUsers(user);
+        if (currentUserResponse.isErr()) {
+            return currentUserResponse.getError();
+        }
+
+        Users currentUser = currentUserResponse.getValue();
+
+        List<BankAccount> bankAccounts = bankAccountService.findAllByUsers(currentUser);
 
         return ResponseEntity.ok(bankAccounts);
     }
