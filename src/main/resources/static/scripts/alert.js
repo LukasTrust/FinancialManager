@@ -59,6 +59,6 @@ function updateAlertPositions() {
 
     alerts.forEach((alert) => {
         alert.style.top = `${cumulativeHeight}px`; // Set the top position
-        cumulativeHeight += alert.offsetHeight + 10; // Add the alert"s height and some margin for spacing
+        cumulativeHeight += alert.offsetHeight + 10; // Add the alerts height and some margin for spacing
     });
 }
