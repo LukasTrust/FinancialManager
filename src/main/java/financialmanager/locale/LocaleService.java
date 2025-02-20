@@ -81,7 +81,7 @@ public class LocaleService {
             String message = messages.getOrDefault(key, key);
 
             for (String placeholder : placeHolders) {
-                message = message.replaceFirst("\\{\\}", placeholder);
+                message = message.replaceFirst("\\{}", placeholder);
             }
             return message;
         } catch (IOException e) {
@@ -96,7 +96,7 @@ public class LocaleService {
             String message = messages.getOrDefault(key, key);
 
             for (String placeholder : placeHolders) {
-                message = message.replaceFirst("\\{\\}", placeholder);
+                message = message.replaceFirst("\\{}", placeholder);
             }
             return message;
         } catch (IOException e) {

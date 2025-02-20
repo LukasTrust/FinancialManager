@@ -12,8 +12,6 @@ import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
 import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -29,8 +27,6 @@ public class KeyFigureService {
     private final ContractService contractService;
     private final BankAccountService bankAccountService;
     private final LocaleService localeService;
-
-    private static final Logger log = LoggerFactory.getLogger(KeyFigureService.class);
 
     public List<KeyFigure> getKeyFiguresOfBankAccounts(List<Long> bankAccountIds, LocalDate startDate, LocalDate endDate) {
         LocalDate[] dates = Utils.normalizeDateRange(startDate, endDate);
