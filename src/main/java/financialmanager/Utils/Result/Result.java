@@ -23,22 +23,4 @@ public sealed interface Result<T, E> permits Ok, Err {
         }
         return new Err<>(getError());
     }
-
-    /**
-     * Executes the given consumer if the result is Ok.
-     */
-    default void ifOk(Consumer<? super T> consumer) {
-        if (isOk()) {
-            consumer.accept(getValue());
-        }
-    }
-
-    /**
-     * Executes the given consumer if the result is Err.
-     */
-    default void ifErr(Consumer<? super E> consumer) {
-        if (isErr()) {
-            consumer.accept(getError());
-        }
-    }
 }
