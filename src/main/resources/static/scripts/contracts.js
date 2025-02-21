@@ -1,3 +1,15 @@
+async function buildChangeContract() {
+    const messages = await fetchLocalization("changeContract");
+
+    await loadContracts(messages);
+
+    document.getElementById("backButton").addEventListener("click", async () => await backToTransactionsView());
+}
+
+async function backToTransactionsView() {
+    await loadURL("/transactions");
+}
+
 async function loadContracts(messages) {
     try {
         const response = await fetch(`/contracts/${bankAccountId}/data`, {

@@ -1,3 +1,4 @@
+const contentArea = document.getElementById('content');
 let alerts = [];
 let existingChart = null;
 let bankAccountId;

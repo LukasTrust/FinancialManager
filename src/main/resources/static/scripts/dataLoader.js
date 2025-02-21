@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const contentArea = document.getElementById('content');  // Where the content will go
-
     await setLocale();
 
     // Load sidebar
@@ -20,38 +18,45 @@ document.addEventListener('DOMContentLoaded', async () => {
                 bankAccountId = link.parentElement.id;
             }
 
-            try {
-                // Fetch the content from the server (just the content fragment)
-                const response = await fetch(url);
-                const html = await response.text();
-
-                // Extract and replace the content (assuming the fragment is inside a div with class "content")
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const newContent = doc.getElementById('content');
-
-                // Replace the old content with the new one
-                contentArea.innerHTML = newContent.innerHTML;
-
-                console.log(url);
-                switch (url) {
-                    case "/addBankAccount":
-                        await buildAddBankAccount();
-                        break;
-                    case "/bankAccountOverview":
-                        await buildBankAccountOverview();
-                        break;
-                    case "/transactions":
-                        await buildTransactions();
-                        break;
-                }
-
-            } catch (error) {
-                console.error("Error loading content:", error);
-            }
+            await loadURL(url);
         });
     });
 });
+
+async function loadURL(url) {
+    try {
+        // Fetch the content from the server (just the content fragment)
+        const response = await fetch(url);
+        const html = await response.text();
+
+        // Extract and replace the content (assuming the fragment is inside a div with class "content")
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const newContent = doc.getElementById('content');
+
+        // Replace the old content with the new one
+        contentArea.innerHTML = newContent.innerHTML;
+
+        console.log(url);
+        switch (url) {
+            case "/addBankAccount":
+                await buildAddBankAccount();
+                break;
+            case "/bankAccountOverview":
+                await buildBankAccountOverview();
+                break;
+            case "/transactions":
+                await buildTransactions();
+                break;
+            case "/changeContract":
+                await buildChangeContract();
+                break;
+        }
+
+    } catch (error) {
+        console.error("Error loading content:", error);
+    }
+}
 
 async function loadBankAccounts() {
     try {

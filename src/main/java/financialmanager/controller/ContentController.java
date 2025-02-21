@@ -41,4 +41,10 @@ public class ContentController {
         model.addAttribute("title", "Transactions");
         return "transactions";
     }
+
+    @GetMapping("/changeContract")
+    public String getChangeContracts(Model model) {
+        model.addAttribute("title", "Change Contracts");
+        return "changeContract";
+    }
 }

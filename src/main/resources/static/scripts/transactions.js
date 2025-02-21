@@ -17,12 +17,10 @@ async function buildTransactions() {
         .addEventListener("click", () => showChangeHiddenDialog(messages));
 
     document.getElementById("changeContractButton")
-        .addEventListener("click", () => showChangeContract(messages));
+        .addEventListener("click", async () => await loadURL("/changeContract"));
 
     document.getElementById("showHiddenRows")
         .addEventListener("change", () => changeRowVisibility());
-
-    loadContracts();
 }
 
 async function loadTransactions(messages) {
@@ -162,109 +160,47 @@ function filterTransactions(messages, searchString) {
     }
 }
 
-function showChangeHiddenDialog(messages) {
-    const checkedRows = new Set(getCheckedRows());
-    const alreadyHiddenTransactions = [];
-    const notHiddenTransactions = [];
+function classifyTransactions(checkedRows) {
+    const alreadyHidden = [];
+    const notHidden = [];
 
     filteredTransactionData.forEach(transaction => {
         if (checkedRows.has(transaction.id)) {
             transaction.hidden
-                ? alreadyHiddenTransactions.push(transaction)
-                : notHiddenTransactions.push(transaction);
+                ? alreadyHidden.push(transaction)
+                : notHidden.push(transaction);
         }
     });
 
-    const flexContainerColumn = createAndAppendElement("", "div", "flexContainerColumn");
-    const header = createDialogHeader(flexContainerColumn, messages["changeHiddenHeader"], "bi bi-eye");
-    const listContainer = createAndAppendElement(flexContainerColumn, "div", "flexContainerSpaced");
-
-    // Close Button
-    const closeButton = createAndAppendElement(header, "button", "closeButton");
-    createAndAppendElement(closeButton, "i", "bi bi-x-lg");
-
-    const model = createModal(flexContainerColumn, closeButton);
-
-    // Left Side: Already Hidden Transactions
-    const leftContainer = createListSection(
-        listContainer,
-        messages["alreadyHiddenHeader"],
-        alreadyHiddenTransactions
-    );
-
-    createDialogButton(
-        leftContainer,
-        "bi bi-eye",
-        messages["unHide"],
-        "left",
-        async () => await updateTransactionVisibility(messages, model, leftContainer, false)
-    );
-
-    // Right Side: Not Hidden Transactions
-    const rightContainer = createListSection(
-        listContainer,
-        messages["notHiddenHeader"],
-        notHiddenTransactions
-    );
-
-    createDialogButton(
-        rightContainer,
-        "bi bi-eye-slash",
-        messages["hide"],
-        "right",
-        async () => await updateTransactionVisibility(messages, model, rightContainer, true)
-    );
+    return { alreadyHidden, notHidden };
 }
 
-function showChangeContract(messages) {
+function showChangeHiddenDialog(messages) {
     const checkedRows = new Set(getCheckedRows());
-    let transactions = [];
+    const { alreadyHidden, notHidden } = classifyTransactions(checkedRows);
 
-    filteredTransactionData.forEach(transaction => {
-        if (checkedRows.has(transaction.id)) {
-            transactions.push(transaction);
-        }
-    });
+    const dialogContent = createDialogContent(messages["changeHiddenHeader"], "bi bi-eye");
+    const listContainer = createAndAppendElement(dialogContent, "div", "flexContainerSpaced");
 
-    const flexContainerColumn = createAndAppendElement("", "div", "flexContainerColumn");
-    const header = createDialogHeader(flexContainerColumn, messages["changeContractHeader"], "bi bi-file-earmark-fill");
-    const listContainer = createAndAppendElement(flexContainerColumn, "div", "flexContainerSpaced");
+    // Hidden transactions
+    const leftSide = createListSection(listContainer, messages["alreadyHiddenHeader"], alreadyHidden);
+    createDialogButton(leftSide, "bi bi-eye", messages["unHide"], "left", () => updateTransactionVisibility(messages, dialogContent, leftSide, false));
 
-    // Close Button
-    const closeButton = createAndAppendElement(header, "button", "closeButton");
-    createAndAppendElement(closeButton, "i", "bi bi-x-lg");
-
-    const model = createModal(flexContainerColumn, closeButton);
-
-    // Left Side: Contracts
-    createListSectionWithPicker(
-        listContainer,
-        messages["contracts"],
-        contractData
-    );
-
-    // Right Side: Transactions
-    createListSection(
-        listContainer,
-        messages["notHiddenHeader"],
-        transactions
-    );
-
-    const contractButton =  createDialogButton(
-        flexContainerColumn,
-        "bi bi-eye-slash",
-        messages["addContractsToTransactions"],
-        "center"
-    );
-    contractButton.style.marginRight = "20px";
+    // Not hidden transactions
+    const rightSide = createListSection(listContainer, messages["notHiddenHeader"], notHidden);
+    createDialogButton(rightSide, "bi bi-eye-slash", messages["hide"], "right", () => updateTransactionVisibility(messages, dialogContent, rightSide, true));
 }
 
 async function updateTransactionVisibility(messages, model, listContainer, hide) {
     try {
         const ids = Array.from(listContainer.querySelectorAll("div span"))
-            .map(span => Number(span.closest("span").id));
+            .map(span => Number(span.id)) // Assuming the ID is directly on the span
+            .filter(id => id !== 0); // Remove 0 if present
 
-        if (ids.length === 0) return;
+        if (ids.length === 0) {
+            showAlert("INFO", messages["noTransactionsUpdated"], model);
+            return;
+        }
 
         const endpoint = hide ? "hideTransactions" : "unHideTransactions";
         const response = await fetch(`/transactions/${bankAccountId}/data/${endpoint}`, {
