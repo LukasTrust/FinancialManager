@@ -159,6 +159,7 @@ button:hover {
     border-radius: 12px;
     cursor: default;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: visible;
 }
 
 .listItem.selected {
@@ -182,6 +183,8 @@ button:hover {
     margin-left: 10px;
     margin-right: 10px;
     margin-bottom: 10px;
+    align-items: center;
+    justify-content: center;
 }
 
 .listContainerHeader {
@@ -192,6 +195,7 @@ button:hover {
     display: flex;
     flex-direction: column;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    overflow: visible;
 }
 
 .listContainerColumn {
@@ -200,7 +204,7 @@ button:hover {
     flex-direction: column; /* Forces items into a single column */
     gap: 10px; /* Space between items */
     padding: 15px; /* Padding inside the list container */
-    flex-grow: 1; /* Allow the list to take up remaining space */
+    flex-grow: 1;
 }
 
 .flexContainer {
@@ -374,6 +378,7 @@ button:hover {
     cursor: pointer;
     color: gray;
     font-size: 1.5rem;
+    z-index: 1000;
 }
 
 .tooltipText {
@@ -534,8 +539,7 @@ dialog {
     opacity: 0;
     transform: translateY(-20px);
     transition: opacity 0.3s ease, transform 0.3s ease;
-    overflow: hidden;
-
+    overflow: visible;
     position: fixed;
     inset: 0;
     margin: auto;

@@ -1,22 +1,3 @@
-function createModal(contentHTML, closeButton) {
-    // Create the dialog element
-    const modal = document.createElement("dialog");
-    modal.appendChild(contentHTML);
-    document.body.appendChild(modal);
-
-    // Add event listener to close the modal
-    if (closeButton) {
-        closeButton.addEventListener("click", () => modal.close());
-    } else {
-        console.error("Close button not found in createModal!");
-    }
-
-    // Show the modal
-    modal.showModal();
-
-    return modal;
-}
-
 function createListElement(parent, text, attributes = {}, addRemove = true) {
     // Create a new list item
     const item = createAndAppendElement(parent,"div", "listItem");
@@ -67,4 +48,27 @@ function formatNumber(number, currency) {
 
     // Combine the formatted number with the currency symbol
     return `${formattedNumber} ${currency}`;
+}
+
+async function backToOtherView(cameFromUrl) {
+    if (cameFromUrl != null){
+        await loadURL(cameFromUrl);
+    }
+}
+
+function createListSection(parent, title, transactions) {
+    const container = createAndAppendElement(parent, "div", "flexContainerColumn", "", { style: "width: 45%" });
+    const header = createAndAppendElement(container, "div", "listContainerHeader");
+    createAndAppendElement(header, "h2", "", title, { style: "margin: 10px" });
+    createListContainer(header, transactions);
+    return container;
+}
+
+function createListContainer(parent, transactions) {
+    const listContainer = createAndAppendElement(parent, "div", "listContainerColumn",
+        "",{style: "min-height: 420px; max-height: 420px;"});
+    transactions.forEach(transaction => {
+        createListElement(listContainer, transaction.counterParty.name, { id: transaction.id });
+    });
+    return listContainer;
 }

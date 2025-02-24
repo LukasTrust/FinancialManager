@@ -7,5 +7,8 @@
   "noValidTransactions": "Die Daten konnten nicht korrekt gelesen und Transaktionen erstellt werden.",
   "userExists": "Benutzer mit der gleichen E-Mail-Adresse existiert bereits",
   "generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut",
-  "localizationNotFound": "Die Lokalisierung Datei wurde nicht gefunden"
+  "localizationNotFound": "Die Lokalisierung Datei wurde nicht gefunden",
+  "transactionNotFound": "Die Transaction wurde nicht gefunden",
+  "transactionDoesNotBelongToBankAccount": "Die Transaktion gehört nicht zum Bank Konto",
+  "transactionHasNoContract": "Die Transaktion hat keinen Vertrag"
 }

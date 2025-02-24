@@ -36,8 +36,6 @@ async function loadURL(url) {
 
         // Replace the old content with the new one
         contentArea.innerHTML = newContent.innerHTML;
-
-        console.log(url);
         switch (url) {
             case "/addBankAccount":
                 await buildAddBankAccount();
@@ -49,7 +47,6 @@ async function loadURL(url) {
                 await buildTransactions();
                 break;
             case "/changeContract":
-                await buildChangeContract();
                 break;
         }
 

@@ -20,6 +20,10 @@ public class TransactionService {
         return transactionRepository.findAllById(ids);
     }
 
+    public Transaction findById(Long id) {
+        return transactionRepository.findById(id).orElse(null);
+    }
+
     public List<Transaction> findByBankAccountIdBetweenDates(Long bankAccountId, LocalDate startDate, LocalDate endDate) {
         List<Transaction> transactions = findByBankAccountId(bankAccountId);
 
@@ -39,5 +43,9 @@ public class TransactionService {
 
     public void saveAll(List<Transaction> transactions) {
         transactionRepository.saveAll(transactions);
+    }
+
+    public void save(Transaction transaction) {
+        transactionRepository.save(transaction);
     }
 }

@@ -1,3 +1,11 @@
 {
-  "changeContractHeader": "Verändere Vertrage von Transaktionen"
+  "changeContractHeader": "Verändere Vertrage von Transaktionen",
+  "amount": "Betrag",
+  "date": "Datum",
+  "contract": "Vertrag",
+  "removeContractFromTransaction": "Vertrag von Transaktion entfernen",
+  "removeContractFromTransactionMainText": "Sind Sie sich sicher das Sie den Vertrag der Transaktion entfernen wollen?",
+  "yes": "Ja",
+  "cancel": "Abbrechen",
+  "removeContractFromTransactionTooltip": "Dadurch wird der Vertrag der Transaktion entfernt, kann später aber wieder hinzugefügt werden"
 }

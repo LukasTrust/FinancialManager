@@ -17,7 +17,9 @@ async function buildTransactions() {
         .addEventListener("click", () => showChangeHiddenDialog(messages));
 
     document.getElementById("changeContractButton")
-        .addEventListener("click", async () => await loadURL("/changeContract"));
+        .addEventListener("click", async () => {
+            await buildChangeContract("/transactions", getCheckedTransactions());
+        });
 
     document.getElementById("showHiddenRows")
         .addEventListener("change", () => changeRowVisibility());
@@ -160,24 +162,35 @@ function filterTransactions(messages, searchString) {
     }
 }
 
-function classifyTransactions(checkedRows) {
+function getCheckedTransactions() {
+    const checkedRows = new Set(getCheckedRows());
+    let transactions = [];
+
+    filteredTransactionData.forEach(transaction => {
+        if (checkedRows.has(transaction.id))
+            transactions.push(transaction);
+    });
+
+    return transactions;
+}
+
+function classifyHiddenTransactions() {
     const alreadyHidden = [];
     const notHidden = [];
 
-    filteredTransactionData.forEach(transaction => {
-        if (checkedRows.has(transaction.id)) {
-            transaction.hidden
-                ? alreadyHidden.push(transaction)
-                : notHidden.push(transaction);
-        }
+    const transactions = getCheckedTransactions();
+
+    transactions.forEach(transaction => {
+        transaction.hidden
+            ? alreadyHidden.push(transaction)
+            : notHidden.push(transaction);
     });
 
-    return { alreadyHidden, notHidden };
+    return {alreadyHidden, notHidden};
 }
 
 function showChangeHiddenDialog(messages) {
-    const checkedRows = new Set(getCheckedRows());
-    const { alreadyHidden, notHidden } = classifyTransactions(checkedRows);
+    const {alreadyHidden, notHidden} = classifyHiddenTransactions();
 
     const dialogContent = createDialogContent(messages["changeHiddenHeader"], "bi bi-eye");
     const listContainer = createAndAppendElement(dialogContent, "div", "flexContainerSpaced");
