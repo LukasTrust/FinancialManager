@@ -7,5 +7,7 @@
   "removeContractFromTransactionMainText": "Sind Sie sich sicher das Sie den Vertrag der Transaktion entfernen wollen?",
   "yes": "Ja",
   "cancel": "Abbrechen",
-  "removeContractFromTransactionTooltip": "Dadurch wird der Vertrag der Transaktion entfernt, kann später aber wieder hinzugefügt werden"
+  "removeContractFromTransactionTooltip": "Dadurch wird der Vertrag der Transaktion entfernt, kann später aber wieder hinzugefügt werden",
+  "transactionsGroupHeader": "Transaktionen gruppiered",
+  "contractsHeader": "Verträge"
 }

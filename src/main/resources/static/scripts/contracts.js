@@ -4,8 +4,19 @@ async function buildChangeContract(cameFromUrl, transactions) {
     const messages = await fetchLocalization("changeContract");
 
     createGroupedTransactions(messages, transactions);
+    await fillContracts();
 
     document.getElementById("backButton").addEventListener("click", async () => await backToOtherView(cameFromUrl));
+}
+
+async function fillContracts(messages) {
+    await loadContracts(messages);
+    const contractsContainer = document.getElementById("contractsContainer");
+
+    contractData.forEach(contract => {
+       const listItem = createAndAppendElement(contractsContainer, "div", "listItem");
+       createAndAppendElement(listItem, "div", "item", contract.name);
+    });
 }
 
 function createGroupedTransactions(messages, transactions) {
