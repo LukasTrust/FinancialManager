@@ -1,3 +1,14 @@
+function toggleSelection(selectedElement, currentSelection, className) {
+    if (currentSelection === selectedElement) {
+        currentSelection.classList.remove(className);
+        return null;
+    } else {
+        if (currentSelection) currentSelection.classList.remove(className);
+        selectedElement.classList.add(className);
+        return selectedElement;
+    }
+}
+
 function createListElement(parent, text, attributes = {}, addRemove = true, small = false) {
     // Create a new list item
     const classType = small ? "listItemSmall" : "listItem";

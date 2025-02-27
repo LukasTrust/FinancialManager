@@ -4,6 +4,7 @@ import financialmanager.objectFolder.contractFolder.contractHistoryFolder.Contra
 import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistoryService;
 import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import financialmanager.objectFolder.transactionFolder.Transaction;
+import financialmanager.objectFolder.usersFolder.Users;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ public class ContractProcessingService {
     private final ContractService contractService;
     private final ContractHistoryService contractHistoryService;
 
-    public void checkIfTransactionsBelongToContract(List<Transaction> transactions) {
+    public void checkIfTransactionsBelongToContract(Users currentUser, List<Transaction> transactions) {
         Optional<Transaction> lastTransaction = transactions.stream().max(Comparator.comparing(financialmanager.objectFolder.transactionFolder.Transaction::getDate));
         List<Transaction> changeableList = new ArrayList<>(transactions);
 
@@ -38,7 +39,7 @@ public class ContractProcessingService {
         changeableList = checkIfExistingContractsChanged(changeableList, contracts);
 
         // Find new contracts
-        List<Contract> newContracts = tryToFindNewContracts(changeableList);
+        List<Contract> newContracts = tryToFindNewContracts(currentUser, changeableList);
 
         if (newContracts != null && !newContracts.isEmpty()) {
             contracts.addAll(newContracts);
@@ -162,7 +163,7 @@ public class ContractProcessingService {
         return monthsDifference >= 0 && monthsDifference % monthsBetweenPayments == 0;
     }
 
-    private List<Contract> tryToFindNewContracts(List<Transaction> transactionsWithOutContract) {
+    private List<Contract> tryToFindNewContracts(Users currentUser, List<Transaction> transactionsWithOutContract) {
         if (transactionsWithOutContract.isEmpty()) {
             return null;
         }
@@ -178,7 +179,7 @@ public class ContractProcessingService {
 
             groupedByCounterParty.forEach((_, possibleMatches) -> {
                 if (possibleMatches.size() > 2) {
-                    tryToIdentifyPattern(possibleMatches).ifPresent(potentialContracts::add);
+                    tryToIdentifyPattern(currentUser, possibleMatches).ifPresent(potentialContracts::add);
                 }
             });
         });
@@ -186,7 +187,7 @@ public class ContractProcessingService {
         return potentialContracts;
     }
 
-    private Optional<Contract> tryToIdentifyPattern(List<Transaction> transactions) {
+    private Optional<Contract> tryToIdentifyPattern(Users currentUser, List<Transaction> transactions) {
         transactions.sort(Comparator.comparing(financialmanager.objectFolder.transactionFolder.Transaction::getDate));
 
         List<Long> intervals = calculateIntervalsBetweenTransactions(transactions);
@@ -194,7 +195,7 @@ public class ContractProcessingService {
         if (isConsistentInterval(intervals)) {
             int monthsBetweenPayments = calculateMonthsFromDays(intervals.getFirst());
 
-            Contract newContract = createContractFromTransactions(transactions, monthsBetweenPayments);
+            Contract newContract = createContractFromTransactions(currentUser, transactions, monthsBetweenPayments);
 
             return Optional.of(newContract);
         }
@@ -226,11 +227,11 @@ public class ContractProcessingService {
         return (int) Math.round((double) days / 30);
     }
 
-    private Contract createContractFromTransactions(List<Transaction> transactions, int monthsBetweenPayments) {
+    private Contract createContractFromTransactions(Users currentUser, List<Transaction> transactions, int monthsBetweenPayments) {
         Transaction firstTransaction = transactions.getFirst();
 
         Contract newContract = new Contract(firstTransaction.getDate(), transactions.getLast().getDate(), monthsBetweenPayments,
-                firstTransaction.getAmount(), firstTransaction.getCounterParty());
+                firstTransaction.getAmount(), firstTransaction.getCounterParty(), currentUser);
 
        setContractForTransactions(newContract, transactions);
 

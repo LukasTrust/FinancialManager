@@ -10,5 +10,6 @@
   "localizationNotFound": "Die Lokalisierung Datei wurde nicht gefunden",
   "transactionNotFound": "Die Transaction wurde nicht gefunden",
   "transactionDoesNotBelongToBankAccount": "Die Transaktion gehört nicht zum Bank Konto",
-  "transactionHasNoContract": "Die Transaktion hat keinen Vertrag"
+  "transactionHasNoContract": "Die Transaktion hat keinen Vertrag",
+  "contractNotFound": "Der Vertrag wurde nicht gefunden"
 }

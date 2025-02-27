@@ -206,11 +206,11 @@ function showChangeHiddenDialog(messages) {
 
 async function updateTransactionVisibility(messages, model, listContainer, hide) {
     try {
-        const ids = Array.from(listContainer.querySelectorAll("div span"))
+        const transactionIds = Array.from(listContainer.querySelectorAll("div span"))
             .map(span => Number(span.id)) // Assuming the ID is directly on the span
             .filter(id => id !== 0); // Remove 0 if present
 
-        if (ids.length === 0) {
+        if (transactionIds.length === 0) {
             showAlert("INFO", messages["noTransactionsUpdated"], model);
             return;
         }
@@ -219,23 +219,23 @@ async function updateTransactionVisibility(messages, model, listContainer, hide)
         const response = await fetch(`/transactions/${bankAccountId}/data/${endpoint}`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(ids)
+            body: JSON.stringify(transactionIds)
         });
 
         const responseBody = await response.json();
 
         showAlert(responseBody.alertType, responseBody.message, model);
 
-        updateCashedTransactionsAndUI(messages, ids);
+        updateCashedTransactionsAndUI(messages, transactionIds);
     } catch (error) {
         console.error("Unexpected error in updateTransactionVisibility:", error);
         showAlert("ERROR", messages["error_generic"], model);
     }
 }
 
-function updateCashedTransactionsAndUI(messages, ids) {
+function updateCashedTransactionsAndUI(messages, transactionIds) {
     filteredTransactionData.forEach(transaction => {
-        if (ids.includes(transaction.id)) {
+        if (transactionIds.includes(transaction.id)) {
             transaction.hidden = !transaction.hidden;
         }
     });

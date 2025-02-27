@@ -3,5 +3,6 @@
   "bankAccountCreated": "Bankkonto erfolgreich erstellt.",
   "signUp": "Registrierung erfolgreich!",
   "transactionsHidden": "{} Transaktionen wurde verborgen",
-  "transactionsUnhidden": "{} Transaktionen wurden sichtbar gemacht"
+  "transactionsUnhidden": "{} Transaktionen wurden sichtbar gemacht",
+  "transactionsAddedContract": "Der Vertrag '{}' wurde den Transaktionen hinzugefügt"
 }

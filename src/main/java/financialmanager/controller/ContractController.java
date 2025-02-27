@@ -3,6 +3,7 @@ package financialmanager.controller;
 import financialmanager.Utils.Result.Result;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
+import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.contractFolder.ContractService;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
@@ -13,6 +14,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -35,7 +38,7 @@ public class ContractController {
         return ResponseEntity.ok(contractService.findByBankAccountId(bankAccountId));
     }
 
-    @PostMapping("/updateTransaction/{transactionId}")
+    @PostMapping("/removeContractFromTransaction/{transactionId}")
     public ResponseEntity<?> removeContractFromTransaction(
             @PathVariable Long bankAccountId,
             @PathVariable Long transactionId) {
@@ -62,5 +65,38 @@ public class ContractController {
         transactionService.save(transaction);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/addContractToTransactions/{contractId}")
+    public ResponseEntity<?> addContractToTransactions(@PathVariable Long bankAccountId, @PathVariable Long contractId,
+                                                       @RequestBody List<Long> transactionIds) {
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
+
+        if (bankAccountResponse.isErr()) {
+            return bankAccountResponse.getError();
+        }
+
+        BankAccount bankAccount = bankAccountResponse.getValue();
+
+        Contract contract = contractService.findByIdAndUsersId(contractId, bankAccount.getUsers().getId());
+
+        if (contract == null) {
+            return responseService.createResponse(HttpStatus.NOT_FOUND, "contractNotFound", AlertType.ERROR);
+        }
+
+        List<Transaction> transactions = transactionService.findAllByListOfIdAndBankAccount(transactionIds, bankAccountId);
+
+        if (transactions.isEmpty()) {
+            return responseService.createResponse(HttpStatus.NOT_FOUND, "transactionNotFound", AlertType.ERROR);
+        }
+
+        transactions.forEach(transaction -> {
+            transaction.setContract(contract);
+        });
+
+        transactionService.saveAll(transactions);
+
+        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "transactionsAddedContract", AlertType.SUCCESS,
+                List.of(contract.getName()));
     }
 }

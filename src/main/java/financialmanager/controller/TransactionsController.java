@@ -36,16 +36,16 @@ public class TransactionsController {
     }
 
     @PostMapping("/hideTransactions")
-    public ResponseEntity<?> hideTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> ids) {
-        return updateTransactionVisibility(bankAccountId, ids, true);
+    public ResponseEntity<?> hideTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
+        return updateTransactionVisibility(bankAccountId, transactionIds, true);
     }
 
     @PostMapping("/unHideTransactions")
-    public ResponseEntity<?> unHideTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> ids) {
-        return updateTransactionVisibility(bankAccountId, ids, false);
+    public ResponseEntity<?> unHideTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
+        return updateTransactionVisibility(bankAccountId, transactionIds, false);
     }
 
-    private ResponseEntity<?> updateTransactionVisibility(Long bankAccountId, List<Long> ids, boolean hide) {
+    private ResponseEntity<?> updateTransactionVisibility(Long bankAccountId, List<Long> transactionIds, boolean hide) {
         Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
 
         if (bankAccountResponse.isErr()) {
@@ -53,9 +53,8 @@ public class TransactionsController {
         }
 
         BankAccount bankAccount = bankAccountResponse.getValue();
-        List<Transaction> transactions = transactionService.findAllByListOfId(ids).stream()
-                .filter(transaction -> transaction.getBankAccount().equals(bankAccount) &&
-                        transaction.isHidden() != hide)
+        List<Transaction> transactions = transactionService.findAllByListOfIdAndBankAccount(transactionIds, bankAccountId).stream()
+                .filter(transaction -> transaction.isHidden() != hide)
                 .toList();
 
         if (transactions.isEmpty()) {
@@ -66,6 +65,6 @@ public class TransactionsController {
         transactionService.saveAll(transactions);
 
         return responseService.createResponseWithPlaceHolders(HttpStatus.OK, hide ? "transactionsHidden" : "transactionsUnhidden",
-                AlertType.SUCCESS, List.of(String.valueOf(ids.size())));
+                AlertType.SUCCESS, List.of(String.valueOf(transactionIds.size())));
     }
 }

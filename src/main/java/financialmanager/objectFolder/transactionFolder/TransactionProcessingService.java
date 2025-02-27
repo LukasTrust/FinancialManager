@@ -99,7 +99,7 @@ public class TransactionProcessingService {
 
         newTransactions.addAll(getTransactionsWithoutContract(existingTransactions));
 
-        contractProcessingService.checkIfTransactionsBelongToContract(newTransactions);
+        contractProcessingService.checkIfTransactionsBelongToContract(currentUser, newTransactions);
         transactionService.saveAll(newTransactions);
     }
 

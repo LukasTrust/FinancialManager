@@ -1,7 +1,6 @@
 package financialmanager.objectFolder.contractFolder;
 
 import financialmanager.Utils.Utils;
-import financialmanager.objectFolder.transactionFolder.TransactionRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +12,13 @@ import java.util.*;
 public class ContractService {
 
     private final ContractRepository contractRepository;
-    private final TransactionRepository transactionRepository;
 
     public List<Contract> findByBankAccountId(Long bankAccountId) {
-        return transactionRepository.findDistinctContractsByBankAccountId(bankAccountId);
+        return contractRepository.findDistinctContractsByBankAccountId(bankAccountId);
+    }
+
+    public Contract findByIdAndUsersId(Long id, Long usersId) {
+        return contractRepository.findByIdAndUsersId(id, usersId);
     }
 
     public List<Contract> findByBankAccountIdBetweenDates(Long bankAccountId, LocalDate startDate, LocalDate endDate) {

@@ -16,8 +16,8 @@ public class TransactionService {
         return transactionRepository.findByBankAccountId(bankAccountId);
     }
 
-    public List<Transaction> findAllByListOfId(List<Long> ids) {
-        return transactionRepository.findAllById(ids);
+    public List<Transaction> findAllByListOfIdAndBankAccount(List<Long> ids, Long bankAccountId) {
+        return transactionRepository.findByIdInAndBankAccountId(ids, bankAccountId);
     }
 
     public Transaction findById(Long id) {
