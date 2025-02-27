@@ -3,8 +3,12 @@ async function buildChangeContract(cameFromUrl, transactions) {
 
     const messages = await fetchLocalization("changeContract");
 
+    selectedTransactionGroup = null;
+    selectedCounterparty = null;
+    selectedContract = null;
+
     createGroupedTransactions(messages, transactions);
-    await fillContracts();
+    await fillContracts(messages);
 
     document.getElementById("backButton").addEventListener("click", async () => await backToOtherView(cameFromUrl));
 }
@@ -13,56 +17,125 @@ async function fillContracts(messages) {
     await loadContracts(messages);
     const contractsContainer = document.getElementById("contractsContainer");
 
+    if (!contractsContainer) {
+        console.error("Contracts container not found!");
+        return;
+    }
+
     contractData.forEach(contract => {
-       const listItem = createAndAppendElement(contractsContainer, "div", "listItem");
-       createAndAppendElement(listItem, "div", "item", contract.name);
+        const listItem = createAndAppendElement(contractsContainer, "div", "listItem tooltip tooltipBottom");
+        listItem.addEventListener("click", () => toggleContractSelection(listItem));
+        listItem.dataset.counterPartyId = contract.counterParty.id;
+        createAndAppendElement(listItem, "div", "normalText", contract.name);
+        createAndAppendElement(listItem, "div", "tooltipText", `${messages["startDate"]}: ${contract.startDate}   ${messages["lastPaymentDate"]}: ${contract.lastPaymentDate}`)
     });
+
+    updateContractAvailability();
 }
 
 function createGroupedTransactions(messages, transactions) {
-    let groups = groupTransactions(transactions); // Group transactions by counterparty
     const transactionGroups = document.getElementById("transactionGroups");
 
+    if (!transactionGroups) {
+        console.error("Transaction groups container not found!");
+        return;
+    }
+
     const currency = getCurrentCurrencySymbol();
+    const groups = groupTransactions(transactions);
 
     groups.forEach((group, key) => {
-        const listContainerHeader = createAndAppendElement(transactionGroups, "div", "listContainerHeader");
-        createAndAppendElement(listContainerHeader, "h2", "", key, {style: "margin-top: 10px"});
-        const listContainer = createAndAppendElement(listContainerHeader, "div", "listContainerColumn", "",
-            {style: "overflow: visible;"});
+        const listContainerHeader = createAndAppendElement(transactionGroups, "div", "listContainerHeader", "",
+            { style: "margin-bottom: 20px" });
+        createAndAppendElement(listContainerHeader, "h2", "", group.counterPartyName);
 
-        group.forEach(item => {
-            const content = createAndAppendElement(listContainer, "div", "listItem", "",
-                {id: item.id});
-            const left = createAndAppendElement(content, "div", "flexContainerColumn");
+        const listContainer = createAndAppendElement(listContainerHeader, "div");
+        listContainerHeader.dataset.counterPartyId = key;
 
-            const firstRow = createAndAppendElement(left, "div", "listContainer");
+        listContainerHeader.addEventListener("click", () => toggleTransactionSelection(listContainerHeader));
 
-            createAndAppendElement(firstRow, "div", "normalSpan",
-                `${messages["amount"]}: ${formatNumber(item.amount, currency)}      ${messages["date"]}: ${formatDateString(item.date)}`,
-                {style: "margin-right: 30px"});
+        group.transactions.forEach(item => {
+            const content = createAndAppendElement(listContainer, "div", "listItemSmall", "", { id: item.id });
+
+            const left = createAndAppendElement(content, "div", "listContainerColumn");
+
+            createAndAppendElement(left, "div", "normalText",
+                `${messages["amount"]}: ${formatNumber(item.amount, currency)}      ${messages["date"]}: ${formatDateString(item.date)}`
+            );
 
             let height = 70;
 
             if (item.contract) {
-                const secondRow = createAndAppendElement(left, "div", "listContainer");
+                const secondRow = createAndAppendElement(left, "div", "flexContainer tooltip tooltipBottom");
+                createAndAppendElement(secondRow, "div", "normalText", `${messages["contract"]}: ${item.contract.name}`);
+                createAndAppendElement(secondRow, "div", "tooltipText", `${messages["startDate"]}: ${item.contract.startDate}   ${messages["lastPaymentDate"]}: ${item.contract.lastPaymentDate}`)
 
-                createAndAppendElement(secondRow, "div", "normalSpan", `${messages["contract"]}: ${item.contract.name}`);
-
-                createAndAppendElement(secondRow, "button", "iconButton bi bi-x-lg", "",
-                    { style: "background-color: #ff4757" },
-                    { click: () => removeContractFromTransactionDialog(messages, item, secondRow) }
-                );
+                const removeContractButton = createAndAppendElement(secondRow, "button", "removeButton bi bi-x-lg", "",
+                    { style: "margin-left: 10px" });
+                removeContractButton.addEventListener("click", () => removeContractFromTransactionDialog(messages, item, secondRow));
 
                 height = 120;
             }
 
-            createAndAppendElement(content, "button", "removeButton bi bi-x-lg",
-                null, {style: `height: ${height}px; overflow: visible;`},
-                {click: () => listContainer.removeChild(content)
+            const removeButton = createAndAppendElement(content, "button", "removeButton bi bi-x-lg", "");
+            removeButton.style.height = `${height}px`;
+            removeButton.addEventListener("click", () => {
+                listContainer.removeChild(content);
+
+                // Check if the group is empty after removing a transaction
+                if (listContainer.children.length === 0) {
+                    transactionGroups.removeChild(listContainerHeader);
+                }
             });
+
         });
     });
+}
+
+function updateContractAvailability() {
+    const contractElements = document.querySelectorAll("#contractsContainer .listItem");
+
+    contractElements.forEach(contract => {
+        if (contract.dataset.counterPartyId === selectedCounterparty) {
+            contract.classList.remove("disabled");
+        } else {
+            contract.classList.add("disabled");
+        }
+    });
+}
+
+function toggleContractSelection(selectedElement) {
+    if (selectedContract === selectedElement) {
+        selectedContract.classList.remove("selected");
+        selectedContract = null;
+    } else {
+        if (selectedContract) selectedContract.classList.remove("selected");
+        selectedContract = selectedElement;
+        selectedContract.classList.add("selected");
+    }
+}
+
+function toggleTransactionSelection(selectedElement) {
+    const isSameSelection = selectedTransactionGroup === selectedElement;
+
+    if (selectedTransactionGroup) {
+        selectedTransactionGroup.classList.remove("selected");
+
+        if (selectedContract) {
+            selectedContract.classList.remove("selected");
+            selectedContract = null;
+        }
+    }
+
+    // Select new transaction if it's not the same as the previous one
+    selectedTransactionGroup = isSameSelection ? null : selectedElement;
+    selectedCounterparty = isSameSelection ? null : selectedElement.dataset.counterPartyId;
+
+    if (selectedTransactionGroup) {
+        selectedTransactionGroup.classList.add("selected");
+    }
+
+    updateContractAvailability();
 }
 
 async function removeContractFromTransactionDialog(messages, transaction, secondRow) {
@@ -116,15 +189,17 @@ async function removeContractFromTransaction(messages, transaction, secondRow) {
 
 function groupTransactions(transactions) {
     return transactions.reduce((map, transaction) => {
-        const key = transaction.counterParty.name;
+        const key = transaction.counterParty.id;
+
         if (!map.has(key)) {
-            map.set(key, []);
+            map.set(key, { transactions: [], counterPartyName: transaction.counterParty.name });
         }
 
-        map.get(key).push(transaction);
+        map.get(key).transactions.push(transaction);
         return map;
     }, new Map());
 }
+
 
 async function loadContracts(messages) {
     try {

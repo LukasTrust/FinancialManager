@@ -157,5 +157,5 @@ function addStringToList(messages, stringList, text) {
         return;
     }
 
-    createListElement(stringList, text);
+    createListElement(stringList, text, {}, true, true);
 }

@@ -42,7 +42,7 @@ function createDialogButton(parent, iconClass, text, alignment, callback) {
         style: `margin-top: 20px; ${alignment === "left" ? "margin-right: auto" : "margin-left: auto"}`
     });
     createAndAppendElement(button, "i", iconClass, "", { style: "margin-right: 10px" });
-    createAndAppendElement(button, "span", "", text);
+    createAndAppendElement(button, "div", "normalText", text);
     if (callback) button.addEventListener("click", callback);
     return button;
 }

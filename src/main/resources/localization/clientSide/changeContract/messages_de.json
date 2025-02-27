@@ -9,5 +9,13 @@
   "cancel": "Abbrechen",
   "removeContractFromTransactionTooltip": "Dadurch wird der Vertrag der Transaktion entfernt, kann später aber wieder hinzugefügt werden",
   "transactionsGroupHeader": "Transaktionen gruppiered",
-  "contractsHeader": "Verträge"
+  "contractsHeader": "Verträge",
+  "transactionsGroupHeaderTooltip": "Wähle eine Gruppe von Transaktionene aus die einem Vertrag zugeweissen werden sollen wo für ein neuer Vertrag erstellt werden soll.",
+  "contractsHeaderTooltip": "Wähle einen Vertrag aus, dabei kann nur ein Vertrag gewählt werden der den passenden Gegenpart hat",
+  "startDate": "Start Datum",
+  "lastPaymentDate": "Letztes Zahlungs Datum",
+  "addGroupToContract": "Vertrag hinzufügen",
+  "addGroupToContractTooltip": "Füge die ausgewählte Gruppe den ausgewählen Vertrag hinzu",
+  "removeGroupFromContract": "Vertrag entfernen",
+  "removeGroupFromContractTooltip": "Entferne den Vertrag von jeder Transaktion der ausgwählten Gruppe"
 }

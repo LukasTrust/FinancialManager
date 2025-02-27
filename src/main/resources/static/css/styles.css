@@ -60,12 +60,14 @@ h1 {
     font-size: 2rem;
     color: #fff;
     text-align: center;
+    cursor: pointer;
 }
 
 h2 {
     font-size: 1.5rem;
     color: #fff;
     text-align: center;
+    cursor: pointer;
 }
 
 h3 {
@@ -74,6 +76,7 @@ h3 {
     text-align: center;
     margin-left: 10px;
     margin-top: 5px;
+    cursor: pointer;
 }
 
 p {
@@ -93,6 +96,7 @@ a {
 a:hover {
     text-decoration: underline;
     color: darkcyan;
+    z-index: 2;
 }
 
 button {
@@ -109,6 +113,7 @@ button {
 
 button:hover {
     background-color: rgb(255, 255, 255, 0.5);
+    z-index: 2;
 }
 
 .closeButton {
@@ -134,21 +139,28 @@ button:hover {
 .closeButton:hover {
     color: #ff1a1a; /* Brighter red on hover */
     transform: scale(1.1); /* Slightly enlarge on hover */
+    z-index: 2;
 }
 
 .closeButton:active {
     transform: scale(0.9); /* Slightly shrink when clicked */
 }
 
-.item {
-    color: #fff;
-    font-size: 16px;
-    padding-left: 12px;
-    font-weight: 500;
-    text-wrap: auto;
-    margin: 8px auto 8px 8px;
-    padding-right: 20px;
-    overflow: hidden;
+.listItemSmall {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #2a4365 0%, #1e3c72 100%);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin: 8px;
+}
+
+.listItemSmall:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 2;
 }
 
 .listItem {
@@ -157,27 +169,29 @@ button:hover {
     background: linear-gradient(135deg, #2a4365 0%, #1e3c72 100%);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     border-radius: 12px;
-    cursor: default;
+    cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    overflow: visible;
+    margin: 8px;
+    padding: 12px;
 }
 
-.listItem.selected {
-    background: linear-gradient(135deg, #4a69bd 0%, #2c3e50 100%);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    transform: scale(1.05);
+.selected {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5); /* Stronger shadow for more depth */
     font-weight: bold;
-    border: 2px solid #ffffff;
+    filter: brightness(1.3) contrast(1.1); /* More vibrant effect */
+    transform: scale(1.02); /* Slight pop-out effect */
+    transition: all 0.3s ease-in-out;
 }
 
 .listItem:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 2;
 }
 
 .listContainer {
     display: flex;
-    height: 40px;
+    height: 60px;
     flex-wrap: wrap;
     gap: 10px;
     margin-left: 10px;
@@ -185,6 +199,7 @@ button:hover {
     margin-bottom: 10px;
     align-items: center;
     justify-content: center;
+    overflow: scroll;
 }
 
 .listContainerHeader {
@@ -195,16 +210,16 @@ button:hover {
     display: flex;
     flex-direction: column;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-    overflow: visible;
+    padding: 10px;
 }
 
 .listContainerColumn {
     display: flex;
-    overflow-y: auto;
     flex-direction: column; /* Forces items into a single column */
     gap: 10px; /* Space between items */
     padding: 15px; /* Padding inside the list container */
     flex-grow: 1;
+    overflow-y: visible;
 }
 
 .flexContainer {
@@ -225,7 +240,6 @@ button:hover {
     display: flex;
     flex-direction: column;
     padding: 20px 20px 0;
-    overflow-y: auto;
     height: 100%;
 }
 
@@ -233,7 +247,6 @@ button:hover {
     display: flex;
     flex-direction: column;
     margin-bottom: 20px;
-    overflow-y: auto;
     border-radius: 20px;
     border: 1px solid #ccc;
     min-height: 20%;
@@ -331,6 +344,7 @@ button:hover {
 
 .boxContainer:hover {
     transform: translateY(-5px);
+    z-index: 2;
 }
 
 .pageContainer {
@@ -378,7 +392,6 @@ button:hover {
     cursor: pointer;
     color: gray;
     font-size: 1.5rem;
-    z-index: 1000;
 }
 
 .tooltipText {
@@ -399,6 +412,7 @@ button:hover {
     transition: opacity 0.3s ease-in-out 0.2s;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     white-space: normal;
+    bottom: 130%;
 }
 
 /* Tooltip arrow */
@@ -409,10 +423,6 @@ button:hover {
     transform: translateX(-50%);
     border-width: 6px;
     border-style: solid;
-}
-
-.tooltipText {
-    bottom: 130%;
 }
 
 .tooltipText::after {
@@ -455,7 +465,7 @@ button:hover {
     cursor: pointer;
 }
 
-.normalSpan {
+.normalText {
     font-size: 1rem;
     color: #fff;
     font-weight: 600;
@@ -480,6 +490,7 @@ button:hover {
 .iconButton:hover {
     background-color: #2a5298; /* Lighter blue on hover */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+    z-index: 2;
 }
 
 .iconButton:active {
@@ -525,6 +536,7 @@ button:hover {
 .removeButton:hover {
     background-color: #fc3040; /* Slightly darker red on hover */
     transform: scale(1.05); /* Slightly enlarge on hover */
+    z-index: 2;
 }
 
 dialog {
@@ -555,3 +567,8 @@ dialog[open] {
     transform: translateY(0);
 }
 
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    filter: grayscale(80%);
+}

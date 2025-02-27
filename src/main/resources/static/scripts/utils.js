@@ -1,13 +1,16 @@
-function createListElement(parent, text, attributes = {}, addRemove = true) {
+function createListElement(parent, text, attributes = {}, addRemove = true, small = false) {
     // Create a new list item
-    const item = createAndAppendElement(parent,"div", "listItem");
+    const classType = small ? "listItemSmall" : "listItem";
+    const styleType = small ? {style: "margin-left: 20px"} : {};
 
-    createAndAppendElement(item,"span", "item", text, attributes);
+    const item = createAndAppendElement(parent,"div", classType);
+
+    createAndAppendElement(item,"div", "normalText", text, attributes);
 
     // Create a remove button
     if (addRemove) {
         createAndAppendElement(item,"button", "removeButton bi bi-x-lg",
-            null, {}, {click: () => parent.removeChild(item)});
+            null, styleType, {click: () => parent.removeChild(item)});
     }
 
     return item;

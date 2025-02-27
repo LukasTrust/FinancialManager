@@ -93,6 +93,7 @@
 
 .button-alert:hover {
     background: var(--alert-button-hover-bg);
+    z-index: 2;
 }
 
 .button-alert span {

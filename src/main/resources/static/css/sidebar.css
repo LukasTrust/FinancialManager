@@ -50,6 +50,7 @@
 
 .sidebarHeader .sidebarToggle:hover {
     background: #dde4fb;
+    z-index: 2;
 }
 
 .sidebarHeader .sidebarToggle span {
@@ -90,6 +91,7 @@
 .sidebarNav .navLink:hover {
     color: #151A2D;
     background: #fff;
+    z-index: 2;
 }
 
 .sidebarNav .navLink .navLabel {
@@ -138,6 +140,7 @@
     pointer-events: auto;
     transform: translateY(50%);
     transition: 0.4s ease;
+    z-index: 2;
 }
 
 .sidebarNav .secondaryNav {
@@ -177,6 +180,7 @@
 .navSubLink:hover {
     color: #151A2D;
     background: #fff;
+    z-index: 2;
 }
 
 /* Sub-item icon and label alignment */

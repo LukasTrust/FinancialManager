@@ -9,3 +9,6 @@ let transactionData;
 let filteredTransactionData;
 let transactionsHiddenToggle;
 let contractData;
+let selectedTransactionGroup;
+let selectedCounterparty;
+let selectedContract;

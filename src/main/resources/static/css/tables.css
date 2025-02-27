@@ -32,7 +32,6 @@ thead {
     color: #fff;
     position: sticky;
     top: 0;
-    z-index: 2;
 }
 
 thead, tbody tr {
@@ -92,6 +91,7 @@ th {
 
 th:hover {
     background-color: rgba(0, 123, 255, 0.8); /* Darker on hover */
+    z-index: 2;
 }
 
 th i {
@@ -113,6 +113,7 @@ tbody tr {
 
 tbody tr:hover {
     background-color: rgba(255, 255, 255, 0.05); /* Subtle hover effect */
+    z-index: 2;
 }
 
 .pagination {
@@ -160,6 +161,7 @@ tbody tr:hover {
 .pagination select:hover {
     border-color: #0056b3; /* Darker border on hover */
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.2); /* Subtle glow */
+    z-index: 2;
 }
 
 .tableCheckbox {
@@ -196,6 +198,7 @@ tbody tr:hover {
 /* Hover effect */
 .tableCheckbox:hover {
     border-color: #357abd; /* Darker border on hover */
+    z-index: 2;
 }
 
 /* Focus state for accessibility */
@@ -237,6 +240,7 @@ tbody tr:hover {
 /* Optional: Add hover effect */
 .highlightCell:hover {
     filter: brightness(95%); /* Slightly darken on hover */
+    z-index: 2;
 }
 
 .iconColor {
