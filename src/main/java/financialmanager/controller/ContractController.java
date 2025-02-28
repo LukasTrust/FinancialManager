@@ -90,13 +90,32 @@ public class ContractController {
             return responseService.createResponse(HttpStatus.NOT_FOUND, "transactionNotFound", AlertType.ERROR);
         }
 
-        transactions.forEach(transaction -> {
-            transaction.setContract(contract);
-        });
+        transactions.forEach(transaction -> transaction.setContract(contract));
 
         transactionService.saveAll(transactions);
 
         return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "transactionsAddedContract", AlertType.SUCCESS,
                 List.of(contract.getName()));
+    }
+
+    @PostMapping("/removeContractFromTransactions")
+    public ResponseEntity<?> removeContractFromTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
+
+        if (bankAccountResponse.isErr()) {
+            return bankAccountResponse.getError();
+        }
+
+        List<Transaction> transactions = transactionService.findAllByListOfIdAndBankAccount(transactionIds, bankAccountId);
+
+        if (transactions.isEmpty()) {
+            return responseService.createResponse(HttpStatus.NOT_FOUND, "transactionNotFound", AlertType.ERROR);
+        }
+
+        transactions.forEach(transaction -> transaction.setContract(null));
+
+        transactionService.saveAll(transactions);
+
+        return responseService.createResponse(HttpStatus.OK, "transactionsRemovedContract", AlertType.SUCCESS);
     }
 }

@@ -49,7 +49,7 @@ function createKeyFigures(keyFigures) {
 
         // Create Header
         const keyFigureHeader = createAndAppendElement(keyFigureBox,"div", "keyFigureHeader");
-        createAndAppendElement(keyFigureHeader,"span", "", keyFigure.name);
+        createAndAppendElement(keyFigureHeader,"span", "", keyFigure.name, {style: "cursor: pointer"});
 
         // Tooltip
         const keyFigureTooltip = createAndAppendElement(keyFigureHeader,"div", "tooltip bi bi-info");

@@ -4,5 +4,6 @@
   "signUp": "Registrierung erfolgreich!",
   "transactionsHidden": "{} Transaktionen wurde verborgen",
   "transactionsUnhidden": "{} Transaktionen wurden sichtbar gemacht",
-  "transactionsAddedContract": "Der Vertrag '{}' wurde den Transaktionen hinzugefügt"
+  "transactionsAddedContract": "Der Vertrag '{}' wurde den Transaktionen hinzugefügt",
+  "transactionsRemovedContract": "Der Vertrag der Transaktionen wurde entfernt"
 }

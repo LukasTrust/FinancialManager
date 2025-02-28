@@ -20,7 +20,6 @@
   "removeGroupFromContractTooltip": "Entferne den Vertrag von jeder Transaktion der ausgwählten Gruppe",
   "error_noTransactionGroupSelected": "Bitte eine Transaktionsgruppe auswählen",
   "error_noContractSelected": "Bitte einen Vertrag auswählen",
-  "error_noTransactionsFound": "Es wurden keine Transaktionen gefunden",
   "error_noContractFound": "Es wurde kein Vertrag gefunden",
   "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut."
 }

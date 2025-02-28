@@ -35,5 +35,6 @@
   "noTransactionsUpdated": "Keine Transaktion wurde geupdated",
   "monthAbbreviations": "'Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'",
   "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.",
-  "error_loadingTransactions": "Ein unerwarteter Fehler ist beim Laden der Transaktionen aufgetreten."
+  "error_loadingTransactions": "Ein unerwarteter Fehler ist beim Laden der Transaktionen aufgetreten.",
+  "sortTooltip": "Klick hier um nach dieser Spalte zu sortieren"
 }

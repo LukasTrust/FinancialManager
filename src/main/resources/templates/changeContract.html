@@ -1,5 +1,5 @@
 <div th:fragment="changeContracts" id="content">
-    <div style="height: 98%" class="flexContainerColumn">
+    <div class="flexContainerColumn">
         <!--Header-->
         <div class="flexContainer">
             <button class="iconButton" id="backButton">
@@ -11,50 +11,44 @@
             </div>
         </div>
 
-        <div class="pageContainer">
-            <div class="container" style="padding-bottom: 0">
-                <button class="iconButton tooltip tooltipBottom" id="addGroupToContract" style="margin-left: 25px">
-                    <i class="bi bi-plus-lg"></i>
-                    <span class="normalText" data-i18n="addGroupToContract"></span>
-                    <span class="tooltipText" data-i18n="addGroupToContractTooltip"></span>
-                </button>
+        <div class="flexContainer" style="margin-top: 20px">
+            <button class="iconButton tooltip tooltipBottom" id="addGroupToContract">
+                <i class="bi bi-plus-lg"></i>
+                <span class="normalText" data-i18n="addGroupToContract"></span>
+                <span class="tooltipText" data-i18n="addGroupToContractTooltip"></span>
+            </button>
 
-                <button class="iconButton tooltip tooltipBottom" id="removeGroupFromContract">
-                    <i class="bi bi-dash-lg"></i>
-                    <span class="normalText" data-i18n="removeGroupFromContract"></span>
-                    <span class="tooltipText" data-i18n="removeGroupFromContractTooltip"></span>
-                </button>
+            <button class="iconButton tooltip tooltipBottom" id="removeGroupFromContract">
+                <i class="bi bi-dash-lg"></i>
+                <span class="normalText" data-i18n="removeGroupFromContract"></span>
+                <span class="tooltipText" data-i18n="removeGroupFromContractTooltip"></span>
+            </button>
+        </div>
+
+        <div class="container" style="padding: 0 0 20px; gap: 50px">
+            <!-- Left Column: Transactions -->
+            <div class="pageContainer" style="width: 50%">
+                <div class="flexContainer" style="margin-top: 20px">
+                    <h1 data-i18n="transactionsGroupHeader" style="margin-bottom: 10px; margin-left: 20px"></h1>
+                    <div class="tooltip tooltipBottom bi bi-info">
+                        <span class="tooltipText" data-i18n="transactionsGroupHeaderTooltip"></span>
+                    </div>
+                </div>
+
+                <div id="transactionGroups" class="flexContainerColumn"
+                     style="overflow: scroll; height: 76vh">
+                </div>
             </div>
 
-            <div class="container" style="padding-top: 0; padding-left: 0">
-                <!-- Left Column: Transactions -->
-                <div class="flexContainerColumn" style="width: 45%">
-                    <div class="flexContainer">
-                        <h1 data-i18n="transactionsGroupHeader" style="margin-bottom: 10px; margin-left: 20px;"></h1>
-                        <div class="tooltip tooltipBottom bi bi-info">
-                            <span class="tooltipText" data-i18n="transactionsGroupHeaderTooltip"></span>
-                        </div>
-                    </div>
-
-                    <div id="transactionGroups" class="flexContainerColumn"
-                         style="height: 70vh; max-height: 70vh; overflow: scroll">
+            <!-- Right Column: Contracts -->
+            <div class="pageContainer" style="padding-right: 0; width: 50%">
+                <div class="flexContainer" style="margin-top: 20px">
+                    <h1 data-i18n="contractsHeader" style="margin-bottom: 10px; margin-left: 20px;"></h1>
+                    <div class="tooltip tooltipBottom bi bi-info">
+                        <span class="tooltipText" data-i18n="contractsHeaderTooltip"></span>
                     </div>
                 </div>
-
-                <!-- Right Column: Contracts -->
-                <div class="flexContainerColumn" style="width: 45%">
-                    <div class="flexContainer">
-                        <h1 data-i18n="contractsHeader" style="margin-bottom: 10px; margin-left: 20px;"></h1>
-                        <div class="tooltip tooltipBottom bi bi-info">
-                            <span class="tooltipText" data-i18n="contractsHeaderTooltip"></span>
-                        </div>
-                    </div>
-                    <div class="flexContainerColumn">
-                        <div id="contractsContainer" class="listContainerHeader"
-                             style="max-height: 70vh; overflow: scroll">
-                        </div>
-                    </div>
-                </div>
+                <div class="flexContainerColumn" id="contractsContainer" style="height: 76vh; overflow: scroll"></div>
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
 <div th:fragment="transactions" id="content">
-    <div style="height: 98%" class="flexContainerColumn">
+    <div class="flexContainerColumn">
         <div class="flexContainer">
             <h1><span class="bi bi-receipt"></span></h1>
             <h1 data-i18n="transactions"></h1>
@@ -57,31 +57,45 @@
                     </th>
                     <th style="width: 25%" class="thHeader">
                         <span data-i18n="counterParty"></span>
-                        <i data-type="string" data-index="1" class="iconColor bi bi-arrows-expand"></i>
+                        <i data-type="string" data-index="1" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                            <span class="tooltipText" data-i18n="sortTooltip"></span>
+                        </i>
                     </th>
                     <th style="width: 15%" class="thHeader">
                         <span data-i18n="contract"></span>
-                        <i data-type="string" data-index="2" class="iconColor bi bi-arrows-expand"></i>
+                        <i data-type="string" data-index="2" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                            <span class="tooltipText" data-i18n="sortTooltip"></span>
+                        </i>
                     </th>
                     <th style="width: 15%" class="thHeader">
                         <span data-i18n="category"></span>
-                        <i data-type="string" data-index="3" class="iconColor bi bi-arrows-expand"></i>
+                        <i data-type="string" data-index="3" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                            <span class="tooltipText" data-i18n="sortTooltip"></span>
+                        </i>
                     </th>
                     <th style="width: 10%" class="rightAligned thHeader">
                         <span data-i18n="date"></span>
-                        <i data-type="date" data-index="4" class="iconColor bi bi-arrows-expand"></i>
+                        <i data-type="date" data-index="4" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                            <span class="tooltipText" data-i18n="sortTooltip"></span>
+                        </i>
                     </th>
                     <th style="width: 10%" class="rightAligned thHeader">
                         <span data-i18n="amountInBankBefore"></span>
-                        <i data-type="number" data-index="5" class="iconColor bi bi-arrows-expand"></i>
+                        <i data-type="number" data-index="5" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                            <span class="tooltipText" data-i18n="sortTooltip"></span>
+                        </i>
                     </th>
                     <th style="width: 10%" class="rightAligned thHeader">
                         <span data-i18n="amount"></span>
-                        <i data-type="number" data-index="6" class="iconColor bi bi-arrows-expand"></i>
+                        <i data-type="number" data-index="6" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                            <span class="tooltipText" data-i18n="sortTooltip"></span>
+                        </i>
                     </th>
                     <th style="width: 10%" class="rightAligned thHeader">
                         <span data-i18n="amountInBankAfter"></span>
-                        <i style="margin-right: 20px" data-type="number" data-index="7" class="iconColor bi bi-arrows-expand"></i>
+                        <i style="margin-right: 20px" data-type="number" data-index="7" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                            <span class="tooltipText" data-i18n="sortTooltip"></span>
+                        </i>
                     </th>
                 </tr>
                 </thead>

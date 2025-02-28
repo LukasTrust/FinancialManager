@@ -84,6 +84,7 @@ p {
     color: #fff;
     font-weight: 600;
     margin: 25px 0 10px;
+    cursor: pointer;
 }
 
 a {
@@ -240,7 +241,6 @@ button:hover {
     display: flex;
     flex-direction: column;
     padding: 20px 20px 0;
-    height: 100%;
 }
 
 .flexContainerColumnSmall {
@@ -311,7 +311,6 @@ button:hover {
 
 .chartContainer {
     width: 100%;
-    max-height: 620px;
     display: flex;
     height: auto;
     margin: 0 auto 20px;
@@ -470,6 +469,7 @@ button:hover {
     color: #fff;
     font-weight: 600;
     margin-left: 10px;
+    cursor: pointer;
 }
 
 .iconButton {
