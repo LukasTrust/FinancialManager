@@ -43,7 +43,7 @@ public class ContentController {
     }
 
     @GetMapping("/changeContract")
-    public String getChangeContracts(Model model) {
+    public String getChangeContract(Model model) {
         model.addAttribute("title", "Change Contracts");
         return "changeContract";
     }
