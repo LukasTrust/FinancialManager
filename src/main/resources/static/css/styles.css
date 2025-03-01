@@ -60,14 +60,14 @@ h1 {
     font-size: 2rem;
     color: #fff;
     text-align: center;
-    cursor: pointer;
+    cursor: default;
 }
 
 h2 {
     font-size: 1.5rem;
     color: #fff;
     text-align: center;
-    cursor: pointer;
+    cursor: default;
 }
 
 h3 {
@@ -76,7 +76,7 @@ h3 {
     text-align: center;
     margin-left: 10px;
     margin-top: 5px;
-    cursor: pointer;
+    cursor: default;
 }
 
 p {
@@ -84,7 +84,7 @@ p {
     color: #fff;
     font-weight: 600;
     margin: 25px 0 10px;
-    cursor: pointer;
+    cursor: default;
 }
 
 a {
@@ -117,12 +117,31 @@ button:hover {
     z-index: 2;
 }
 
+.backButton {
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    transition: color 0.3s ease, transform 0.2s ease;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: white;
+}
+
+.backButton:hover {
+    transform: scale(1.1);
+    z-index: 2;
+}
+
 .closeButton {
     background: transparent; /* Transparent background */
     border: none; /* Remove default border */
     color: #ff4d4d; /* Red color for the "X" icon */
     font-size: 24px; /* Adjust size as needed */
-    cursor: pointer;
     transition: color 0.3s ease, transform 0.2s ease;
     padding: 8px; /* Add padding for better click area */
     border-radius: 50%; /* Circular shape for a modern look */
@@ -388,7 +407,7 @@ button:hover {
 
 .tooltip {
     position: relative;
-    cursor: pointer;
+    cursor: default;
     color: gray;
     font-size: 1.5rem;
 }
@@ -452,7 +471,7 @@ button:hover {
     border: 2px solid #0f5132;
     border-radius: 10px;
     padding: 10px;
-    cursor: pointer;
+    cursor: default;
 }
 
 .negative {
@@ -461,7 +480,7 @@ button:hover {
     border: 2px solid #842029;
     border-radius: 10px;
     padding: 10px;
-    cursor: pointer;
+    cursor: default;
 }
 
 .normalText {
@@ -469,7 +488,7 @@ button:hover {
     color: #fff;
     font-weight: 600;
     margin-left: 10px;
-    cursor: pointer;
+    cursor: default;
 }
 
 .iconButton {
@@ -482,7 +501,6 @@ button:hover {
     color: white;
     border: none;
     border-radius: 4px;
-    cursor: pointer;
     transition: background-color 0.3s;
     width: auto;
 }
@@ -502,7 +520,6 @@ button:hover {
     border: none; /* Remove default border */
     color: white; /* White color for the icon */
     font-size: 1.5em; /* Slightly larger than normal text */
-    cursor: pointer;
     transition: color 0.3s ease, transform 0.2s ease;
     padding: 10px; /* Add padding for better click area */
     display: flex;

@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -32,7 +33,12 @@ public class TransactionsController {
             return bankAccountResponse.getError();
         }
 
-        return ResponseEntity.ok(transactionService.findByBankAccountId(bankAccountId));
+        List<Transaction> transactions = transactionService.findByBankAccountId(bankAccountId)
+                .stream()
+                .sorted(Comparator.comparing(Transaction::getDate, Comparator.reverseOrder()))
+                .toList();
+
+        return ResponseEntity.ok(transactions);
     }
 
     @PostMapping("/hideTransactions")

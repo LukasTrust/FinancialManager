@@ -21,5 +21,6 @@
   "error_noTransactionGroupSelected": "Bitte eine Transaktionsgruppe auswählen",
   "error_noContractSelected": "Bitte einen Vertrag auswählen",
   "error_noContractFound": "Es wurde kein Vertrag gefunden",
-  "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut."
+  "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.",
+  "notTransactionSelected": "Es wurden keine Transaktionen ausgewählt, bitte zuerst Transaktionen auswählen um deren Verträge anzupassen"
 }

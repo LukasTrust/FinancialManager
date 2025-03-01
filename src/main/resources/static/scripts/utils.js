@@ -86,3 +86,18 @@ function createListContainer(parent, transactions) {
     });
     return listContainer;
 }
+
+function startTimer(source) {
+    console.log(`Timer started from: ${source}`);
+    timer = Date.now();
+}
+
+function stopTimer(source) {
+    if (timer) {
+        const elapsedTime = (Date.now() - timer) / 1000;
+        console.log(`Timer stopped from: ${source}. Elapsed time: ${elapsedTime} seconds`);
+        timer = null;
+    } else {
+        console.log(`No active timer to stop from: ${source}`);
+    }
+}

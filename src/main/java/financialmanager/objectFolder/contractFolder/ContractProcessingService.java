@@ -21,7 +21,7 @@ public class ContractProcessingService {
     private final ContractHistoryService contractHistoryService;
 
     public void checkIfTransactionsBelongToContract(Users currentUser, List<Transaction> transactions) {
-        Optional<Transaction> lastTransaction = transactions.stream().max(Comparator.comparing(financialmanager.objectFolder.transactionFolder.Transaction::getDate));
+        Optional<Transaction> lastTransaction = transactions.stream().max(Comparator.comparing(Transaction::getDate));
         List<Transaction> changeableList = new ArrayList<>(transactions);
 
         LocalDate lastTransactionDate = LocalDate.now();
@@ -60,7 +60,7 @@ public class ContractProcessingService {
                     isTransactionValidForContract(transaction, contract, false)).toList());
 
             if (possibleMatches.size() > 2) {
-                possibleMatches.sort(Comparator.comparing(financialmanager.objectFolder.transactionFolder.Transaction::getDate));
+                possibleMatches.sort(Comparator.comparing(Transaction::getDate));
                 Transaction firstTransaction = possibleMatches.getFirst();
 
                 ContractHistory contractHistory = new ContractHistory(contract, firstTransaction.getAmount(), firstTransaction.getDate());
@@ -115,7 +115,7 @@ public class ContractProcessingService {
     }
 
     private void updateLastPaymentDate(Contract contract, List<Transaction> transactions) {
-        Optional<Transaction> lastTransaction = transactions.stream().max(Comparator.comparing(financialmanager.objectFolder.transactionFolder.Transaction::getDate));
+        Optional<Transaction> lastTransaction = transactions.stream().max(Comparator.comparing(Transaction::getDate));
 
         lastTransaction.ifPresent(transaction -> {
             if (contract.getLastPaymentDate().isBefore(transaction.getDate())) {
@@ -125,7 +125,7 @@ public class ContractProcessingService {
     }
 
     private void updateStartDate(Contract contract, List<Transaction> transactions) {
-        Optional<Transaction> firstDate = transactions.stream().min(Comparator.comparing(financialmanager.objectFolder.transactionFolder.Transaction::getDate));
+        Optional<Transaction> firstDate = transactions.stream().min(Comparator.comparing(Transaction::getDate));
 
         firstDate.ifPresent(transaction -> {
             if (contract.getStartDate().isAfter(transaction.getDate())) {
@@ -169,13 +169,13 @@ public class ContractProcessingService {
         }
 
         Map<Double, List<Transaction>> groupedByAmount = transactionsWithOutContract.stream()
-                .collect(Collectors.groupingBy(financialmanager.objectFolder.transactionFolder.Transaction::getAmount));
+                .collect(Collectors.groupingBy(Transaction::getAmount));
 
         List<Contract> potentialContracts = new ArrayList<>();
 
         groupedByAmount.forEach((_, amountTransactions) -> {
             Map<CounterParty, List<Transaction>> groupedByCounterParty = amountTransactions.stream()
-                    .collect(Collectors.groupingBy(financialmanager.objectFolder.transactionFolder.Transaction::getCounterParty));
+                    .collect(Collectors.groupingBy(Transaction::getCounterParty));
 
             groupedByCounterParty.forEach((_, possibleMatches) -> {
                 if (possibleMatches.size() > 2) {
@@ -188,7 +188,7 @@ public class ContractProcessingService {
     }
 
     private Optional<Contract> tryToIdentifyPattern(Users currentUser, List<Transaction> transactions) {
-        transactions.sort(Comparator.comparing(financialmanager.objectFolder.transactionFolder.Transaction::getDate));
+        transactions.sort(Comparator.comparing(Transaction::getDate));
 
         List<Long> intervals = calculateIntervalsBetweenTransactions(transactions);
 

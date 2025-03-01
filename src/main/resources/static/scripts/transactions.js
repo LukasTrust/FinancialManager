@@ -10,19 +10,15 @@ async function buildTransactions() {
     splitDataIntoPages(messages, "transaction", transactionData);
     setUpSorting();
 
-    document.getElementById("searchBarInput")
-        .addEventListener("input", () => searchTable(messages, "transaction"));
+    document.getElementById("searchBarInput").addEventListener("input", () => searchTable(messages, "transaction"));
 
-    document.getElementById("changeHiddenButton")
-        .addEventListener("click", () => showChangeHiddenDialog(messages));
+    document.getElementById("changeHiddenButton").addEventListener("click", () => showChangeHiddenDialog(messages));
 
     document.getElementById("changeContractButton")
         .addEventListener("click", async () => {
             await buildChangeContract("/transactions", getCheckedTransactions());
         });
-
-    document.getElementById("showHiddenRows")
-        .addEventListener("change", () => changeRowVisibility());
+    document.getElementById("showHiddenRows").addEventListener("change", () => changeRowVisibility());
 }
 
 async function loadTransactions(messages) {
@@ -33,7 +29,6 @@ async function loadTransactions(messages) {
                 'Content-Type': 'application/json'
             }
         });
-
         if (!response.ok) {
             const responseBody = await response.json();
             showAlert(responseBody.alertType, responseBody.message);

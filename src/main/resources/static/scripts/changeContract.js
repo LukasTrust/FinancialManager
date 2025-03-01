@@ -53,6 +53,15 @@ function createGroupedTransactions(messages, transactions) {
         return;
     }
 
+    if (transactions.length === 0) {
+        const header = createAndAppendElement(transactionGroups, "div", "listContainerHeader", "",
+            {style: "flex-direction: row; align-items: center"});
+        createAndAppendElement(header, "i", "bi bi-info-circle-fill", "",
+            {style: "font-size: 1.5rem; margin-right: 20px"});
+        createAndAppendElement(header, "div", "normalText", messages["notTransactionSelected"]);
+        return;
+    }
+
     const currency = getCurrentCurrencySymbol();
     const groups = groupTransactions(transactions);
 
