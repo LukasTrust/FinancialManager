@@ -2,5 +2,9 @@
   "dashboard": "Dashboard",
   "addBankAccount": "Neues Bankkonto",
   "settings": "Einstellungen",
-  "logout": "Abmelden"
+  "logout": "Abmelden",
+  "transactions": "Transaktionen",
+  "categories": "Kategorien",
+  "contracts": "Verträge",
+  "counterParties": "Gegenparteien"
 }

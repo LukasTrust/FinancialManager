@@ -1,5 +1,6 @@
 package financialmanager.objectFolder.transactionFolder;
 
+import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,4 +12,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findByBankAccountId(Long accountId);
 
     List<Transaction> findByIdInAndBankAccountId(List<Long> ids, Long bankAccountId);
+
+    List<Transaction> findByCounterParty(CounterParty counterParty);
 }

@@ -84,7 +84,7 @@ public class ContractController {
             return responseService.createResponse(HttpStatus.NOT_FOUND, "contractNotFound", AlertType.ERROR);
         }
 
-        List<Transaction> transactions = transactionService.findAllByListOfIdAndBankAccount(transactionIds, bankAccountId);
+        List<Transaction> transactions = transactionService.findByIdInAndBankAccountId(transactionIds, bankAccountId);
 
         if (transactions.isEmpty()) {
             return responseService.createResponse(HttpStatus.NOT_FOUND, "transactionNotFound", AlertType.ERROR);
@@ -106,7 +106,7 @@ public class ContractController {
             return bankAccountResponse.getError();
         }
 
-        List<Transaction> transactions = transactionService.findAllByListOfIdAndBankAccount(transactionIds, bankAccountId);
+        List<Transaction> transactions = transactionService.findByIdInAndBankAccountId(transactionIds, bankAccountId);
 
         if (transactions.isEmpty()) {
             return responseService.createResponse(HttpStatus.NOT_FOUND, "transactionNotFound", AlertType.ERROR);

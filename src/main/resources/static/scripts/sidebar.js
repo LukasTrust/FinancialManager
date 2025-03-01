@@ -12,13 +12,13 @@ async function loadSidebar() {
 
         initStaticLinks();
 
-        await fetchLocalization("sidebar");
+        const messages = await fetchLocalization("sidebar");
 
         const bankAccounts = await loadBankAccounts();
 
         bankAccounts.forEach(bankAccount => {
             bankAccountSymbols[bankAccount.id] = bankAccount.currencySymbol;
-            addBankAccountToSidebar(bankAccount);
+            addBankAccountToSidebar(messages, bankAccount);
         });
 
         sidebarToggle.addEventListener('click', () => toggleSidebar(sidebar, content));
@@ -35,7 +35,7 @@ function toggleSidebar(sidebar, content) {
     allSubItems.forEach(item => item.classList.toggle('collapsed'));
 }
 
-function addBankAccountToSidebar({name, id, interestRate}) {
+function addBankAccountToSidebar(messages, {name, id, interestRate}) {
     const topNav = document.getElementById('topNav');
 
     const isSavings = interestRate != null;
@@ -47,7 +47,7 @@ function addBankAccountToSidebar({name, id, interestRate}) {
     createAndAppendElement(accountLink,'span', 'navLabel', name)
     createAndAppendElement(accountItem,'span', 'navTooltip', name);
 
-    const sublist = createSublist(accountItem);
+    const sublist = createSublist(messages, accountItem);
 
     accountLink.addEventListener('click', (event) => {
         event.preventDefault();
@@ -55,15 +55,14 @@ function addBankAccountToSidebar({name, id, interestRate}) {
     });
 }
 
-function createSublist(parent) {
+function createSublist(messages, parent) {
     const sublist = createAndAppendElement(parent,'ul', 'navSublist hidden');
 
     const subItems = [
-        {name: 'Overview', href: '/bankAccountOverview', icon: 'bi bi-border-style'},
-        {name: 'Transactions', href: '/transactions', icon: 'bi bi-receipt'},
-        {name: 'Categories', href: '/bankAccount/categories', icon: 'bi bi-tag-fill'},
-        {name: 'Counterparties', href: '/bankAccount/counterparties', icon: 'bi bi-person-fill'},
-        {name: 'Contracts', href: '/bankAccount/contracts', icon: 'bi bi-file-earmark-fill'}
+        {name: messages["dashboard"], href: '/bankAccountOverview', icon: 'bi bi-border-style'},
+        {name: messages["transactions"], href: '/transactions', icon: 'bi bi-receipt'},
+        {name: messages["categories"], href: '/categories', icon: 'bi bi-tag-fill'},
+        {name: messages["contracts"], href: '/bankAccount/contracts', icon: 'bi bi-file-earmark-fill'}
     ];
 
     subItems.forEach(({name, href, icon}) => {

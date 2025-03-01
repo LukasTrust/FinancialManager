@@ -1,5 +1,6 @@
 package financialmanager.objectFolder.transactionFolder;
 import financialmanager.Utils.Utils;
+import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +17,12 @@ public class TransactionService {
         return transactionRepository.findByBankAccountId(bankAccountId);
     }
 
-    public List<Transaction> findAllByListOfIdAndBankAccount(List<Long> ids, Long bankAccountId) {
+    public List<Transaction> findByIdInAndBankAccountId(List<Long> ids, Long bankAccountId) {
         return transactionRepository.findByIdInAndBankAccountId(ids, bankAccountId);
+    }
+
+    public List<Transaction> findByCounterParty(CounterParty counterParty) {
+        return transactionRepository.findByCounterParty(counterParty);
     }
 
     public Transaction findById(Long id) {

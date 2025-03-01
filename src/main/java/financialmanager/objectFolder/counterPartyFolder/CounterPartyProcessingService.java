@@ -1,6 +1,9 @@
 package financialmanager.objectFolder.counterPartyFolder;
 
+import financialmanager.objectFolder.contractFolder.Contract;
+import financialmanager.objectFolder.contractFolder.ContractService;
 import financialmanager.objectFolder.transactionFolder.Transaction;
+import financialmanager.objectFolder.transactionFolder.TransactionService;
 import financialmanager.objectFolder.usersFolder.Users;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +18,28 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class CounterPartyProcessingService {
 
-    private CounterPartyService counterPartyService;
+    private final CounterPartyService counterPartyService;
+    private final TransactionService transactionService;
+    private final ContractService contractService;
+
+    public List<CounterPartyDisplay> createCounterPartyDisplays(Users users) {
+        List<CounterPartyDisplay> counterPartyDisplays = new ArrayList<>();
+
+        List<CounterParty> counterParties = counterPartyService.findByUsers(users);
+
+        for (CounterParty counterParty : counterParties) {
+            List<Transaction> transactions = transactionService.findByCounterParty(counterParty);
+            List<Contract> contracts = contractService.findByCounterParty(counterParty);
+
+            Double totalAmount = transactions.stream().mapToDouble(Transaction::getAmount).sum();
+            Integer numberOfContracts = contracts.size();
+
+            CounterPartyDisplay counterPartyDisplay = new CounterPartyDisplay(counterParty, numberOfContracts, totalAmount);
+            counterPartyDisplays.add(counterPartyDisplay);
+        }
+
+        return counterPartyDisplays;
+    }
 
     public void setCounterCounterParties(Users users, List<Transaction> transactions) {
         List<CounterParty> existingCounterParties = counterPartyService.findByUsers(users);

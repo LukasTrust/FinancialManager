@@ -59,7 +59,7 @@ public class TransactionsController {
         }
 
         BankAccount bankAccount = bankAccountResponse.getValue();
-        List<Transaction> transactions = transactionService.findAllByListOfIdAndBankAccount(transactionIds, bankAccountId).stream()
+        List<Transaction> transactions = transactionService.findByIdInAndBankAccountId(transactionIds, bankAccountId).stream()
                 .filter(transaction -> transaction.isHidden() != hide)
                 .toList();
 

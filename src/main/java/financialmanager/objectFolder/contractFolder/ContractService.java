@@ -1,6 +1,7 @@
 package financialmanager.objectFolder.contractFolder;
 
 import financialmanager.Utils.Utils;
+import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,10 @@ public class ContractService {
 
     public Contract findByIdAndUsersId(Long id, Long usersId) {
         return contractRepository.findByIdAndUsersId(id, usersId);
+    }
+
+    public List<Contract> findByCounterParty(CounterParty counterParty) {
+        return contractRepository.findByCounterParty(counterParty);
     }
 
     public List<Contract> findByBankAccountIdBetweenDates(Long bankAccountId, LocalDate startDate, LocalDate endDate) {
