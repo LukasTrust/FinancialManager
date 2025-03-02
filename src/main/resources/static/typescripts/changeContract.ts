@@ -80,8 +80,10 @@ function createGroupedTransactions(messages: Record<string, string>, transaction
     }
 
     if (transactions.length === 0) {
-        const header = createAndAppendElement(transactionGroups, "div", "listContainerHeader", "", { style: "flex-direction: row; align-items: center" });
-        createAndAppendElement(header, "i", "bi bi-info-circle-fill", "", { style: "font-size: 1.5rem; margin-right: 20px" });
+        const header = createAndAppendElement(transactionGroups, "div", "listContainerHeader", "",
+            { style: "flex-direction: row; align-items: center" });
+        createAndAppendElement(header, "i", "bi bi-info-circle-fill", "",
+            { style: "font-size: 1.5rem; margin-right: 20px" });
         createAndAppendElement(header, "div", "normalText", messages["notTransactionSelected"]);
         return;
     }
@@ -90,7 +92,8 @@ function createGroupedTransactions(messages: Record<string, string>, transaction
     const groups = groupTransactions(transactions);
 
     groups.forEach((group, key) => {
-        const listContainerHeader = createAndAppendElement(transactionGroups, "div", "listContainerHeader", "", { style: "margin-bottom: 20px" });
+        const listContainerHeader = createAndAppendElement(transactionGroups, "div", "listContainerHeader", "",
+            { style: "margin-bottom: 20px" });
         createAndAppendElement(listContainerHeader, "h2", "", group.counterPartyName);
 
         const listContainer = createAndAppendElement(listContainerHeader, "div");
@@ -99,10 +102,48 @@ function createGroupedTransactions(messages: Record<string, string>, transaction
         listContainerHeader.addEventListener("click", () => toggleTransactionSelection(listContainerHeader));
 
         group.transactions.forEach(item => {
-            const content = createAndAppendElement(listContainer, "div", "listItemSmall", "", { id: item.id.toString() });
+            const content = createAndAppendElement(listContainer, "div", "listItemSmall", "", {id: item.id.toString()});
+
             const left = createAndAppendElement(content, "div", "listContainerColumn");
 
-            createAndAppendElement(left, "div", "normalText", `${messages["amount"]}: ${formatNumber(item.amount, currency)}      ${messages["date"]}: ${formatDateString(item.date)}`);
+            createAndAppendElement(left, "div", "normalText",
+                `${messages["amount"]}: ${formatNumber(item.amount, currency)}      ${messages["date"]}: ${formatDateString(item.date)}`
+            );
+
+            let height = 70;
+
+            if (item.contract) {
+                createContractSection(
+                    messages,
+                    left,
+                    item.contract.name,
+                    item.contract.startDate,
+                    item.contract.lastPaymentDate,
+                    async (event) => {
+                        event.stopPropagation();
+                        await removeContractFromTransactionDialog(messages, item, left.querySelector(".tooltip"))
+                    }
+                );
+
+                height = 120;
+            }
+
+            const removeButton = createAndAppendElement(content, "button", "removeButton bi bi-x-lg", "");
+            removeButton.style.height = `${height}px`;
+
+            removeButton.addEventListener("click", (event) => {
+                event.stopPropagation();
+                listContainer.removeChild(content);
+
+                // If no transactions remain, remove the group
+                if (!listContainer.children.length) {
+                    if (listContainerHeader === selectedTransactionGroup) {
+                        selectedTransactionGroup = null;
+                        toggleTransactionSelection(selectedTransactionGroup);
+                    }
+                    transactionGroups.removeChild(listContainerHeader);
+                }
+            });
         });
     });
 }
