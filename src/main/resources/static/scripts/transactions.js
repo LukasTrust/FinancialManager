@@ -201,7 +201,7 @@ function showChangeHiddenDialog(messages) {
 
 async function updateTransactionVisibility(messages, model, listContainer, hide) {
     try {
-        const transactionIds = Array.from(listContainer.querySelectorAll("div span"))
+        const transactionIds = Array.from(listContainer.querySelectorAll("div"))
             .map(span => Number(span.id)) // Assuming the ID is directly on the span
             .filter(id => id !== 0); // Remove 0 if present
 
@@ -218,6 +218,7 @@ async function updateTransactionVisibility(messages, model, listContainer, hide)
         });
 
         const responseBody = await response.json();
+        console.log(responseBody);
 
         showAlert(responseBody.alertType, responseBody.message, model);
 
