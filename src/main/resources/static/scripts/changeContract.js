@@ -1,5 +1,5 @@
 async function buildChangeContract(cameFromUrl, transactions) {
-    await loadURL("/changeContract", "/transactions")
+    await loadURL("/changeContract")
 
     const messages = await fetchLocalization("changeContract");
 
