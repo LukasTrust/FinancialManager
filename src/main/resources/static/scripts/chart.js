@@ -1,62 +1,57 @@
 async function loadLineChart(messages, startDate = null, endDate = null) {
+    var _a;
     try {
         let url = `/bankAccountOverview/${bankAccountId}/data/lineChart`;
         const params = new URLSearchParams();
-
-        if (startDate) params.append("startDate", startDate);
-        if (endDate) params.append("endDate", endDate);
-
+        if (startDate)
+            params.append("startDate", startDate);
+        if (endDate)
+            params.append("endDate", endDate);
         if (params.toString()) {
             url += `?${params.toString()}`;
         }
-
         const response = await fetch(url, {
-            method: 'GET',
+            method: "GET",
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json"
             }
         });
-
         if (!response.ok) {
             showAlert("ERROR", messages["error_loadingLineChart"]);
             return;
         }
-
         const responseBody = await response.json();
-
         const bankName = document.getElementById("bankName");
-
-        bankName.innerText = responseBody.seriesList[0].name;
-
+        if (bankName) {
+            bankName.innerText = ((_a = responseBody.seriesList[0]) === null || _a === void 0 ? void 0 : _a.name) || "";
+        }
         createLineChart(responseBody);
-    } catch (error) {
+    }
+    catch (error) {
         showAlert("ERROR", messages["error_generic"]);
         console.error("Error loading chart:", error);
     }
 }
-
 function createLineChart(responseBody) {
     const chartId = "lineChart";
-
     const chartContainer = document.getElementById(chartId);
     if (!chartContainer) {
         console.error("Chart container not found");
         return;
     }
-
     const ctx = chartContainer.getContext("2d");
-
+    if (!ctx) {
+        console.error("Could not get 2D context");
+        return;
+    }
     // Destroy previous chart instance if it exists
     if (existingChart) {
         existingChart.destroy();
     }
-
     const chartData = transformChartData(responseBody);
-
     const currency = getCurrentCurrencySymbol();
-
     existingChart = new Chart(ctx, {
-        type: 'line',
+        type: "line",
         data: chartData,
         options: {
             responsive: true,
@@ -65,10 +60,10 @@ function createLineChart(responseBody) {
                 legend: { display: true },
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
+                        label: (context) => {
+                            let label = context.dataset.label || "";
                             if (label) {
-                                label += ': ';
+                                label += ": ";
                             }
                             if (context.parsed.y !== null) {
                                 label += formatNumber(context.parsed.y, currency);
@@ -80,23 +75,28 @@ function createLineChart(responseBody) {
             },
             scales: {
                 x: {
-                    type: 'time',
+                    type: "time",
                     time: {
-                        unit: 'month',
-                        tooltipFormat: 'dd MMM yyyy'
-                    },
-                },
+                        unit: "month",
+                        tooltipFormat: "dd MMM yyyy"
+                    }
+                }
             }
         }
     });
 }
-
 function transformChartData(responseBody) {
+    var _a;
     return {
-        labels: responseBody.seriesList[0].dataPoints.map(dp => dp.date),
+        labels: ((_a = responseBody.seriesList[0]) === null || _a === void 0 ? void 0 : _a.dataPoints.map(dp => new Date(dp.date))) || [],
         datasets: responseBody.seriesList.map(series => ({
             label: series.name,
-            data: series.dataPoints.map(dp => ({ x: dp.date, y: dp.value, info: dp.info })),
+            data: series.dataPoints.map(dp => ({
+                x: new Date(dp.date),
+                y: dp.value,
+                info: dp.info
+            }))
         }))
     };
 }
+//# sourceMappingURL=chart.js.map
