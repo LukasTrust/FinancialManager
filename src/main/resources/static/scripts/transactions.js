@@ -218,7 +218,6 @@ async function updateTransactionVisibility(messages, model, listContainer, hide)
         });
 
         const responseBody = await response.json();
-        console.log(responseBody);
 
         showAlert(responseBody.alertType, responseBody.message, model);
 
