@@ -120,7 +120,9 @@ function updateUI(
     const currentPage = document.getElementById("currentPage") as HTMLElement | null;
     const numberOfPagesElement = document.getElementById("numberOfPages") as HTMLElement | null;
 
-    if (currentPage) currentPage.textContent = String(currentPageIndex);
+    const lengthDifference = currentPageIndex - currentPageIndex;
+
+    if (currentPage) currentPage.textContent = "&nbsp;".repeat(lengthDifference) + String(currentPageIndex);
     if (numberOfPagesElement) numberOfPagesElement.textContent = String(numberOfPages);
 
     const nextButton = document.getElementById("nextButton") as HTMLButtonElement | null;

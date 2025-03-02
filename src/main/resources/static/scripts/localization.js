@@ -5,35 +5,35 @@ async function setLocale() {
         await fetch(`/localization/update/locale/${currentLanguage}`, {
             method: 'POST',
         });
-    } catch (error) {
+    }
+    catch (error) {
         console.log(error);
     }
 }
-
 async function fetchLocalization(subDirectory) {
     const filePath = `/localization/clientSide/${subDirectory}/messages/${currentLanguage}`;
 
     try {
         const responseBody = await fetch(filePath);
-
         if (responseBody.ok) {
             const messages = await responseBody.json();
-
             // Apply translations to the page
             applyTranslations(messages);
-
             return messages;
-        } else {
+        }
+        else {
             showAlert("Error", "Error loading localization");
             console.warn(`Localization file not found in ${subDirectory}. Falling back to default.`);
         }
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error fetching localization file:", error);
     }
 
+    showAlert("Error", "Error loading localization");
+    console.warn(`Localization file not found in ${subDirectory}. Falling back to default.`);
     return null; // Return null if fetching fails
 }
-
 function applyTranslations(messages) {
     if (!messages) {
         console.warn("No messages provided for translation.");
@@ -49,7 +49,6 @@ function applyTranslations(messages) {
         if (i18nKey && messages[i18nKey]) {
             element.textContent = messages[i18nKey];
         }
-
         // Apply placeholder translation
         const i18nPlaceholderKey = element.getAttribute('data-i18n-placeholder');
         if (i18nPlaceholderKey && messages[i18nPlaceholderKey]) {
@@ -57,3 +56,4 @@ function applyTranslations(messages) {
         }
     });
 }
+//# sourceMappingURL=localization.js.map

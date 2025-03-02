@@ -70,12 +70,6 @@ function formatNumber(number: number, currency: string): string {
     return `${number.toFixed(2).replace('.', ',')} ${currency}`;
 }
 
-async function backToOtherView(cameFromUrl: string | null): Promise<void> {
-    if (cameFromUrl) {
-        await loadURL(cameFromUrl);
-    }
-}
-
 function createListSection(
     parent: HTMLElement,
     title: string,
@@ -99,6 +93,12 @@ function createListContainer(
         createListElement(listContainer, transaction.counterParty?.name, { id: transaction.id.toString() });
     });
     return listContainer;
+}
+
+async function backToOtherView(cameFromUrl: string | null): Promise<void> {
+    if (cameFromUrl) {
+        await loadURL(cameFromUrl);
+    }
 }
 
 function startTimer(source: string): void {
