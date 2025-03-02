@@ -1,65 +1,46 @@
-async function buildAddBankAccount()  {
+async function buildAddBankAccount() {
     const isSavingsAccount = document.getElementById("isSavingsAccount");
     const hiddenInputs = document.getElementById("hiddenInputs");
-
     isSavingsAccount.addEventListener("change", () => {
-        showHiddenInputs(hiddenInputs)
-    })
-
+        showHiddenInputs(hiddenInputs);
+    });
     const fields = [
-        {
-            addButtonId: "addCounterPartyStrings",
-            inputId: "inputCounterPartyStrings",
-            listId: "counterPartySearchStrings"
-        },
-        {addButtonId: "addAmountStrings", inputId: "inputAmountStrings", listId: "amountSearchStrings"},
-        {
-            addButtonId: "addAmountAfterStrings",
-            inputId: "inputAmountAfterStrings",
-            listId: "amountInBankAfterSearchStrings"
-        },
-        {addButtonId: "addDateStrings", inputId: "inputDateStrings", listId: "dateSearchStrings"},
-        {
-            addButtonId: "addInterestRateStrings",
-            inputId: "inputInterestRateStrings",
-            listId: "interestRateSearchStrings"
-        }
+        { addButtonId: "addCounterPartyStrings", inputId: "inputCounterPartyStrings", listId: "counterPartySearchStrings" },
+        { addButtonId: "addAmountStrings", inputId: "inputAmountStrings", listId: "amountSearchStrings" },
+        { addButtonId: "addAmountAfterStrings", inputId: "inputAmountAfterStrings", listId: "amountInBankAfterSearchStrings" },
+        { addButtonId: "addDateStrings", inputId: "inputDateStrings", listId: "dateSearchStrings" },
+        { addButtonId: "addInterestRateStrings", inputId: "inputInterestRateStrings", listId: "interestRateSearchStrings" }
     ];
-
     const messages = await fetchLocalization("addBankAccount");
-
+    if (!messages)
+        return;
     const submitButton = document.getElementById("submitButton");
     submitButton.addEventListener("click", async (event) => {
         event.preventDefault();
-        // Extract the listIds from the fields array
         const listIds = fields.map(field => field.listId);
         await submitAddNewBank(messages, isSavingsAccount.checked, listIds);
-    })
-
+    });
     fields.forEach(field => {
         const addButton = document.getElementById(field.addButtonId);
         const inputField = document.getElementById(field.inputId);
         const stringList = document.getElementById(field.listId);
-
         addButton.addEventListener("click", () => {
             const inputValue = inputField.value.trim();
             if (inputValue) {
                 addStringToList(messages, stringList, inputValue);
-                inputField.value = ""; // Clear input field
-            } else {
+                inputField.value = "";
+            }
+            else {
                 showAlert("info", messages["error_enterWord"]);
             }
         });
     });
 }
-
 async function submitAddNewBank(messages, isSavingsAccount, listIds) {
     const name = document.getElementById("name").value.trim();
     const description = document.getElementById("description").value.trim();
-    const currencySymbols = ["$", "€", "£", "¥", "₣", "₱", "₹", "₽", "₩", "₪", "₫", "₺"];
     const currencySymbol = document.getElementById("currencySymbol").value.trim();
-
-    // Check if all fields are filled
+    const currencySymbols = ["$", "€", "£", "¥", "₣", "₱", "₹", "₽", "₩", "₪", "₫", "₺"];
     if (!name) {
         showAlert("warning", messages["error_bankAccountName"]);
         return;
@@ -72,90 +53,58 @@ async function submitAddNewBank(messages, isSavingsAccount, listIds) {
         showAlert("warning", messages["error_unknownCurrencySymbol"]);
         return;
     }
-
-    const data = {
-        name,
-        description,
-        currencySymbol,
-        type: isSavingsAccount ? "saving" : "checking"
-    };
-
+    const data = { name, description, currencySymbol, type: isSavingsAccount ? "saving" : "checking" };
     if (isSavingsAccount) {
         const interestRate = document.getElementById("interestRate").value.trim();
-
         if (!interestRate) {
             showAlert("warning", messages["error_NoInterestRate"]);
             return;
         }
-
-        data["interestRate"] = interestRate
+        data["interestRate"] = interestRate;
     }
-
-    // Loop over listIds and create a semicolon-separated string for each list
-    listIds.forEach((listId, index) => {
+    listIds.forEach(listId => {
         const listElement = document.getElementById(listId);
-
         if (listElement) {
             const listItems = Array.from(listElement.children)
-                .map(item => item.textContent.trim()) // Extract text content
-                .filter(text => text.length > 0); // Filter out empty items
-
-            if (listItems.length > 0) {
-                data[listId] = listItems; // Assign as an array
-            } else {
-                data[listId] = null; // Set to null if empty
-            }
+                .map(item => { var _a; return (_a = item.textContent) === null || _a === void 0 ? void 0 : _a.trim(); })
+                .filter(text => text && text.length > 0);
+            data[listId] = listItems.length > 0 ? listItems : null;
         }
     });
-
     try {
         const response = await fetch("/addBankAccount", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-            },
-            body: JSON.stringify(data),
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify(data)
         });
-
         const responseBody = await response.json();
         showAlert(responseBody.alertType, responseBody.message);
-
-        // Clear when successful
-        if (responseBody.alertType.toLowerCase() === "success") {
+        if (responseBody.alertType === "SUCCESS") {
             const bankAccount = responseBody.data;
-
-            addBankAccountToSidebar(bankAccount);
-
+            addBankAccountToSidebar(messages, bankAccount);
             document.getElementById("name").value = "";
             document.getElementById("description").value = "";
             document.getElementById("interestRate").value = "";
-
-            listIds.forEach((listId, index) => {
+            listIds.forEach(listId => {
                 const listElement = document.getElementById(listId);
-
                 listElement.innerHTML = "";
             });
         }
-
-    } catch (error) {
-        console.error("There was an error the create bank request:", error);
+    }
+    catch (error) {
+        console.error("Error creating bank account:", error);
         showAlert("error", messages["error_generic"]);
     }
 }
-
 function showHiddenInputs(hiddenInputs) {
     hiddenInputs.classList.toggle("hidden");
 }
-
-// Function to add a string to the list
 function addStringToList(messages, stringList, text) {
-    //Check if the string is already in the list
-    const existingItems = Array.from(stringList.children).map(item => item.textContent.trim());
+    const existingItems = Array.from(stringList.children).map(item => { var _a; return ((_a = item.textContent) === null || _a === void 0 ? void 0 : _a.trim()) || ""; });
     if (existingItems.includes(text)) {
         showAlert("Warning", messages["error_alreadyInList"]);
         return;
     }
-
     createListElement(stringList, text, {}, true, true);
 }
+//# sourceMappingURL=addBankAccount.js.map

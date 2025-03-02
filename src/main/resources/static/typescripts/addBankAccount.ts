@@ -32,6 +32,7 @@ async function buildAddBankAccount(): Promise<void> {
 
         addButton.addEventListener("click", () => {
             const inputValue = inputField.value.trim();
+
             if (inputValue) {
                 addStringToList(messages, stringList, inputValue);
                 inputField.value = "";
@@ -52,10 +53,12 @@ async function submitAddNewBank(messages: Record<string, string>, isSavingsAccou
         showAlert("warning", messages["error_bankAccountName"]);
         return;
     }
+
     if (!currencySymbol) {
         showAlert("warning", messages["error_currencySymbol"]);
         return;
     }
+
     if (!currencySymbols.includes(currencySymbol)) {
         showAlert("warning", messages["error_unknownCurrencySymbol"]);
         return;
@@ -69,15 +72,18 @@ async function submitAddNewBank(messages: Record<string, string>, isSavingsAccou
             showAlert("warning", messages["error_NoInterestRate"]);
             return;
         }
+
         data["interestRate"] = interestRate;
     }
 
     listIds.forEach(listId => {
         const listElement = document.getElementById(listId) as HTMLElement;
+
         if (listElement) {
             const listItems = Array.from(listElement.children)
                 .map(item => item.textContent?.trim())
                 .filter(text => text && text.length > 0);
+
             data[listId] = listItems.length > 0 ? listItems : null;
         }
     });
@@ -88,15 +94,18 @@ async function submitAddNewBank(messages: Record<string, string>, isSavingsAccou
             headers: { "Content-Type": "application/json", "Accept": "application/json" },
             body: JSON.stringify(data)
         });
+
         const responseBody = await response.json();
         showAlert(responseBody.alertType, responseBody.message);
 
-        if (responseBody.alertType.toLowerCase() === "success") {
+        if (responseBody.alertType === "SUCCESS") {
             const bankAccount = responseBody.data;
             addBankAccountToSidebar(messages, bankAccount);
+
             (document.getElementById("name") as HTMLInputElement).value = "";
             (document.getElementById("description") as HTMLInputElement).value = "";
             (document.getElementById("interestRate") as HTMLInputElement).value = "";
+
             listIds.forEach(listId => {
                 const listElement = document.getElementById(listId) as HTMLElement;
                 listElement.innerHTML = "";
