@@ -104,7 +104,6 @@ async function sendFiles(messages: Record<string, string>, files: File[]): Promi
         let newDate = false;
 
         responseBody.forEach((fileResponse: { body: { alertType: string; message: string } }) => {
-            console.log(fileResponse.body.message);
             showAlert(fileResponse.body.alertType, fileResponse.body.message);
             if (fileResponse.body.alertType === "SUCCESS") {
                 newDate = true;
