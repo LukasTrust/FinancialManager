@@ -37,6 +37,7 @@ function showAlert(
 // Convert string to AlertType safely
 function convertToAlertType(type: string | AlertType): AlertType {
     const normalizedType = type.toUpperCase();
+
     if (Object.values(AlertType).includes(normalizedType as AlertType)) {
         return normalizedType as AlertType;
     }
@@ -62,6 +63,7 @@ function getAlertIcon(type: AlertType): string {
 function removeAlert(alert: HTMLElement): void {
     alert.classList.remove("show");
     alert.classList.add("hide");
+
     setTimeout(() => {
         alert.remove();
         alerts = alerts.filter(a => a !== alert);
