@@ -47,11 +47,6 @@ function formatDateString(date) {
 function formatNumber(number, currency) {
     return `${number.toFixed(2).replace('.', ',')} ${currency}`;
 }
-async function backToOtherView(cameFromUrl) {
-    if (cameFromUrl) {
-        await loadURL(cameFromUrl);
-    }
-}
 function createListSection(parent, title, transactions) {
     const container = createAndAppendElement(parent, "div", "flexContainerColumn", "", { style: "width: 45%" });
     const header = createAndAppendElement(container, "div", "listContainerHeader");
@@ -68,6 +63,25 @@ function createListContainer(parent, transactions) {
         createListElement(listContainer, (_a = transaction.counterParty) === null || _a === void 0 ? void 0 : _a.name, { id: transaction.id.toString() });
     });
     return listContainer;
+}
+async function backToOtherView(cameFromUrl) {
+    if (cameFromUrl) {
+        await loadURL(cameFromUrl);
+    }
+}
+function moveElements(sourceContainer, targetContainer) {
+    const items = Array.from(sourceContainer.querySelectorAll(`.listItem`));
+    items.forEach((item, index) => {
+        // Add a delay for staggered animation
+        setTimeout(() => {
+            item.classList.add('moving');
+            // Wait for the transition to complete
+            item.addEventListener('transitionend', () => {
+                targetContainer.appendChild(item);
+                item.classList.remove('moving');
+            }, { once: true });
+        }, index * 100); // 100ms delay between items
+    });
 }
 function startTimer(source) {
     console.log(`Timer started from: ${source}`);

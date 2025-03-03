@@ -101,6 +101,23 @@ async function backToOtherView(cameFromUrl: string | null): Promise<void> {
     }
 }
 
+function moveElements(sourceContainer: HTMLElement, targetContainer: HTMLElement): void {
+    const items = Array.from(sourceContainer.querySelectorAll<HTMLElement>(`.listItem`));
+
+    items.forEach((item, index) => {
+        // Add a delay for staggered animation
+        setTimeout(() => {
+            item.classList.add('moving');
+
+            // Wait for the transition to complete
+            item.addEventListener('transitionend', () => {
+                targetContainer.appendChild(item);
+                item.classList.remove('moving');
+            }, { once: true });
+        }, index * 150); // 150ms delay between items for a smoother stagger
+    });
+}
+
 function startTimer(source: string): void {
     console.log(`Timer started from: ${source}`);
     timer = Date.now();

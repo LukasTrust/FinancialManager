@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
+    if (!currentLanguage) {
+        currentLanguage = navigator.language;
+    }
     // Load localization messages
     const messages = await fetchLocalization("login&signup");
     if (!messages)
@@ -6,7 +9,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Check if the error parameter is present in the URL
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('error')) {
-        // Call showAlert with type "ERROR" and a localized message
         showAlert('error', messages["error_invalidCredentials"]);
     }
     const submitButton = document.getElementById("submitButton");

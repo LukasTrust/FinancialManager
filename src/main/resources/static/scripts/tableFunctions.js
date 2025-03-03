@@ -85,8 +85,9 @@ function updateUI(data, currentPageIndex, itemsPerPage, numberOfPages, messages,
     }
     const currentPage = document.getElementById("currentPage");
     const numberOfPagesElement = document.getElementById("numberOfPages");
+    const lengthDifference = currentPageIndex - currentPageIndex;
     if (currentPage)
-        currentPage.textContent = String(currentPageIndex);
+        currentPage.textContent = "&nbsp;".repeat(lengthDifference) + String(currentPageIndex);
     if (numberOfPagesElement)
         numberOfPagesElement.textContent = String(numberOfPages);
     const nextButton = document.getElementById("nextButton");

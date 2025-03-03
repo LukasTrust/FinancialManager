@@ -6,8 +6,8 @@ let bankAccountId: number;
 let bankAccountSymbols: Record<string, string> = {};
 let currentLanguage: string;
 let monthAbbreviations: string[] = [];
-let transactionData: any[] = []; // Define a proper type if available
-let filteredTransactionData: any[] = []; // Define a proper type if available
+let transactionData: Transaction[] = []; // Define a proper type if available
+let filteredTransactionData: Transaction[] = []; // Define a proper type if available
 let transactionsHiddenToggle: boolean = false;
 let selectedTransactionGroup: HTMLElement | null = null;
 let selectedCounterparty: string | null = null;

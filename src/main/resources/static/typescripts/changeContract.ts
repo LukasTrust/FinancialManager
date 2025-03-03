@@ -189,10 +189,10 @@ async function addGroupToContract(messages: Record<string, string>): Promise<voi
             body: JSON.stringify(transactionIds)
         });
 
-        const responseBody = await response.json();
+        const responseBody: Response = await response.json();
         showAlert(responseBody.alertType, responseBody.message);
 
-        if (responseBody.alertType === "SUCCESS") {
+        if (responseBody.alertType === AlertType.SUCCESS) {
             transactionIds.forEach(transactionId => {
                 const transactionElement = document.getElementById(transactionId.toString());
                 if (transactionElement) {
@@ -233,10 +233,10 @@ async function removeContractFromTransactions(messages: Record<string, string>):
             body: JSON.stringify(transactionIds)
         });
 
-        const responseBody = await response.json();
+        const responseBody: Response = await response.json();
         showAlert(responseBody.alertType, responseBody.message);
 
-        if (responseBody.alertType === "SUCCESS") {
+        if (responseBody.alertType === AlertType.SUCCESS) {
             selectedTransactionGroup?.querySelectorAll(".tooltip").forEach(transaction => {
                 transaction.remove();
             });

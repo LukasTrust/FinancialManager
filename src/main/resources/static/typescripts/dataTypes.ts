@@ -49,12 +49,12 @@ interface Contract {
 
 interface Transaction {
     id: number;
-    date: string; // LocalDate is represented as a string in JSON
+    date: string;
     amount: number;
     amountInBankBefore: number;
     amountInBankAfter: number;
     originalCounterParty: string;
-    isHidden: boolean;
+    hidden: boolean;
     bankAccount: BankAccount;
     contract?: Contract;
     counterParty: CounterParty;

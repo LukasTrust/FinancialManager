@@ -56,22 +56,23 @@ function addRowsToTransactionTable(data: Transaction[], messages: Record<string,
                 return;
             }
 
-            let rowClass: string | null = transaction.isHidden ? "hiddenRow" : null;
+            let rowClass: string | null = transaction.hidden ? "hiddenRow" : null;
             if (rowClass && !transactionsHiddenToggle) {
                 rowClass += " hidden";
             }
 
             const newRow = createAndAppendElement(tableBody, "tr", rowClass, null, { id: transaction.id.toString() });
             const trCheckBox = createAndAppendElement(newRow, "td", null, "", { style: "width: 5%" });
+
+            if (rowClass) {
+                createAndAppendElement(trCheckBox, "span", "bi bi-eye-slash");
+            }
+
             const checkBox = createAndAppendElement(trCheckBox, "input", "tableCheckbox", "", {
                 type: "checkbox",
                 id: transaction.id.toString(),
                 style: "margin-left: 10px;",
             }) as HTMLInputElement;
-
-            if (rowClass) {
-                createAndAppendElement(trCheckBox, "span", "bi bi-eye-slash");
-            }
 
             checkBox.addEventListener("change", () => updateRowStyle(newRow, checkBox));
 
@@ -81,13 +82,45 @@ function addRowsToTransactionTable(data: Transaction[], messages: Record<string,
                 updateRowStyle(newRow, checkBox);
             });
 
-            createAndAppendElement(newRow, "td", "", transaction.counterParty?.name || "", { style: "width: 25%" });
-            createAndAppendElement(newRow, "td", "", transaction.contract?.name || "", { style: "width: 15%" });
-            createAndAppendElement(newRow, "td", "", transaction.category?.name || "", { style: "width: 15%" });
-            createAndAppendElement(newRow, "td", "rightAligned", formatDateString(transaction.date), { style: "width: 10%" });
-            createAndAppendElement(newRow, "td", "rightAligned", formatNumber(transaction.amountInBankBefore, currency), { style: "width: 10%" });
-            createAndAppendElement(newRow, "td", "rightAligned", formatNumber(transaction.amount, currency), { style: "width: 10%" });
-            createAndAppendElement(newRow, "td", "rightAligned", formatNumber(transaction.amountInBankAfter, currency), { style: "width: 10%" });
+            // Counterparty cell
+            let counterparty = createAndAppendElement(newRow, "td", "", "", {style: "width: 25%"});
+            createAndAppendElement(counterparty, "span", "tdMargin", transaction.counterParty.name, {
+                style: "font-weight: bold;",
+            });
+
+            // Contract cell
+            let contract = createAndAppendElement(newRow, "td", "", "", {style: "width: 15%"});
+            if (transaction.contract?.name) {
+                createAndAppendElement(contract, "span", "tdMargin highlightCell highlightCellPink",
+                    transaction.contract.name);
+            }
+
+            // Category cell
+            let category = createAndAppendElement(newRow, "td", "", "", {style: "width: 15%"});
+            if (transaction.category?.name) {
+                createAndAppendElement(category, "span", "tdMargin highlightCell highlightCellOrange", transaction.category.name);
+            }
+
+            // Date cell
+            let date = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
+            createAndAppendElement(date, "span", "tdMargin", formatDateString(transaction.date));
+
+            // Amount before cell
+            let amountBefore = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
+            createAndAppendElement(amountBefore, "span", "tdMargin", formatNumber(transaction.amountInBankBefore, currency));
+
+            // Amount cell with positive/negative styling
+            const amount = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
+            const amountClass = transaction.amount >= 0 ? "positive" : "negative";
+            createAndAppendElement(amount, "span", `tdMargin rightAligned ${amountClass}`,
+                formatNumber(transaction.amount, currency)
+            );
+
+            // Amount after cell
+            let amountInBankAfter = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
+
+            createAndAppendElement(amountInBankAfter, "span", "tdMargin",
+                formatNumber(transaction.amountInBankAfter, currency), {style: "margin-right: 30px;"});
         });
     } catch (error) {
         console.error("Unexpected error in addRowsToTransactionTable:", error);
@@ -139,14 +172,15 @@ function showChangeHiddenDialog(messages: Record<string, string>): void {
 
     // Hidden transactions
     const leftSide = createListSection(listContainer, messages["alreadyHiddenHeader"], alreadyHidden);
+    const rightSide = createListSection(listContainer, messages["notHiddenHeader"], notHidden);
+
     createDialogButton(leftSide, "bi bi-eye", messages["unHide"], "left", () =>
-        updateTransactionVisibility(messages, dialogContent, leftSide, false)
+        updateTransactionVisibility(messages, dialogContent, leftSide, rightSide.querySelector(".listContainerColumn"), false)
     );
 
     // Not hidden transactions
-    const rightSide = createListSection(listContainer, messages["notHiddenHeader"], notHidden);
     createDialogButton(rightSide, "bi bi-eye-slash", messages["hide"], "right", () =>
-        updateTransactionVisibility(messages, dialogContent, rightSide, true)
+        updateTransactionVisibility(messages, dialogContent, rightSide, leftSide.querySelector(".listContainerColumn"), true)
     );
 }
 
@@ -157,7 +191,7 @@ function classifyHiddenTransactions(): { alreadyHidden: Transaction[]; notHidden
     const transactions: Transaction[] = getCheckedTransactions();
 
     transactions.forEach(transaction => {
-        transaction.isHidden ? alreadyHidden.push(transaction) : notHidden.push(transaction);
+        transaction.hidden ? alreadyHidden.push(transaction) : notHidden.push(transaction);
     });
 
     return { alreadyHidden, notHidden };
@@ -166,13 +200,17 @@ function classifyHiddenTransactions(): { alreadyHidden: Transaction[]; notHidden
 async function updateTransactionVisibility(
     messages: Record<string, string>,
     model: HTMLElement,
-    listContainer: HTMLElement,
+    updatedContainer: HTMLElement,
+    moveToContainer: HTMLElement,
     hide: boolean
 ): Promise<void> {
     try {
-        const transactionIds: number[] = Array.from(listContainer.querySelectorAll("div span"))
-            .map(span => Number((span as HTMLElement).id)) // Ensure type assertion for HTMLElement
-            .filter(id => id !== 0); // Remove 0 if present
+        // Get all transaction IDs
+        const transactionIds: number[] = Array.from(
+            updatedContainer.querySelectorAll<HTMLElement>(".normalText")
+        )
+            .map(span => Number(span.id))
+            .filter(id => !isNaN(id) && id !== 0); // Ensure valid IDs
 
         if (transactionIds.length === 0) {
             showAlert("INFO", messages["noTransactionsUpdated"], model);
@@ -186,11 +224,15 @@ async function updateTransactionVisibility(
             body: JSON.stringify(transactionIds),
         });
 
-        const responseBody = await response.json();
+        const responseBody: Response = await response.json();
 
         showAlert(responseBody.alertType, responseBody.message, model);
 
-        updateCachedTransactionsAndUI(messages, transactionIds);
+        if (responseBody.alertType === AlertType.SUCCESS) {
+            // Animate and move elements
+            moveElements(updatedContainer, moveToContainer);
+            updateCachedTransactionsAndUI(messages, transactionIds);
+        }
     } catch (error) {
         console.error("Unexpected error in updateTransactionVisibility:", error);
         showAlert("ERROR", messages["error_generic"], model);
@@ -200,7 +242,7 @@ async function updateTransactionVisibility(
 function updateCachedTransactionsAndUI(messages: Record<string, string>, transactionIds: number[]): void {
     filteredTransactionData.forEach((transaction: Transaction) => {
         if (transactionIds.includes(transaction.id)) {
-            transaction.isHidden = !transaction.isHidden;
+            transaction.hidden = !transaction.hidden;
         }
     });
 

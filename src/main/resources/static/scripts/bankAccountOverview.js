@@ -88,9 +88,8 @@ async function sendFiles(messages, files) {
         const responseBody = await response.json();
         let newDate = false;
         responseBody.forEach((fileResponse) => {
-            console.log(fileResponse.body.message);
             showAlert(fileResponse.body.alertType, fileResponse.body.message);
-            if (fileResponse.body.alertType === "SUCCESS") {
+            if (fileResponse.body.alertType === AlertType.SUCCESS) {
                 newDate = true;
             }
         });

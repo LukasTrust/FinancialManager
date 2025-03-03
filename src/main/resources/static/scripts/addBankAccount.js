@@ -79,7 +79,7 @@ async function submitAddNewBank(messages, isSavingsAccount, listIds) {
         });
         const responseBody = await response.json();
         showAlert(responseBody.alertType, responseBody.message);
-        if (responseBody.alertType === "SUCCESS") {
+        if (responseBody.alertType === AlertType.SUCCESS) {
             const bankAccount = responseBody.data;
             addBankAccountToSidebar(messages, bankAccount);
             document.getElementById("name").value = "";

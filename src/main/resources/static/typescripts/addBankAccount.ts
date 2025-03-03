@@ -95,10 +95,10 @@ async function submitAddNewBank(messages: Record<string, string>, isSavingsAccou
             body: JSON.stringify(data)
         });
 
-        const responseBody = await response.json();
+        const responseBody: Response = await response.json();
         showAlert(responseBody.alertType, responseBody.message);
 
-        if (responseBody.alertType === "SUCCESS") {
+        if (responseBody.alertType === AlertType.SUCCESS) {
             const bankAccount = responseBody.data;
             addBankAccountToSidebar(messages, bankAccount);
 

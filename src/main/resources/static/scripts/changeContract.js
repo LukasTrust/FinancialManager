@@ -82,6 +82,28 @@ function createGroupedTransactions(messages, transactions) {
             const content = createAndAppendElement(listContainer, "div", "listItemSmall", "", { id: item.id.toString() });
             const left = createAndAppendElement(content, "div", "listContainerColumn");
             createAndAppendElement(left, "div", "normalText", `${messages["amount"]}: ${formatNumber(item.amount, currency)}      ${messages["date"]}: ${formatDateString(item.date)}`);
+            let height = 70;
+            if (item.contract) {
+                createContractSection(messages, left, item.contract.name, item.contract.startDate, item.contract.lastPaymentDate, async (event) => {
+                    event.stopPropagation();
+                    await removeContractFromTransactionDialog(messages, item, left.querySelector(".tooltip"));
+                });
+                height = 120;
+            }
+            const removeButton = createAndAppendElement(content, "button", "removeButton bi bi-x-lg", "");
+            removeButton.style.height = `${height}px`;
+            removeButton.addEventListener("click", (event) => {
+                event.stopPropagation();
+                listContainer.removeChild(content);
+                // If no transactions remain, remove the group
+                if (!listContainer.children.length) {
+                    if (listContainerHeader === selectedTransactionGroup) {
+                        selectedTransactionGroup = null;
+                        toggleTransactionSelection(selectedTransactionGroup);
+                    }
+                    transactionGroups.removeChild(listContainerHeader);
+                }
+            });
         });
     });
 }
@@ -119,7 +141,7 @@ async function addGroupToContract(messages) {
         });
         const responseBody = await response.json();
         showAlert(responseBody.alertType, responseBody.message);
-        if (responseBody.alertType === "SUCCESS") {
+        if (responseBody.alertType === AlertType.SUCCESS) {
             transactionIds.forEach(transactionId => {
                 const transactionElement = document.getElementById(transactionId.toString());
                 if (transactionElement) {
@@ -150,7 +172,7 @@ async function removeContractFromTransactions(messages) {
         });
         const responseBody = await response.json();
         showAlert(responseBody.alertType, responseBody.message);
-        if (responseBody.alertType === "SUCCESS") {
+        if (responseBody.alertType === AlertType.SUCCESS) {
             selectedTransactionGroup === null || selectedTransactionGroup === void 0 ? void 0 : selectedTransactionGroup.querySelectorAll(".tooltip").forEach(transaction => {
                 transaction.remove();
             });

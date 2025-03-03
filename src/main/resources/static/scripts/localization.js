@@ -1,6 +1,5 @@
 async function setLocale() {
     currentLanguage = navigator.language;
-
     try {
         await fetch(`/localization/update/locale/${currentLanguage}`, {
             method: 'POST',
@@ -12,7 +11,6 @@ async function setLocale() {
 }
 async function fetchLocalization(subDirectory) {
     const filePath = `/localization/clientSide/${subDirectory}/messages/${currentLanguage}`;
-
     try {
         const responseBody = await fetch(filePath);
         if (responseBody.ok) {
@@ -29,7 +27,6 @@ async function fetchLocalization(subDirectory) {
     catch (error) {
         console.error("Error fetching localization file:", error);
     }
-
     showAlert("Error", "Error loading localization");
     console.warn(`Localization file not found in ${subDirectory}. Falling back to default.`);
     return null; // Return null if fetching fails
@@ -39,10 +36,8 @@ function applyTranslations(messages) {
         console.warn("No messages provided for translation.");
         return;
     }
-
     // Loop through all elements with a data-i18n attribute
     const elements = document.querySelectorAll('[data-i18n], [data-i18n-placeholder]');
-
     elements.forEach(element => {
         // Apply text content translation
         const i18nKey = element.getAttribute('data-i18n');
