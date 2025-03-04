@@ -1,0 +1,11 @@
+{
+  "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.",
+  "sortTooltip": "Klick hier um nach dieser Spalte zu sortieren",
+  "counterParties": "Gegenparteien",
+  "showHiddenCounterParties": "Zeige verborgene Gegenparteien",
+  "searchText": "Suche...",
+  "name": "Name",
+  "description": "Beschreibung",
+  "totalAmount": "Gesamterbetrag",
+  "contractCount": "Anzahl der Verträge"
+}

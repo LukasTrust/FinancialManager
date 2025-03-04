@@ -1,3 +1,8 @@
+async function showAlertFromResponse(response: any) {
+    const responseBody = await response.json();
+    showAlert(responseBody.alertType, responseBody.message);
+}
+
 function showAlert(
     type: AlertType | string,
     message: string,

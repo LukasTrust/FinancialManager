@@ -66,6 +66,7 @@ interface CounterParty {
     users?: User;
     name: string;
     description?: string;
+    hidden: boolean;
     counterPartySearchStrings: string[];
 }
 

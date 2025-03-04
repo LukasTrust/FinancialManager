@@ -83,6 +83,9 @@ function updateUI(data, currentPageIndex, itemsPerPage, numberOfPages, messages,
     if (type === "transaction") {
         addRowsToTransactionTable(paginatedData, messages);
     }
+    else if (type === "counterParties") {
+        addRowsToCounterPartyTable(paginatedData, messages);
+    }
     const currentPage = document.getElementById("currentPage");
     const numberOfPagesElement = document.getElementById("numberOfPages");
     const lengthDifference = currentPageIndex - currentPageIndex;

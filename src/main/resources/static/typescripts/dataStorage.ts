@@ -1,14 +1,22 @@
 const contentArea: HTMLElement | null = document.getElementById('content');
 let timer: number | null = null;
 let alerts: HTMLElement[] = [];
-let existingChart: any = null; // Consider specifying a more precise type if possible
-let bankAccountId: number;
-let bankAccountSymbols: Record<string, string> = {};
+
+let existingChart: any = null;
 let currentLanguage: string;
 let monthAbbreviations: string[] = [];
-let transactionData: Transaction[] = []; // Define a proper type if available
-let filteredTransactionData: Transaction[] = []; // Define a proper type if available
+
+let bankAccountId: number;
+let bankAccountSymbols: Record<string, string> = {};
+
+let transactionData: Transaction[] = []
+let filteredTransactionData: Transaction[] = [];
 let transactionsHiddenToggle: boolean = false;
+
 let selectedTransactionGroup: HTMLElement | null = null;
 let selectedCounterparty: string | null = null;
 let selectedContract: HTMLElement | null = null;
+
+let counterParties: CounterPartyDisplay[] = [];
+let filteredCounterParties: CounterPartyDisplay[] = [];
+let counterPartiesHiddenToggle: boolean = false;

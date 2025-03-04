@@ -24,9 +24,7 @@ async function loadTransactions(messages) {
             headers: { 'Content-Type': 'application/json' }
         });
         if (!response.ok) {
-            const responseBody = await response.json();
-            showAlert(responseBody.alertType, responseBody.message);
-            showAlert("ERROR", messages["error_loadingTransactions"]);
+            await showAlertFromResponse(response);
             return;
         }
         transactionData = await response.json();
@@ -54,22 +52,7 @@ function addRowsToTransactionTable(data, messages) {
                 rowClass += " hidden";
             }
             const newRow = createAndAppendElement(tableBody, "tr", rowClass, null, { id: transaction.id.toString() });
-            const trCheckBox = createAndAppendElement(newRow, "td", null, "", { style: "width: 5%" });
-            if (rowClass) {
-                createAndAppendElement(trCheckBox, "span", "bi bi-eye-slash");
-            }
-            const checkBox = createAndAppendElement(trCheckBox, "input", "tableCheckbox", "", {
-                type: "checkbox",
-                id: transaction.id.toString(),
-                style: "margin-left: 10px;",
-            });
-            checkBox.addEventListener("change", () => updateRowStyle(newRow, checkBox));
-            newRow.addEventListener("click", (event) => {
-                if (event.target.type === "checkbox")
-                    return;
-                checkBox.checked = !checkBox.checked;
-                updateRowStyle(newRow, checkBox);
-            });
+            createCheckBoxForTable(newRow, transaction.id, transaction.hidden);
             // Counterparty cell
             let counterparty = createAndAppendElement(newRow, "td", "", "", { style: "width: 25%" });
             createAndAppendElement(counterparty, "span", "tdMargin", transaction.counterParty.name, {
@@ -107,6 +90,14 @@ function addRowsToTransactionTable(data, messages) {
 }
 function updateRowStyle(newRow, checkBox) {
     newRow.classList.toggle("selectedRow", checkBox.checked);
+}
+function updateRowGroupStyle(rowGroup, checkBox) {
+    if (checkBox.checked) {
+        rowGroup.classList.add("selectedRow");
+    }
+    else {
+        rowGroup.classList.remove("selectedRow");
+    }
 }
 function filterTransactions(messages, searchString) {
     try {

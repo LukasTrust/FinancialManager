@@ -1,4 +1,81 @@
 <div th:fragment="counterParties" id="content">
     <div class="flexContainerColumn">
+        <div class="flexContainer">
+            <h1><span class="bi bi-tag-fill"></span></h1>
+            <h1 data-i18n="counterParties"></h1>
+        </div>
+
+        <div class="pageContainer">
+            <!-- Controls -->
+            <div style="padding: 0" class="flexContainerSpaced">
+                <div style="padding-left: 5px" class="container">
+                    <div class="checkboxWrapper">
+                        <input id="showHiddenRows" type="checkbox" class="switch">
+                        <label for="showHiddenRows" data-i18n="showHiddenCounterParties"></label>
+                    </div>
+                </div>
+                <div style="padding-right: 0" class="container">
+                    <div class="searchBar">
+                        <label for="searchBarInput"></label>
+                        <input type="text" id="searchBarInput" data-i18n-placeholder="searchText">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <table>
+                <thead>
+                <tr>
+                    <th style="width: 5%" class="thHeader">
+                    </th>
+                    <th style="width: 25%" class="thHeader">
+                        <span data-i18n="name"></span>
+                        <i data-type="string" data-index="1" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                            <span class="tooltipText" data-i18n="sortTooltip"></span>
+                        </i>
+                    </th>
+                    <th style="width: 30%" class="thHeader">
+                        <span data-i18n="description"></span>
+                        <i data-type="string" data-index="2" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                            <span class="tooltipText" data-i18n="sortTooltip"></span>
+                        </i>
+                    </th>
+                    <th style="width: 15%" class="rightAligned thHeader">
+                        <span data-i18n="contractCount"></span>
+                        <i data-type="string" data-index="3" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                            <span class="tooltipText" data-i18n="sortTooltip"></span>
+                        </i>
+                    </th>
+                    <th style="width: 25%" class="rightAligned thHeader">
+                        <span data-i18n="totalAmount"></span>
+                        <i style="margin-right: 20px" data-type="string" data-index="4" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                            <span class="tooltipText" data-i18n="sortTooltip"></span>
+                        </i>
+                    </th>
+                </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="disabled" id="previousButton" data-i18n="previous"></button>
+                <div style="max-width: 200px; min-width: 200px" class="container">
+                    <span class="normalText" data-i18n="page"></span>
+                    <span class="normalText" data-index="1" id="currentPage"></span>
+                    <span class="normalText" data-i18n="of"></span>
+                    <span class="normalText" id="numberOfPages"></span>
+                </div>
+                <button id="nextButton" data-i18n="next"></button>
+                <label for="itemsPerPage"></label><select id="itemsPerPage">
+                <option value="0">All</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+            </div>
+        </div>
     </div>
 </div>

@@ -118,6 +118,70 @@ function moveElements(sourceContainer: HTMLElement, targetContainer: HTMLElement
     });
 }
 
+function createCheckBoxForRowGroup(rowGroup: HTMLElement, newRow: HTMLElement, id: number, isHidden: boolean) {
+    const trCheckBox = createAndAppendElement(newRow, "td", null, "", { style: "width: 5%" });
+
+    if (isHidden) {
+        createAndAppendElement(trCheckBox, "span", "bi bi-eye-slash");
+    }
+
+    const checkBox = createAndAppendElement(trCheckBox, "input", "tableCheckbox", "", {
+        type: "checkbox",
+        id: id.toString(),
+        style: "margin-left: 10px;",
+    }) as HTMLInputElement;
+
+    checkBox.addEventListener("change", () => updateRowGroupStyle(rowGroup, checkBox));
+
+    rowGroup.addEventListener("click", (event) => {
+        if ((event.target as HTMLInputElement).type === "checkbox") return;
+        checkBox.checked = !checkBox.checked;
+        updateRowGroupStyle(rowGroup, checkBox);
+    });
+}
+
+function addHoverToOtherElement(newRow: HTMLElement, subRow: HTMLElement) {
+    // Add event listeners to newRow
+    newRow.addEventListener('mouseenter', () => {
+        subRow.classList.add('hover'); // Add a class to subRow to mimic hover
+    });
+
+    newRow.addEventListener('mouseleave', () => {
+        subRow.classList.remove('hover'); // Remove the class from subRow
+    });
+
+    // Add event listeners to subRow
+    subRow.addEventListener('mouseenter', () => {
+        newRow.classList.add('hover'); // Add a class to newRow to mimic hover
+    });
+
+    subRow.addEventListener('mouseleave', () => {
+        newRow.classList.remove('hover'); // Remove the class from newRow
+    });
+}
+
+function createCheckBoxForTable(newRow: HTMLElement, id: number, isHidden: boolean) {
+    const trCheckBox = createAndAppendElement(newRow, "td", null, "", { style: "width: 5%" });
+
+    if (isHidden) {
+        createAndAppendElement(trCheckBox, "span", "bi bi-eye-slash");
+    }
+
+    const checkBox = createAndAppendElement(trCheckBox, "input", "tableCheckbox", "", {
+        type: "checkbox",
+        id: id.toString(),
+        style: "margin-left: 10px;",
+    }) as HTMLInputElement;
+
+    checkBox.addEventListener("change", () => updateRowStyle(newRow, checkBox));
+
+    newRow.addEventListener("click", (event) => {
+        if ((event.target as HTMLInputElement).type === "checkbox") return;
+        checkBox.checked = !checkBox.checked;
+        updateRowStyle(newRow, checkBox);
+    });
+}
+
 function startTimer(source: string): void {
     console.log(`Timer started from: ${source}`);
     timer = Date.now();

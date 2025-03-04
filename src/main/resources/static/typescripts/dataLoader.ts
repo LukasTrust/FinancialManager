@@ -49,7 +49,8 @@ async function loadURL(url: string): Promise<void> {
             case "/transactions":
                 await buildTransactions();
                 break;
-            case "/changeContract":
+            case "/counterParties":
+                await buildCounterParties();
                 break;
         }
     } catch (error) {

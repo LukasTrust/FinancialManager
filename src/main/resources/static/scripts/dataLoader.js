@@ -41,7 +41,8 @@ async function loadURL(url) {
             case "/transactions":
                 await buildTransactions();
                 break;
-            case "/changeContract":
+            case "/counterParties":
+                await buildCounterParties();
                 break;
         }
     }

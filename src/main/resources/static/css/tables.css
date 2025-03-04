@@ -89,11 +89,6 @@ th {
     transition: background 0.3s ease;
 }
 
-th:hover {
-    background-color: rgba(0, 123, 255, 0.8); /* Darker on hover */
-    z-index: 2;
-}
-
 th i {
     margin-left: 8px;
     font-size: 12px;
@@ -106,15 +101,33 @@ tbody {
     overflow-y: auto;
 }
 
-tbody tr {
+tr {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Lighter border */
     transition: background 0.3s ease;
     height: 65px;
 }
 
-tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.05); /* Subtle hover effect */
+tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: background-color 0.2s ease-in-out;
     z-index: 2;
+}
+
+.rowWithSubRow {
+    border-bottom: none;
+}
+
+.hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: background-color 0.2s ease-in-out;
+    z-index: 2;
+}
+
+.subRow {
+    display: flex;
+    align-items: center;
+    flex-flow: row-reverse;
+    height: 60px;
 }
 
 .pagination {

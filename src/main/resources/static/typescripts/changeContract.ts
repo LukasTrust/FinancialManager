@@ -58,9 +58,7 @@ async function loadContracts(messages: Record<string, string>): Promise<Contract
         });
 
         if (!response.ok) {
-            const responseBody = await response.json();
-            showAlert(responseBody.alertType, responseBody.message);
-            showAlert("ERROR", messages["error_loadingContracts"]);
+            await showAlertFromResponse(response);
             return;
         }
 

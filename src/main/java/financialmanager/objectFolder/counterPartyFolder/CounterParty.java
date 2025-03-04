@@ -32,6 +32,10 @@ public class CounterParty {
     private String description;
 
     @Setter
+    @Column(nullable = false)
+    private boolean isHidden;
+
+    @Setter
     @Convert(converter = JsonStringListConverter.class)
     private List<String> counterPartySearchStrings;
 

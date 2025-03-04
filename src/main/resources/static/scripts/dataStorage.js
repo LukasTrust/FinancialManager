@@ -1,15 +1,18 @@
 const contentArea = document.getElementById('content');
 let timer = null;
 let alerts = [];
-let existingChart = null; // Consider specifying a more precise type if possible
-let bankAccountId;
-let bankAccountSymbols = {};
+let existingChart = null;
 let currentLanguage;
 let monthAbbreviations = [];
-let transactionData = []; // Define a proper type if available
-let filteredTransactionData = []; // Define a proper type if available
+let bankAccountId;
+let bankAccountSymbols = {};
+let transactionData = [];
+let filteredTransactionData = [];
 let transactionsHiddenToggle = false;
 let selectedTransactionGroup = null;
 let selectedCounterparty = null;
 let selectedContract = null;
+let counterParties = [];
+let filteredCounterParties = [];
+let counterPartiesHiddenToggle = false;
 //# sourceMappingURL=dataStorage.js.map
