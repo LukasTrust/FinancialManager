@@ -14,4 +14,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findByIdInAndBankAccountId(List<Long> ids, Long bankAccountId);
 
     List<Transaction> findByCounterParty(CounterParty counterParty);
+
+    List<Transaction> findByOriginalCounterParty(String originalCounterParty);
 }

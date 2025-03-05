@@ -42,16 +42,16 @@ public class KeyFigureService {
         boolean isSavingsAccount = false;
 
         for (Long bankAccountId : bankAccountIds) {
-            Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
+            Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
-            if (bankAccountResponse.isErr()) {
+            if (bankAccountResult.isErr()) {
                 continue;
             }
 
             List<Transaction> bankAccountTransactions = transactionService.findByBankAccountIdBetweenDates(bankAccountId, start, end);
             allTransactions.addAll(bankAccountTransactions);
 
-            if (bankAccountResponse.getValue() instanceof SavingsBankAccount) {
+            if (bankAccountResult.getValue() instanceof SavingsBankAccount) {
                 discrepancy += getDiscrepancy(bankAccountTransactions);
                 isSavingsAccount = true;
             } else {

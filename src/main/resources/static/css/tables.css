@@ -113,21 +113,29 @@ tr:hover {
     z-index: 2;
 }
 
+.rowGroup {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px 8px 0 0;
+    position: relative;
+}
+
 .rowWithSubRow {
     border-bottom: none;
+}
+
+.subRow {
+    display: flex;
+    align-items: center;
+    height: 60px;
+    margin-left: 20px;
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0 0 8px 8px;
 }
 
 .hover {
     background-color: rgba(255, 255, 255, 0.05);
     transition: background-color 0.2s ease-in-out;
     z-index: 2;
-}
-
-.subRow {
-    display: flex;
-    align-items: center;
-    flex-flow: row-reverse;
-    height: 60px;
 }
 
 .pagination {

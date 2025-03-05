@@ -31,18 +31,34 @@ public class CounterPartyProcessingService {
             List<Transaction> transactions = transactionService.findByCounterParty(counterParty);
             List<Contract> contracts = contractService.findByCounterParty(counterParty);
 
-            Double totalAmount = transactions.stream().mapToDouble(Transaction::getAmount).sum();
+            Integer transactionCount = transactions.size();
             Integer numberOfContracts = contracts.size();
+            Double totalAmount = transactions.stream().mapToDouble(Transaction::getAmount).sum();
 
-            CounterPartyDisplay counterPartyDisplay = new CounterPartyDisplay(counterParty, numberOfContracts, totalAmount);
+            CounterPartyDisplay counterPartyDisplay = new CounterPartyDisplay(counterParty, transactionCount, numberOfContracts, totalAmount);
             counterPartyDisplays.add(counterPartyDisplay);
         }
 
         return counterPartyDisplays;
     }
 
-    public void setCounterCounterParties(Users users, List<Transaction> transactions) {
-        List<CounterParty> existingCounterParties = counterPartyService.findByUsers(users);
+    public CounterParty changeCounterPartyOfTransactions(Users currentUser, String counterPartyName) {
+        List<Transaction> transactions = transactionService.findByOriginalCounterParty(counterPartyName);
+
+        if (transactions.isEmpty()) {
+            return null;
+        }
+
+        CounterParty counterParty = new CounterParty(currentUser, counterPartyName);
+        setCounterParty(counterParty, transactions);
+
+        transactionService.saveAll(transactions);
+
+        return counterParty;
+    }
+
+    public void setCounterCounterParties(Users currentUser, List<Transaction> transactions) {
+        List<CounterParty> existingCounterParties = counterPartyService.findByUsers(currentUser);
         Map<String, CounterParty> counterPartyLookup = new HashMap<>();
 
         // Populate lookup for quick search
@@ -63,17 +79,14 @@ public class CounterPartyProcessingService {
             List<Transaction> counterPartyTransactions = entry.getValue();
 
             CounterParty counterParty = counterPartyLookup.get(counterPartyName);
-            CounterParty finalCounterParty;
 
             if (counterParty != null) {
                 // If existing counterparty found, assign it to transactions
-                finalCounterParty = counterParty;
-                counterPartyTransactions.forEach(transaction -> transaction.setCounterParty(finalCounterParty));
+                setCounterParty(counterParty, counterPartyTransactions);
             } else {
                 // If not found, create a new one
-                counterParty = new CounterParty(users, counterPartyName);
-                finalCounterParty = counterParty;
-                counterPartyTransactions.forEach(transaction -> transaction.setCounterParty(finalCounterParty));
+                counterParty = new CounterParty(currentUser, counterPartyName);
+                setCounterParty(counterParty, counterPartyTransactions);
                 newCounterParties.add(counterParty);
             }
         }
@@ -82,5 +95,9 @@ public class CounterPartyProcessingService {
         if (!newCounterParties.isEmpty()) {
             counterPartyService.saveAll(newCounterParties);
         }
+    }
+
+    private void setCounterParty(CounterParty counterParty, List<Transaction> transactions) {
+        transactions.forEach(transaction -> {transaction.setCounterParty(counterParty);});
     }
 }

@@ -11,5 +11,8 @@
   "transactionNotFound": "Die Transaction wurde nicht gefunden",
   "transactionDoesNotBelongToBankAccount": "Die Transaktion gehört nicht zum Bank Konto",
   "transactionHasNoContract": "Die Transaktion hat keinen Vertrag",
-  "contractNotFound": "Der Vertrag wurde nicht gefunden"
+  "contractNotFound": "Der Vertrag wurde nicht gefunden",
+  "counterPartyNotFound": "Die Gegenpartei wurde nicht gefunden",
+  "searchStringNotFoundInCounterParty": "Der Suchebegriff '{}' wurde nicht in der Gegenpartei gefunden",
+  "searchStringCanNotBeRemovedFromCounterParty": "Der Suchebegriff der Gegenpartei kann nicht entfernt werden, da diese dann keine Suchbegriffe mehr hat"
 }

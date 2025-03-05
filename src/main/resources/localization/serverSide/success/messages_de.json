@@ -5,5 +5,6 @@
   "transactionsHidden": "{} Transaktionen wurde verborgen",
   "transactionsUnhidden": "{} Transaktionen wurden sichtbar gemacht",
   "transactionsAddedContract": "Der Vertrag '{}' wurde den Transaktionen hinzugefügt",
-  "transactionsRemovedContract": "Der Vertrag der Transaktionen wurde entfernt"
+  "transactionsRemovedContract": "Der Vertrag der Transaktionen wurde entfernt",
+  "removedSearchStringFromCounterParty": "Der Suchbegriff wurde von der Gegenpartei entfernt"
 }

@@ -29,10 +29,10 @@ public class ContractController {
 
     @GetMapping("")
     public ResponseEntity<?> getContractsForBankAccount(@PathVariable Long bankAccountId) {
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
-        if (bankAccountResponse.isErr()) {
-            return bankAccountResponse.getError();
+        if (bankAccountResult.isErr()) {
+            return bankAccountResult.getError();
         }
 
         return ResponseEntity.ok(contractService.findByBankAccountId(bankAccountId));
@@ -42,10 +42,10 @@ public class ContractController {
     public ResponseEntity<?> removeContractFromTransaction(
             @PathVariable Long bankAccountId,
             @PathVariable Long transactionId) {
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
-        if (bankAccountResponse.isErr()) {
-            return bankAccountResponse.getError();
+        if (bankAccountResult.isErr()) {
+            return bankAccountResult.getError();
         }
 
         Transaction transaction = transactionService.findById(transactionId);
@@ -53,7 +53,7 @@ public class ContractController {
             return responseService.createResponse(HttpStatus.NOT_FOUND, "transactionNotFound", AlertType.ERROR);
         }
 
-        if (!transaction.getBankAccount().equals(bankAccountResponse.getValue())) {
+        if (!transaction.getBankAccount().equals(bankAccountResult.getValue())) {
             return responseService.createResponse(HttpStatus.NOT_ACCEPTABLE, "transactionDoesNotBelongToBankAccount", AlertType.ERROR);
         }
 
@@ -70,13 +70,13 @@ public class ContractController {
     @PostMapping("/addContractToTransactions/{contractId}")
     public ResponseEntity<?> addContractToTransactions(@PathVariable Long bankAccountId, @PathVariable Long contractId,
                                                        @RequestBody List<Long> transactionIds) {
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
-        if (bankAccountResponse.isErr()) {
-            return bankAccountResponse.getError();
+        if (bankAccountResult.isErr()) {
+            return bankAccountResult.getError();
         }
 
-        BankAccount bankAccount = bankAccountResponse.getValue();
+        BankAccount bankAccount = bankAccountResult.getValue();
 
         Contract contract = contractService.findByIdAndUsersId(contractId, bankAccount.getUsers().getId());
 
@@ -100,10 +100,10 @@ public class ContractController {
 
     @PostMapping("/removeContractFromTransactions")
     public ResponseEntity<?> removeContractFromTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
-        if (bankAccountResponse.isErr()) {
-            return bankAccountResponse.getError();
+        if (bankAccountResult.isErr()) {
+            return bankAccountResult.getError();
         }
 
         List<Transaction> transactions = transactionService.findByIdInAndBankAccountId(transactionIds, bankAccountId);

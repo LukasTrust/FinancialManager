@@ -50,10 +50,10 @@ public class TransactionProcessingService {
         String fileName = fileParser.getFileName();
         String[] header;
 
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
-        if (bankAccountResponse.isErr()) {
-            return bankAccountResponse.getError();
+        if (bankAccountResult.isErr()) {
+            return bankAccountResult.getError();
         }
 
         header = fileParser.getNextLineOfData();
@@ -64,7 +64,7 @@ public class TransactionProcessingService {
                     AlertType.ERROR, Collections.singletonList(fileName));
         }
 
-        BankAccount bankAccount = bankAccountResponse.getValue();
+        BankAccount bankAccount = bankAccountResult.getValue();
         DataColumns dataColumns = findColumnsInData(header, bankAccount);
         if (!dataColumns.checkIfAllAreFound()) {
             log.error("{} could not find the date columns", fileName);

@@ -27,10 +27,10 @@ public class TransactionsController {
 
     @GetMapping("")
     public ResponseEntity<?> getTransactionsForBankAccount(@PathVariable Long bankAccountId) {
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
-        if (bankAccountResponse.isErr()) {
-            return bankAccountResponse.getError();
+        if (bankAccountResult.isErr()) {
+            return bankAccountResult.getError();
         }
 
         List<Transaction> transactions = transactionService.findByBankAccountId(bankAccountId)
@@ -52,10 +52,10 @@ public class TransactionsController {
     }
 
     private ResponseEntity<?> updateTransactionVisibility(Long bankAccountId, List<Long> transactionIds, boolean hide) {
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
-        if (bankAccountResponse.isErr()) {
-            return bankAccountResponse.getError();
+        if (bankAccountResult.isErr()) {
+            return bankAccountResult.getError();
         }
 
         List<Transaction> transactions = transactionService.findByIdInAndBankAccountId(transactionIds, bankAccountId).stream()

@@ -72,6 +72,7 @@ interface CounterParty {
 
 interface CounterPartyDisplay {
     counterParty: CounterParty;
+    transactionCount: number;
     contractCount: number;
     totalAmount: number;
 }

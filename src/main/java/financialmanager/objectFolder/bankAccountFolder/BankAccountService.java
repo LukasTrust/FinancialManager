@@ -45,10 +45,10 @@ public class BankAccountService {
 
         Users currentUser = currentUserResponse.getValue();
 
-        Optional<BankAccount> bankAccountResponse = bankAccountRepository.findByIdAndUsers(bankAccountId, currentUser);
+        Optional<BankAccount> bankAccountOptional = bankAccountRepository.findByIdAndUsers(bankAccountId, currentUser);
 
-        if (bankAccountResponse.isPresent())  {
-            return new Ok<>(bankAccountResponse.get());
+        if (bankAccountOptional.isPresent())  {
+            return new Ok<>(bankAccountOptional.get());
         }
 
         log.warn("User {} does not own the bank account {}", currentUser, bankAccountId);

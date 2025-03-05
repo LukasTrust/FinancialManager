@@ -15,22 +15,30 @@ function toggleSelection<T extends HTMLElement>(
 
 function createListElement(
     parent: HTMLElement,
-    text: string | undefined,
+    text?: string,
     attributes: Record<string, string> = {},
     addRemove: boolean = true,
-    small: boolean = false
+    small: boolean = false,
+    toolTipText?: string,
+    removeCallback: (element: HTMLElement) => void = (element) => element.parentElement?.removeChild(element)
 ): HTMLElement {
-    const classType = small ? "listItemSmall" : "listItem";
+    let classType = small ? "listItemSmall" : "listItem";
+    if (toolTipText) {
+        classType += " tooltip tooltipBottom";
+    }
 
     const item = createAndAppendElement(parent, "div", classType);
     createAndAppendElement(item, "div", "normalText", text, attributes);
 
-    if (addRemove) {
-        const removeButton = createAndAppendElement(item, "button", "removeButton bi bi-x-lg", null, {}, {
-            click: () => parent.removeChild(item),
-        });
+    if (toolTipText) {
+        createAndAppendElement(item, "div", "tooltipText", toolTipText);
+    }
 
-        // Apply styles properly
+    if (addRemove) {
+        const removeButton = createAndAppendElement(item, "button", "removeButton bi bi-x-lg");
+
+        removeButton.addEventListener("click", () => removeCallback(item));
+
         if (small) {
             removeButton.style.marginLeft = "20px";
         }

@@ -58,10 +58,10 @@ public class ChartService {
     private Optional<ChartSeries> getChartSeries(Long bankAccountId, LocalDate startDate, LocalDate endDate) {
         Optional<ChartSeries> chartSeriesOptional = Optional.empty();
 
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResponse = bankAccountService.findById(bankAccountId);
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
-        if (bankAccountResponse.isOk()) {
-            BankAccount bankAccount = bankAccountResponse.getValue();
+        if (bankAccountResult.isOk()) {
+            BankAccount bankAccount = bankAccountResult.getValue();
             List<Transaction> transactions = new ArrayList<>(transactionService.findByBankAccountIdBetweenDates(
                     bankAccount.getId(), startDate, endDate));
 

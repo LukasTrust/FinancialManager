@@ -10,15 +10,19 @@ function toggleSelection(selectedElement, currentSelection, className) {
         return selectedElement;
     }
 }
-function createListElement(parent, text, attributes = {}, addRemove = true, small = false) {
-    const classType = small ? "listItemSmall" : "listItem";
+function createListElement(parent, text, attributes = {}, addRemove = true, small = false, toolTipText, removeCallback = (element) => { var _a; return (_a = element.parentElement) === null || _a === void 0 ? void 0 : _a.removeChild(element); }) {
+    let classType = small ? "listItemSmall" : "listItem";
+    if (toolTipText) {
+        classType += " tooltip tooltipBottom";
+    }
     const item = createAndAppendElement(parent, "div", classType);
     createAndAppendElement(item, "div", "normalText", text, attributes);
+    if (toolTipText) {
+        createAndAppendElement(item, "div", "tooltipText", toolTipText);
+    }
     if (addRemove) {
-        const removeButton = createAndAppendElement(item, "button", "removeButton bi bi-x-lg", null, {}, {
-            click: () => parent.removeChild(item),
-        });
-        // Apply styles properly
+        const removeButton = createAndAppendElement(item, "button", "removeButton bi bi-x-lg");
+        removeButton.addEventListener("click", () => removeCallback(item));
         if (small) {
             removeButton.style.marginLeft = "20px";
         }

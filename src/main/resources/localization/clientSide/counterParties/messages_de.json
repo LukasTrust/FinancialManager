@@ -7,5 +7,12 @@
   "name": "Name",
   "description": "Beschreibung",
   "totalAmount": "Gesamterbetrag",
-  "contractCount": "Anzahl der Verträge"
+  "transactionCount": "Anzahl der Transaktionen",
+  "contractCount": "Anzahl der Verträge",
+  "counterpartySearchStrings": "Suchbegriffe für Gegenparteien:",
+  "removeSearchStringToolTip": "Klicke hier um diesen Suchbegriff für die Gegenpartei zu entfernen",
+  "changeHiddenButton": "Verstecken/Sichtbar",
+  "changeHiddenButtonTooltip": "Verborgene Gegenparteien ein- oder ausblenden",
+  "mergeCounterParties": "Gegenpartien zusammenführen",
+  "mergeCounterPartiesTooltip": "Die Ausgewähl"
 }

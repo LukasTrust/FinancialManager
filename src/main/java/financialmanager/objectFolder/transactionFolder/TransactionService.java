@@ -25,6 +25,10 @@ public class TransactionService {
         return transactionRepository.findByCounterParty(counterParty);
     }
 
+    public List<Transaction> findByOriginalCounterParty(String originalCounterParty) {
+        return transactionRepository.findByOriginalCounterParty(originalCounterParty);
+    }
+
     public Transaction findById(Long id) {
         return transactionRepository.findById(id).orElse(null);
     }
