@@ -17,6 +17,6 @@ let selectedTransactionGroup: HTMLElement | null = null;
 let selectedCounterparty: string | null = null;
 let selectedContract: HTMLElement | null = null;
 
-let counterParties: CounterPartyDisplay[] = [];
-let filteredCounterParties: CounterPartyDisplay[] = [];
+let counterPartyData: CounterPartyDisplay[] = [];
+let filteredCounterPartyData: CounterPartyDisplay[] = [];
 let counterPartiesHiddenToggle: boolean = false;

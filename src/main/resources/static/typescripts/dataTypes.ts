@@ -77,6 +77,18 @@ interface CounterPartyDisplay {
     totalAmount: number;
 }
 
+enum SortType {
+    TRANSACTION = "TRANSACTION",
+    COUNTERPARTY = "COUNTERPARTY"
+}
+
+enum DataTypeForSort {
+    string = "string",
+    number = "number",
+    date = "date",
+    input = "input"
+}
+
 enum AlertType {
     SUCCESS = "SUCCESS",
     WARNING = "WARNING",

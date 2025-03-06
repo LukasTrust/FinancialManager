@@ -58,6 +58,31 @@ function createListSection(parent, title, transactions) {
     createListContainer(header, transactions);
     return container;
 }
+function createInputBox(parent, icon, idText, type, text = null) {
+    const inputBox = createAndAppendElement(parent, "div", "inputBox");
+    createAndAppendElement(inputBox, "span", icon);
+    createAndAppendElement(inputBox, "label", "", "", { for: idText });
+    // Create input element separately to set its value
+    const inputElement = createAndAppendElement(inputBox, "input", "", "", {
+        id: idText,
+        name: idText,
+        type: type,
+    });
+    if (text !== null) {
+        inputElement.value = text;
+    }
+    return inputElement;
+}
+function debounceInputChange(inputElement, callback, id, messages, delay = 500) {
+    inputElement.addEventListener("input", (event) => {
+        clearTimeout(inputElement.dataset.timeoutId); // Clear previous timeout
+        const timeoutId = setTimeout(() => {
+            const newValue = event.target.value;
+            callback(id, newValue, messages);
+        }, delay);
+        inputElement.dataset.timeoutId = timeoutId.toString(); // Store timeout ID
+    });
+}
 function createListContainer(parent, transactions) {
     const listContainer = createAndAppendElement(parent, "div", "listContainerColumn", "", {
         style: "min-height: 420px; max-height: 420px;",
@@ -152,5 +177,12 @@ function stopTimer(source) {
     else {
         console.log(`No active timer to stop from: ${source}`);
     }
+}
+function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func(...args), delay);
+    };
 }
 //# sourceMappingURL=utils.js.map

@@ -14,5 +14,10 @@
   "changeHiddenButton": "Verstecken/Sichtbar",
   "changeHiddenButtonTooltip": "Verborgene Gegenparteien ein- oder ausblenden",
   "mergeCounterParties": "Gegenpartien zusammenführen",
-  "mergeCounterPartiesTooltip": "Die Ausgewähl"
+  "mergeCounterPartiesTooltip": "Die Ausgewähl",
+  "previous": "Vorherige",
+  "page": "Seite ",
+  "of": " von ",
+  "next": "Nächste",
+  "perPage": "pro Seite"
 }

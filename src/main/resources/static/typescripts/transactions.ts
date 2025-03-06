@@ -8,10 +8,10 @@ async function buildTransactions(): Promise<void> {
     transactionsHiddenToggle = false;
 
     await loadTransactions(messages);
-    splitDataIntoPages(messages, "transaction", transactionData);
+    splitDataIntoPages(messages, SortType.TRANSACTION, transactionData);
     setUpSorting();
 
-    document.getElementById("searchBarInput")?.addEventListener("input", () => searchTable(messages, "transaction"));
+    document.getElementById("searchBarInput")?.addEventListener("input", () => searchTable(messages, SortType.TRANSACTION));
 
     document.getElementById("changeHiddenButton")?.addEventListener("click", () => showChangeHiddenDialog(messages));
 
@@ -131,7 +131,7 @@ function filterTransactions(messages: Record<string, string>, searchString: stri
             transaction.amountInBankAfter?.toString().toLowerCase().includes(searchString)
         );
 
-        splitDataIntoPages(messages, "transaction", filteredTransactionData);
+        splitDataIntoPages(messages, SortType.TRANSACTION, filteredTransactionData);
     } catch (error) {
         console.error("Unexpected error in filterTransactions:", error);
         showAlert("ERROR", messages["error_generic"]);
@@ -233,5 +233,5 @@ function updateCachedTransactionsAndUI(messages: Record<string, string>, transac
         }
     });
 
-    splitDataIntoPages(messages, "transaction", filteredTransactionData);
+    splitDataIntoPages(messages, SortType.TRANSACTION, filteredTransactionData);
 }

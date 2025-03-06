@@ -22,23 +22,23 @@ function searchTable(messages, type) {
     searchBarInput.addEventListener("input", debounce(() => {
         const inputText = searchBarInput.value.trim().toLowerCase();
         if (inputText.length <= 2) {
-            if (type === "transaction") {
+            if (type === SortType.TRANSACTION) {
                 filteredTransactionData = transactionData;
                 splitDataIntoPages(messages, type, transactionData);
             }
+            else if (type === SortType.COUNTERPARTY) {
+                filteredCounterPartyData = counterPartyData;
+                splitDataIntoPages(messages, type, counterPartyData);
+            }
             return;
         }
-        if (type === "transaction") {
+        if (type === SortType.TRANSACTION) {
             filterTransactions(messages, inputText);
         }
+        else if (type === SortType.COUNTERPARTY) {
+            filterCounterParties(messages, inputText);
+        }
     }, 300));
-}
-function debounce(func, delay) {
-    let timeoutId;
-    return function (...args) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => func(...args), delay);
-    };
 }
 function splitDataIntoPages(messages, type, data) {
     const itemsPerPageSelection = document.getElementById("itemsPerPage");
@@ -80,10 +80,10 @@ function updateUI(data, currentPageIndex, itemsPerPage, numberOfPages, messages,
     const endIndex = startIndex + itemsPerPage;
     const paginatedData = data.slice(startIndex, endIndex);
     clearTable(currentTableBody);
-    if (type === "transaction") {
+    if (type === SortType.TRANSACTION) {
         addRowsToTransactionTable(paginatedData, messages);
     }
-    else if (type === "counterParties") {
+    else if (type === SortType.COUNTERPARTY) {
         addRowsToCounterPartyTable(paginatedData, messages);
     }
     const currentPage = document.getElementById("currentPage");
@@ -107,7 +107,7 @@ function updateUI(data, currentPageIndex, itemsPerPage, numberOfPages, messages,
 function clearTable(currentTableBody) {
     currentTableBody.innerHTML = "";
 }
-function setUpSorting() {
+function setUpSorting(keepSubRowTogether = false) {
     const currentTableBody = getCurrentTableBody();
     if (!currentTableBody)
         return;
@@ -115,61 +115,91 @@ function setUpSorting() {
     columnIcons.forEach(columnIcon => {
         columnIcon.addEventListener("click", () => {
             const columnIndex = Number(columnIcon.getAttribute("data-index"));
-            const dataType = columnIcon.getAttribute("data-type") || "string";
+            const dataTypeString = columnIcon.getAttribute("data-type") || "string";
+            let dataType;
+            if (Object.values(DataTypeForSort).includes(dataTypeString)) {
+                dataType = dataTypeString;
+            }
             const isAscending = columnIcon.dataset.order === "asc";
             columnIcon.dataset.order = isAscending ? "desc" : "asc";
-            sortTable(currentTableBody, columnIndex, dataType, isAscending);
+            sortTable(currentTableBody, columnIndex, dataType, isAscending, keepSubRowTogether);
         });
     });
 }
-function sortTable(tableBody, columnIndex, dataType, isAscending) {
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
-    rows.sort((rowA, rowB) => {
-        var _a, _b, _c, _d;
-        const cellA = ((_b = (_a = rowA.children[columnIndex]) === null || _a === void 0 ? void 0 : _a.textContent) === null || _b === void 0 ? void 0 : _b.trim()) || "";
-        const cellB = ((_d = (_c = rowB.children[columnIndex]) === null || _c === void 0 ? void 0 : _c.textContent) === null || _d === void 0 ? void 0 : _d.trim()) || "";
-        const valueA = parseSortableValue(cellA, dataType);
-        const valueB = parseSortableValue(cellB, dataType);
-        return compareValues(valueA, valueB, isAscending);
-    });
+function getCellValue(row, columnIndex, dataType) {
+    var _a;
+    const cell = row.children[columnIndex];
+    if (!cell)
+        return "";
+    if (dataType === DataTypeForSort.input) {
+        const inputElement = cell.querySelector("input");
+        return inputElement ? inputElement.value.trim() : "";
+    }
+    return ((_a = cell.textContent) === null || _a === void 0 ? void 0 : _a.trim()) || "";
+}
+function sortTable(tableBody, columnIndex, dataType, isAscending, keepSubRowTogether) {
     const fragment = document.createDocumentFragment();
-    rows.forEach(row => fragment.appendChild(row));
-    tableBody.innerHTML = "";
-    tableBody.appendChild(fragment);
+    if (keepSubRowTogether) {
+        const rowGroups = Array.from(tableBody.querySelectorAll(".rowGroup"));
+        rowGroups.sort((groupA, groupB) => {
+            const rowA = groupA.querySelector(".rowWithSubRow");
+            const rowB = groupB.querySelector(".rowWithSubRow");
+            if (!rowA || !rowB)
+                return 0; // Keep order if any group lacks a main row
+            const valueA = parseSortableValue(getCellValue(rowA, columnIndex, dataType), dataType);
+            const valueB = parseSortableValue(getCellValue(rowB, columnIndex, dataType), dataType);
+            return compareValues(valueA, valueB, isAscending);
+        });
+        rowGroups.forEach(group => fragment.appendChild(group));
+    }
+    else {
+        const rows = Array.from(tableBody.querySelectorAll("tr"));
+        rows.sort((rowA, rowB) => {
+            const valueA = parseSortableValue(getCellValue(rowA, columnIndex, dataType), dataType);
+            const valueB = parseSortableValue(getCellValue(rowB, columnIndex, dataType), dataType);
+            return compareValues(valueA, valueB, isAscending);
+        });
+        rows.forEach(row => fragment.appendChild(row));
+    }
+    tableBody.replaceChildren(fragment);
 }
 function parseSortableValue(value, dataType) {
+    if (!value.trim())
+        return value; // Handle empty values gracefully
     try {
         switch (dataType) {
-            case "number":
+            case DataTypeForSort.number:
                 return formatNumberForSort(value);
-            case "date":
+            case DataTypeForSort.date:
                 return formatDateForSort(value);
-            case "string":
             default:
-                return value;
+                return value.toLowerCase();
         }
     }
     catch (error) {
-        console.error(`Error parsing value: ${value}`, error);
+        console.warn(`Error parsing value: "${value}"`, error);
         return value;
     }
 }
 function formatDateForSort(value) {
+    const parsedDate = Date.parse(value);
+    if (!isNaN(parsedDate))
+        return new Date(parsedDate);
     const dateParts = value.split(" ");
     const day = parseInt(dateParts[0], 10);
     const month = monthAbbreviations.indexOf(dateParts[1]);
     const year = parseInt(dateParts[2], 10);
     if (month === -1 || isNaN(day) || isNaN(year)) {
-        throw new Error("Invalid date format");
+        throw new Error(`Invalid date format: "${value}"`);
     }
     return new Date(year, month, day);
 }
 function formatNumberForSort(value) {
-    const numericValue = parseFloat(value.replace(/[^0-9.,-]/g, '').replace(',', '.'));
-    if (!isNaN(numericValue)) {
+    const cleanedValue = value.replace(/[^\d.,-]/g, '').replace(',', '.');
+    const numericValue = parseFloat(cleanedValue);
+    if (!isNaN(numericValue))
         return numericValue;
-    }
-    throw new Error("Invalid number format");
+    throw new Error(`Invalid number format: "${value}"`);
 }
 function compareValues(valueA, valueB, isAscending) {
     if (typeof valueA === "number" && typeof valueB === "number") {

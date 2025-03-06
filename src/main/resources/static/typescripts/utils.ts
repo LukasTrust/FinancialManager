@@ -90,6 +90,50 @@ function createListSection(
     return container;
 }
 
+function createInputBox(
+    parent: HTMLElement,
+    icon: string,
+    idText: string,
+    type: string,
+    text: string | null = null,
+): HTMLInputElement {
+    const inputBox = createAndAppendElement(parent, "div", "inputBox");
+    createAndAppendElement(inputBox, "span", icon);
+    createAndAppendElement(inputBox, "label", "", "", { for: idText });
+
+    // Create input element separately to set its value
+    const inputElement = createAndAppendElement(inputBox, "input", "", "", {
+        id: idText,
+        name: idText,
+        type: type,
+    }) as HTMLInputElement;
+
+    if (text !== null) {
+        inputElement.value = text;
+    }
+
+    return inputElement;
+}
+
+function debounceInputChange(
+    inputElement: HTMLInputElement,
+    callback: (id: number, newValue: string, messages: Record<string, string>) => void,
+    id: number,
+    messages: Record<string, string>,
+    delay = 500
+) {
+    inputElement.addEventListener("input", (event) => {
+        clearTimeout(inputElement.dataset.timeoutId as unknown as number); // Clear previous timeout
+
+        const timeoutId = setTimeout(() => {
+            const newValue = (event.target as HTMLInputElement).value;
+            callback(id, newValue, messages);
+        }, delay);
+
+        inputElement.dataset.timeoutId = timeoutId.toString(); // Store timeout ID
+    });
+}
+
 function createListContainer(
     parent: HTMLElement,
     transactions: Transaction[]
@@ -203,4 +247,16 @@ function stopTimer(source: string): void {
     } else {
         console.log(`No active timer to stop from: ${source}`);
     }
+}
+
+function debounce<T extends (...args: any[]) => void>(
+    func: T,
+    delay: number
+): (...args: Parameters<T>) => void {
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    return function (this: void, ...args: Parameters<T>) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func(...args), delay);
+    };
 }

@@ -1,3 +1,15 @@
+var SortType;
+(function (SortType) {
+    SortType["TRANSACTION"] = "TRANSACTION";
+    SortType["COUNTERPARTY"] = "COUNTERPARTY";
+})(SortType || (SortType = {}));
+var DataTypeForSort;
+(function (DataTypeForSort) {
+    DataTypeForSort["string"] = "string";
+    DataTypeForSort["number"] = "number";
+    DataTypeForSort["date"] = "date";
+    DataTypeForSort["input"] = "input";
+})(DataTypeForSort || (DataTypeForSort = {}));
 var AlertType;
 (function (AlertType) {
     AlertType["SUCCESS"] = "SUCCESS";

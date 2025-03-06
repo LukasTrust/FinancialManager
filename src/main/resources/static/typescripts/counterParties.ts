@@ -1,11 +1,15 @@
-async function buildCounterParties() : Promise<void> {
+async function buildCounterParties(): Promise<void> {
     const messages = await fetchLocalization("counterParties");
     if (!messages) return;
 
     counterPartiesHiddenToggle = false;
 
     await loadCounterParties(messages);
-    splitDataIntoPages(messages, "counterParties", counterParties);
+    splitDataIntoPages(messages, SortType.COUNTERPARTY, counterPartyData);
+
+    setUpSorting(true);
+
+    document.getElementById("searchBarInput")?.addEventListener("input", () => searchTable(messages, SortType.COUNTERPARTY));
 }
 
 async function loadCounterParties(messages: Record<string, string>): Promise<void> {
@@ -20,8 +24,8 @@ async function loadCounterParties(messages: Record<string, string>): Promise<voi
             return;
         }
 
-        counterParties = await response.json();
-        filteredCounterParties = counterParties;
+        counterPartyData = await response.json();
+        filteredCounterPartyData = counterPartyData;
     } catch (error) {
         console.error("There was an error loading the counterParties:", error);
         showAlert('error', messages["error_generic"]);
@@ -57,33 +61,36 @@ function addRowsToCounterPartyTable(data: CounterPartyDisplay[], messages: Recor
             createCheckBoxForRowGroup(rowGroup, newRow, counterParty.id, counterParty.hidden);
 
             // Name cell
-            const name = createAndAppendElement(newRow, "td", "", "", {style: "width: 25%"});
-            createAndAppendElement(name, "span", "tdMargin", counterParty.name);
+            const name = createAndAppendElement(newRow, "td", "", "", {style: "width: 15%"});
+            const nameInput = createInputBox(name, "bi bi-pencil-fill", "name", "text", counterParty.name);
+            debounceInputChange(nameInput, (id, newValue, messages) =>
+                updateCounterPartyField(id, "name", newValue, messages), counterParty.id, messages);
 
             // Transaction count
-            const transactionCount = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
+            const transactionCount = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 20%"});
             createAndAppendElement(transactionCount, "span", "tdMargin", counterPartyDisplay.transactionCount.toString());
 
             // Contract count
-            const contractCount = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
+            const contractCount = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 15%"});
             createAndAppendElement(contractCount, "span", "tdMargin", counterPartyDisplay.contractCount.toString());
 
             // Total amount
-            const totalAmount = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 20%"});
+            const totalAmount = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 15%"});
             createAndAppendElement(totalAmount, "span", "tdMargin", formatNumber(counterPartyDisplay.totalAmount, currency),
                 {style: "margin-right: 30px;"});
 
             // Description Cell
-            const description = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 30%"});
-            if (counterParty.description) {
-                createAndAppendElement(description, "span", "tdMargin", counterParty.description);
-            }
+            const description = createAndAppendElement(newRow, "td", "", "",
+                {style: "width: 30%; padding-right: 20px"});
+            const descriptionInput = createInputBox(description, "bi bi-pencil-fill", "name", "text", counterParty.description);
+            debounceInputChange(descriptionInput, (id, newValue, messages) =>
+                updateCounterPartyField(id, "description", newValue, messages), counterParty.id, messages);
 
             // Secondary Row for Search Strings
             const searchStringRow = createAndAppendElement(rowGroup, "tr", "subRow", "");
 
             const counterpartySearchStrings = createAndAppendElement(searchStringRow, "td", "", "", {style: "width: 20%"});
-            createAndAppendElement(counterpartySearchStrings, "h3", "", messages["counterpartySearchStrings"], {style: "margin-bottom: 15px"});
+            createAndAppendElement(counterpartySearchStrings, "h3", "", messages["counterpartySearchStrings"]);
 
             const searchStringCell = createAndAppendElement(searchStringRow, "td", "", "", {style: "width: 80%"});
             const listContainer = createAndAppendElement(searchStringCell, "div", "listContainer", "", {style: "justify-content: normal; overflow: visible;"});
@@ -108,6 +115,28 @@ function addRowsToCounterPartyTable(data: CounterPartyDisplay[], messages: Recor
     }
 }
 
+async function updateCounterPartyField(
+    counterPartyId: number,
+    field: "name" | "description",
+    newValue: string,
+    messages: Record<string, string>
+): Promise<void> {
+    try {
+        const response = await fetch(`/counterParty/data/${counterPartyId}/change/${field}/${newValue}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+        });
+
+        if (!response.ok) {
+            await showAlertFromResponse(response);
+            return;
+        }
+    } catch (error) {
+        console.error(`There was an error changing the ${field} of a counterParty:`, error);
+        showAlert('error', messages["error_generic"]);
+    }
+}
+
 async function removeSearchStringFromCounterParty(counterPartyId: number, searchString: string, elementToRemove: HTMLElement, messages: Record<string, string>): Promise<void> {
     try {
         const params = new URLSearchParams();
@@ -117,7 +146,6 @@ async function removeSearchStringFromCounterParty(counterPartyId: number, search
         const response = await fetch(url, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(searchString),
         });
 
         if (!response.ok) {
@@ -129,5 +157,22 @@ async function removeSearchStringFromCounterParty(counterPartyId: number, search
     } catch (error) {
         console.error("There was an error removing the search string form the counterParty:", error);
         showAlert('error', messages["error_generic"]);
+    }
+}
+
+function filterCounterParties(messages: Record<string, string>, searchString: string): void {
+    try {
+        filteredCounterPartyData = counterPartyData.filter(counterPartyDisplay =>
+            counterPartyDisplay.counterParty?.name?.toLowerCase().includes(searchString) ||
+            counterPartyDisplay.transactionCount?.toString().toLowerCase().includes(searchString) ||
+            counterPartyDisplay.contractCount?.toString().toLowerCase().includes(searchString) ||
+            counterPartyDisplay.totalAmount?.toString().toLowerCase().includes(searchString) ||
+            counterPartyDisplay.counterParty.description?.toString().toLowerCase().includes(searchString)
+        );
+
+        splitDataIntoPages(messages, SortType.COUNTERPARTY, filteredCounterPartyData);
+    } catch (error) {
+        console.error("Unexpected error in filterCounterParties:", error);
+        showAlert("ERROR", messages["error_generic"]);
     }
 }

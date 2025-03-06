@@ -32,6 +32,10 @@ public class CounterPartyService {
         counterPartyRepository.saveAll(counterParties);
     }
 
+    public void save(CounterParty counterParty) {
+        counterPartyRepository.save(counterParty);
+    }
+
     public List<CounterParty> findByUsers(Users user) {
         return counterPartyRepository.findByUsers(user);
     }

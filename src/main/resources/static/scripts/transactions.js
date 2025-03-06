@@ -8,9 +8,9 @@ async function buildTransactions() {
         .map((month) => month.replace(/'/g, ''));
     transactionsHiddenToggle = false;
     await loadTransactions(messages);
-    splitDataIntoPages(messages, "transaction", transactionData);
+    splitDataIntoPages(messages, SortType.TRANSACTION, transactionData);
     setUpSorting();
-    (_a = document.getElementById("searchBarInput")) === null || _a === void 0 ? void 0 : _a.addEventListener("input", () => searchTable(messages, "transaction"));
+    (_a = document.getElementById("searchBarInput")) === null || _a === void 0 ? void 0 : _a.addEventListener("input", () => searchTable(messages, SortType.TRANSACTION));
     (_b = document.getElementById("changeHiddenButton")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => showChangeHiddenDialog(messages));
     (_c = document.getElementById("changeContractButton")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", async () => {
         await buildChangeContract("/transactions", getCheckedTransactions());
@@ -111,7 +111,7 @@ function filterTransactions(messages, searchString) {
                 ((_j = transaction.amount) === null || _j === void 0 ? void 0 : _j.toString().toLowerCase().includes(searchString)) ||
                 ((_k = transaction.amountInBankAfter) === null || _k === void 0 ? void 0 : _k.toString().toLowerCase().includes(searchString));
         });
-        splitDataIntoPages(messages, "transaction", filteredTransactionData);
+        splitDataIntoPages(messages, SortType.TRANSACTION, filteredTransactionData);
     }
     catch (error) {
         console.error("Unexpected error in filterTransactions:", error);
@@ -185,6 +185,6 @@ function updateCachedTransactionsAndUI(messages, transactionIds) {
             transaction.hidden = !transaction.hidden;
         }
     });
-    splitDataIntoPages(messages, "transaction", filteredTransactionData);
+    splitDataIntoPages(messages, SortType.TRANSACTION, filteredTransactionData);
 }
 //# sourceMappingURL=transactions.js.map

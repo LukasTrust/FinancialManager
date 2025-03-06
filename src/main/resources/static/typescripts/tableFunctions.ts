@@ -17,7 +17,7 @@ function getCheckedRows(): number[] {
         .map(checkbox => Number(checkbox.closest("tr")?.id));
 }
 
-function searchTable(messages: Record<string, string>, type: string): void {
+function searchTable(messages: Record<string, string>, type: SortType): void {
     const searchBarInput = document.getElementById("searchBarInput") as HTMLInputElement | null;
 
     if (!searchBarInput) {
@@ -29,33 +29,25 @@ function searchTable(messages: Record<string, string>, type: string): void {
         const inputText = searchBarInput.value.trim().toLowerCase();
 
         if (inputText.length <= 2) {
-            if (type === "transaction") {
+            if (type === SortType.TRANSACTION) {
                 filteredTransactionData = transactionData;
                 splitDataIntoPages(messages, type, transactionData);
+            } else if (type === SortType.COUNTERPARTY) {
+                filteredCounterPartyData = counterPartyData;
+                splitDataIntoPages(messages, type, counterPartyData);
             }
             return;
         }
 
-        if (type === "transaction") {
+        if (type === SortType.TRANSACTION) {
             filterTransactions(messages, inputText);
+        } else if (type === SortType.COUNTERPARTY) {
+            filterCounterParties(messages, inputText);
         }
     }, 300));
 }
 
-function debounce<T extends (...args: any[]) => void>(
-    func: T,
-    delay: number
-): (...args: Parameters<T>) => void {
-    let timeoutId: ReturnType<typeof setTimeout>;
-
-    return function (this: void, ...args: Parameters<T>) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => func(...args), delay);
-    };
-}
-
-
-function splitDataIntoPages(messages: Record<string, string>, type: string, data: any[]): void {
+function splitDataIntoPages(messages: Record<string, string>, type: SortType, data: any[]): void {
     const itemsPerPageSelection = document.getElementById("itemsPerPage") as HTMLSelectElement | null;
     const nextButton = document.getElementById("nextButton") as HTMLButtonElement | null;
     const previousButton = document.getElementById("previousButton") as HTMLButtonElement | null;
@@ -98,25 +90,17 @@ function calculateNumberOfPages(totalItems: number, itemsPerPage: number): numbe
     return Math.ceil(totalItems / itemsPerPage);
 }
 
-function updateUI(
-    data: any[],
-    currentPageIndex: number,
-    itemsPerPage: number,
-    numberOfPages: number,
-    messages: Record<string, string>,
-    type: string,
-    currentTableBody: HTMLElement
-): void {
+function updateUI(data: any[], currentPageIndex: number, itemsPerPage: number, numberOfPages: number, messages: Record<string, string>,
+                  type: SortType, currentTableBody: HTMLElement): void {
     const startIndex = (currentPageIndex - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const paginatedData = data.slice(startIndex, endIndex);
 
     clearTable(currentTableBody);
 
-    if (type === "transaction") {
+    if (type === SortType.TRANSACTION) {
         addRowsToTransactionTable(paginatedData, messages);
-    }
-    else if (type === "counterParties") {
+    } else if (type === SortType.COUNTERPARTY) {
         addRowsToCounterPartyTable(paginatedData, messages);
     }
 
@@ -146,7 +130,7 @@ function clearTable(currentTableBody: HTMLElement): void {
     currentTableBody.innerHTML = "";
 }
 
-function setUpSorting(): void {
+function setUpSorting(keepSubRowTogether: boolean = false): void {
     const currentTableBody = getCurrentTableBody();
     if (!currentTableBody) return;
 
@@ -155,72 +139,109 @@ function setUpSorting(): void {
     columnIcons.forEach(columnIcon => {
         columnIcon.addEventListener("click", () => {
             const columnIndex = Number(columnIcon.getAttribute("data-index"));
-            const dataType = columnIcon.getAttribute("data-type") || "string";
+            const dataTypeString = columnIcon.getAttribute("data-type") || "string";
+
+            let dataType: DataTypeForSort;
+            if (Object.values(DataTypeForSort).includes(dataTypeString as DataTypeForSort)) {
+                dataType = dataTypeString as DataTypeForSort;
+            }
+
             const isAscending = columnIcon.dataset.order === "asc";
             columnIcon.dataset.order = isAscending ? "desc" : "asc";
 
-            sortTable(currentTableBody, columnIndex, dataType, isAscending);
+            sortTable(currentTableBody, columnIndex, dataType, isAscending, keepSubRowTogether);
         });
     });
 }
 
-function sortTable(tableBody: HTMLElement, columnIndex: number, dataType: string, isAscending: boolean): void {
-    const rows = Array.from(tableBody.querySelectorAll<HTMLTableRowElement>("tr"));
+function getCellValue(row: HTMLTableRowElement, columnIndex: number, dataType: DataTypeForSort): string {
+    const cell = row.children[columnIndex];
+    if (!cell) return "";
 
-    rows.sort((rowA, rowB) => {
-        const cellA = rowA.children[columnIndex]?.textContent?.trim() || "";
-        const cellB = rowB.children[columnIndex]?.textContent?.trim() || "";
+    if (dataType === DataTypeForSort.input) {
+        const inputElement = cell.querySelector("input");
+        return inputElement ? inputElement.value.trim() : "";
+    }
 
-        const valueA = parseSortableValue(cellA, dataType);
-        const valueB = parseSortableValue(cellB, dataType);
-
-        return compareValues(valueA, valueB, isAscending);
-    });
-
-    const fragment = document.createDocumentFragment();
-    rows.forEach(row => fragment.appendChild(row));
-
-    tableBody.innerHTML = "";
-    tableBody.appendChild(fragment);
+    return cell.textContent?.trim() || "";
 }
 
-function parseSortableValue(value: string, dataType: string): string | number | Date {
+function sortTable(tableBody: HTMLElement, columnIndex: number, dataType: DataTypeForSort, isAscending: boolean, keepSubRowTogether: boolean): void {
+    const fragment = document.createDocumentFragment();
+
+    if (keepSubRowTogether) {
+        const rowGroups = Array.from(tableBody.querySelectorAll<HTMLTableRowElement>(".rowGroup"));
+
+        rowGroups.sort((groupA, groupB) => {
+            const rowA = groupA.querySelector<HTMLTableRowElement>(".rowWithSubRow");
+            const rowB = groupB.querySelector<HTMLTableRowElement>(".rowWithSubRow");
+
+            if (!rowA || !rowB) return 0; // Keep order if any group lacks a main row
+
+            const valueA = parseSortableValue(getCellValue(rowA, columnIndex, dataType), dataType);
+            const valueB = parseSortableValue(getCellValue(rowB, columnIndex, dataType), dataType);
+
+            return compareValues(valueA, valueB, isAscending);
+        });
+
+        rowGroups.forEach(group => fragment.appendChild(group));
+    } else {
+        const rows = Array.from(tableBody.querySelectorAll<HTMLTableRowElement>("tr"));
+
+        rows.sort((rowA, rowB) => {
+            const valueA = parseSortableValue(getCellValue(rowA, columnIndex, dataType), dataType);
+            const valueB = parseSortableValue(getCellValue(rowB, columnIndex, dataType), dataType);
+
+            return compareValues(valueA, valueB, isAscending);
+        });
+
+        rows.forEach(row => fragment.appendChild(row));
+    }
+
+    tableBody.replaceChildren(fragment);
+}
+
+function parseSortableValue(value: string, dataType: DataTypeForSort): string | number | Date {
+    if (!value.trim()) return value; // Handle empty values gracefully
+
     try {
         switch (dataType) {
-            case "number":
+            case DataTypeForSort.number:
                 return formatNumberForSort(value);
-            case "date":
+            case DataTypeForSort.date:
                 return formatDateForSort(value);
-            case "string":
             default:
-                return value;
+                return value.toLowerCase();
         }
     } catch (error) {
-        console.error(`Error parsing value: ${value}`, error);
+        console.warn(`Error parsing value: "${value}"`, error);
         return value;
     }
 }
 
 function formatDateForSort(value: string): Date {
+    const parsedDate = Date.parse(value);
+    if (!isNaN(parsedDate)) return new Date(parsedDate);
+
     const dateParts = value.split(" ");
     const day = parseInt(dateParts[0], 10);
     const month = monthAbbreviations.indexOf(dateParts[1]);
     const year = parseInt(dateParts[2], 10);
 
     if (month === -1 || isNaN(day) || isNaN(year)) {
-        throw new Error("Invalid date format");
+        throw new Error(`Invalid date format: "${value}"`);
     }
 
     return new Date(year, month, day);
 }
 
 function formatNumberForSort(value: string): number {
-    const numericValue = parseFloat(value.replace(/[^0-9.,-]/g, '').replace(',', '.'));
-    if (!isNaN(numericValue)) {
-        return numericValue;
-    }
+    const cleanedValue = value.replace(/[^\d.,-]/g, '').replace(',', '.');
+    const numericValue = parseFloat(cleanedValue);
 
-    throw new Error("Invalid number format");
+    if (!isNaN(numericValue)) return numericValue;
+
+    throw new Error(`Invalid number format: "${value}"`);
 }
 
 function compareValues(valueA: string | number | Date, valueB: string | number | Date, isAscending: boolean): number {
