@@ -2,12 +2,13 @@ package financialmanager.objectFolder.transactionFolder;
 
 import financialmanager.Utils.Result.Result;
 import financialmanager.Utils.fileParser.DataColumns;
+import financialmanager.Utils.fileParser.FileParserFactory;
 import financialmanager.Utils.fileParser.IFileParser;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.categoryFolder.CategoryProcessingService;
 import financialmanager.objectFolder.contractFolder.ContractProcessingService;
-import financialmanager.objectFolder.counterPartyFolder.CounterPartyProcessingService;
+import financialmanager.objectFolder.counterPartyFolder.CounterPartyService;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.ResponseService;
@@ -18,12 +19,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,10 +38,33 @@ public class TransactionProcessingService {
     private final UsersService usersService;
     private final TransactionService transactionService;
     private final ResponseService responseService;
-    private final CounterPartyProcessingService counterPartyProcessingService;
     private final ContractProcessingService contractProcessingService;
     private final CategoryProcessingService categoryProcessingService;
+    private final FileParserFactory fileParserFactory;
+
     private static final Logger log = LoggerFactory.getLogger(TransactionProcessingService.class);
+    private final CounterPartyService counterPartyService;
+
+    public ResponseEntity<?> uploadDataForTransactions(Long bankAccountId, MultipartFile[] files) {
+        List<CompletableFuture<ResponseEntity<Response>>> futures = new ArrayList<>();
+
+        for (MultipartFile file : files) {
+            futures.add(processFileAsync(file, bankAccountId));
+        }
+
+        List<ResponseEntity<Response>> responses = futures.stream()
+                .map(CompletableFuture::join)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(responses);
+    }
+
+    @Async
+    protected CompletableFuture<ResponseEntity<Response>> processFileAsync(MultipartFile file, Long bankAccountId) {
+        IFileParser fileParser = fileParserFactory.getFileParser(file);
+        ResponseEntity<Response> response = createTransactionsFromData(fileParser, bankAccountId);
+        return CompletableFuture.completedFuture(response);
+    }
 
     public ResponseEntity<Response> createTransactionsFromData(IFileParser fileParser, Long bankAccountId) {
         Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
@@ -94,7 +121,7 @@ public class TransactionProcessingService {
     }
 
     private void processAndSaveTransactions(Users currentUser, List<Transaction> newTransactions, List<Transaction> existingTransactions) {
-        counterPartyProcessingService.setCounterCounterParties(currentUser, newTransactions);
+        counterPartyService.setCounterCounterParties(currentUser, newTransactions);
         categoryProcessingService.addTransactionsToCategories(currentUser, newTransactions);
 
         newTransactions.addAll(getTransactionsWithoutContract(existingTransactions));

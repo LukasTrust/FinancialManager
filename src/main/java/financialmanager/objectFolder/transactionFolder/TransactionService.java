@@ -1,7 +1,15 @@
 package financialmanager.objectFolder.transactionFolder;
+import financialmanager.Utils.Result.Result;
 import financialmanager.Utils.Utils;
+import financialmanager.objectFolder.bankAccountFolder.BankAccount;
+import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.counterPartyFolder.CounterParty;
+import financialmanager.objectFolder.responseFolder.AlertType;
+import financialmanager.objectFolder.responseFolder.Response;
+import financialmanager.objectFolder.responseFolder.ResponseService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -12,6 +20,8 @@ import java.util.*;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
+    private final BankAccountService bankAccountService;
+    private final ResponseService responseService;
 
     public List<Transaction> findByBankAccountId(Long bankAccountId) {
         return transactionRepository.findByBankAccountId(bankAccountId);
@@ -37,6 +47,29 @@ public class TransactionService {
         return transactionRepository.findById(id).orElse(null);
     }
 
+    public void saveAll(List<Transaction> transactions) {
+        transactionRepository.saveAll(transactions);
+    }
+
+    public void save(Transaction transaction) {
+        transactionRepository.save(transaction);
+    }
+
+    public ResponseEntity<?> getTransactionsForBankAccount(Long bankAccountId) {
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+
+        if (bankAccountResult.isErr()) {
+            return bankAccountResult.getError();
+        }
+
+        List<Transaction> transactions = findByBankAccountId(bankAccountId)
+                .stream()
+                .sorted(Comparator.comparing(Transaction::getDate, Comparator.reverseOrder()))
+                .toList();
+
+        return ResponseEntity.ok(transactions);
+    }
+
     public List<Transaction> findByBankAccountIdBetweenDates(Long bankAccountId, LocalDate startDate, LocalDate endDate) {
         List<Transaction> transactions = findByBankAccountId(bankAccountId);
 
@@ -54,11 +87,25 @@ public class TransactionService {
                 .toList();
     }
 
-    public void saveAll(List<Transaction> transactions) {
-        transactionRepository.saveAll(transactions);
-    }
+    public ResponseEntity<?> updateTransactionVisibility(Long bankAccountId, List<Long> transactionIds, boolean hide) {
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
-    public void save(Transaction transaction) {
-        transactionRepository.save(transaction);
+        if (bankAccountResult.isErr()) {
+            return bankAccountResult.getError();
+        }
+
+        List<Transaction> transactions = findByIdInAndBankAccountId(transactionIds, bankAccountId).stream()
+                .filter(transaction -> transaction.isHidden() != hide)
+                .toList();
+
+        if (transactions.isEmpty()) {
+            return responseService.createResponse(HttpStatus.CONFLICT, "noTransactionsUpdated", AlertType.INFO);
+        }
+
+        transactions.forEach(transaction -> transaction.setHidden(hide));
+        saveAll(transactions);
+
+        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, hide ? "transactionsHidden" : "transactionsUnhidden",
+                AlertType.SUCCESS, List.of(String.valueOf(transactionIds.size())));
     }
 }

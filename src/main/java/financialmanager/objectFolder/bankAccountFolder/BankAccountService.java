@@ -32,7 +32,7 @@ public class BankAccountService {
         return bankAccountRepository.save(bankAccount);
     }
 
-    public List<BankAccount> findAllByUsers(Users users){
+    public List<BankAccount> findAllByUsers(Users users) {
         return bankAccountRepository.findAllByUsers(users);
     }
 
@@ -47,12 +47,35 @@ public class BankAccountService {
 
         Optional<BankAccount> bankAccountOptional = bankAccountRepository.findByIdAndUsers(bankAccountId, currentUser);
 
-        if (bankAccountOptional.isPresent())  {
+        if (bankAccountOptional.isPresent()) {
             return new Ok<>(bankAccountOptional.get());
         }
 
         log.warn("User {} does not own the bank account {}", currentUser, bankAccountId);
 
         return new Err<>(responseService.createResponse(HttpStatus.NOT_FOUND, "bankNotFound", AlertType.ERROR));
+    }
+
+    public ResponseEntity<Response> createBankAccount(BankAccount bankAccount) {
+        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+
+        if (currentUserResponse.isErr()) {
+            return currentUserResponse.getError();
+        }
+
+        Users currentUser = currentUserResponse.getValue();
+
+        // Set the associated currentUser
+        bankAccount.setUsers(currentUser);
+
+        try {
+            BankAccount savedBankAccount = save(bankAccount);
+
+            return responseService.createResponseWithData(HttpStatus.CREATED, "bankAccountCreated",
+                    AlertType.SUCCESS, savedBankAccount);
+        } catch (Exception e) {
+            return responseService.createResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "failedCreateBankAccount", AlertType.ERROR);
+        }
     }
 }
