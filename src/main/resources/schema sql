@@ -73,7 +73,8 @@ create table if not exists contract
     contract_search_strings varchar(255),
     description             varchar(255),
     name                    varchar(255) not null,
-    amount double precision not null
+    amount double precision not null,
+    is_Hidden             boolean not null DEFAULT FALSE
 );
 
 

@@ -3,6 +3,8 @@ import financialmanager.Utils.Result.Result;
 import financialmanager.Utils.Utils;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
+import financialmanager.objectFolder.contractFolder.Contract;
+import financialmanager.objectFolder.contractFolder.ContractService;
 import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
@@ -22,6 +24,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final BankAccountService bankAccountService;
     private final ResponseService responseService;
+    private final ContractService contractService;
 
     public List<Transaction> findByBankAccountId(Long bankAccountId) {
         return transactionRepository.findByBankAccountId(bankAccountId);
@@ -53,6 +56,81 @@ public class TransactionService {
 
     public void save(Transaction transaction) {
         transactionRepository.save(transaction);
+    }
+
+    public ResponseEntity<?> addContractToTransactions(Long bankAccountId, Long contractId, List<Long> transactionIds) {
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+
+        if (bankAccountResult.isErr()) {
+            return bankAccountResult.getError();
+        }
+
+        BankAccount bankAccount = bankAccountResult.getValue();
+
+        Contract contract = contractService.findByIdAndUsersId(contractId, bankAccount.getUsers().getId());
+
+        if (contract == null) {
+            return responseService.createResponse(HttpStatus.NOT_FOUND, "contractNotFound", AlertType.ERROR);
+        }
+
+        List<Transaction> transactions = findByIdInAndBankAccountId(transactionIds, bankAccountId);
+
+        if (transactions.isEmpty()) {
+            return responseService.createResponse(HttpStatus.NOT_FOUND, "transactionNotFound", AlertType.ERROR);
+        }
+
+        transactions.forEach(transaction -> transaction.setContract(contract));
+
+        saveAll(transactions);
+
+        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "transactionsAddedContract", AlertType.SUCCESS,
+                List.of(contract.getName()));
+    }
+
+    public ResponseEntity<?> removeContractFromTransactions(Long bankAccountId, List<Long> transactionIds) {
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+
+        if (bankAccountResult.isErr()) {
+            return bankAccountResult.getError();
+        }
+
+        List<Transaction> transactions = findByIdInAndBankAccountId(transactionIds, bankAccountId);
+
+        if (transactions.isEmpty()) {
+            return responseService.createResponse(HttpStatus.NOT_FOUND, "transactionNotFound", AlertType.ERROR);
+        }
+
+        transactions.forEach(transaction -> transaction.setContract(null));
+
+        saveAll(transactions);
+
+        return responseService.createResponse(HttpStatus.OK, "transactionsRemovedContract", AlertType.SUCCESS);
+    }
+
+    public ResponseEntity<?> removeContractFromTransaction(Long bankAccountId, Long transactionId) {
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+
+        if (bankAccountResult.isErr()) {
+            return bankAccountResult.getError();
+        }
+
+        Transaction transaction = findById(transactionId);
+        if (transaction == null) {
+            return responseService.createResponse(HttpStatus.NOT_FOUND, "transactionNotFound", AlertType.ERROR);
+        }
+
+        if (!transaction.getBankAccount().equals(bankAccountResult.getValue())) {
+            return responseService.createResponse(HttpStatus.NOT_ACCEPTABLE, "transactionDoesNotBelongToBankAccount", AlertType.ERROR);
+        }
+
+        if (transaction.getContract() == null) {
+            return responseService.createResponse(HttpStatus.NOT_FOUND, "transactionHasNoContract", AlertType.ERROR);
+        }
+
+        transaction.setContract(null);
+        save(transaction);
+
+        return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<?> getTransactionsForBankAccount(Long bankAccountId) {

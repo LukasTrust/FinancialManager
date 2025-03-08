@@ -48,6 +48,10 @@ public class Contract {
     private LocalDate lastUpdatedAt;
 
     @Setter
+    @Column(nullable = false)
+    private boolean isHidden;
+
+    @Setter
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Users users;

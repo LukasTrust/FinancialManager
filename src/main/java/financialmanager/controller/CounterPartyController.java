@@ -50,4 +50,8 @@ public class CounterPartyController {
         return counterPartyService.updateCounterPartyVisibility(counterPartyIds, false);
     }
 
+    @PostMapping("/mergeCounterParties/{headerId}")
+    public ResponseEntity<?> mergeCounterParties(@PathVariable Long headerId, @RequestBody List<Long> counterPartyIds) {
+        return counterPartyService.mergeCounterParties(headerId, counterPartyIds);
+    }
 }
