@@ -17,7 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 @Controller
 @AllArgsConstructor
@@ -44,38 +46,20 @@ public class CounterPartyController {
         return ResponseEntity.ok(counterPartyDisplays);
     }
 
-    private Result<CounterParty, ResponseEntity<Response>> getCounterParty(@PathVariable Long counterPartyId) {
-        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
-
-        if (currentUserResponse.isErr()) {
-            return new Err<>(currentUserResponse.getError());
-        }
-
-        Users currentUser = currentUserResponse.getValue();
-
-        return counterPartyService.findByIdAndUsers(counterPartyId, currentUser);
-    }
-
     @PostMapping("/{counterPartyId}/change/name/{newValue}")
-    public ResponseEntity<?> nameOfCounterPartyChanged(@PathVariable("counterPartyId") Long counterPartyId,
-                                                       @PathVariable("newValue") String newValue) {
-        Result<CounterParty, ResponseEntity<Response>> counterPartyResult = getCounterParty(counterPartyId);
-
-        if (counterPartyResult.isErr()) {
-            return counterPartyResult.getError();
-        }
-
-        CounterParty counterParty = counterPartyResult.getValue();
-        counterParty.setName(newValue);
-
-        counterPartyService.save(counterParty);
-
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> updateCounterPartyName(@PathVariable Long counterPartyId,
+                                                    @PathVariable String newValue) {
+        return updateCounterPartyField(counterPartyId, newValue, CounterParty::setName);
     }
 
     @PostMapping("/{counterPartyId}/change/description/{newValue}")
-    public ResponseEntity<?> descriptionOfCounterPartyChanged(@PathVariable("counterPartyId") Long counterPartyId,
-                                                       @PathVariable("newValue") String newValue) {
+    public ResponseEntity<?> updateCounterPartyDescription(@PathVariable Long counterPartyId,
+                                                           @PathVariable String newValue) {
+        return updateCounterPartyField(counterPartyId, newValue, CounterParty::setDescription);
+    }
+
+    private ResponseEntity<?> updateCounterPartyField(Long counterPartyId, String newValue,
+                                                      BiConsumer<CounterParty, String> fieldUpdater) {
         Result<CounterParty, ResponseEntity<Response>> counterPartyResult = getCounterParty(counterPartyId);
 
         if (counterPartyResult.isErr()) {
@@ -83,7 +67,7 @@ public class CounterPartyController {
         }
 
         CounterParty counterParty = counterPartyResult.getValue();
-        counterParty.setDescription(newValue);
+        fieldUpdater.accept(counterParty, newValue);
 
         counterPartyService.save(counterParty);
 
@@ -106,7 +90,7 @@ public class CounterPartyController {
         // Ensure search string removal is allowed
         if (searchStrings.size() == 1) {
             return responseService.createResponse(
-                    HttpStatus.BAD_REQUEST, "searchStringCanNotBeRemovedFromCounterParty", AlertType.ERROR);
+                    HttpStatus.BAD_REQUEST, "searchStringCanNotBeRemovedFromCounterParty", AlertType.WARNING);
         }
 
         // Attempt to remove the search string
@@ -126,5 +110,52 @@ public class CounterPartyController {
         // Return success response with new counterParty
         return responseService.createResponseWithData(
                 HttpStatus.OK, "removedSearchStringFromCounterParty", AlertType.SUCCESS, splitCounterParty);
+    }
+
+    private Result<CounterParty, ResponseEntity<Response>> getCounterParty(@PathVariable Long counterPartyId) {
+        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+
+        if (currentUserResponse.isErr()) {
+            return new Err<>(currentUserResponse.getError());
+        }
+
+        Users currentUser = currentUserResponse.getValue();
+
+        return counterPartyService.findByIdAndUsers(counterPartyId, currentUser);
+    }
+
+    @PostMapping("/hideCounterParties")
+    public ResponseEntity<?> hideCounterParties(@RequestBody List<Long> counterPartyIds) {
+        return updateCounterPartyVisibility(counterPartyIds, true);
+    }
+
+    @PostMapping("/unHideCounterParties")
+    public ResponseEntity<?> unHideCounterParties(@RequestBody List<Long> counterPartyIds) {
+        return updateCounterPartyVisibility(counterPartyIds, false);
+    }
+
+    private ResponseEntity<?> updateCounterPartyVisibility(List<Long> counterPartyIds, boolean hide) {
+        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+
+        if (currentUserResponse.isErr()) {
+            return currentUserResponse.getError();
+        }
+
+        Users currentUser = currentUserResponse.getValue();
+
+        List<CounterParty> counterParties = counterPartyService.findByIdInAndUsers(counterPartyIds, currentUser);
+
+        if (counterParties.isEmpty()) {
+            return responseService.createResponse(HttpStatus.NOT_FOUND, "counterPartiesNotFound", AlertType.ERROR);
+        }
+
+        int updatedTransactions = counterPartyProcessingService.updateCounterPartyVisibility(counterParties, hide);
+
+        List<String> placeHolder = new ArrayList<>();
+        placeHolder.add(String.valueOf(counterParties.size()));
+        placeHolder.add(String.valueOf(updatedTransactions));
+
+        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, hide ? "counterPartiesHidden" : "counterPartiesUnHidden",
+                AlertType.SUCCESS, placeHolder);
     }
 }

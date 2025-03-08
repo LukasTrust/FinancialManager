@@ -15,5 +15,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findByCounterParty(CounterParty counterParty);
 
+    List<Transaction> findByCounterPartyIn(List<CounterParty> counterParties);
+
     List<Transaction> findByOriginalCounterParty(String originalCounterParty);
 }

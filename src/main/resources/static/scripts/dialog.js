@@ -64,4 +64,27 @@ function showMessageBox(headerText, headerIcon, mainText, leftButtonText, leftIc
         createAndAppendElement(rightButton, "span", "tooltipText", toolTipRight);
     }
 }
+function showChangeHiddenDialog(type, messages) {
+    const { alreadyHidden, notHidden } = classifyHiddenOrNot(type);
+    const height = type === Type.COUNTERPARTY ? 70 : "";
+    const dialogContent = createDialogContent(messages["changeHiddenHeader"], "bi bi-eye", "", height);
+    if (type === Type.COUNTERPARTY) {
+        createAndAppendElement(dialogContent, "h2", "", messages["infoTransactionsWillAlsoBeAffected"], { style: "margin-right: auto; margin-left: 30px; margin-top: 10px; margin-top: 10px;" });
+    }
+    const listContainer = createAndAppendElement(dialogContent, "div", "flexContainerSpaced");
+    const leftSide = createListSection(listContainer, messages["alreadyHiddenHeader"], type, alreadyHidden);
+    const rightSide = createListSection(listContainer, messages["notHiddenHeader"], type, notHidden);
+    createDialogButton(leftSide, "bi bi-eye", messages["unHide"], "left", async () => {
+        if (type === Type.TRANSACTION)
+            await updateTransactionVisibility(messages, dialogContent, leftSide, rightSide.querySelector(".listContainerColumn"), false);
+        else
+            await updateCounterPartyVisibility(messages, dialogContent, leftSide, rightSide.querySelector(".listContainerColumn"), false);
+    });
+    createDialogButton(rightSide, "bi bi-eye-slash", messages["hide"], "right", async () => {
+        if (type === Type.TRANSACTION)
+            await updateTransactionVisibility(messages, dialogContent, rightSide, leftSide.querySelector(".listContainerColumn"), true);
+        else
+            await updateCounterPartyVisibility(messages, dialogContent, rightSide, leftSide.querySelector(".listContainerColumn"), true);
+    });
+}
 //# sourceMappingURL=dialog.js.map

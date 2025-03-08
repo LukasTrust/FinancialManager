@@ -78,18 +78,6 @@ function formatNumber(number: number, currency: string): string {
     return `${number.toFixed(2).replace('.', ',')} ${currency}`;
 }
 
-function createListSection(
-    parent: HTMLElement,
-    title: string,
-    transactions: Transaction[]
-): HTMLElement {
-    const container = createAndAppendElement(parent, "div", "flexContainerColumn", "", { style: "width: 45%" });
-    const header = createAndAppendElement(container, "div", "listContainerHeader");
-    createAndAppendElement(header, "h2", "", title, { style: "margin: 10px" });
-    createListContainer(header, transactions);
-    return container;
-}
-
 function createInputBox(
     parent: HTMLElement,
     icon: string,
@@ -132,19 +120,6 @@ function debounceInputChange(
 
         inputElement.dataset.timeoutId = timeoutId.toString(); // Store timeout ID
     });
-}
-
-function createListContainer(
-    parent: HTMLElement,
-    transactions: Transaction[]
-): HTMLElement {
-    const listContainer = createAndAppendElement(parent, "div", "listContainerColumn", "", {
-        style: "min-height: 420px; max-height: 420px;",
-    });
-    transactions.forEach(transaction => {
-        createListElement(listContainer, transaction.counterParty?.name, { id: transaction.id.toString() });
-    });
-    return listContainer;
 }
 
 async function backToOtherView(cameFromUrl: string | null): Promise<void> {
@@ -259,4 +234,39 @@ function debounce<T extends (...args: any[]) => void>(
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => func(...args), delay);
     };
+}
+
+function createListSection(
+    parent: HTMLElement,
+    title: string,
+    type: Type,
+    data: Transaction[] | CounterPartyDisplay[]
+): HTMLElement {
+    const container = createAndAppendElement(parent, "div", "flexContainerColumn", "", { style: "width: 45%" });
+    const header = createAndAppendElement(container, "div", "listContainerHeader");
+    createAndAppendElement(header, "h2", "", title, { style: "margin: 10px" });
+
+    if (type === Type.TRANSACTION) {
+        createListContainer(header, transactionToTextAndIdArray(data as Transaction[]));
+    }
+    else if (type === Type.COUNTERPARTY) {
+        createListContainer(header, counterPartyToTextAndIdArray(data as CounterPartyDisplay[]));
+    }
+
+    return container;
+}
+
+function createListContainer(
+    parent: HTMLElement,
+    textAndIdArray: TextAndId[]
+): HTMLElement {
+    const listContainer = createAndAppendElement(parent, "div", "listContainerColumn", "", {
+        style: "min-height: 420px; max-height: 420px;",
+    });
+
+    textAndIdArray.forEach(textAndId => {
+        createListElement(listContainer, textAndId.text, {id: textAndId.id.toString()});
+    });
+
+    return listContainer;
 }

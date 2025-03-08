@@ -1,8 +1,8 @@
-var SortType;
-(function (SortType) {
-    SortType["TRANSACTION"] = "TRANSACTION";
-    SortType["COUNTERPARTY"] = "COUNTERPARTY";
-})(SortType || (SortType = {}));
+var Type;
+(function (Type) {
+    Type["TRANSACTION"] = "TRANSACTION";
+    Type["COUNTERPARTY"] = "COUNTERPARTY";
+})(Type || (Type = {}));
 var DataTypeForSort;
 (function (DataTypeForSort) {
     DataTypeForSort["string"] = "string";

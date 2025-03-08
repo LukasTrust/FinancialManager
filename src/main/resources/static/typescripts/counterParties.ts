@@ -5,11 +5,15 @@ async function buildCounterParties(): Promise<void> {
     counterPartiesHiddenToggle = false;
 
     await loadCounterParties(messages);
-    splitDataIntoPages(messages, SortType.COUNTERPARTY, counterPartyData);
+    splitDataIntoPages(messages, Type.COUNTERPARTY, counterPartyData);
 
     setUpSorting(true);
 
-    document.getElementById("searchBarInput")?.addEventListener("input", () => searchTable(messages, SortType.COUNTERPARTY));
+    document.getElementById("changeHiddenButton")?.addEventListener("click", () => showChangeHiddenDialog(Type.COUNTERPARTY, messages));
+
+    document.getElementById("searchBarInput")?.addEventListener("input", () => searchTable(messages, Type.COUNTERPARTY));
+
+    document.getElementById("showHiddenRows")?.addEventListener("change", () => changeRowVisibility(Type.COUNTERPARTY));
 }
 
 async function loadCounterParties(messages: Record<string, string>): Promise<void> {
@@ -47,15 +51,15 @@ function addRowsToCounterPartyTable(data: CounterPartyDisplay[], messages: Recor
 
             const counterParty = counterPartyDisplay.counterParty;
 
-            let rowClass: string = counterParty.hidden ? "rowWithSubRow hiddenRow" : "rowWithSubRow";
+            let rowGroupClass: string = counterParty.hidden ? "rowGroup hiddenRow" : "rowGroup";
 
             if (counterParty.hidden && !counterPartiesHiddenToggle) {
-                rowClass += " hidden";
+                rowGroupClass += " hidden";
             }
 
-            const rowGroup = createAndAppendElement(tableBody, "div", "rowGroup");
+            const rowGroup = createAndAppendElement(tableBody, "div", rowGroupClass);
 
-            const newRow = createAndAppendElement(rowGroup, "tr", rowClass, "", {id: counterParty.id.toString()});
+            const newRow = createAndAppendElement(rowGroup, "tr", "rowWithSubRow", "", {id: counterParty.id.toString()});
             createAndAppendElement(newRow, "td", "", "", {style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px"});
 
             createCheckBoxForRowGroup(rowGroup, newRow, counterParty.id, counterParty.hidden);
@@ -170,9 +174,66 @@ function filterCounterParties(messages: Record<string, string>, searchString: st
             counterPartyDisplay.counterParty.description?.toString().toLowerCase().includes(searchString)
         );
 
-        splitDataIntoPages(messages, SortType.COUNTERPARTY, filteredCounterPartyData);
+        splitDataIntoPages(messages, Type.COUNTERPARTY, filteredCounterPartyData);
     } catch (error) {
         console.error("Unexpected error in filterCounterParties:", error);
         showAlert("ERROR", messages["error_generic"]);
+    }
+}
+
+function counterPartyToTextAndIdArray(counterParties: CounterPartyDisplay[]): TextAndId[] {
+    let textAndIdArray: TextAndId[] = [];
+
+    counterParties.forEach(counterParty => {
+        const textAndId: TextAndId = {
+            id: counterParty.counterParty.id,
+            text: counterParty.counterParty.name
+        };
+
+        textAndIdArray.push(textAndId);
+    });
+
+    return textAndIdArray;
+}
+
+async function updateCounterPartyVisibility(
+    messages: Record<string, string>,
+    model: HTMLElement,
+    updatedContainer: HTMLElement,
+    moveToContainer: HTMLElement,
+    hide: boolean
+): Promise<void> {
+    try {
+        // Get all counterParty IDs
+        const counterPartyIds: number[] = Array.from(
+            updatedContainer.querySelectorAll<HTMLElement>(".normalText")
+        )
+            .map(span => Number(span.id))
+            .filter(id => !isNaN(id) && id !== 0);
+
+        if (counterPartyIds.length === 0) {
+            showAlert("INFO", messages["noCounterPartyToUpdate"], model);
+            return;
+        }
+
+        const endpoint = hide ? "hideCounterParties" : "unHideCounterParties";
+        const response = await fetch(`/counterParty/data/${endpoint}`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(counterPartyIds),
+        });
+
+        const responseBody: Response = await response.json();
+
+        showAlert(responseBody.alertType, responseBody.message, model);
+
+        if (responseBody.alertType === AlertType.SUCCESS) {
+            // Animate and move elements
+            moveElements(updatedContainer, moveToContainer);
+            updateCachedDataAndUI(Type.COUNTERPARTY, messages, counterPartyIds);
+        }
+    } catch (error) {
+        console.error("Unexpected error in updateCounterPartyVisibility:", error);
+        showAlert("ERROR", messages["error_generic"], model);
     }
 }

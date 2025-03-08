@@ -13,4 +13,6 @@ public interface CounterPartyRepository extends JpaRepository<CounterParty, Long
     List<CounterParty> findByUsers(Users users);
 
     Optional<CounterParty> findByIdAndUsers(Long counterPartyId, Users users);
+
+    List<CounterParty> findByIdInAndUsers(List<Long> counterPartyIds, Users users);
 }

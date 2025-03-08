@@ -53,7 +53,7 @@ function createDialogButton(
         style: `margin-top: 20px; ${alignment === "left" ? "margin-right: auto" : "margin-left: auto"}`
     }) as HTMLButtonElement;
 
-    createAndAppendElement(button, "i", iconClass, "", { style: "margin-right: 10px" });
+    createAndAppendElement(button, "i", iconClass, "", {style: "margin-right: 10px"});
     createAndAppendElement(button, "div", "normalText", text);
 
     if (callback) {
@@ -95,7 +95,7 @@ function showMessageBox(
     const content = createDialogContent(headerText, headerIcon, 30, 25);
     content.style.overflow = "visible";
 
-    createAndAppendElement(content, "h2", "", mainText, { style: "margin-top: 30px; margin-bottom: 30px" });
+    createAndAppendElement(content, "h2", "", mainText, {style: "margin-top: 30px; margin-bottom: 30px"});
 
     const buttonContainer = createAndAppendElement(content, "div", "flexContainerSpaced");
 
@@ -108,4 +108,36 @@ function showMessageBox(
     if (toolTipRight) {
         createAndAppendElement(rightButton, "span", "tooltipText", toolTipRight);
     }
+}
+
+function showChangeHiddenDialog(type: Type, messages: Record<string, string>): void {
+    const {alreadyHidden, notHidden} = classifyHiddenOrNot<Transaction>(type);
+
+    const height = type === Type.COUNTERPARTY ? 70 : "";
+
+    const dialogContent = createDialogContent(messages["changeHiddenHeader"], "bi bi-eye", "", height);
+
+    if (type === Type.COUNTERPARTY) {
+        createAndAppendElement(dialogContent, "h2", "", messages["infoTransactionsWillAlsoBeAffected"],
+            {style: "margin-right: auto; margin-left: 30px; margin-top: 10px; margin-top: 10px;"})
+    }
+
+    const listContainer = createAndAppendElement(dialogContent, "div", "flexContainerSpaced");
+
+    const leftSide = createListSection(listContainer, messages["alreadyHiddenHeader"], type, alreadyHidden);
+    const rightSide = createListSection(listContainer, messages["notHiddenHeader"], type, notHidden);
+
+    createDialogButton(leftSide, "bi bi-eye", messages["unHide"], "left", async () => {
+        if (type === Type.TRANSACTION)
+            await updateTransactionVisibility(messages, dialogContent, leftSide, rightSide.querySelector(".listContainerColumn"), false);
+        else
+            await updateCounterPartyVisibility(messages, dialogContent, leftSide, rightSide.querySelector(".listContainerColumn"), false);
+    });
+
+    createDialogButton(rightSide, "bi bi-eye-slash", messages["hide"], "right", async () => {
+        if (type === Type.TRANSACTION)
+            await updateTransactionVisibility(messages, dialogContent, rightSide, leftSide.querySelector(".listContainerColumn"), true);
+        else
+            await updateCounterPartyVisibility(messages, dialogContent, rightSide, leftSide.querySelector(".listContainerColumn"), true);
+    });
 }

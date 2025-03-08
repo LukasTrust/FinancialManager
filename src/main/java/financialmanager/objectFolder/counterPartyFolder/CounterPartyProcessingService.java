@@ -22,6 +22,20 @@ public class CounterPartyProcessingService {
     private final TransactionService transactionService;
     private final ContractService contractService;
 
+    public int updateCounterPartyVisibility(List<CounterParty> counterParties, boolean isVisible) {
+        List<Transaction> transactions = transactionService.findByCounterPartyIn(counterParties);
+
+        transactions.forEach(transaction -> transaction.setHidden(isVisible));
+
+        counterParties.forEach(counterParty -> counterParty.setHidden(isVisible));
+
+        transactionService.saveAll(transactions);
+        counterPartyService.saveAll(counterParties);
+
+        return transactions.size();
+    }
+
+
     public List<CounterPartyDisplay> createCounterPartyDisplays(Users users) {
         List<CounterPartyDisplay> counterPartyDisplays = new ArrayList<>();
 
@@ -98,6 +112,8 @@ public class CounterPartyProcessingService {
     }
 
     private void setCounterParty(CounterParty counterParty, List<Transaction> transactions) {
-        transactions.forEach(transaction -> {transaction.setCounterParty(counterParty);});
+        transactions.forEach(transaction -> {
+            transaction.setCounterParty(counterParty);
+        });
     }
 }

@@ -40,6 +40,10 @@ public class CounterPartyService {
         return counterPartyRepository.findByUsers(user);
     }
 
+    public List<CounterParty> findByIdInAndUsers(List<Long> counterPartyIds, Users user) {
+        return counterPartyRepository.findByIdInAndUsers(counterPartyIds, user);
+    }
+
     public Result<CounterParty, ResponseEntity<Response>> findByIdAndUsers(Long counterPartyId, Users currentUser) {
         Optional<CounterParty> counterPartyOptional = counterPartyRepository.findByIdAndUsers(counterPartyId, currentUser);
 

@@ -8,25 +8,25 @@ async function buildTransactions(): Promise<void> {
     transactionsHiddenToggle = false;
 
     await loadTransactions(messages);
-    splitDataIntoPages(messages, SortType.TRANSACTION, transactionData);
+    splitDataIntoPages(messages, Type.TRANSACTION, transactionData);
     setUpSorting();
 
-    document.getElementById("searchBarInput")?.addEventListener("input", () => searchTable(messages, SortType.TRANSACTION));
+    document.getElementById("searchBarInput")?.addEventListener("input", () => searchTable(messages, Type.TRANSACTION));
 
-    document.getElementById("changeHiddenButton")?.addEventListener("click", () => showChangeHiddenDialog(messages));
+    document.getElementById("changeHiddenButton")?.addEventListener("click", () => showChangeHiddenDialog(Type.TRANSACTION, messages));
 
     document.getElementById("changeContractButton")?.addEventListener("click", async () => {
-        await buildChangeContract("/transactions", getCheckedTransactions());
+        await buildChangeContract("/transactions", getCheckedData(Type.TRANSACTION) as Transaction[]);
     });
 
-    document.getElementById("showHiddenRows")?.addEventListener("change", () => changeRowVisibility());
+    document.getElementById("showHiddenRows")?.addEventListener("change", () => changeRowVisibility(Type.TRANSACTION));
 }
 
 async function loadTransactions(messages: Record<string, string>): Promise<void> {
     try {
         const response = await fetch(`/transactions/${bankAccountId}/data`, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            headers: {'Content-Type': 'application/json'}
         });
 
         if (!response.ok) {
@@ -59,7 +59,7 @@ function addRowsToTransactionTable(data: Transaction[], messages: Record<string,
                 rowClass += " hidden";
             }
 
-            const newRow = createAndAppendElement(tableBody, "tr", rowClass, null, { id: transaction.id.toString() });
+            const newRow = createAndAppendElement(tableBody, "tr", rowClass, null, {id: transaction.id.toString()});
             createCheckBoxForTable(newRow, transaction.id, transaction.hidden);
 
             // Counterparty cell
@@ -107,18 +107,6 @@ function addRowsToTransactionTable(data: Transaction[], messages: Record<string,
     }
 }
 
-function updateRowStyle(newRow: HTMLElement, checkBox: HTMLInputElement): void {
-    newRow.classList.toggle("selectedRow", checkBox.checked);
-}
-
-function updateRowGroupStyle(rowGroup: HTMLElement, checkBox: HTMLInputElement) {
-    if (checkBox.checked) {
-        rowGroup.classList.add("selectedRow");
-    } else {
-        rowGroup.classList.remove("selectedRow");
-    }
-}
-
 function filterTransactions(messages: Record<string, string>, searchString: string): void {
     try {
         filteredTransactionData = transactionData.filter(transaction =>
@@ -131,58 +119,29 @@ function filterTransactions(messages: Record<string, string>, searchString: stri
             transaction.amountInBankAfter?.toString().toLowerCase().includes(searchString)
         );
 
-        splitDataIntoPages(messages, SortType.TRANSACTION, filteredTransactionData);
+        splitDataIntoPages(messages, Type.TRANSACTION, filteredTransactionData);
     } catch (error) {
         console.error("Unexpected error in filterTransactions:", error);
         showAlert("ERROR", messages["error_generic"]);
     }
 }
 
-function getCheckedTransactions(): Transaction[] {
-    const checkedRows = new Set(getCheckedRows());
-    return filteredTransactionData.filter(transaction => checkedRows.has(transaction.id));
-}
 
-function changeRowVisibility(): void {
-    const currentTableBody = getCurrentTableBody();
-    if (!currentTableBody) return;
-    const rows = Array.from(currentTableBody.querySelectorAll("tr.hiddenRow"));
-    transactionsHiddenToggle = !transactionsHiddenToggle;
-    rows.forEach(row => row.classList.toggle("hidden"));
-}
-
-function showChangeHiddenDialog(messages: Record<string, string>): void {
-    const { alreadyHidden, notHidden } = classifyHiddenTransactions();
-
-    const dialogContent = createDialogContent(messages["changeHiddenHeader"], "bi bi-eye");
-    const listContainer = createAndAppendElement(dialogContent, "div", "flexContainerSpaced");
-
-    // Hidden transactions
-    const leftSide = createListSection(listContainer, messages["alreadyHiddenHeader"], alreadyHidden);
-    const rightSide = createListSection(listContainer, messages["notHiddenHeader"], notHidden);
-
-    createDialogButton(leftSide, "bi bi-eye", messages["unHide"], "left", () =>
-        updateTransactionVisibility(messages, dialogContent, leftSide, rightSide.querySelector(".listContainerColumn"), false)
-    );
-
-    // Not hidden transactions
-    createDialogButton(rightSide, "bi bi-eye-slash", messages["hide"], "right", () =>
-        updateTransactionVisibility(messages, dialogContent, rightSide, leftSide.querySelector(".listContainerColumn"), true)
-    );
-}
-
-function classifyHiddenTransactions(): { alreadyHidden: Transaction[]; notHidden: Transaction[] } {
-    const alreadyHidden: Transaction[] = [];
-    const notHidden: Transaction[] = [];
-
-    const transactions: Transaction[] = getCheckedTransactions();
+function transactionToTextAndIdArray(transactions: Transaction[]): TextAndId[] {
+    const textAndIdArray: TextAndId[] = [];
 
     transactions.forEach(transaction => {
-        transaction.hidden ? alreadyHidden.push(transaction) : notHidden.push(transaction);
+        const textAndId: TextAndId = {
+            id: transaction.id,
+            text: transaction.counterParty.name
+        };
+
+        textAndIdArray.push(textAndId);
     });
 
-    return { alreadyHidden, notHidden };
+    return textAndIdArray;
 }
+
 
 async function updateTransactionVisibility(
     messages: Record<string, string>,
@@ -207,7 +166,7 @@ async function updateTransactionVisibility(
         const endpoint = hide ? "hideTransactions" : "unHideTransactions";
         const response = await fetch(`/transactions/${bankAccountId}/data/${endpoint}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify(transactionIds),
         });
 
@@ -218,20 +177,10 @@ async function updateTransactionVisibility(
         if (responseBody.alertType === AlertType.SUCCESS) {
             // Animate and move elements
             moveElements(updatedContainer, moveToContainer);
-            updateCachedTransactionsAndUI(messages, transactionIds);
+            updateCachedDataAndUI(Type.TRANSACTION, messages, transactionIds);
         }
     } catch (error) {
         console.error("Unexpected error in updateTransactionVisibility:", error);
         showAlert("ERROR", messages["error_generic"], model);
     }
-}
-
-function updateCachedTransactionsAndUI(messages: Record<string, string>, transactionIds: number[]): void {
-    filteredTransactionData.forEach((transaction: Transaction) => {
-        if (transactionIds.includes(transaction.id)) {
-            transaction.hidden = !transaction.hidden;
-        }
-    });
-
-    splitDataIntoPages(messages, SortType.TRANSACTION, filteredTransactionData);
 }

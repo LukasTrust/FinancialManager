@@ -70,6 +70,11 @@ interface CounterParty {
     counterPartySearchStrings: string[];
 }
 
+interface TextAndId {
+    id: number,
+    text: string
+}
+
 interface CounterPartyDisplay {
     counterParty: CounterParty;
     transactionCount: number;
@@ -77,7 +82,7 @@ interface CounterPartyDisplay {
     totalAmount: number;
 }
 
-enum SortType {
+enum Type {
     TRANSACTION = "TRANSACTION",
     COUNTERPARTY = "COUNTERPARTY"
 }

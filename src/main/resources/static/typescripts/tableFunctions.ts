@@ -17,7 +17,7 @@ function getCheckedRows(): number[] {
         .map(checkbox => Number(checkbox.closest("tr")?.id));
 }
 
-function searchTable(messages: Record<string, string>, type: SortType): void {
+function searchTable(messages: Record<string, string>, type: Type): void {
     const searchBarInput = document.getElementById("searchBarInput") as HTMLInputElement | null;
 
     if (!searchBarInput) {
@@ -29,25 +29,25 @@ function searchTable(messages: Record<string, string>, type: SortType): void {
         const inputText = searchBarInput.value.trim().toLowerCase();
 
         if (inputText.length <= 2) {
-            if (type === SortType.TRANSACTION) {
+            if (type === Type.TRANSACTION) {
                 filteredTransactionData = transactionData;
                 splitDataIntoPages(messages, type, transactionData);
-            } else if (type === SortType.COUNTERPARTY) {
+            } else if (type === Type.COUNTERPARTY) {
                 filteredCounterPartyData = counterPartyData;
                 splitDataIntoPages(messages, type, counterPartyData);
             }
             return;
         }
 
-        if (type === SortType.TRANSACTION) {
+        if (type === Type.TRANSACTION) {
             filterTransactions(messages, inputText);
-        } else if (type === SortType.COUNTERPARTY) {
+        } else if (type === Type.COUNTERPARTY) {
             filterCounterParties(messages, inputText);
         }
     }, 300));
 }
 
-function splitDataIntoPages(messages: Record<string, string>, type: SortType, data: any[]): void {
+function splitDataIntoPages(messages: Record<string, string>, type: Type, data: any[]): void {
     const itemsPerPageSelection = document.getElementById("itemsPerPage") as HTMLSelectElement | null;
     const nextButton = document.getElementById("nextButton") as HTMLButtonElement | null;
     const previousButton = document.getElementById("previousButton") as HTMLButtonElement | null;
@@ -91,16 +91,16 @@ function calculateNumberOfPages(totalItems: number, itemsPerPage: number): numbe
 }
 
 function updateUI(data: any[], currentPageIndex: number, itemsPerPage: number, numberOfPages: number, messages: Record<string, string>,
-                  type: SortType, currentTableBody: HTMLElement): void {
+                  type: Type, currentTableBody: HTMLElement): void {
     const startIndex = (currentPageIndex - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const paginatedData = data.slice(startIndex, endIndex);
 
     clearTable(currentTableBody);
 
-    if (type === SortType.TRANSACTION) {
+    if (type === Type.TRANSACTION) {
         addRowsToTransactionTable(paginatedData, messages);
-    } else if (type === SortType.COUNTERPARTY) {
+    } else if (type === Type.COUNTERPARTY) {
         addRowsToCounterPartyTable(paginatedData, messages);
     }
 
@@ -254,4 +254,79 @@ function compareValues(valueA: string | number | Date, valueB: string | number |
     }
 
     return isAscending ? valueA.toString().localeCompare(valueB.toString()) : valueB.toString().localeCompare(valueA.toString());
+}
+
+function classifyHiddenOrNot<T extends Transaction | CounterPartyDisplay>(
+    type: Type
+): { alreadyHidden: T[]; notHidden: T[] } {
+    const data = getCheckedData(type) as T[];
+    const alreadyHidden: T[] = [];
+    const notHidden: T[] = [];
+
+    data.forEach(item => {
+        const isHidden = type === Type.TRANSACTION
+            ? (item as Transaction).hidden
+            : (item as CounterPartyDisplay).counterParty.hidden;
+
+        isHidden ? alreadyHidden.push(item) : notHidden.push(item);
+    });
+
+    return { alreadyHidden, notHidden };
+}
+
+function getCheckedData(type: Type): Transaction[] | CounterPartyDisplay[] {
+    const checkedRows = new Set(getCheckedRows());
+
+    return (type === Type.TRANSACTION
+        ? filteredTransactionData.filter(t => checkedRows.has(t.id))
+        : filteredCounterPartyData.filter(c => checkedRows.has(c.counterParty.id))) as Transaction[] | CounterPartyDisplay[];
+}
+
+function updateRowStyle(newRow: HTMLElement, checkBox: HTMLInputElement): void {
+    newRow.classList.toggle("selectedRow", checkBox.checked);
+}
+
+function updateRowGroupStyle(rowGroup: HTMLElement, checkBox: HTMLInputElement) {
+    if (checkBox.checked) {
+        rowGroup.classList.add("selectedRow");
+    } else {
+        rowGroup.classList.remove("selectedRow");
+    }
+}
+
+function updateCachedDataAndUI(type: Type, messages: Record<string, string>, ids: number[]): void {
+    const idSet = new Set(ids); // Use Set for efficient lookup
+
+    if (type === Type.TRANSACTION) {
+        filteredTransactionData.forEach(transaction => {
+            if (idSet.has(transaction.id)) {
+                transaction.hidden = !transaction.hidden;
+            }
+        });
+
+        splitDataIntoPages(messages, Type.TRANSACTION, filteredTransactionData);
+    } else {
+        filteredCounterPartyData.forEach(counterParty => {
+            if (idSet.has(counterParty.counterParty.id)) {
+                counterParty.counterParty.hidden = !counterParty.counterParty.hidden;
+            }
+        });
+
+        splitDataIntoPages(messages, Type.COUNTERPARTY, filteredCounterPartyData);
+    }
+}
+
+function changeRowVisibility(type: Type): void {
+    const currentTableBody = getCurrentTableBody();
+    if (!currentTableBody) return;
+    const rows = Array.from(currentTableBody.querySelectorAll(".hiddenRow"));
+
+    if (type === Type.TRANSACTION) {
+        transactionsHiddenToggle = !transactionsHiddenToggle;
+    }
+    else {
+        counterPartiesHiddenToggle = !counterPartiesHiddenToggle;
+    }
+
+    rows.forEach(row => row.classList.toggle("hidden"));
 }

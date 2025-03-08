@@ -8,14 +8,14 @@ async function buildTransactions() {
         .map((month) => month.replace(/'/g, ''));
     transactionsHiddenToggle = false;
     await loadTransactions(messages);
-    splitDataIntoPages(messages, SortType.TRANSACTION, transactionData);
+    splitDataIntoPages(messages, Type.TRANSACTION, transactionData);
     setUpSorting();
-    (_a = document.getElementById("searchBarInput")) === null || _a === void 0 ? void 0 : _a.addEventListener("input", () => searchTable(messages, SortType.TRANSACTION));
-    (_b = document.getElementById("changeHiddenButton")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => showChangeHiddenDialog(messages));
+    (_a = document.getElementById("searchBarInput")) === null || _a === void 0 ? void 0 : _a.addEventListener("input", () => searchTable(messages, Type.TRANSACTION));
+    (_b = document.getElementById("changeHiddenButton")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => showChangeHiddenDialog(Type.TRANSACTION, messages));
     (_c = document.getElementById("changeContractButton")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", async () => {
-        await buildChangeContract("/transactions", getCheckedTransactions());
+        await buildChangeContract("/transactions", getCheckedData(Type.TRANSACTION));
     });
-    (_d = document.getElementById("showHiddenRows")) === null || _d === void 0 ? void 0 : _d.addEventListener("change", () => changeRowVisibility());
+    (_d = document.getElementById("showHiddenRows")) === null || _d === void 0 ? void 0 : _d.addEventListener("change", () => changeRowVisibility(Type.TRANSACTION));
 }
 async function loadTransactions(messages) {
     try {
@@ -88,17 +88,6 @@ function addRowsToTransactionTable(data, messages) {
         showAlert("ERROR", messages["error_generic"]);
     }
 }
-function updateRowStyle(newRow, checkBox) {
-    newRow.classList.toggle("selectedRow", checkBox.checked);
-}
-function updateRowGroupStyle(rowGroup, checkBox) {
-    if (checkBox.checked) {
-        rowGroup.classList.add("selectedRow");
-    }
-    else {
-        rowGroup.classList.remove("selectedRow");
-    }
-}
 function filterTransactions(messages, searchString) {
     try {
         filteredTransactionData = transactionData.filter(transaction => {
@@ -111,44 +100,23 @@ function filterTransactions(messages, searchString) {
                 ((_j = transaction.amount) === null || _j === void 0 ? void 0 : _j.toString().toLowerCase().includes(searchString)) ||
                 ((_k = transaction.amountInBankAfter) === null || _k === void 0 ? void 0 : _k.toString().toLowerCase().includes(searchString));
         });
-        splitDataIntoPages(messages, SortType.TRANSACTION, filteredTransactionData);
+        splitDataIntoPages(messages, Type.TRANSACTION, filteredTransactionData);
     }
     catch (error) {
         console.error("Unexpected error in filterTransactions:", error);
         showAlert("ERROR", messages["error_generic"]);
     }
 }
-function getCheckedTransactions() {
-    const checkedRows = new Set(getCheckedRows());
-    return filteredTransactionData.filter(transaction => checkedRows.has(transaction.id));
-}
-function changeRowVisibility() {
-    const currentTableBody = getCurrentTableBody();
-    if (!currentTableBody)
-        return;
-    const rows = Array.from(currentTableBody.querySelectorAll("tr.hiddenRow"));
-    transactionsHiddenToggle = !transactionsHiddenToggle;
-    rows.forEach(row => row.classList.toggle("hidden"));
-}
-function showChangeHiddenDialog(messages) {
-    const { alreadyHidden, notHidden } = classifyHiddenTransactions();
-    const dialogContent = createDialogContent(messages["changeHiddenHeader"], "bi bi-eye");
-    const listContainer = createAndAppendElement(dialogContent, "div", "flexContainerSpaced");
-    // Hidden transactions
-    const leftSide = createListSection(listContainer, messages["alreadyHiddenHeader"], alreadyHidden);
-    const rightSide = createListSection(listContainer, messages["notHiddenHeader"], notHidden);
-    createDialogButton(leftSide, "bi bi-eye", messages["unHide"], "left", () => updateTransactionVisibility(messages, dialogContent, leftSide, rightSide.querySelector(".listContainerColumn"), false));
-    // Not hidden transactions
-    createDialogButton(rightSide, "bi bi-eye-slash", messages["hide"], "right", () => updateTransactionVisibility(messages, dialogContent, rightSide, leftSide.querySelector(".listContainerColumn"), true));
-}
-function classifyHiddenTransactions() {
-    const alreadyHidden = [];
-    const notHidden = [];
-    const transactions = getCheckedTransactions();
+function transactionToTextAndIdArray(transactions) {
+    const textAndIdArray = [];
     transactions.forEach(transaction => {
-        transaction.hidden ? alreadyHidden.push(transaction) : notHidden.push(transaction);
+        const textAndId = {
+            id: transaction.id,
+            text: transaction.counterParty.name
+        };
+        textAndIdArray.push(textAndId);
     });
-    return { alreadyHidden, notHidden };
+    return textAndIdArray;
 }
 async function updateTransactionVisibility(messages, model, updatedContainer, moveToContainer, hide) {
     try {
@@ -171,20 +139,12 @@ async function updateTransactionVisibility(messages, model, updatedContainer, mo
         if (responseBody.alertType === AlertType.SUCCESS) {
             // Animate and move elements
             moveElements(updatedContainer, moveToContainer);
-            updateCachedTransactionsAndUI(messages, transactionIds);
+            updateCachedDataAndUI(Type.TRANSACTION, messages, transactionIds);
         }
     }
     catch (error) {
         console.error("Unexpected error in updateTransactionVisibility:", error);
         showAlert("ERROR", messages["error_generic"], model);
     }
-}
-function updateCachedTransactionsAndUI(messages, transactionIds) {
-    filteredTransactionData.forEach((transaction) => {
-        if (transactionIds.includes(transaction.id)) {
-            transaction.hidden = !transaction.hidden;
-        }
-    });
-    splitDataIntoPages(messages, SortType.TRANSACTION, filteredTransactionData);
 }
 //# sourceMappingURL=transactions.js.map

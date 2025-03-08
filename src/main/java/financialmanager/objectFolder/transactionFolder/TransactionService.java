@@ -25,6 +25,10 @@ public class TransactionService {
         return transactionRepository.findByCounterParty(counterParty);
     }
 
+    public List<Transaction> findByCounterPartyIn(List<CounterParty> counterParties) {
+        return transactionRepository.findByCounterPartyIn(counterParties);
+    }
+
     public List<Transaction> findByOriginalCounterParty(String originalCounterParty) {
         return transactionRepository.findByOriginalCounterParty(originalCounterParty);
     }

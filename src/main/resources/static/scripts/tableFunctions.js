@@ -22,20 +22,20 @@ function searchTable(messages, type) {
     searchBarInput.addEventListener("input", debounce(() => {
         const inputText = searchBarInput.value.trim().toLowerCase();
         if (inputText.length <= 2) {
-            if (type === SortType.TRANSACTION) {
+            if (type === Type.TRANSACTION) {
                 filteredTransactionData = transactionData;
                 splitDataIntoPages(messages, type, transactionData);
             }
-            else if (type === SortType.COUNTERPARTY) {
+            else if (type === Type.COUNTERPARTY) {
                 filteredCounterPartyData = counterPartyData;
                 splitDataIntoPages(messages, type, counterPartyData);
             }
             return;
         }
-        if (type === SortType.TRANSACTION) {
+        if (type === Type.TRANSACTION) {
             filterTransactions(messages, inputText);
         }
-        else if (type === SortType.COUNTERPARTY) {
+        else if (type === Type.COUNTERPARTY) {
             filterCounterParties(messages, inputText);
         }
     }, 300));
@@ -80,10 +80,10 @@ function updateUI(data, currentPageIndex, itemsPerPage, numberOfPages, messages,
     const endIndex = startIndex + itemsPerPage;
     const paginatedData = data.slice(startIndex, endIndex);
     clearTable(currentTableBody);
-    if (type === SortType.TRANSACTION) {
+    if (type === Type.TRANSACTION) {
         addRowsToTransactionTable(paginatedData, messages);
     }
-    else if (type === SortType.COUNTERPARTY) {
+    else if (type === Type.COUNTERPARTY) {
         addRowsToCounterPartyTable(paginatedData, messages);
     }
     const currentPage = document.getElementById("currentPage");
@@ -209,5 +209,66 @@ function compareValues(valueA, valueB, isAscending) {
         return isAscending ? valueA.getTime() - valueB.getTime() : valueB.getTime() - valueA.getTime();
     }
     return isAscending ? valueA.toString().localeCompare(valueB.toString()) : valueB.toString().localeCompare(valueA.toString());
+}
+function classifyHiddenOrNot(type) {
+    const data = getCheckedData(type);
+    const alreadyHidden = [];
+    const notHidden = [];
+    data.forEach(item => {
+        const isHidden = type === Type.TRANSACTION
+            ? item.hidden
+            : item.counterParty.hidden;
+        isHidden ? alreadyHidden.push(item) : notHidden.push(item);
+    });
+    return { alreadyHidden, notHidden };
+}
+function getCheckedData(type) {
+    const checkedRows = new Set(getCheckedRows());
+    return (type === Type.TRANSACTION
+        ? filteredTransactionData.filter(t => checkedRows.has(t.id))
+        : filteredCounterPartyData.filter(c => checkedRows.has(c.counterParty.id)));
+}
+function updateRowStyle(newRow, checkBox) {
+    newRow.classList.toggle("selectedRow", checkBox.checked);
+}
+function updateRowGroupStyle(rowGroup, checkBox) {
+    if (checkBox.checked) {
+        rowGroup.classList.add("selectedRow");
+    }
+    else {
+        rowGroup.classList.remove("selectedRow");
+    }
+}
+function updateCachedDataAndUI(type, messages, ids) {
+    const idSet = new Set(ids); // Use Set for efficient lookup
+    if (type === Type.TRANSACTION) {
+        filteredTransactionData.forEach(transaction => {
+            if (idSet.has(transaction.id)) {
+                transaction.hidden = !transaction.hidden;
+            }
+        });
+        splitDataIntoPages(messages, Type.TRANSACTION, filteredTransactionData);
+    }
+    else {
+        filteredCounterPartyData.forEach(counterParty => {
+            if (idSet.has(counterParty.counterParty.id)) {
+                counterParty.counterParty.hidden = !counterParty.counterParty.hidden;
+            }
+        });
+        splitDataIntoPages(messages, Type.COUNTERPARTY, filteredCounterPartyData);
+    }
+}
+function changeRowVisibility(type) {
+    const currentTableBody = getCurrentTableBody();
+    if (!currentTableBody)
+        return;
+    const rows = Array.from(currentTableBody.querySelectorAll(".hiddenRow"));
+    if (type === Type.TRANSACTION) {
+        transactionsHiddenToggle = !transactionsHiddenToggle;
+    }
+    else {
+        counterPartiesHiddenToggle = !counterPartiesHiddenToggle;
+    }
+    rows.forEach(row => row.classList.toggle("hidden"));
 }
 //# sourceMappingURL=tableFunctions.js.map

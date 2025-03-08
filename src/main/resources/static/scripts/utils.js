@@ -51,13 +51,6 @@ function formatDateString(date) {
 function formatNumber(number, currency) {
     return `${number.toFixed(2).replace('.', ',')} ${currency}`;
 }
-function createListSection(parent, title, transactions) {
-    const container = createAndAppendElement(parent, "div", "flexContainerColumn", "", { style: "width: 45%" });
-    const header = createAndAppendElement(container, "div", "listContainerHeader");
-    createAndAppendElement(header, "h2", "", title, { style: "margin: 10px" });
-    createListContainer(header, transactions);
-    return container;
-}
 function createInputBox(parent, icon, idText, type, text = null) {
     const inputBox = createAndAppendElement(parent, "div", "inputBox");
     createAndAppendElement(inputBox, "span", icon);
@@ -82,16 +75,6 @@ function debounceInputChange(inputElement, callback, id, messages, delay = 500) 
         }, delay);
         inputElement.dataset.timeoutId = timeoutId.toString(); // Store timeout ID
     });
-}
-function createListContainer(parent, transactions) {
-    const listContainer = createAndAppendElement(parent, "div", "listContainerColumn", "", {
-        style: "min-height: 420px; max-height: 420px;",
-    });
-    transactions.forEach(transaction => {
-        var _a;
-        createListElement(listContainer, (_a = transaction.counterParty) === null || _a === void 0 ? void 0 : _a.name, { id: transaction.id.toString() });
-    });
-    return listContainer;
 }
 async function backToOtherView(cameFromUrl) {
     if (cameFromUrl) {
@@ -184,5 +167,26 @@ function debounce(func, delay) {
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => func(...args), delay);
     };
+}
+function createListSection(parent, title, type, data) {
+    const container = createAndAppendElement(parent, "div", "flexContainerColumn", "", { style: "width: 45%" });
+    const header = createAndAppendElement(container, "div", "listContainerHeader");
+    createAndAppendElement(header, "h2", "", title, { style: "margin: 10px" });
+    if (type === Type.TRANSACTION) {
+        createListContainer(header, transactionToTextAndIdArray(data));
+    }
+    else if (type === Type.COUNTERPARTY) {
+        createListContainer(header, counterPartyToTextAndIdArray(data));
+    }
+    return container;
+}
+function createListContainer(parent, textAndIdArray) {
+    const listContainer = createAndAppendElement(parent, "div", "listContainerColumn", "", {
+        style: "min-height: 420px; max-height: 420px;",
+    });
+    textAndIdArray.forEach(textAndId => {
+        createListElement(listContainer, textAndId.text, { id: textAndId.id.toString() });
+    });
+    return listContainer;
 }
 //# sourceMappingURL=utils.js.map

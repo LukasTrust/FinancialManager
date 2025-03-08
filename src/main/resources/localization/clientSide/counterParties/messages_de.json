@@ -19,5 +19,12 @@
   "page": "Seite ",
   "of": " von ",
   "next": "Nächste",
-  "perPage": "pro Seite"
+  "perPage": "pro Seite",
+  "changeHiddenHeader": "Verändere Sichtbarkeit von Gegenparteien",
+  "alreadyHiddenHeader": "Bereits verborgene Gegenparteien",
+  "notHiddenHeader": "Noch nicht verborgene Gegenparteien",
+  "unHide": "Gegenparteien sichtbar machen",
+  "hide": "Gegenparteien verbesergen",
+  "noCounterPartyToUpdate": "Keine Gegenparteien wurden geupdated",
+  "infoTransactionsWillAlsoBeAffected": "Diese Aktionen haben auswirkungen auf die Sichtbarkeit der Transaktionen"
 }
