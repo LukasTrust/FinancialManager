@@ -107,16 +107,18 @@ function filterTransactions(messages, searchString) {
         showAlert("ERROR", messages["error_generic"]);
     }
 }
-function transactionToTextAndIdArray(transactions) {
-    const textAndIdArray = [];
+function transactionToListElementObjectArray(transactions) {
+    const listElementObjects = [];
+    const currency = getCurrentCurrencySymbol();
     transactions.forEach(transaction => {
-        const textAndId = {
+        const listElementObject = {
             id: transaction.id,
-            text: transaction.counterParty.name
+            text: transaction.counterParty.name,
+            toolTip: formatNumber(transaction.amount, currency).toString()
         };
-        textAndIdArray.push(textAndId);
+        listElementObjects.push(listElementObject);
     });
-    return textAndIdArray;
+    return listElementObjects;
 }
 async function updateTransactionVisibility(messages, model, updatedContainer, moveToContainer, hide) {
     try {

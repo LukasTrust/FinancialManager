@@ -1,6 +1,6 @@
 package financialmanager.objectFolder.chartFolder;
 
-import financialmanager.Utils.Result.Result;
+import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.Utils.Utils;
 import financialmanager.locale.LocaleService;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;

@@ -1,8 +1,8 @@
 package financialmanager.objectFolder.bankAccountFolder;
 
-import financialmanager.Utils.Result.Err;
-import financialmanager.Utils.Result.Ok;
-import financialmanager.Utils.Result.Result;
+import financialmanager.objectFolder.resultFolder.Err;
+import financialmanager.objectFolder.resultFolder.Ok;
+import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.ResponseService;

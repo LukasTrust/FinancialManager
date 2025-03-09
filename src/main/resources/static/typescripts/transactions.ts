@@ -127,19 +127,22 @@ function filterTransactions(messages: Record<string, string>, searchString: stri
 }
 
 
-function transactionToTextAndIdArray(transactions: Transaction[]): TextAndId[] {
-    const textAndIdArray: TextAndId[] = [];
+function transactionToListElementObjectArray(transactions: Transaction[]): ListElementObject[] {
+    const listElementObjects: ListElementObject[] = [];
+
+    const currency = getCurrentCurrencySymbol();
 
     transactions.forEach(transaction => {
-        const textAndId: TextAndId = {
+        const listElementObject: ListElementObject = {
             id: transaction.id,
-            text: transaction.counterParty.name
+            text: transaction.counterParty.name,
+            toolTip: formatNumber(transaction.amount, currency).toString()
         };
 
-        textAndIdArray.push(textAndId);
+        listElementObjects.push(listElementObject);
     });
 
-    return textAndIdArray;
+    return listElementObjects;
 }
 
 

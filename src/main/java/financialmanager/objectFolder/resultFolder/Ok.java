@@ -1,4 +1,4 @@
-package financialmanager.Utils.Result;
+package financialmanager.objectFolder.resultFolder;
 
 /**
  * Represents a successful result.

@@ -1,6 +1,6 @@
 package financialmanager.controller;
 
-import financialmanager.Utils.Result.Result;
+import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.locale.LocaleService;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;

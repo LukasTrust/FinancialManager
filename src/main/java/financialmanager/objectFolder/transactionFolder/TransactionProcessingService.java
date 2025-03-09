@@ -1,12 +1,12 @@
 package financialmanager.objectFolder.transactionFolder;
 
-import financialmanager.Utils.Result.Result;
+import financialmanager.objectFolder.categoryFolder.CategoryService;
+import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.Utils.fileParser.DataColumns;
 import financialmanager.Utils.fileParser.FileParserFactory;
 import financialmanager.Utils.fileParser.IFileParser;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
-import financialmanager.objectFolder.categoryFolder.CategoryProcessingService;
 import financialmanager.objectFolder.contractFolder.ContractProcessingService;
 import financialmanager.objectFolder.counterPartyFolder.CounterPartyService;
 import financialmanager.objectFolder.responseFolder.AlertType;
@@ -39,7 +39,7 @@ public class TransactionProcessingService {
     private final TransactionService transactionService;
     private final ResponseService responseService;
     private final ContractProcessingService contractProcessingService;
-    private final CategoryProcessingService categoryProcessingService;
+    private final CategoryService categoryService;
     private final FileParserFactory fileParserFactory;
 
     private static final Logger log = LoggerFactory.getLogger(TransactionProcessingService.class);
@@ -122,7 +122,7 @@ public class TransactionProcessingService {
 
     private void processAndSaveTransactions(Users currentUser, List<Transaction> newTransactions, List<Transaction> existingTransactions) {
         counterPartyService.setCounterPartyForNewTransactions(currentUser, newTransactions);
-        categoryProcessingService.addTransactionsToCategories(currentUser, newTransactions);
+        categoryService.addTransactionsToCategories(currentUser, newTransactions);
 
         newTransactions.addAll(getTransactionsWithoutContract(existingTransactions));
 

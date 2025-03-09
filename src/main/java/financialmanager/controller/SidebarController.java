@@ -1,6 +1,6 @@
 package financialmanager.controller;
 
-import financialmanager.Utils.Result.Result;
+import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.responseFolder.Response;

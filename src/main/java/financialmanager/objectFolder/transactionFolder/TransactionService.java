@@ -1,5 +1,5 @@
 package financialmanager.objectFolder.transactionFolder;
-import financialmanager.Utils.Result.Result;
+import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.Utils.Utils;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;

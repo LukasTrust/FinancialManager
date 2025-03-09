@@ -1,7 +1,7 @@
 package financialmanager.locale;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import financialmanager.Utils.Result.Result;
+import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.usersFolder.Users;
 import financialmanager.objectFolder.usersFolder.UsersService;

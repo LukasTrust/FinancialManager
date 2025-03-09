@@ -1,6 +1,6 @@
-async function showAlertFromResponse(response) {
+async function showAlertFromResponse(response, parent = document.body) {
     const responseBody = await response.json();
-    showAlert(responseBody.alertType, responseBody.message);
+    showAlert(responseBody.alertType, responseBody.message, parent);
 }
 function showAlert(type, message, parent = document.body, duration = 5000) {
     // Convert string input to AlertType

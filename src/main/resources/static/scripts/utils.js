@@ -41,6 +41,8 @@ function createAndAppendElement(parent, type, className = null, textContent = nu
     return element;
 }
 function getCurrentCurrencySymbol() {
+    if (bankAccountId === 0)
+        return " " + Object.values(bankAccountSymbols)[0];
     return " " + bankAccountSymbols[bankAccountId];
 }
 function formatDateString(date) {
@@ -81,8 +83,22 @@ async function backToOtherView(cameFromUrl) {
         await loadURL(cameFromUrl);
     }
 }
-function moveElements(sourceContainer, targetContainer) {
-    const items = Array.from(sourceContainer.querySelectorAll(`.listItem`));
+function removeElements(sourceContainer, soloItem = null) {
+    let items = soloItem ? [soloItem] : Array.from(sourceContainer.querySelectorAll('.listItem'));
+    items.forEach((item, index) => {
+        setTimeout(() => {
+            item.parentElement.removeChild(item);
+            item.addEventListener('transitionend', () => {
+                item.remove();
+            }, { once: true });
+        }, index * 150); // Stagger effect
+    });
+}
+function moveElements(sourceContainer, targetContainer, soloItem = null) {
+    let items = Array.from(sourceContainer.querySelectorAll(`.listItem`));
+    if (soloItem) {
+        items.push(soloItem);
+    }
     items.forEach((item, index) => {
         // Add a delay for staggered animation
         setTimeout(() => {
@@ -168,25 +184,51 @@ function debounce(func, delay) {
         timeoutId = setTimeout(() => func(...args), delay);
     };
 }
-function createListSection(parent, title, type, data) {
+function createListSection(parent, title, type, data, withSelect = false) {
     const container = createAndAppendElement(parent, "div", "flexContainerColumn", "", { style: "width: 45%" });
     const header = createAndAppendElement(container, "div", "listContainerHeader");
     createAndAppendElement(header, "h2", "", title, { style: "margin: 10px" });
     if (type === Type.TRANSACTION) {
-        createListContainer(header, transactionToTextAndIdArray(data));
+        createListContainer(header, transactionToListElementObjectArray(data), withSelect);
     }
     else if (type === Type.COUNTERPARTY) {
-        createListContainer(header, counterPartyToTextAndIdArray(data));
+        createListContainer(header, counterPartyToListElementObjectArray(data), withSelect);
     }
     return container;
 }
-function createListContainer(parent, textAndIdArray) {
+function createListContainer(parent, listElementObjects, withSelect) {
     const listContainer = createAndAppendElement(parent, "div", "listContainerColumn", "", {
         style: "min-height: 420px; max-height: 420px;",
     });
-    textAndIdArray.forEach(textAndId => {
-        createListElement(listContainer, textAndId.text, { id: textAndId.id.toString() });
+    let selectedElement = null;
+    listElementObjects.forEach(listElementObject => {
+        const listElement = createListElement(listContainer, listElementObject.text, { id: listElementObject.id.toString() }, true, false, listElementObject.toolTip);
+        if (withSelect) {
+            listElement.addEventListener("click", () => {
+                if (selectedElement) {
+                    selectedElement.classList.remove("selected");
+                }
+                if (selectedElement !== listElement) {
+                    listElement.classList.add("selected");
+                    selectedElement = listElement;
+                }
+                else {
+                    selectedElement = null;
+                }
+            });
+        }
     });
     return listContainer;
+}
+function chooseHeader(dialogContent, messages, updatedContainer, moveToContainer) {
+    const selectedElementList = updatedContainer.querySelectorAll(".selected");
+    if (selectedElementList.length === 0) {
+        showAlert(AlertType.INFO, messages["error_SelectAHeader"], dialogContent);
+        return;
+    }
+    const selectedElement = selectedElementList.item(0);
+    selectedElement.classList.remove("selected");
+    moveElements(moveToContainer, updatedContainer);
+    moveElements(selectedElement, moveToContainer, selectedElement);
 }
 //# sourceMappingURL=utils.js.map

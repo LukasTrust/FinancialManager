@@ -1,6 +1,6 @@
-async function showAlertFromResponse(response: any) {
+async function showAlertFromResponse(response: any, parent: HTMLElement = document.body) {
     const responseBody = await response.json();
-    showAlert(responseBody.alertType, responseBody.message);
+    showAlert(responseBody.alertType, responseBody.message, parent);
 }
 
 function showAlert(

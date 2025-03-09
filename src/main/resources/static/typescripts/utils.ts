@@ -65,6 +65,9 @@ function createAndAppendElement(
 }
 
 function getCurrentCurrencySymbol(): string {
+    if (bankAccountId === 0)
+        return " " + Object.values(bankAccountSymbols)[0];
+
     return " " + bankAccountSymbols[bankAccountId];
 }
 
@@ -87,7 +90,7 @@ function createInputBox(
 ): HTMLInputElement {
     const inputBox = createAndAppendElement(parent, "div", "inputBox");
     createAndAppendElement(inputBox, "span", icon);
-    createAndAppendElement(inputBox, "label", "", "", { for: idText });
+    createAndAppendElement(inputBox, "label", "", "", {for: idText});
 
     // Create input element separately to set its value
     const inputElement = createAndAppendElement(inputBox, "input", "", "", {
@@ -128,8 +131,26 @@ async function backToOtherView(cameFromUrl: string | null): Promise<void> {
     }
 }
 
-function moveElements(sourceContainer: HTMLElement, targetContainer: HTMLElement): void {
-    const items = Array.from(sourceContainer.querySelectorAll<HTMLElement>(`.listItem`));
+function removeElements(sourceContainer, soloItem = null) {
+    let items = soloItem ? [soloItem] : Array.from(sourceContainer.querySelectorAll('.listItem'));
+
+    items.forEach((item, index) => {
+        setTimeout(() => {
+            item.parentElement.removeChild(item);
+
+            item.addEventListener('transitionend', () => {
+                item.remove();
+            }, { once: true });
+        }, index * 150); // Stagger effect
+    });
+}
+
+function moveElements(sourceContainer: HTMLElement, targetContainer: HTMLElement, soloItem: HTMLElement = null): void {
+    let items = Array.from(sourceContainer.querySelectorAll<HTMLElement>(`.listItem`));
+
+    if (soloItem) {
+        items.push(soloItem);
+    }
 
     items.forEach((item, index) => {
         // Add a delay for staggered animation
@@ -140,13 +161,13 @@ function moveElements(sourceContainer: HTMLElement, targetContainer: HTMLElement
             item.addEventListener('transitionend', () => {
                 targetContainer.appendChild(item);
                 item.classList.remove('moving');
-            }, { once: true });
+            }, {once: true});
         }, index * 150); // 150ms delay between items for a smoother stagger
     });
 }
 
 function createCheckBoxForRowGroup(rowGroup: HTMLElement, newRow: HTMLElement, id: number, isHidden: boolean) {
-    const trCheckBox = createAndAppendElement(newRow, "td", null, "", { style: "width: 5%" });
+    const trCheckBox = createAndAppendElement(newRow, "td", null, "", {style: "width: 5%"});
 
     if (isHidden) {
         createAndAppendElement(trCheckBox, "span", "bi bi-eye-slash");
@@ -188,7 +209,7 @@ function addHoverToOtherElement(newRow: HTMLElement, subRow: HTMLElement) {
 }
 
 function createCheckBoxForTable(newRow: HTMLElement, id: number, isHidden: boolean) {
-    const trCheckBox = createAndAppendElement(newRow, "td", null, "", { style: "width: 5%" });
+    const trCheckBox = createAndAppendElement(newRow, "td", null, "", {style: "width: 5%"});
 
     if (isHidden) {
         createAndAppendElement(trCheckBox, "span", "bi bi-eye-slash");
@@ -240,17 +261,17 @@ function createListSection(
     parent: HTMLElement,
     title: string,
     type: Type,
-    data: Transaction[] | CounterPartyDisplay[]
+    data: Transaction[] | CounterPartyDisplay[],
+    withSelect: boolean = false
 ): HTMLElement {
-    const container = createAndAppendElement(parent, "div", "flexContainerColumn", "", { style: "width: 45%" });
+    const container = createAndAppendElement(parent, "div", "flexContainerColumn", "", {style: "width: 45%"});
     const header = createAndAppendElement(container, "div", "listContainerHeader");
-    createAndAppendElement(header, "h2", "", title, { style: "margin: 10px" });
+    createAndAppendElement(header, "h2", "", title, {style: "margin: 10px"});
 
     if (type === Type.TRANSACTION) {
-        createListContainer(header, transactionToTextAndIdArray(data as Transaction[]));
-    }
-    else if (type === Type.COUNTERPARTY) {
-        createListContainer(header, counterPartyToTextAndIdArray(data as CounterPartyDisplay[]));
+        createListContainer(header, transactionToListElementObjectArray(data as Transaction[]), withSelect);
+    } else if (type === Type.COUNTERPARTY) {
+        createListContainer(header, counterPartyToListElementObjectArray(data as CounterPartyDisplay[]), withSelect);
     }
 
     return container;
@@ -258,15 +279,49 @@ function createListSection(
 
 function createListContainer(
     parent: HTMLElement,
-    textAndIdArray: TextAndId[]
+    listElementObjects: ListElementObject[],
+    withSelect: boolean
 ): HTMLElement {
     const listContainer = createAndAppendElement(parent, "div", "listContainerColumn", "", {
         style: "min-height: 420px; max-height: 420px;",
     });
 
-    textAndIdArray.forEach(textAndId => {
-        createListElement(listContainer, textAndId.text, {id: textAndId.id.toString()});
+    let selectedElement: HTMLElement | null = null;
+
+    listElementObjects.forEach(listElementObject => {
+        const listElement = createListElement(listContainer, listElementObject.text, {id: listElementObject.id.toString()},
+            true, false, listElementObject.toolTip);
+
+        if (withSelect) {
+            listElement.addEventListener("click", () => {
+                if (selectedElement) {
+                    selectedElement.classList.remove("selected");
+                }
+                if (selectedElement !== listElement) {
+                    listElement.classList.add("selected");
+                    selectedElement = listElement;
+                } else {
+                    selectedElement = null;
+                }
+            });
+        }
     });
 
     return listContainer;
+}
+
+function chooseHeader(dialogContent: HTMLElement, messages: Record<string, string>,
+                      updatedContainer: HTMLElement, moveToContainer: HTMLElement,): void {
+    const selectedElementList = updatedContainer.querySelectorAll(".selected");
+
+    if (selectedElementList.length === 0) {
+        showAlert(AlertType.INFO, messages["error_SelectAHeader"], dialogContent)
+        return;
+    }
+
+    const selectedElement = selectedElementList.item(0) as HTMLElement;
+    selectedElement.classList.remove("selected");
+
+    moveElements(moveToContainer, updatedContainer);
+    moveElements(selectedElement, moveToContainer, selectedElement);
 }

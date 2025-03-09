@@ -26,5 +26,11 @@
   "unHide": "Gegenparteien sichtbar machen",
   "hide": "Gegenparteien verbesergen",
   "noCounterPartyToUpdate": "Keine Gegenparteien wurden geupdated",
-  "infoTransactionsWillAlsoBeAffected": "Diese Aktionen haben auswirkungen auf die Sichtbarkeit der Transaktionen"
+  "infoTransactionsWillAlsoBeAffected": "Diese Aktionen haben auswirkungen auf die Sichtbarkeit der Transaktionen",
+  "mergeHeader": "Vereingien von Gegenparteien",
+  "mergeCounterPartiesInfo": "Wähle eine Gegenpartei aus in die die anderen zusammen geführt werden",
+  "counterPartyHeader": "Kopf Gegenpartei",
+  "counterPartiesToMerge": "Gegenparteien zum vereinigen",
+  "chooseHeader": "Auswahl as Kopf auswählen",
+  "error_SelectAHeader": "Bitte einen Kopf auswählen"
 }

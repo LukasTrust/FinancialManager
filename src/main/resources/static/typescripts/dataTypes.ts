@@ -70,9 +70,10 @@ interface CounterParty {
     counterPartySearchStrings: string[];
 }
 
-interface TextAndId {
+interface ListElementObject {
     id: number,
-    text: string
+    text: string,
+    toolTip: string
 }
 
 interface CounterPartyDisplay {

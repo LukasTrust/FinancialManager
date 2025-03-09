@@ -1,8 +1,8 @@
 package financialmanager.objectFolder.counterPartyFolder;
 
-import financialmanager.Utils.Result.Err;
-import financialmanager.Utils.Result.Ok;
-import financialmanager.Utils.Result.Result;
+import financialmanager.objectFolder.resultFolder.Err;
+import financialmanager.objectFolder.resultFolder.Ok;
+import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
@@ -89,7 +89,7 @@ public class CounterPartyService {
     //<editor-fold desc="get functions">
     public ResponseEntity<?> getCounterPartyDisplays() {
         return usersService.getCurrentUser()
-                .map(this::createCounterPartyDisplays)
+                .map(this::createCounterPartyDisplay)
                 .map(counterPartyDisplays -> ResponseEntity.ok((Object) counterPartyDisplays))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(usersService.getCurrentUser().getError()));
     }
@@ -106,26 +106,37 @@ public class CounterPartyService {
         return findByIdAndUsers(counterPartyId, currentUser);
     }
 
-    private List<CounterPartyDisplay> createCounterPartyDisplays(Users users) {
+    private List<CounterPartyDisplay> createCounterPartyDisplay(Users users) {
         List<CounterPartyDisplay> counterPartyDisplays = new ArrayList<>();
 
         List<CounterParty> counterParties = findByUsers(users);
 
         for (CounterParty counterParty : counterParties) {
-            List<Transaction> transactions = transactionService.findByCounterParty(counterParty);
-            List<Contract> contracts = transactions.stream()
-                    .map(Transaction::getContract)
-                    .toList();
-
-            Integer transactionCount = transactions.size();
-            Integer numberOfContracts = contracts.size();
-            Double totalAmount = transactions.stream().mapToDouble(Transaction::getAmount).sum();
-
-            CounterPartyDisplay counterPartyDisplay = new CounterPartyDisplay(counterParty, transactionCount, numberOfContracts, totalAmount);
+            CounterPartyDisplay counterPartyDisplay = createCounterPartyDisplay(counterParty);
             counterPartyDisplays.add(counterPartyDisplay);
         }
 
         return counterPartyDisplays;
+    }
+
+    private CounterPartyDisplay createCounterPartyDisplay(CounterParty counterParty) {
+        List<Transaction> transactions = transactionService.findByCounterParty(counterParty);
+        List<Contract> contracts = getContractsFromTransactions(transactions);
+
+        Integer transactionCount = transactions.size();
+        Integer numberOfContracts = contracts.size();
+        Double totalAmount = transactions.stream().mapToDouble(Transaction::getAmount).sum();
+
+        return new CounterPartyDisplay(counterParty, transactionCount, numberOfContracts, totalAmount);
+    }
+
+    private List<Contract> getContractsFromTransactions(List<Transaction> transactions) {
+        return transactions.stream()
+                .map(Transaction::getContract)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet())
+                .stream()
+                .toList();
     }
     //</editor-fold>
 
@@ -148,15 +159,19 @@ public class CounterPartyService {
             return counterPartiesResult.getError();
         }
 
-        List<String> updatedData = mergeCounterPartiesIntoHeader(counterPartiesResult.getValue(), headerResult.getValue());
+        CounterParty headerCounterParty = headerResult.getValue();
+        List<String> updatedData = mergeCounterPartiesIntoHeader(counterPartiesResult.getValue(), headerCounterParty);
 
-        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "counterPartiesMerged", AlertType.SUCCESS, updatedData);
+        CounterPartyDisplay counterPartyDisplay = createCounterPartyDisplay(headerCounterParty);
+
+        return responseService.createResponseWithDataAndPlaceHolders(HttpStatus.OK, "counterPartiesMerged", AlertType.SUCCESS, counterPartyDisplay, updatedData);
     }
 
     private List<String> mergeCounterPartiesIntoHeader(List<CounterParty> mergingCounterParties, CounterParty targetCounterParty) {
         List<Transaction> transactions = transactionService.findByCounterPartyIn(mergingCounterParties);
 
         int contractCount = setCounterParty(targetCounterParty, transactions);
+        transactionService.saveAll(transactions);
 
         // Merge unique search strings
         Set<String> mergedSearchStrings = mergingCounterParties.stream()
@@ -193,7 +208,7 @@ public class CounterPartyService {
 
     private List<String> updateVisibilityForCounterParties(List<CounterParty> counterParties, boolean isHidden) {
         List<Transaction> transactions = transactionService.findByCounterPartyIn(counterParties);
-        List<Contract> contracts = transactions.stream().map(Transaction::getContract).toList();
+        List<Contract> contracts = getContractsFromTransactions(transactions);
 
         transactions.forEach(transaction -> transaction.setHidden(isHidden));
         contracts.forEach(contract -> contract.setHidden(isHidden));
@@ -226,30 +241,31 @@ public class CounterPartyService {
     }
 
     public ResponseEntity<Response> removeSearchStringFromCounterParty(Long counterPartyId, String searchString) {
-        return getCounterParty(counterPartyId)
-                .flatMap(counterParty -> {
-                    List<String> searchStrings = counterParty.getCounterPartySearchStrings();
+        Result<CounterParty, ResponseEntity<Response>> counterPartyResult = getCounterParty(counterPartyId);
 
-                    if (searchStrings.size() == 1) {
-                        log.warn("Search string list size is 1, can not remove search string {} from id: {}", searchString, counterPartyId);
-                        return new Err<>(responseService.createResponse(
-                                HttpStatus.BAD_REQUEST, "searchStringCanNotBeRemovedFromCounterParty", AlertType.WARNING));
-                    }
+        if (counterPartyResult.isErr()){
+            return counterPartyResult.getError();
+        }
 
-                    if (!searchStrings.remove(searchString)) {
-                        log.error("Error while removing search string {} from id: {}", searchString, counterPartyId);
-                        return new Err<>(responseService.createResponseWithPlaceHolders(
-                                HttpStatus.NOT_FOUND, "searchStringNotFoundInCounterParty", AlertType.ERROR, List.of(searchString)));
-                    }
+        CounterParty counterParty = counterPartyResult.getValue();
+        List<String> searchStrings = counterParty.getCounterPartySearchStrings();
 
-                    CounterParty splitCounterParty = changeCounterPartyOfTransactions(counterParty.getUsers(), searchString);
-                    return new Ok<>(splitCounterParty);
-                })
-                .map(splitCounterParty -> splitCounterParty != null
-                        ? responseService.createResponseWithData(HttpStatus.OK, "removedSearchStringFromCounterParty", AlertType.SUCCESS, splitCounterParty)
-                        : responseService.createResponse(HttpStatus.OK, "removedSearchStringFromCounterParty", AlertType.SUCCESS)
-                )
-                .getError();
+        if (searchStrings.size() == 1) {
+            log.warn("Search string list size is 1, can not remove search string {} from id: {}", searchString, counterPartyId);
+            return responseService.createResponse(
+                    HttpStatus.BAD_REQUEST, "searchStringCanNotBeRemovedFromCounterParty", AlertType.WARNING);
+        }
+
+        if (!searchStrings.remove(searchString)) {
+            log.error("Error while removing search string {} from id: {}", searchString, counterPartyId);
+            return responseService.createResponseWithPlaceHolders(
+                    HttpStatus.NOT_FOUND, "searchStringNotFoundInCounterParty", AlertType.ERROR, List.of(searchString));
+        }
+
+        CounterParty splitCounterParty = changeCounterPartyOfTransactions(counterParty.getUsers(), searchString);
+        CounterPartyDisplay counterPartyDisplay = createCounterPartyDisplay(splitCounterParty);
+
+        return responseService.createResponseWithData(HttpStatus.OK, "removedSearchStringFromCounterParty", AlertType.SUCCESS, counterPartyDisplay);
     }
     //</editor-fold>
 
@@ -319,6 +335,8 @@ public class CounterPartyService {
         CounterParty counterParty = new CounterParty(currentUser, counterPartyName);
         setCounterParty(counterParty, transactions);
 
+        save(counterParty);
+
         transactionService.saveAll(transactions);
 
         return counterParty;
@@ -329,10 +347,9 @@ public class CounterPartyService {
 
         transactions.forEach(transaction -> transaction.setCounterParty(counterParty));
 
-        List<Contract> uniqueContracts = transactions.stream().map(Transaction::getContract).toList();
+        List<Contract> uniqueContracts = getContractsFromTransactions(transactions);
         uniqueContracts.forEach(contract -> contract.setCounterParty(counterParty));
 
-        transactionService.saveAll(transactions);
         return uniqueContracts.size();
     }
     //</editor-fold>

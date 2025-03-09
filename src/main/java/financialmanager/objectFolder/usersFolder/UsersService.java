@@ -1,8 +1,8 @@
 package financialmanager.objectFolder.usersFolder;
 
-import financialmanager.Utils.Result.Err;
-import financialmanager.Utils.Result.Result;
-import financialmanager.Utils.Result.Ok;
+import financialmanager.objectFolder.resultFolder.Err;
+import financialmanager.objectFolder.resultFolder.Result;
+import financialmanager.objectFolder.resultFolder.Ok;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
 import lombok.AllArgsConstructor;

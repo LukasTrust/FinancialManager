@@ -1,4 +1,4 @@
-package financialmanager.Utils.Result;
+package financialmanager.objectFolder.resultFolder;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
