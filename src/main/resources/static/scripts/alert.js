@@ -14,7 +14,7 @@ function showAlert(type, message, parent = document.body, duration = 5000) {
     // Create message span
     createAndAppendElement(alert, "span", "message", message);
     // Create close button
-    const closeButton = createAndAppendElement(alert, "span", "button-alert");
+    const closeButton = createAndAppendElement(alert, "button", "buttonAlert");
     createAndAppendElement(closeButton, "span", "bi bi-x-circle-fill", null, {}, {
         click: () => removeAlert(alert),
     });

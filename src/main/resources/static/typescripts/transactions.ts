@@ -42,6 +42,48 @@ async function loadTransactions(messages: Record<string, string>): Promise<void>
     }
 }
 
+async function updateTransactionVisibility(
+    messages: Record<string, string>,
+    model: HTMLElement,
+    updatedContainer: HTMLElement,
+    moveToContainer: HTMLElement,
+    hide: boolean
+): Promise<void> {
+    try {
+        // Get all transaction IDs
+        const transactionIds: number[] = Array.from(
+            updatedContainer.querySelectorAll<HTMLElement>(".normalText")
+        )
+            .map(span => Number(span.id))
+            .filter(id => !isNaN(id) && id !== 0); // Ensure valid IDs
+
+        if (transactionIds.length === 0) {
+            showAlert("INFO", messages["noTransactionsUpdated"], model);
+            return;
+        }
+
+        const endpoint = hide ? "hideTransactions" : "unHideTransactions";
+        const response = await fetch(`/transactions/${bankAccountId}/data/${endpoint}`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(transactionIds),
+        });
+
+        const responseBody: Response = await response.json();
+
+        showAlert(responseBody.alertType, responseBody.message, model);
+
+        if (responseBody.alertType === AlertType.SUCCESS) {
+            // Animate and move elements
+            moveElements(updatedContainer, moveToContainer);
+            updateCachedDataAndUI(Type.TRANSACTION, messages, transactionIds);
+        }
+    } catch (error) {
+        console.error("Unexpected error in updateTransactionVisibility:", error);
+        showAlert("ERROR", messages["error_generic"], model);
+    }
+}
+
 function addRowsToTransactionTable(data: Transaction[], messages: Record<string, string>): void {
     try {
         const tableBody = getCurrentTableBody();
@@ -143,47 +185,4 @@ function transactionToListElementObjectArray(transactions: Transaction[]): ListE
     });
 
     return listElementObjects;
-}
-
-
-async function updateTransactionVisibility(
-    messages: Record<string, string>,
-    model: HTMLElement,
-    updatedContainer: HTMLElement,
-    moveToContainer: HTMLElement,
-    hide: boolean
-): Promise<void> {
-    try {
-        // Get all transaction IDs
-        const transactionIds: number[] = Array.from(
-            updatedContainer.querySelectorAll<HTMLElement>(".normalText")
-        )
-            .map(span => Number(span.id))
-            .filter(id => !isNaN(id) && id !== 0); // Ensure valid IDs
-
-        if (transactionIds.length === 0) {
-            showAlert("INFO", messages["noTransactionsUpdated"], model);
-            return;
-        }
-
-        const endpoint = hide ? "hideTransactions" : "unHideTransactions";
-        const response = await fetch(`/transactions/${bankAccountId}/data/${endpoint}`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(transactionIds),
-        });
-
-        const responseBody: Response = await response.json();
-
-        showAlert(responseBody.alertType, responseBody.message, model);
-
-        if (responseBody.alertType === AlertType.SUCCESS) {
-            // Animate and move elements
-            moveElements(updatedContainer, moveToContainer);
-            updateCachedDataAndUI(Type.TRANSACTION, messages, transactionIds);
-        }
-    } catch (error) {
-        console.error("Unexpected error in updateTransactionVisibility:", error);
-        showAlert("ERROR", messages["error_generic"], model);
-    }
 }

@@ -35,6 +35,35 @@ async function loadTransactions(messages) {
         showAlert('error', messages["error_generic"]);
     }
 }
+async function updateTransactionVisibility(messages, model, updatedContainer, moveToContainer, hide) {
+    try {
+        // Get all transaction IDs
+        const transactionIds = Array.from(updatedContainer.querySelectorAll(".normalText"))
+            .map(span => Number(span.id))
+            .filter(id => !isNaN(id) && id !== 0); // Ensure valid IDs
+        if (transactionIds.length === 0) {
+            showAlert("INFO", messages["noTransactionsUpdated"], model);
+            return;
+        }
+        const endpoint = hide ? "hideTransactions" : "unHideTransactions";
+        const response = await fetch(`/transactions/${bankAccountId}/data/${endpoint}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(transactionIds),
+        });
+        const responseBody = await response.json();
+        showAlert(responseBody.alertType, responseBody.message, model);
+        if (responseBody.alertType === AlertType.SUCCESS) {
+            // Animate and move elements
+            moveElements(updatedContainer, moveToContainer);
+            updateCachedDataAndUI(Type.TRANSACTION, messages, transactionIds);
+        }
+    }
+    catch (error) {
+        console.error("Unexpected error in updateTransactionVisibility:", error);
+        showAlert("ERROR", messages["error_generic"], model);
+    }
+}
 function addRowsToTransactionTable(data, messages) {
     try {
         const tableBody = getCurrentTableBody();
@@ -119,34 +148,5 @@ function transactionToListElementObjectArray(transactions) {
         listElementObjects.push(listElementObject);
     });
     return listElementObjects;
-}
-async function updateTransactionVisibility(messages, model, updatedContainer, moveToContainer, hide) {
-    try {
-        // Get all transaction IDs
-        const transactionIds = Array.from(updatedContainer.querySelectorAll(".normalText"))
-            .map(span => Number(span.id))
-            .filter(id => !isNaN(id) && id !== 0); // Ensure valid IDs
-        if (transactionIds.length === 0) {
-            showAlert("INFO", messages["noTransactionsUpdated"], model);
-            return;
-        }
-        const endpoint = hide ? "hideTransactions" : "unHideTransactions";
-        const response = await fetch(`/transactions/${bankAccountId}/data/${endpoint}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(transactionIds),
-        });
-        const responseBody = await response.json();
-        showAlert(responseBody.alertType, responseBody.message, model);
-        if (responseBody.alertType === AlertType.SUCCESS) {
-            // Animate and move elements
-            moveElements(updatedContainer, moveToContainer);
-            updateCachedDataAndUI(Type.TRANSACTION, messages, transactionIds);
-        }
-    }
-    catch (error) {
-        console.error("Unexpected error in updateTransactionVisibility:", error);
-        showAlert("ERROR", messages["error_generic"], model);
-    }
 }
 //# sourceMappingURL=transactions.js.map

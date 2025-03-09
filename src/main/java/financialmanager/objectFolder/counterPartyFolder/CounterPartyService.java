@@ -263,9 +263,11 @@ public class CounterPartyService {
         }
 
         CounterParty splitCounterParty = changeCounterPartyOfTransactions(counterParty.getUsers(), searchString);
-        CounterPartyDisplay counterPartyDisplay = createCounterPartyDisplay(splitCounterParty);
+        List<CounterPartyDisplay> counterPartyDisplays = new ArrayList<>();
+        counterPartyDisplays.add(createCounterPartyDisplay(splitCounterParty));
+        counterPartyDisplays.add(createCounterPartyDisplay(counterParty));
 
-        return responseService.createResponseWithData(HttpStatus.OK, "removedSearchStringFromCounterParty", AlertType.SUCCESS, counterPartyDisplay);
+        return responseService.createResponseWithData(HttpStatus.OK, "removedSearchStringFromCounterParty", AlertType.SUCCESS, counterPartyDisplays);
     }
     //</editor-fold>
 

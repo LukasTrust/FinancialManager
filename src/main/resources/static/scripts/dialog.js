@@ -87,4 +87,21 @@ function showChangeHiddenDialog(type, messages) {
             await updateCounterPartyVisibility(messages, dialogContent, rightSide, leftSide.querySelector(".listContainerColumn"), true);
     });
 }
+function showMergeDialog(type, messages) {
+    const checkedData = getCheckedData(type);
+    const dialogContent = createDialogContent(messages["mergeHeader"], "bi bi-arrows-collapse-vertical", "", 70);
+    const info = type === Type.COUNTERPARTY ? messages["mergeCounterPartiesInfo"] : messages[""];
+    createAndAppendElement(dialogContent, "h2", "", info, { style: "margin-right: auto; margin-left: 30px; margin-top: 10px; margin-top: 10px;" });
+    const listContainer = createAndAppendElement(dialogContent, "div", "flexContainerSpaced");
+    const leftSide = createListSection(listContainer, messages["counterPartyHeader"], type, []);
+    const rightSide = createListSection(listContainer, messages["counterPartiesToMerge"], type, checkedData, true);
+    createDialogButton(leftSide, "bi bi-arrows-collapse-vertical", messages["mergeCounterParties"], "left", async () => {
+        if (type === Type.COUNTERPARTY)
+            await mergeCounterParties(dialogContent, messages, leftSide, rightSide);
+    });
+    createDialogButton(rightSide, "bi bi-bar-chart-steps", messages["chooseHeader"], "right", () => {
+        if (type === Type.COUNTERPARTY)
+            chooseHeader(dialogContent, messages, rightSide.querySelector(".listContainerColumn"), leftSide.querySelector(".listContainerColumn"));
+    });
+}
 //# sourceMappingURL=dialog.js.map

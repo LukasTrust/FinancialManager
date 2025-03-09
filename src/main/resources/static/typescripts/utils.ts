@@ -65,7 +65,7 @@ function createAndAppendElement(
 }
 
 function getCurrentCurrencySymbol(): string {
-    if (bankAccountId === 0)
+    if (bankAccountId === 0 || bankAccountId === undefined)
         return " " + Object.values(bankAccountSymbols)[0];
 
     return " " + bankAccountSymbols[bankAccountId];

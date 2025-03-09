@@ -287,10 +287,16 @@ function updateRowStyle(newRow: HTMLElement, checkBox: HTMLInputElement): void {
 }
 
 function updateRowGroupStyle(rowGroup: HTMLElement, checkBox: HTMLInputElement) {
-    if (checkBox.checked) {
-        rowGroup.classList.add("selectedRow");
-    } else {
-        rowGroup.classList.remove("selectedRow");
+    // Get the children of the rowGroup
+    const children = rowGroup.children;
+
+    // Loop through each child and add or remove the class
+    for (let i = 0; i < children.length; i++) {
+        if (checkBox.checked) {
+            children[i].classList.add("selectedRow");
+        } else {
+            children[i].classList.remove("selectedRow");
+        }
     }
 }
 

@@ -8,25 +8,24 @@
 
     background-color: var(--alert-bg-color);
     padding: 20px 40px;
-    min-width: 420px;
-    max-width: 420px;
+    min-width: 300px;
+    max-width: 90%;
+    width: fit-content;
     position: absolute;
-    right: 0px;
+    right: 0;
     top: 10px;
     overflow: hidden;
     border-radius: 4px;
     border-left: 8px solid var(--alert-border-color);
     transition: top 0.5s ease;
-    border-radius: 4px;
-    border-left: 8px solid var(--alert-border-color);
-    display: flex; /* Use flexbox for proper alignment */
-    align-items: center; /* Vertically align icon and text */
-    justify-content: space-between; /* Ensure space between icon, text, and button */
-    flex-wrap: wrap; /* Allow wrapping of text */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .alert.show {
-    animation: show_slide 1.5s ease forwards;
+    animation: show_slide 0.5s ease forwards;
 }
 
 @keyframes show_slide {
@@ -45,7 +44,7 @@
 }
 
 .alert.hide {
-    animation: hide_slide 1.5s ease forwards;
+    animation: hide_slide 0.5s ease forwards;
 }
 
 @keyframes hide_slide {
@@ -69,37 +68,43 @@
     top: 50%;
     transform: translateY(-50%);
     color: var(--alert-icon-color);
-    font-size: 30px;
+    font-size: 24px;
 }
 
 .alert .message {
     padding: 0 20px;
     font-size: 18px;
     color: var(--alert-text-color);
-    white-space: normal; /* Ensures text wraps */
-    word-wrap: break-word; /* Ensures long words break and wrap */
-    overflow-wrap: break-word; /* Alternative for word wrapping */
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    flex-grow: 1; /* Allow message to take up remaining space */
 }
 
-.alert .button-alert {
+.alert .buttonAlert {
     position: absolute;
-    right: 0px;
-    top: 50%;
-    transform: translateY(-50%);
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: auto;
     background: var(--alert-button-bg);
-    padding: 20px 18px;
+    padding: 0 18px; /* Adjust padding */
     cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+    transition: background 0.3s ease;
 }
 
-.button-alert:hover {
+.buttonAlert:hover {
     background: var(--alert-button-hover-bg);
-    z-index: 2;
 }
 
-.button-alert span {
+.buttonAlert span {
     color: var(--alert-icon-color);
     font-size: 22px;
-    line-height: 40px;
+    line-height: 1; /* Reset line height */
 }
 
 /* Alert types */

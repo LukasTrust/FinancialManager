@@ -41,7 +41,7 @@ function createAndAppendElement(parent, type, className = null, textContent = nu
     return element;
 }
 function getCurrentCurrencySymbol() {
-    if (bankAccountId === 0)
+    if (bankAccountId === 0 || bankAccountId === undefined)
         return " " + Object.values(bankAccountSymbols)[0];
     return " " + bankAccountSymbols[bankAccountId];
 }
