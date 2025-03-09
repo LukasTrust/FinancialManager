@@ -58,7 +58,7 @@ public class TransactionService {
         transactionRepository.save(transaction);
     }
 
-    public ResponseEntity<?> addContractToTransactions(Long bankAccountId, Long contractId, List<Long> transactionIds) {
+    public ResponseEntity<Response> addContractToTransactions(Long bankAccountId, Long contractId, List<Long> transactionIds) {
         Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
         if (bankAccountResult.isErr()) {
@@ -87,7 +87,7 @@ public class TransactionService {
                 List.of(contract.getName()));
     }
 
-    public ResponseEntity<?> removeContractFromTransactions(Long bankAccountId, List<Long> transactionIds) {
+    public ResponseEntity<Response> removeContractFromTransactions(Long bankAccountId, List<Long> transactionIds) {
         Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
         if (bankAccountResult.isErr()) {
@@ -107,7 +107,7 @@ public class TransactionService {
         return responseService.createResponse(HttpStatus.OK, "transactionsRemovedContract", AlertType.SUCCESS);
     }
 
-    public ResponseEntity<?> removeContractFromTransaction(Long bankAccountId, Long transactionId) {
+    public ResponseEntity<Response> removeContractFromTransaction(Long bankAccountId, Long transactionId) {
         Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
         if (bankAccountResult.isErr()) {
@@ -165,7 +165,7 @@ public class TransactionService {
                 .toList();
     }
 
-    public ResponseEntity<?> updateTransactionVisibility(Long bankAccountId, List<Long> transactionIds, boolean hide) {
+    public ResponseEntity<Response> updateTransactionVisibility(Long bankAccountId, List<Long> transactionIds, boolean hide) {
         Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
         if (bankAccountResult.isErr()) {

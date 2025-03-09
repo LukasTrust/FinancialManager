@@ -1,6 +1,7 @@
 package financialmanager.controller;
 
 import financialmanager.objectFolder.contractFolder.ContractService;
+import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,20 +23,20 @@ public class ContractController {
     }
 
     @PostMapping("/removeContractFromTransaction/{transactionId}")
-    public ResponseEntity<?> removeContractFromTransaction(
+    public ResponseEntity<Response> removeContractFromTransaction(
             @PathVariable Long bankAccountId,
             @PathVariable Long transactionId) {
         return transactionService.removeContractFromTransaction(bankAccountId, transactionId);
     }
 
     @PostMapping("/addContractToTransactions/{contractId}")
-    public ResponseEntity<?> addContractToTransactions(@PathVariable Long bankAccountId, @PathVariable Long contractId,
+    public ResponseEntity<Response> addContractToTransactions(@PathVariable Long bankAccountId, @PathVariable Long contractId,
                                                        @RequestBody List<Long> transactionIds) {
         return transactionService.addContractToTransactions(bankAccountId, contractId, transactionIds);
     }
 
     @PostMapping("/removeContractFromTransactions")
-    public ResponseEntity<?> removeContractFromTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
+    public ResponseEntity<Response> removeContractFromTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
         return transactionService.removeContractFromTransactions(bankAccountId, transactionIds);
     }
 }

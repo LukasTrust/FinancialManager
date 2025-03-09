@@ -14,5 +14,6 @@
   "contractNotFound": "Der Vertrag wurde nicht gefunden",
   "counterPartyNotFound": "Die Gegenpartei wurde nicht gefunden",
   "searchStringNotFoundInCounterParty": "Der Suchebegriff '{}' wurde nicht in der Gegenpartei gefunden",
-  "counterPartiesNotFound": "Die Gegenparteien wurden nicht gefunden"
+  "counterPartiesNotFound": "Die Gegenparteien wurden nicht gefunden",
+  "counterPartySearchStringAlreadyInCounterParty": "Der Suchbegriff ist bereits in einer Gegenpatei vorhanden. Bitte ihn erst dort entfernen before er hier hinzugefügt werden kann"
 }

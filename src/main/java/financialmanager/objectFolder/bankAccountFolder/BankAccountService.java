@@ -52,7 +52,6 @@ public class BankAccountService {
         }
 
         log.warn("User {} does not own the bank account {}", currentUser, bankAccountId);
-
         return new Err<>(responseService.createResponse(HttpStatus.NOT_FOUND, "bankNotFound", AlertType.ERROR));
     }
 

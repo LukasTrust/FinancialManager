@@ -21,6 +21,6 @@ public record Ok<T, E>(T value) implements Result<T, E> {
 
     @Override
     public E getError() {
-        throw new UnsupportedOperationException("Ok does not contain an error");
+        throw new UnsupportedOperationException("Cannot get error from Ok<T, E>");
     }
 }

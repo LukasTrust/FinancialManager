@@ -26,13 +26,16 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class CounterPartyService {
 
+    //<editor-fold desc="properties">
     private final CounterPartyRepository counterPartyRepository;
     private final ResponseService responseService;
     private final UsersService usersService;
     private final TransactionService transactionService;
 
     private static final Logger log = LoggerFactory.getLogger(CounterPartyService.class);
+    //</editor-fold>
 
+    //<editor-fold desc="repository functions">
     public void saveAll(List<CounterParty> counterParties) {
         counterPartyRepository.saveAll(counterParties);
     }
@@ -49,10 +52,17 @@ public class CounterPartyService {
         counterPartyRepository.deleteAll(counterParties);
     }
 
+    public boolean existsByCounterPartySearchStringsContaining(String searchString) {
+        return counterPartyRepository.existsByCounterPartySearchStringsContaining(searchString);
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="find functions">
     public Result<List<CounterParty>, ResponseEntity<Response>> findByIdInAndUsers(List<Long> counterPartyIds, Users user) {
         List<CounterParty> counterParties = counterPartyRepository.findByIdInAndUsers(counterPartyIds, user);
 
         if (counterParties.isEmpty()) {
+            log.warn("Counter parties not found");
             return new Err<>(responseService.createResponse(HttpStatus.NOT_FOUND, "counterPartiesNotFound", AlertType.ERROR));
         }
 
@@ -60,130 +70,28 @@ public class CounterPartyService {
     }
 
     public Result<CounterParty, ResponseEntity<Response>> findByIdAndUsers(Long counterPartyId, Users currentUser) {
-        Optional<CounterParty> counterPartyOptional = counterPartyRepository.findByIdAndUsers(counterPartyId, currentUser);
+        Optional<CounterParty> counterPartyOpt = counterPartyRepository.findByIdAndUsers(counterPartyId, currentUser);
 
-        if (counterPartyOptional.isPresent()) {
-            return new Ok<>(counterPartyOptional.get());
+        if (counterPartyOpt.isPresent()) {
+            CounterParty counterParty = counterPartyOpt.get();
+            return new Ok<>(counterParty);
+        } else {
+            log.warn("User {} does not own the bank account {}", currentUser, counterPartyId);
+            ResponseEntity<Response> errorResponse = responseService.createResponse(
+                    HttpStatus.NOT_FOUND, "counterPartyNotFound", AlertType.ERROR
+            );
+            return new Err<>(errorResponse);
         }
-
-        log.warn("User {} does not own the bank account {}", currentUser, counterPartyId);
-
-        return new Err<>(responseService.createResponse(HttpStatus.NOT_FOUND, "counterPartyNotFound", AlertType.ERROR));
     }
 
-    public ResponseEntity<?> mergeCounterParties(Long headerId, List<Long> counterPartyIds) {
-        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+    //</editor-fold>
 
-        if (currentUserResponse.isErr()) {
-            return currentUserResponse.getError();
-        }
-
-        Users currentUser = currentUserResponse.getValue();
-
-        Result<CounterParty, ResponseEntity<Response>> counterPartyResponse = findByIdAndUsers(headerId, currentUser);
-
-        if (counterPartyResponse.isErr()) {
-            return counterPartyResponse.getError();
-        }
-
-        CounterParty headerCounterParty = counterPartyResponse.getValue();
-
-        Result<List<CounterParty>, ResponseEntity<Response>> counterParties = findByIdInAndUsers(counterPartyIds, currentUser);
-
-        if (counterParties.isErr()) {
-            return counterParties.getError();
-        }
-
-        List<String> updatedData = mergeCounterPartiesIntoHeader(counterParties.getValue(), headerCounterParty);
-
-        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "counterPartiesMerged",
-                AlertType.SUCCESS, updatedData);
-    }
-
-    public ResponseEntity<?> updateCounterPartyVisibility(List<Long> counterPartyIds, boolean hide) {
-        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
-
-        if (currentUserResponse.isErr()) {
-            return currentUserResponse.getError();
-        }
-
-        Users currentUser = currentUserResponse.getValue();
-
-        Result<List<CounterParty>, ResponseEntity<Response>> counterParties = findByIdInAndUsers(counterPartyIds, currentUser);
-
-        if (counterParties.isErr()) {
-            return counterParties.getError();
-        }
-
-        List<String> updatedData = updateVisibilityForCounterParties(counterParties.getValue(), hide);
-
-        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, hide ? "counterPartiesHidden" : "counterPartiesUnHidden",
-                AlertType.SUCCESS, updatedData);
-    }
-
-    public ResponseEntity<?> removeSearchStringFromCounterParty(Long counterPartyId, String searchString) {
-        Result<CounterParty, ResponseEntity<Response>> counterPartyResult = getCounterParty(counterPartyId);
-
-        if (counterPartyResult.isErr()) {
-            return counterPartyResult.getError();
-        }
-
-        CounterParty counterParty = counterPartyResult.getValue();
-        List<String> searchStrings = counterParty.getCounterPartySearchStrings();
-
-        // Ensure search string removal is allowed
-        if (searchStrings.size() == 1) {
-            return responseService.createResponse(
-                    HttpStatus.BAD_REQUEST, "searchStringCanNotBeRemovedFromCounterParty", AlertType.WARNING);
-        }
-
-        // Attempt to remove the search string
-        if (!searchStrings.remove(searchString)) {
-            return responseService.createResponseWithPlaceHolders(
-                    HttpStatus.NOT_FOUND, "searchStringNotFoundInCounterParty", AlertType.ERROR, List.of(searchString));
-        }
-
-        CounterParty splitCounterParty = changeCounterPartyOfTransactions(counterParty.getUsers(), searchString);
-
-        if (splitCounterParty == null) {
-            // Return success response without new counterParty
-            return responseService.createResponse(
-                    HttpStatus.OK, "removedSearchStringFromCounterParty", AlertType.SUCCESS);
-        }
-
-        // Return success response with new counterParty
-        return responseService.createResponseWithData(
-                HttpStatus.OK, "removedSearchStringFromCounterParty", AlertType.SUCCESS, splitCounterParty);
-    }
-
+    //<editor-fold desc="get functions">
     public ResponseEntity<?> getCounterPartyDisplays() {
-        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
-
-        if (currentUserResponse.isErr()) {
-            return currentUserResponse.getError();
-        }
-
-        Users currentUser = currentUserResponse.getValue();
-
-        List<CounterPartyDisplay> counterPartyDisplays = createCounterPartyDisplays(currentUser);
-
-        return ResponseEntity.ok(counterPartyDisplays);
-    }
-
-    public ResponseEntity<?> updateCounterPartyField(Long counterPartyId, String newValue,
-                                                     BiConsumer<CounterParty, String> fieldUpdater) {
-        Result<CounterParty, ResponseEntity<Response>> counterPartyResult = getCounterParty(counterPartyId);
-
-        if (counterPartyResult.isErr()) {
-            return counterPartyResult.getError();
-        }
-
-        CounterParty counterParty = counterPartyResult.getValue();
-        fieldUpdater.accept(counterParty, newValue);
-
-        save(counterParty);
-
-        return ResponseEntity.ok().build();
+        return usersService.getCurrentUser()
+                .map(this::createCounterPartyDisplays)
+                .map(counterPartyDisplays -> ResponseEntity.ok((Object) counterPartyDisplays))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(usersService.getCurrentUser().getError()));
     }
 
     public Result<CounterParty, ResponseEntity<Response>> getCounterParty(Long counterPartyId) {
@@ -197,82 +105,6 @@ public class CounterPartyService {
 
         return findByIdAndUsers(counterPartyId, currentUser);
     }
-
-    private List<String> mergeCounterPartiesIntoHeader(List<CounterParty> mergingCounterParties, CounterParty targetCounterParty) {
-        List<Transaction> transactions = transactionService.findByCounterPartyIn(mergingCounterParties);
-
-        int contractCount = setCounterParty(targetCounterParty, transactions);
-
-        // Merge unique search strings efficiently
-        Set<String> mergedSearchStrings = mergingCounterParties.stream()
-                .flatMap(counterParty -> counterParty.getCounterPartySearchStrings().stream())
-                .collect(Collectors.toSet());
-
-        mergedSearchStrings.addAll(targetCounterParty.getCounterPartySearchStrings());
-        targetCounterParty.setCounterPartySearchStrings(new ArrayList<>(mergedSearchStrings));
-
-        // Remove merged counterparties
-        deleteAll(mergingCounterParties);
-
-        return List.of(
-                String.valueOf(mergingCounterParties.size()),
-                String.valueOf(transactions.size()),
-                String.valueOf(contractCount)
-        );
-    }
-
-    private List<String> updateVisibilityForCounterParties(List<CounterParty> counterParties, boolean isHidden) {
-        List<Transaction> transactions = transactionService.findByCounterPartyIn(counterParties);
-        List<Contract> contracts = transactions.stream()
-                .map(Transaction::getContract)
-                .toList();
-
-        transactions.forEach(transaction -> transaction.setHidden(isHidden));
-        contracts.forEach(contract -> contract.setHidden(isHidden));
-        counterParties.forEach(counterParty -> counterParty.setHidden(isHidden));
-
-        transactionService.saveAll(transactions);
-
-        return List.of(
-                String.valueOf(counterParties.size()),
-                String.valueOf(transactions.size()),
-                String.valueOf(contracts.size())
-        );
-    }
-
-    private CounterParty changeCounterPartyOfTransactions(Users currentUser, String counterPartyName) {
-        List<Transaction> transactions = transactionService.findByOriginalCounterParty(counterPartyName);
-
-        if (transactions.isEmpty()) {
-            return null;
-        }
-
-        CounterParty counterParty = new CounterParty(currentUser, counterPartyName);
-        setCounterParty(counterParty, transactions);
-
-        transactionService.saveAll(transactions);
-
-        return counterParty;
-    }
-
-    private int setCounterParty(CounterParty counterParty, List<Transaction> transactions) {
-        if (transactions.isEmpty()) {
-            return 0;
-        }
-
-        transactions.forEach(transaction -> transaction.setCounterParty(counterParty));
-
-        List<Contract> uniqueContracts = transactions.stream()
-                .map(Transaction::getContract)
-                .toList();
-
-        uniqueContracts.forEach(contract -> contract.setCounterParty(counterParty));
-
-        transactionService.saveAll(transactions);
-
-        return uniqueContracts.size();
-    }
-
 
     private List<CounterPartyDisplay> createCounterPartyDisplays(Users users) {
         List<CounterPartyDisplay> counterPartyDisplays = new ArrayList<>();
@@ -295,8 +127,152 @@ public class CounterPartyService {
 
         return counterPartyDisplays;
     }
+    //</editor-fold>
 
-    public void setCounterCounterParties(Users currentUser, List<Transaction> transactions) {
+    //<editor-fold desc="merge functions">
+    public ResponseEntity<Response> mergeCounterParties(Long headerId, List<Long> counterPartyIds) {
+        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+        if (currentUserResponse.isErr()) return currentUserResponse.getError();
+
+        Users currentUser = currentUserResponse.getValue();
+
+        Result<CounterParty, ResponseEntity<Response>> headerResult = findByIdAndUsers(headerId, currentUser);
+        if (headerResult.isErr()) {
+            log.error("Error loading the header counter party, id: {}", headerId);
+            return headerResult.getError();
+        }
+
+        Result<List<CounterParty>, ResponseEntity<Response>> counterPartiesResult = findByIdInAndUsers(counterPartyIds, currentUser);
+        if (counterPartiesResult.isErr()) {
+            log.error("Error loading the counter parties, ids: {}", counterPartyIds);
+            return counterPartiesResult.getError();
+        }
+
+        List<String> updatedData = mergeCounterPartiesIntoHeader(counterPartiesResult.getValue(), headerResult.getValue());
+
+        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "counterPartiesMerged", AlertType.SUCCESS, updatedData);
+    }
+
+    private List<String> mergeCounterPartiesIntoHeader(List<CounterParty> mergingCounterParties, CounterParty targetCounterParty) {
+        List<Transaction> transactions = transactionService.findByCounterPartyIn(mergingCounterParties);
+
+        int contractCount = setCounterParty(targetCounterParty, transactions);
+
+        // Merge unique search strings
+        Set<String> mergedSearchStrings = mergingCounterParties.stream()
+                .flatMap(cp -> cp.getCounterPartySearchStrings().stream())
+                .collect(Collectors.toSet());
+
+        mergedSearchStrings.addAll(targetCounterParty.getCounterPartySearchStrings());
+        targetCounterParty.setCounterPartySearchStrings(new ArrayList<>(mergedSearchStrings));
+
+        deleteAll(mergingCounterParties);
+
+        return List.of(
+                String.valueOf(mergingCounterParties.size()),
+                String.valueOf(transactions.size()),
+                String.valueOf(contractCount)
+        );
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="update functions">
+    //<editor-fold desc="visibility functions">
+    public ResponseEntity<Response> updateCounterPartyVisibility(List<Long> counterPartyIds, boolean hide) {
+        return usersService.getCurrentUser()
+                .flatMap(user -> findByIdInAndUsers(counterPartyIds, user))
+                .map(counterParties -> {
+                    List<String> updatedData = updateVisibilityForCounterParties(counterParties, hide);
+                    return responseService.createResponseWithPlaceHolders(
+                            HttpStatus.OK, hide ? "counterPartiesHidden" : "counterPartiesUnHidden",
+                            AlertType.SUCCESS, updatedData
+                    );
+                })
+                .orElseGet(usersService.getCurrentUser()::getError);
+    }
+
+    private List<String> updateVisibilityForCounterParties(List<CounterParty> counterParties, boolean isHidden) {
+        List<Transaction> transactions = transactionService.findByCounterPartyIn(counterParties);
+        List<Contract> contracts = transactions.stream().map(Transaction::getContract).toList();
+
+        transactions.forEach(transaction -> transaction.setHidden(isHidden));
+        contracts.forEach(contract -> contract.setHidden(isHidden));
+        counterParties.forEach(counterParty -> counterParty.setHidden(isHidden));
+
+        transactionService.saveAll(transactions);
+
+        return List.of(
+                String.valueOf(counterParties.size()),
+                String.valueOf(transactions.size()),
+                String.valueOf(contracts.size())
+        );
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="change searchString functions">
+    public ResponseEntity<Response> addSearchStringToCounterParty(Long counterPartyId, String searchString) {
+        if (existsByCounterPartySearchStringsContaining(searchString)) {
+            log.warn("Counter parties contains search string {}", searchString);
+            return responseService.createResponse(HttpStatus.CONFLICT, "counterPartySearchStringAlreadyInCounterParty", AlertType.ERROR);
+        }
+
+        return getCounterParty(counterPartyId)
+                .map(counterParty -> {
+                    counterParty.getCounterPartySearchStrings().add(searchString);
+                    save(counterParty);
+                    return responseService.createResponse(HttpStatus.OK, "addedSearchStringToCounterParty", AlertType.SUCCESS);
+                })
+                .getError();
+    }
+
+    public ResponseEntity<Response> removeSearchStringFromCounterParty(Long counterPartyId, String searchString) {
+        return getCounterParty(counterPartyId)
+                .flatMap(counterParty -> {
+                    List<String> searchStrings = counterParty.getCounterPartySearchStrings();
+
+                    if (searchStrings.size() == 1) {
+                        log.warn("Search string list size is 1, can not remove search string {} from id: {}", searchString, counterPartyId);
+                        return new Err<>(responseService.createResponse(
+                                HttpStatus.BAD_REQUEST, "searchStringCanNotBeRemovedFromCounterParty", AlertType.WARNING));
+                    }
+
+                    if (!searchStrings.remove(searchString)) {
+                        log.error("Error while removing search string {} from id: {}", searchString, counterPartyId);
+                        return new Err<>(responseService.createResponseWithPlaceHolders(
+                                HttpStatus.NOT_FOUND, "searchStringNotFoundInCounterParty", AlertType.ERROR, List.of(searchString)));
+                    }
+
+                    CounterParty splitCounterParty = changeCounterPartyOfTransactions(counterParty.getUsers(), searchString);
+                    return new Ok<>(splitCounterParty);
+                })
+                .map(splitCounterParty -> splitCounterParty != null
+                        ? responseService.createResponseWithData(HttpStatus.OK, "removedSearchStringFromCounterParty", AlertType.SUCCESS, splitCounterParty)
+                        : responseService.createResponse(HttpStatus.OK, "removedSearchStringFromCounterParty", AlertType.SUCCESS)
+                )
+                .getError();
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="edit counterParty">
+    public ResponseEntity<Response> updateCounterPartyField(Long counterPartyId, String newValue,
+                                                            BiConsumer<CounterParty, String> fieldUpdater) {
+        Result<CounterParty, ResponseEntity<Response>> counterPartyResult = getCounterParty(counterPartyId);
+
+        if (counterPartyResult.isErr()) {
+            return counterPartyResult.getError();
+        }
+
+        CounterParty counterParty = counterPartyResult.getValue();
+        fieldUpdater.accept(counterParty, newValue);
+
+        save(counterParty);
+
+        return ResponseEntity.ok().build();
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="edit transactions">
+    public void setCounterPartyForNewTransactions(Users currentUser, List<Transaction> transactions) {
         List<CounterParty> existingCounterParties = findByUsers(currentUser);
         Map<String, CounterParty> counterPartyLookup = new HashMap<>();
 
@@ -335,4 +311,30 @@ public class CounterPartyService {
             saveAll(newCounterParties);
         }
     }
+
+    private CounterParty changeCounterPartyOfTransactions(Users currentUser, String counterPartyName) {
+        List<Transaction> transactions = transactionService.findByOriginalCounterParty(counterPartyName);
+        if (transactions.isEmpty()) return null;
+
+        CounterParty counterParty = new CounterParty(currentUser, counterPartyName);
+        setCounterParty(counterParty, transactions);
+
+        transactionService.saveAll(transactions);
+
+        return counterParty;
+    }
+
+    private int setCounterParty(CounterParty counterParty, List<Transaction> transactions) {
+        if (transactions.isEmpty()) return 0;
+
+        transactions.forEach(transaction -> transaction.setCounterParty(counterParty));
+
+        List<Contract> uniqueContracts = transactions.stream().map(Transaction::getContract).toList();
+        uniqueContracts.forEach(contract -> contract.setCounterParty(counterParty));
+
+        transactionService.saveAll(transactions);
+        return uniqueContracts.size();
+    }
+    //</editor-fold>
+    //</editor-fold>
 }

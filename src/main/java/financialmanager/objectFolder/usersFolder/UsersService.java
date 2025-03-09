@@ -6,6 +6,8 @@ import financialmanager.Utils.Result.Ok;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -23,6 +25,8 @@ import java.util.Optional;
 public class UsersService implements UserDetailsService {
 
     private final UsersRepository usersRepository;
+    
+    private static final Logger log = LoggerFactory.getLogger(UsersService.class);
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -35,6 +39,7 @@ public class UsersService implements UserDetailsService {
                     .build();
         }
         else{
+            log.error("User not found, email: {}", email);
             throw new UsernameNotFoundException(email);
         }
     }
@@ -55,8 +60,10 @@ public class UsersService implements UserDetailsService {
                 return new Ok<>(usersOptional.get());
             }
 
+            log.error("Current User not found, email: {}", username);
             return new Err<>(ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(AlertType.ERROR, "User not found", null)));
         } catch (Exception e) {
+            log.error("Error while getting current user", e);
             return new Err<>(ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Response(AlertType.ERROR, "Internal server error", null)));
         }
     }

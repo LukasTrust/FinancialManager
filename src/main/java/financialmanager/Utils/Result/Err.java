@@ -16,7 +16,7 @@ public record Err<T, E>(E error) implements Result<T, E> {
 
     @Override
     public T getValue() {
-        throw new UnsupportedOperationException("Err does not contain a value");
+        throw new UnsupportedOperationException("Cannot get value from Err<T, E>");
     }
 
     @Override

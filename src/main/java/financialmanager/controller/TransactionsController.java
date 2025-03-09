@@ -1,5 +1,6 @@
 package financialmanager.controller;
 
+import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +21,12 @@ public class TransactionsController {
     }
 
     @PostMapping("/hideTransactions")
-    public ResponseEntity<?> hideTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
+    public ResponseEntity<Response> hideTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
         return transactionService.updateTransactionVisibility(bankAccountId, transactionIds, true);
     }
 
     @PostMapping("/unHideTransactions")
-    public ResponseEntity<?> unHideTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
+    public ResponseEntity<Response> unHideTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
         return transactionService.updateTransactionVisibility(bankAccountId, transactionIds, false);
     }
 }

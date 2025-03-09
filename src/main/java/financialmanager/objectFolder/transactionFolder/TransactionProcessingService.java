@@ -121,7 +121,7 @@ public class TransactionProcessingService {
     }
 
     private void processAndSaveTransactions(Users currentUser, List<Transaction> newTransactions, List<Transaction> existingTransactions) {
-        counterPartyService.setCounterCounterParties(currentUser, newTransactions);
+        counterPartyService.setCounterPartyForNewTransactions(currentUser, newTransactions);
         categoryProcessingService.addTransactionsToCategories(currentUser, newTransactions);
 
         newTransactions.addAll(getTransactionsWithoutContract(existingTransactions));
