@@ -1,9 +1,12 @@
 package financialmanager.objectFolder.counterPartyFolder;
 
-import financialmanager.Utils.JsonStringListConverter;
 import financialmanager.objectFolder.usersFolder.Users;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +38,9 @@ public class CounterParty {
     @Column(nullable = false)
     private boolean isHidden;
 
-    @Setter
-    @Convert(converter = JsonStringListConverter.class)
+    @Type(JsonBinaryType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "counter_party_search_strings", columnDefinition = "jsonb")
     private List<String> counterPartySearchStrings;
 
     public CounterParty(Users users, String name) {

@@ -55,6 +55,25 @@ async function loadCounterParties(messages) {
         showAlert('error', messages["error_generic"]);
     }
 }
+async function addSearchString(counterPartyId, newSearchString, messages, parent, toolTip) {
+    try {
+        const params = new URLSearchParams();
+        params.append("searchString", newSearchString);
+        const url = `/counterParty/data/${counterPartyId}/addSearchString?${params.toString()}`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        await showAlertFromResponse(response);
+        if (response.ok) {
+            createListElement(parent, newSearchString, {}, true, true, toolTip, () => removeSearchStringFromCounterParty(counterPartyId, newSearchString, messages), true);
+        }
+    }
+    catch (error) {
+        console.error(`There was an error adding a searchString to the counterParty:`, error);
+        showAlert('error', messages["error_generic"]);
+    }
+}
 async function updateCounterPartyField(counterPartyId, field, newValue, messages) {
     try {
         const response = await fetch(`/counterParty/data/${counterPartyId}/change/${field}/${newValue}`, {
@@ -63,7 +82,6 @@ async function updateCounterPartyField(counterPartyId, field, newValue, messages
         });
         if (!response.ok) {
             await showAlertFromResponse(response);
-            return;
         }
     }
     catch (error) {
@@ -110,12 +128,18 @@ async function removeSearchStringFromCounterParty(counterPartyId, searchString, 
         const responseBody = await response.json();
         showAlert(responseBody.alertType, responseBody.message);
         if (responseBody.alertType === AlertType.SUCCESS) {
-            const createdCounterParty = responseBody.data[0];
-            const updatedCounterParty = responseBody.data[1];
+            const updatedCounterParty = responseBody.data[0];
+            if (responseBody.data.length == 2) {
+                const createdCounterParty = responseBody.data[1];
+                counterPartyData.push(createdCounterParty);
+                filteredCounterPartyData.push(createdCounterParty);
+                showAlert(AlertType.INFO, messages["counterPartyWasSplit"]);
+            }
+            else {
+                showAlert(AlertType.INFO, messages["counterPartyWasUpdated"]);
+            }
             updateCounterParty(updatedCounterParty, counterPartyData);
             updateCounterParty(updatedCounterParty, filteredCounterPartyData);
-            counterPartyData.push(createdCounterParty);
-            filteredCounterPartyData.push(createdCounterParty);
             splitDataIntoPages(messages, Type.COUNTERPARTY, filteredCounterPartyData);
         }
     }
@@ -181,6 +205,7 @@ function createCounterPartyRow(tableBody, counterPartyDisplay, currency, toolTip
         rowGroupClass += " hidden";
     }
     const rowGroup = createAndAppendElement(tableBody, "div", rowGroupClass);
+    animateElement(rowGroup);
     const newRow = createAndAppendElement(rowGroup, "tr", "rowWithSubRow", "", { id: counterParty.id.toString() });
     createAndAppendElement(newRow, "td", "", "", { style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px" });
     createCheckBoxForRowGroup(rowGroup, newRow, counterParty.id, counterParty.hidden);
@@ -205,7 +230,15 @@ function createCounterPartyRow(tableBody, counterPartyDisplay, currency, toolTip
     const searchStringRow = createAndAppendElement(rowGroup, "tr", "subRow", "");
     const counterpartySearchStrings = createAndAppendElement(searchStringRow, "td", "", "", { style: "width: 20%" });
     createAndAppendElement(counterpartySearchStrings, "h3", "", messages["counterpartySearchStrings"]);
-    const searchStringCell = createAndAppendElement(searchStringRow, "td", "", "", { style: "width: 80%" });
+    const searchString = createAndAppendElement(searchStringRow, "td", "", "", { style: "width: 20%" });
+    const searchStringContainer = createAndAppendElement(searchString, "div", "flexContainer");
+    const searchStringInput = createInputBox(searchStringContainer, "", "name", "text", "", messages["addSearchStringPlaceHolder"]);
+    const searchStringButton = createAndAppendElement(searchStringContainer, "button", "iconOnlyButton bi bi bi-plus-circle");
+    searchStringButton.addEventListener("click", async () => {
+        await addSearchString(counterParty.id, searchStringInput.value, messages, listContainer, toolTip);
+        searchStringInput.value = "";
+    });
+    const searchStringCell = createAndAppendElement(searchStringRow, "td", "", "", { style: "width: 60%" });
     const listContainer = createAndAppendElement(searchStringCell, "div", "listContainer", "", { style: "justify-content: normal; overflow: visible;" });
     counterParty.counterPartySearchStrings.forEach(searchString => {
         createListElement(listContainer, searchString, {}, true, true, toolTip, () => removeSearchStringFromCounterParty(counterParty.id, searchString, messages));

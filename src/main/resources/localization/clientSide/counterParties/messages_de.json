@@ -32,5 +32,8 @@
   "counterPartyHeader": "Kopf Gegenpartei",
   "counterPartiesToMerge": "Gegenparteien zum vereinigen",
   "chooseHeader": "Auswahl as Kopf auswählen",
-  "error_SelectAHeader": "Bitte einen Kopf auswählen"
+  "error_SelectAHeader": "Bitte einen Kopf auswählen",
+  "addSearchStringPlaceHolder": "Neue Suchbegriffe hinzufügen",
+  "counterPartyWasSplit": "Der entfernte Suchbegriff wurde in eine neue Gegenpartei aufgeteilt da er noch in Transaktionen verwendet wird",
+  "counterPartyWasUpdated": "Der entfernete Suchbegriff wurde noch in Transaktionen verwendet, die restlichen Suchbegriffe jedoch nicht"
 }

@@ -96,8 +96,8 @@ th i {
 
 tbody {
     display: block;
-    max-height: 70vh;
-    height: 70vh;
+    max-height: 69vh;
+    height: 69vh;
     overflow-y: auto;
 }
 
@@ -129,6 +129,7 @@ tr:hover {
     margin-left: 20px;
     border-left: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 0 0 8px 8px;
+    width: auto;
 }
 
 .hover {

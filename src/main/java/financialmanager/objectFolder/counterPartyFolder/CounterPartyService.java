@@ -52,9 +52,14 @@ public class CounterPartyService {
         counterPartyRepository.deleteAll(counterParties);
     }
 
-    public boolean existsByCounterPartySearchStringsContaining(String searchString) {
-        return counterPartyRepository.existsByCounterPartySearchStringsContaining(searchString);
+    public void delete(CounterParty counterParty) {
+        counterPartyRepository.delete(counterParty);
     }
+
+    public boolean existsByCounterPartySearchStringsContaining(String searchString) {
+        return !counterPartyRepository.findByCounterPartySearchStringsContaining(searchString).isEmpty();
+    }
+
     //</editor-fold>
 
     //<editor-fold desc="find functions">
@@ -231,24 +236,34 @@ public class CounterPartyService {
             return responseService.createResponse(HttpStatus.CONFLICT, "counterPartySearchStringAlreadyInCounterParty", AlertType.ERROR);
         }
 
-        return getCounterParty(counterPartyId)
-                .map(counterParty -> {
-                    counterParty.getCounterPartySearchStrings().add(searchString);
-                    save(counterParty);
-                    return responseService.createResponse(HttpStatus.OK, "addedSearchStringToCounterParty", AlertType.SUCCESS);
-                })
-                .getError();
+        Result<CounterParty, ResponseEntity<Response>> counterPartyResult = getCounterParty(counterPartyId);
+
+        if (counterPartyResult.isErr()) {
+            return counterPartyResult.getError();
+        }
+
+        CounterParty counterParty = counterPartyResult.getValue();
+        counterParty.getCounterPartySearchStrings().add(searchString);
+        save(counterParty);
+
+        return responseService.createResponse(HttpStatus.OK, "addedSearchStringToCounterParty", AlertType.SUCCESS);
     }
 
     public ResponseEntity<Response> removeSearchStringFromCounterParty(Long counterPartyId, String searchString) {
         Result<CounterParty, ResponseEntity<Response>> counterPartyResult = getCounterParty(counterPartyId);
 
-        if (counterPartyResult.isErr()){
+        if (counterPartyResult.isErr()) {
             return counterPartyResult.getError();
         }
 
         CounterParty counterParty = counterPartyResult.getValue();
         List<String> searchStrings = counterParty.getCounterPartySearchStrings();
+
+        if (!searchStrings.contains(searchString)) {
+            log.error("Counter parties contains search string {}", searchString);
+            return responseService.createResponse(
+                    HttpStatus.BAD_REQUEST, "searchStringNotInCounterParty", AlertType.ERROR);
+        }
 
         if (searchStrings.size() == 1) {
             log.warn("Search string list size is 1, can not remove search string {} from id: {}", searchString, counterPartyId);
@@ -262,10 +277,35 @@ public class CounterPartyService {
                     HttpStatus.NOT_FOUND, "searchStringNotFoundInCounterParty", AlertType.ERROR, List.of(searchString));
         }
 
-        CounterParty splitCounterParty = changeCounterPartyOfTransactions(counterParty.getUsers(), searchString);
         List<CounterPartyDisplay> counterPartyDisplays = new ArrayList<>();
-        counterPartyDisplays.add(createCounterPartyDisplay(splitCounterParty));
-        counterPartyDisplays.add(createCounterPartyDisplay(counterParty));
+
+        if (!checkIfOtherSearchStringsAreInUse(searchStrings)) {
+            // No other search strings are in use, reset list and add back searchString
+            searchStrings = new ArrayList<>();
+            searchStrings.add(searchString);
+
+            counterParty.setCounterPartySearchStrings(searchStrings);
+
+            // Ensure the updated counterparty is added first
+            CounterPartyDisplay updatedDisplay = createCounterPartyDisplay(counterParty);
+            counterPartyDisplays.add(updatedDisplay);
+        } else {
+            // Updated counterparty should be first
+            counterParty.setCounterPartySearchStrings(searchStrings);
+
+            CounterPartyDisplay updatedDisplay = createCounterPartyDisplay(counterParty);
+            counterPartyDisplays.add(updatedDisplay);
+
+            CounterParty splitCounterParty = changeCounterPartyOfTransactions(counterParty.getUsers(), searchString);
+
+            // Create and add the split counterparty second
+            if (splitCounterParty != null) {
+                CounterPartyDisplay splitDisplay = createCounterPartyDisplay(splitCounterParty);
+                counterPartyDisplays.add(splitDisplay);
+            }
+        }
+
+        save(counterParty);
 
         return responseService.createResponseWithData(HttpStatus.OK, "removedSearchStringFromCounterParty", AlertType.SUCCESS, counterPartyDisplays);
     }
@@ -330,18 +370,27 @@ public class CounterPartyService {
         }
     }
 
+    private boolean checkIfOtherSearchStringsAreInUse(List<String> searchStrings) {
+        for (String searchString : searchStrings) {
+            if (!transactionService.findByOriginalCounterParty(searchString).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private CounterParty changeCounterPartyOfTransactions(Users currentUser, String counterPartyName) {
         List<Transaction> transactions = transactionService.findByOriginalCounterParty(counterPartyName);
         if (transactions.isEmpty()) return null;
 
-        CounterParty counterParty = new CounterParty(currentUser, counterPartyName);
-        setCounterParty(counterParty, transactions);
+        CounterParty splitCounterParty = new CounterParty(currentUser, counterPartyName);
+        setCounterParty(splitCounterParty, transactions);
 
-        save(counterParty);
+        save(splitCounterParty);
 
         transactionService.saveAll(transactions);
 
-        return counterParty;
+        return splitCounterParty;
     }
 
     private int setCounterParty(CounterParty counterParty, List<Transaction> transactions) {

@@ -1,6 +1,5 @@
 package financialmanager.controller;
 
-import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.chartFolder.ChartData;
 import financialmanager.objectFolder.chartFolder.ChartService;
 import financialmanager.objectFolder.keyFigureFolder.KeyFigure;

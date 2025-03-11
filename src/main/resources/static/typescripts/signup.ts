@@ -32,7 +32,7 @@ async function submitSignup(messages: Record<string, string>): Promise<void> {
         return;
     }
 
-    const data = { firstName, lastName, email, password };
+    const user = { firstName, lastName, email, password };
 
     try {
         const response = await fetch('/signup', {
@@ -41,13 +41,22 @@ async function submitSignup(messages: Record<string, string>): Promise<void> {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(user),
         });
 
-        const responseBody: { alertType: string; message: string } = await response.json();
-        showAlert(responseBody.alertType, responseBody.message);
+        const responseBody: string = await response.text();
 
-        if (responseBody.alertType.toLowerCase() === 'warning' || responseBody.alertType.toLowerCase() === 'error') {
+        let alertType: AlertType;
+
+        if (responseBody.startsWith("success"))
+            alertType = AlertType.SUCCESS;
+        else if (responseBody.startsWith("warning"))
+            alertType = AlertType.WARNING;
+        else alertType = AlertType.ERROR;
+
+        showAlert(alertType, messages[responseBody]);
+
+        if (alertType === AlertType.WARNING || alertType === AlertType.ERROR) {
             const passwordField = document.getElementById("password") as HTMLInputElement | null;
             const confirmPasswordField = document.getElementById("confirmPassword") as HTMLInputElement | null;
             if (passwordField) passwordField.value = '';

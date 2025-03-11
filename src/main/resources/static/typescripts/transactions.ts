@@ -103,6 +103,7 @@ function addRowsToTransactionTable(data: Transaction[], messages: Record<string,
 
             const newRow = createAndAppendElement(tableBody, "tr", rowClass, null, {id: transaction.id.toString()});
             createCheckBoxForTable(newRow, transaction.id, transaction.hidden);
+            animateElement(newRow);
 
             // Counterparty cell
             const counterparty = createAndAppendElement(newRow, "td", "", "", {style: "width: 25%"});

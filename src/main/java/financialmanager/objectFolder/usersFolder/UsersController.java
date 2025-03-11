@@ -29,20 +29,19 @@ public class UsersController {
             Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
 
     @PostMapping(value = "/signup", consumes = "application/json", produces = "application/json")
-    @ResponseBody
-    public ResponseEntity<Response> createUser(@RequestBody Users user) {
+    public ResponseEntity<String> createUser(@RequestBody Users user) {
         try {
             // Validate email
             String email = user.getEmail();
             if (!isValidEmail(email)) {
-                return responseService.createResponse(HttpStatus.BAD_REQUEST, "invalidEmail", AlertType.WARNING);
+                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("warning_invalidEmail") ;
             }
 
             // Validate password
             String password = user.getPassword();
 //            String passwordValidationMessage = validatePassword(password);
 //            if (passwordValidationMessage != null) {
-//                return responseService.createResponse(HttpStatus.BAD_REQUEST, passwordValidationMessage, AlertType.WARNING);
+//                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(passwordValidationMessage);
 //            }
 
             // Encode password
@@ -52,22 +51,21 @@ public class UsersController {
             usersService.save(user);
 
             // Success response
-            return responseService.createResponse(HttpStatus.CREATED, "signUp", AlertType.SUCCESS);
-
+            return ResponseEntity.status(HttpStatus.OK).body("success_signUp");
         } catch (DataIntegrityViolationException e) {
-            return responseService.createResponse(HttpStatus.CONFLICT, "userExists", AlertType.ERROR);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("error_userExists");
         } catch (Exception e) {
-            return responseService.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, "generic", AlertType.ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error_generic");
         }
     }
 
     // Utility method for password validation
     public String validatePassword(String password) {
         if (password.length() < 8) {
-            return "passwordLength";
+            return "warning_passwordLength";
         }
         if (!isStrongPassword(password)) {
-            return "error_passwordStrength";
+            return "warning_passwordStrength";
         }
         return null; // Indicates password is valid
     }

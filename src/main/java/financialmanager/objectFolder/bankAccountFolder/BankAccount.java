@@ -5,10 +5,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import financialmanager.Utils.JsonStringListConverter;
 import financialmanager.objectFolder.bankAccountFolder.savingsBankAccountFolder.SavingsBankAccount;
 import financialmanager.objectFolder.usersFolder.Users;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 
@@ -44,19 +48,23 @@ public class BankAccount {
     @Column(nullable = false)
     private String currencySymbol;
 
-    @Setter
-    @Convert(converter = JsonStringListConverter.class)
+    @Type(JsonBinaryType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "amount_search_strings", columnDefinition = "jsonb")
     private List<String> amountSearchStrings;
 
-    @Setter
-    @Convert(converter = JsonStringListConverter.class)
+    @Type(JsonBinaryType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "date_search_strings", columnDefinition = "jsonb")
     private List<String> dateSearchStrings;
 
-    @Setter
-    @Convert(converter = JsonStringListConverter.class)
+    @Type(JsonBinaryType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "counter_party_search_strings", columnDefinition = "jsonb")
     private List<String> counterPartySearchStrings;
 
-    @Setter
-    @Convert(converter = JsonStringListConverter.class)
+    @Type(JsonBinaryType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "amount_in_bank_after_search_strings", columnDefinition = "jsonb")
     private List<String> amountInBankAfterSearchStrings;
 }

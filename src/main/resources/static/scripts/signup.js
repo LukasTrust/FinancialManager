@@ -28,7 +28,7 @@ async function submitSignup(messages) {
         showAlert('warning', messages["error_passwordNotMatch"]);
         return;
     }
-    const data = { firstName, lastName, email, password };
+    const user = { firstName, lastName, email, password };
     try {
         const response = await fetch('/signup', {
             method: 'POST',
@@ -36,11 +36,18 @@ async function submitSignup(messages) {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(user),
         });
-        const responseBody = await response.json();
-        showAlert(responseBody.alertType, responseBody.message);
-        if (responseBody.alertType.toLowerCase() === 'warning' || responseBody.alertType.toLowerCase() === 'error') {
+        const responseBody = await response.text();
+        let alertType;
+        if (responseBody.startsWith("success"))
+            alertType = AlertType.SUCCESS;
+        else if (responseBody.startsWith("warning"))
+            alertType = AlertType.WARNING;
+        else
+            alertType = AlertType.ERROR;
+        showAlert(alertType, messages[responseBody]);
+        if (alertType === AlertType.WARNING || alertType === AlertType.ERROR) {
             const passwordField = document.getElementById("password");
             const confirmPasswordField = document.getElementById("confirmPassword");
             if (passwordField)

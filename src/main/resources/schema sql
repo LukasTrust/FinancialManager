@@ -23,10 +23,10 @@ create table if not exists  bank_account
     description                  varchar(255),
         name                         varchar(255) not null,
     currency_symbol                     varchar(5),
-    amount_in_bank_after_search_strings varchar(255),
-    amount_search_strings               varchar(255),
-    counter_party_search_strings        varchar(255),
-    date_search_strings                 varchar(255)
+    amount_in_bank_after_search_strings jsonb,
+    amount_search_strings               jsonb,
+    counter_party_search_strings        jsonb,
+    date_search_strings                 jsonb
 );
 
 -- Create SAVINGS-BANK-ACCOUNT table
@@ -37,7 +37,7 @@ create table if not exists savings_bank_account
         primary key
         constraint saving_bank_account
             references bank_account,
-    interest_rate_search_strings varchar(255)
+    interest_rate_search_strings jsonb
 );
 
 -- Create COUNTER-PARTY table
@@ -48,7 +48,7 @@ create table if not exists counter_party
     user_id                             bigint not null
             constraint counter_party_to_users
                 references users,
-    counter_party_search_strings varchar(255),
+    counter_party_search_strings JSONB,
     description                  varchar(255),
     name                         varchar(255) not null,
     is_Hidden             boolean not null DEFAULT FALSE
@@ -70,7 +70,6 @@ create table if not exists contract
     user_id                 bigint not null
                                            constraint contract_user
                                                references users,
-    contract_search_strings varchar(255),
     description             varchar(255),
     name                    varchar(255) not null,
     amount double precision not null,
@@ -102,7 +101,7 @@ create table if not exists category
     user_id                             bigint not null
             constraint category_to_users
                 references users,
-    counter_party_search_strings varchar(255),
+    counter_party_search_strings jsonb,
     description                  varchar(255),
     name                         varchar(255) not null
 );

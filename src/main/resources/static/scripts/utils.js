@@ -10,7 +10,16 @@ function toggleSelection(selectedElement, currentSelection, className) {
         return selectedElement;
     }
 }
-function createListElement(parent, text, attributes = {}, addRemove = true, small = false, toolTipText, removeCallback = (element) => { var _a; return (_a = element.parentElement) === null || _a === void 0 ? void 0 : _a.removeChild(element); }) {
+function animateElement(element) {
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(-20px)';
+    setTimeout(() => {
+        element.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+        element.style.opacity = '1';
+        element.style.transform = 'translateY(0)';
+    }, 10);
+}
+function createListElement(parent, text, attributes = {}, addRemove = true, small = false, toolTipText, removeCallback = (element) => { var _a; return (_a = element.parentElement) === null || _a === void 0 ? void 0 : _a.removeChild(element); }, animateTheElements = false) {
     let classType = small ? "listItemSmall" : "listItem";
     if (toolTipText) {
         classType += " tooltip tooltipBottom";
@@ -27,6 +36,8 @@ function createListElement(parent, text, attributes = {}, addRemove = true, smal
             removeButton.style.marginLeft = "20px";
         }
     }
+    if (animateTheElements)
+        animateElement(item);
     return item;
 }
 function createAndAppendElement(parent, type, className = null, textContent = null, attributes = {}, eventListeners = {}) {
@@ -53,7 +64,7 @@ function formatDateString(date) {
 function formatNumber(number, currency) {
     return `${number.toFixed(2).replace('.', ',')} ${currency}`;
 }
-function createInputBox(parent, icon, idText, type, text = null) {
+function createInputBox(parent, icon, idText, type, text = null, placeHolder = null) {
     const inputBox = createAndAppendElement(parent, "div", "inputBox");
     createAndAppendElement(inputBox, "span", icon);
     createAndAppendElement(inputBox, "label", "", "", { for: idText });
@@ -65,6 +76,9 @@ function createInputBox(parent, icon, idText, type, text = null) {
     });
     if (text !== null) {
         inputElement.value = text;
+    }
+    if (placeHolder) {
+        inputElement.placeholder = placeHolder;
     }
     return inputElement;
 }
@@ -87,11 +101,13 @@ function removeElements(sourceContainer, soloItem = null) {
     let items = soloItem ? [soloItem] : Array.from(sourceContainer.querySelectorAll('.listItem'));
     items.forEach((item, index) => {
         setTimeout(() => {
-            item.parentElement.removeChild(item);
+            // Animate the item before removing it
+            animateElement(item);
+            // Wait for the transition to complete
             item.addEventListener('transitionend', () => {
-                item.remove();
+                item.remove(); // Remove the item from the DOM
             }, { once: true });
-        }, index * 150); // Stagger effect
+        }, index * 150); // 150ms delay between items for a smoother stagger
     });
 }
 function moveElements(sourceContainer, targetContainer, soloItem = null) {
@@ -100,15 +116,13 @@ function moveElements(sourceContainer, targetContainer, soloItem = null) {
         items.push(soloItem);
     }
     items.forEach((item, index) => {
-        // Add a delay for staggered animation
         setTimeout(() => {
-            item.classList.add('moving');
-            // Wait for the transition to complete
             item.addEventListener('transitionend', () => {
                 targetContainer.appendChild(item);
                 item.classList.remove('moving');
+                animateElement(item); // Animate the item back into view
             }, { once: true });
-        }, index * 150); // 150ms delay between items for a smoother stagger
+        }, index * 150);
     });
 }
 function createCheckBoxForRowGroup(rowGroup, newRow, id, isHidden) {
@@ -123,8 +137,13 @@ function createCheckBoxForRowGroup(rowGroup, newRow, id, isHidden) {
     });
     checkBox.addEventListener("change", () => updateRowGroupStyle(rowGroup, checkBox));
     rowGroup.addEventListener("click", (event) => {
-        if (event.target.type === "checkbox")
-            return;
+        const target = event.target;
+        // Ignore checkboxes, buttons, and text inputs
+        if (target.type === 'checkbox' ||
+            target.tagName === 'BUTTON' ||
+            (target.tagName === 'INPUT' && target.type === 'text')) {
+            return; // Skip the parent's click logic
+        }
         checkBox.checked = !checkBox.checked;
         updateRowGroupStyle(rowGroup, checkBox);
     });

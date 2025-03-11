@@ -5,8 +5,6 @@
   "headerNotFound": "Die angegebenen Begriffe wurden in der Datei nicht gefunden: {}",
   "notFourColumnsFound": "Nicht alle erforderlichen Begriffe wurden in der Datei gefunden. Bitte stellen Sie sicher, dass sie vorhanden sind.",
   "noValidTransactions": "Die Daten konnten nicht korrekt gelesen und Transaktionen erstellt werden.",
-  "userExists": "Benutzer mit der gleichen E-Mail-Adresse existiert bereits",
-  "generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut",
   "localizationNotFound": "Die Lokalisierung Datei wurde nicht gefunden",
   "transactionNotFound": "Die Transaction wurde nicht gefunden",
   "transactionDoesNotBelongToBankAccount": "Die Transaktion gehört nicht zum Bank Konto",
@@ -15,5 +13,6 @@
   "counterPartyNotFound": "Die Gegenpartei wurde nicht gefunden",
   "searchStringNotFoundInCounterParty": "Der Suchebegriff '{}' wurde nicht in der Gegenpartei gefunden",
   "counterPartiesNotFound": "Die Gegenparteien wurden nicht gefunden",
-  "counterPartySearchStringAlreadyInCounterParty": "Der Suchbegriff ist bereits in einer Gegenpatei vorhanden. Bitte ihn erst dort entfernen before er hier hinzugefügt werden kann"
+  "counterPartySearchStringAlreadyInCounterParty": "Der Suchbegriff ist bereits in einer Gegenpatei vorhanden. Bitte ihn erst dort entfernen before er hier hinzugefügt werden kann",
+  "searchStringNotInCounterParty": "Der Suchbegriff ist nicht in der Gegenpartei gespeichert"
 }
