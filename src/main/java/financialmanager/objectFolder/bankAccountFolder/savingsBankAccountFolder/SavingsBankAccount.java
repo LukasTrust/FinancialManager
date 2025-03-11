@@ -1,7 +1,6 @@
 package financialmanager.objectFolder.bankAccountFolder.savingsBankAccountFolder;
 
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
-import financialmanager.Utils.JsonStringListConverter;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.*;

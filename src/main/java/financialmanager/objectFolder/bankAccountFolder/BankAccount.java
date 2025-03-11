@@ -2,7 +2,6 @@ package financialmanager.objectFolder.bankAccountFolder;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import financialmanager.Utils.JsonStringListConverter;
 import financialmanager.objectFolder.bankAccountFolder.savingsBankAccountFolder.SavingsBankAccount;
 import financialmanager.objectFolder.usersFolder.Users;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;

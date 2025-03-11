@@ -129,7 +129,7 @@ async function removeSearchStringFromCounterParty(counterPartyId, searchString, 
         showAlert(responseBody.alertType, responseBody.message);
         if (responseBody.alertType === AlertType.SUCCESS) {
             const updatedCounterParty = responseBody.data[0];
-            if (responseBody.data.length == 2) {
+            if (responseBody.data.length === 2) {
                 const createdCounterParty = responseBody.data[1];
                 counterPartyData.push(createdCounterParty);
                 filteredCounterPartyData.push(createdCounterParty);

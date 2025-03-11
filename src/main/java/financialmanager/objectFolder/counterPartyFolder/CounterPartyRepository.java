@@ -19,7 +19,7 @@ public interface CounterPartyRepository extends JpaRepository<CounterParty, Long
     List<CounterParty> findByIdInAndUsers(List<Long> counterPartyIds, Users users);
 
     @Query(value = """
-    SELECT * FROM counter_party 
+    SELECT * FROM counter_party
     WHERE :searchString IN (SELECT jsonb_array_elements_text(counter_party_search_strings))
     """, nativeQuery = true)
     List<CounterParty> findByCounterPartySearchStringsContaining(@Param("searchString") String searchString);

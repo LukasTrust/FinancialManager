@@ -52,10 +52,6 @@ public class CounterPartyService {
         counterPartyRepository.deleteAll(counterParties);
     }
 
-    public void delete(CounterParty counterParty) {
-        counterPartyRepository.delete(counterParty);
-    }
-
     public boolean existsByCounterPartySearchStringsContaining(String searchString) {
         return !counterPartyRepository.findByCounterPartySearchStringsContaining(searchString).isEmpty();
     }

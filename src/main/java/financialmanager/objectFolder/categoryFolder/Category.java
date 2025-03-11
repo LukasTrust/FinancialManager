@@ -1,6 +1,5 @@
 package financialmanager.objectFolder.categoryFolder;
 
-import financialmanager.Utils.JsonStringListConverter;
 import financialmanager.objectFolder.usersFolder.Users;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;

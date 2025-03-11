@@ -1,8 +1,5 @@
 package financialmanager.objectFolder.usersFolder;
 
-import financialmanager.objectFolder.responseFolder.Response;
-import financialmanager.objectFolder.responseFolder.AlertType;
-import financialmanager.objectFolder.responseFolder.ResponseService;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -10,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.regex.Pattern;
@@ -21,7 +17,6 @@ public class UsersController {
 
     private final UsersService usersService;
     private final PasswordEncoder passwordEncoder;
-    private final ResponseService responseService;
 
     private final Pattern passwordPattern =
             Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$");
