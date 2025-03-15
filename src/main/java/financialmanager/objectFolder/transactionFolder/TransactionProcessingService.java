@@ -67,13 +67,6 @@ public class TransactionProcessingService {
     }
 
     public ResponseEntity<Response> createTransactionsFromData(IFileParser fileParser, Long bankAccountId) {
-        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
-
-        if (currentUserResponse.isErr()) {
-            return currentUserResponse.getError();
-        }
-
-        Users currentUser = currentUserResponse.getValue();
         String fileName = fileParser.getFileName();
         String[] header;
 

@@ -2,7 +2,6 @@ package financialmanager.objectFolder.contractFolder;
 
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.counterPartyFolder.CounterParty;
-import financialmanager.objectFolder.usersFolder.Users;
 import jakarta.persistence.*;
 import lombok.*;
 
