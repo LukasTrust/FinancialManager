@@ -12,7 +12,7 @@ import java.util.List;
 
 @Controller
 @AllArgsConstructor
-@RequestMapping("/counterParty/data")
+@RequestMapping("/counterParties/data")
 public class CounterPartyController {
 
     private final CounterPartyService counterPartyService;
@@ -34,12 +34,12 @@ public class CounterPartyController {
         return counterPartyService.updateCounterPartyField(counterPartyId, newValue, CounterParty::setDescription);
     }
 
-    @PostMapping("/hideCounterParties")
+    @PostMapping("/hide")
     public ResponseEntity<Response> hideCounterParties(@RequestBody List<Long> counterPartyIds) {
         return counterPartyService.updateCounterPartyVisibility(counterPartyIds, true);
     }
 
-    @PostMapping("/unHideCounterParties")
+    @PostMapping("/unHide")
     public ResponseEntity<Response> unHideCounterParties(@RequestBody List<Long> counterPartyIds) {
         return counterPartyService.updateCounterPartyVisibility(counterPartyIds, false);
     }
@@ -58,7 +58,7 @@ public class CounterPartyController {
         return counterPartyService.addSearchStringToCounterParty(counterPartyId, searchString);
     }
 
-    @PostMapping("/mergeCounterParties/{headerId}")
+    @PostMapping("/merge/{headerId}")
     public ResponseEntity<Response> mergeCounterParties(@PathVariable Long headerId, @RequestBody List<Long> counterPartyIds) {
         return counterPartyService.mergeCounterParties(headerId, counterPartyIds);
     }

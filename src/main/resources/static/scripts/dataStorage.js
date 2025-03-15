@@ -15,4 +15,7 @@ let selectedContract = null;
 let counterPartyData = [];
 let filteredCounterPartyData = [];
 let counterPartiesHiddenToggle = false;
+let contractData = [];
+let filteredContractData = [];
+let contractsHiddenToggle = false;
 //# sourceMappingURL=dataStorage.js.map

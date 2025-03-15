@@ -1,7 +1,8 @@
 var Type;
 (function (Type) {
-    Type["TRANSACTION"] = "TRANSACTION";
-    Type["COUNTERPARTY"] = "COUNTERPARTY";
+    Type["TRANSACTION"] = "transactions";
+    Type["COUNTERPARTY"] = "counterParties";
+    Type["CONTRACT"] = "contracts";
 })(Type || (Type = {}));
 var DataTypeForSort;
 (function (DataTypeForSort) {

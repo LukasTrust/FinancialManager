@@ -23,7 +23,7 @@
 
 table {
     width: 100%;
-    height: inherit;
+    height: 69vh;
     border-collapse: collapse;
 }
 
@@ -73,7 +73,7 @@ th, td {
     padding-top: 14px;
     padding-bottom: 14px;
     text-align: left;
-    color: #fff; /* White text for contrast */
+    color: #fff;
     cursor: pointer;
 }
 
@@ -89,16 +89,10 @@ th {
     transition: background 0.3s ease;
 }
 
-th i {
-    margin-left: 8px;
-    font-size: 12px;
-}
-
 tbody {
     display: block;
-    max-height: 69vh;
-    height: 69vh;
     overflow-y: auto;
+    height: inherit;
 }
 
 tr {
@@ -116,6 +110,7 @@ tr:hover {
 .rowGroup {
     border-radius: 8px 8px 0 0;
     position: relative;
+    height: auto;
 }
 
 .rowWithSubRow {

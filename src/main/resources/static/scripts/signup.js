@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!currentLanguage) {
         currentLanguage = navigator.language;
     }
-    const messages = await fetchLocalization("login&signup");
+    const messages = await loadLocalization("login&signup");
     if (!messages)
         return;
     const submitButton = document.getElementById("submitButton");

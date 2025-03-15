@@ -10,7 +10,7 @@ async function setLocale(): Promise<void> {
     }
 }
 
-async function fetchLocalization(subDirectory: string): Promise<Record<string, string> | null> {
+async function loadLocalization(subDirectory: string): Promise<Record<string, string> | null> {
     const filePath = `/localization/clientSide/${subDirectory}/messages/${currentLanguage}`;
 
     try {

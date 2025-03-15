@@ -1,5 +1,5 @@
 async function buildBankAccountOverview() {
-    const messages = await fetchLocalization("bankAccountOverview");
+    const messages = await loadLocalization("bankAccountOverview");
     if (!messages)
         return;
     handleFileBrowser(messages);

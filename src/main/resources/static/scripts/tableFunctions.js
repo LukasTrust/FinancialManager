@@ -86,6 +86,9 @@ function updateUI(data, currentPageIndex, itemsPerPage, numberOfPages, messages,
     else if (type === Type.COUNTERPARTY) {
         addRowsToCounterPartyTable(paginatedData, messages);
     }
+    else if (type === Type.CONTRACT) {
+        addRowsToContractTable(paginatedData, messages);
+    }
     const currentPage = document.getElementById("currentPage");
     const numberOfPagesElement = document.getElementById("numberOfPages");
     const lengthDifference = currentPageIndex - currentPageIndex;
@@ -245,7 +248,7 @@ function updateRowGroupStyle(rowGroup, checkBox) {
     }
 }
 function updateCachedDataAndUI(type, messages, ids) {
-    const idSet = new Set(ids); // Use Set for efficient lookup
+    const idSet = new Set(ids);
     if (type === Type.TRANSACTION) {
         filteredTransactionData.forEach(transaction => {
             if (idSet.has(transaction.id)) {
@@ -275,5 +278,10 @@ function changeRowVisibility(type) {
         counterPartiesHiddenToggle = !counterPartiesHiddenToggle;
     }
     rows.forEach(row => row.classList.toggle("hidden"));
+}
+function getIdsFromContainer(container) {
+    return Array.from(container.querySelectorAll(".normalText"))
+        .map(span => Number(span.id))
+        .filter(id => !isNaN(id) && id !== 0);
 }
 //# sourceMappingURL=tableFunctions.js.map

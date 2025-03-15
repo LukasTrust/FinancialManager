@@ -14,7 +14,7 @@ async function buildAddBankAccount(): Promise<void> {
         { addButtonId: "addInterestRateStrings", inputId: "inputInterestRateStrings", listId: "interestRateSearchStrings" }
     ];
 
-    const messages = await fetchLocalization("addBankAccount");
+    const messages = await loadLocalization("addBankAccount");
     if (!messages) return;
 
     const submitButton = document.getElementById("submitButton") as HTMLButtonElement;

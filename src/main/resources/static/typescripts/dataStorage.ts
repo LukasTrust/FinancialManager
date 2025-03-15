@@ -20,3 +20,7 @@ let selectedContract: HTMLElement | null = null;
 let counterPartyData: CounterPartyDisplay[] = [];
 let filteredCounterPartyData: CounterPartyDisplay[] = [];
 let counterPartiesHiddenToggle: boolean = false;
+
+let contractData: ContractDisplay[] = [];
+let filteredContractData: ContractDisplay[] = [];
+let contractsHiddenToggle: boolean = false;

@@ -1,65 +1,22 @@
 async function buildCounterParties() {
     var _a, _b, _c, _d;
-    const messages = await fetchLocalization("counterParties");
+    const messages = await loadLocalization("counterParties");
     if (!messages)
         return;
-    counterPartiesHiddenToggle = false;
-    await loadCounterParties(messages);
-    splitDataIntoPages(messages, Type.COUNTERPARTY, counterPartyData);
+    const type = Type.COUNTERPARTY;
+    await loadData(type, messages);
+    splitDataIntoPages(messages, type, counterPartyData);
     setUpSorting(true);
-    (_a = document.getElementById("changeHiddenButton")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => showChangeHiddenDialog(Type.COUNTERPARTY, messages));
-    (_b = document.getElementById("mergeCounterParties")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => showMergeDialog(Type.COUNTERPARTY, messages));
-    (_c = document.getElementById("searchBarInput")) === null || _c === void 0 ? void 0 : _c.addEventListener("input", () => searchTable(messages, Type.COUNTERPARTY));
-    (_d = document.getElementById("showHiddenRows")) === null || _d === void 0 ? void 0 : _d.addEventListener("change", () => changeRowVisibility(Type.COUNTERPARTY));
-}
-async function mergeCounterParties(model, messages, leftSide, updatedContainer) {
-    try {
-        const headerId = getCounterPartyIds(leftSide)[0];
-        const counterPartyIds = getCounterPartyIds(updatedContainer);
-        if (counterPartyIds.length === 0) {
-            showAlert("INFO", messages["noCounterPartyToUpdate"], model);
-            return;
-        }
-        const response = await fetch(`/counterParty/data/mergeCounterParties/${headerId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(counterPartyIds),
-        });
-        const responseBody = await response.json();
-        showAlert(responseBody.alertType, responseBody.message, model);
-        updateCounterParty(responseBody.data, counterPartyData);
-        updateCounterParty(responseBody.data, filteredCounterPartyData);
-        removeElements(updatedContainer);
-        removeMergedCounterParties(counterPartyIds, messages);
-    }
-    catch (error) {
-        console.error("There was an error merging the counterParties:", error);
-        showAlert('error', messages["error_generic"], model);
-    }
-}
-async function loadCounterParties(messages) {
-    try {
-        const response = await fetch(`/counterParty/data`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        if (!response.ok) {
-            await showAlertFromResponse(response);
-            return;
-        }
-        counterPartyData = await response.json();
-        filteredCounterPartyData = counterPartyData;
-    }
-    catch (error) {
-        console.error("There was an error loading the counterParties:", error);
-        showAlert('error', messages["error_generic"]);
-    }
+    (_a = document.getElementById("changeHiddenButton")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => showChangeHiddenDialog(type, messages));
+    (_b = document.getElementById("mergeCounterParties")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => showMergeDialog(type, messages));
+    (_c = document.getElementById("searchBarInput")) === null || _c === void 0 ? void 0 : _c.addEventListener("input", () => searchTable(messages, type));
+    (_d = document.getElementById("showHiddenRows")) === null || _d === void 0 ? void 0 : _d.addEventListener("change", () => changeRowVisibility(type));
 }
 async function addSearchString(counterPartyId, newSearchString, messages, parent, toolTip) {
     try {
         const params = new URLSearchParams();
         params.append("searchString", newSearchString);
-        const url = `/counterParty/data/${counterPartyId}/addSearchString?${params.toString()}`;
+        const url = `/counterParties/data/${counterPartyId}/addSearchString?${params.toString()}`;
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -76,7 +33,7 @@ async function addSearchString(counterPartyId, newSearchString, messages, parent
 }
 async function updateCounterPartyField(counterPartyId, field, newValue, messages) {
     try {
-        const response = await fetch(`/counterParty/data/${counterPartyId}/change/${field}/${newValue}`, {
+        const response = await fetch(`/counterParties/data/${counterPartyId}/change/${field}/${newValue}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
         });
@@ -89,38 +46,11 @@ async function updateCounterPartyField(counterPartyId, field, newValue, messages
         showAlert('error', messages["error_generic"]);
     }
 }
-async function updateCounterPartyVisibility(messages, model, updatedContainer, moveToContainer, hide) {
-    try {
-        // Get all counterParty IDs
-        const counterPartyIds = getCounterPartyIds(updatedContainer);
-        if (counterPartyIds.length === 0) {
-            showAlert("INFO", messages["noCounterPartyToUpdate"], model);
-            return;
-        }
-        const endpoint = hide ? "hideCounterParties" : "unHideCounterParties";
-        const response = await fetch(`/counterParty/data/${endpoint}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(counterPartyIds),
-        });
-        const responseBody = await response.json();
-        showAlert(responseBody.alertType, responseBody.message, model);
-        if (responseBody.alertType === AlertType.SUCCESS) {
-            // Animate and move elements
-            moveElements(updatedContainer, moveToContainer);
-            updateCachedDataAndUI(Type.COUNTERPARTY, messages, counterPartyIds);
-        }
-    }
-    catch (error) {
-        console.error("Unexpected error in updateCounterPartyVisibility:", error);
-        showAlert("ERROR", messages["error_generic"], model);
-    }
-}
 async function removeSearchStringFromCounterParty(counterPartyId, searchString, messages) {
     try {
         const params = new URLSearchParams();
         params.append("searchString", searchString);
-        const url = `/counterParty/data/${counterPartyId}/removeSearchString?${params.toString()}`;
+        const url = `/counterParties/data/${counterPartyId}/removeSearchString?${params.toString()}`;
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -129,7 +59,7 @@ async function removeSearchStringFromCounterParty(counterPartyId, searchString, 
         showAlert(responseBody.alertType, responseBody.message);
         if (responseBody.alertType === AlertType.SUCCESS) {
             const updatedCounterParty = responseBody.data[0];
-            if (responseBody.data.length === 2) {
+            if (responseBody.data.length == 2) {
                 const createdCounterParty = responseBody.data[1];
                 counterPartyData.push(createdCounterParty);
                 filteredCounterPartyData.push(createdCounterParty);
@@ -210,11 +140,11 @@ function createCounterPartyRow(tableBody, counterPartyDisplay, currency, toolTip
     createAndAppendElement(newRow, "td", "", "", { style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px" });
     createCheckBoxForRowGroup(rowGroup, newRow, counterParty.id, counterParty.hidden);
     // Name cell
-    const name = createAndAppendElement(newRow, "td", "", "", { style: "width: 15%" });
+    const name = createAndAppendElement(newRow, "td", "", "", { style: "width: 23%" });
     const nameInput = createInputBox(name, "bi bi-pencil-fill", "name", "text", counterParty.name);
     debounceInputChange(nameInput, (id, newValue, messages) => updateCounterPartyField(id, "name", newValue, messages), counterParty.id, messages);
     // Transaction count
-    const transactionCount = createAndAppendElement(newRow, "td", "rightAligned", "", { style: "width: 20%" });
+    const transactionCount = createAndAppendElement(newRow, "td", "rightAligned", "", { style: "width: 15%" });
     createAndAppendElement(transactionCount, "span", "tdMargin", counterPartyDisplay.transactionCount.toString());
     // Contract count
     const contractCount = createAndAppendElement(newRow, "td", "rightAligned", "", { style: "width: 15%" });
@@ -244,11 +174,6 @@ function createCounterPartyRow(tableBody, counterPartyDisplay, currency, toolTip
         createListElement(listContainer, searchString, {}, true, true, toolTip, () => removeSearchStringFromCounterParty(counterParty.id, searchString, messages));
     });
     addHoverToOtherElement(newRow, searchStringRow);
-}
-function getCounterPartyIds(updatedContainer) {
-    return Array.from(updatedContainer.querySelectorAll(".normalText"))
-        .map(span => Number(span.id))
-        .filter(id => !isNaN(id) && id !== 0);
 }
 function updateCounterParty(counterPartyDisplay, data) {
     const item = data.find(item => item.counterParty.id === counterPartyDisplay.counterParty.id);

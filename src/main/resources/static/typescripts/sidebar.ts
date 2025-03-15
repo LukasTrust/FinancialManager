@@ -12,7 +12,7 @@ async function loadSidebar(): Promise<void> {
 
         initStaticLinks();
 
-        const messages = await fetchLocalization("sidebar");
+        const messages = await loadLocalization("sidebar");
         if (!messages) return;
 
         const bankAccounts = await loadBankAccounts();
@@ -68,7 +68,7 @@ function createSublist(messages: Record<string, string>, parent: HTMLElement): H
         { name: messages["dashboard"], href: '/bankAccountOverview', icon: 'bi bi-border-style' },
         { name: messages["transactions"], href: '/transactions', icon: 'bi bi-receipt' },
         { name: messages["categories"], href: '/categories', icon: 'bi bi-tag-fill' },
-        { name: messages["contracts"], href: '/bankAccount/contracts', icon: 'bi bi-file-earmark-fill' }
+        { name: messages["contracts"], href: '/contracts', icon: 'bi bi-file-earmark-fill' }
     ];
 
     subItems.forEach(({ name, href, icon }) => {

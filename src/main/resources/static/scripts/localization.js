@@ -9,7 +9,7 @@ async function setLocale() {
         console.log(error);
     }
 }
-async function fetchLocalization(subDirectory) {
+async function loadLocalization(subDirectory) {
     const filePath = `/localization/clientSide/${subDirectory}/messages/${currentLanguage}`;
     try {
         const responseBody = await fetch(filePath);

@@ -45,6 +45,13 @@ interface Contract {
     lastUpdatedAt: string;
     counterParty: CounterParty;
     users?: User;
+    hidden: boolean;
+}
+
+interface ContractDisplay {
+    contract: Contract;
+    transactionCount: number;
+    totalAmount: number;
 }
 
 interface Transaction {
@@ -70,12 +77,6 @@ interface CounterParty {
     counterPartySearchStrings: string[];
 }
 
-interface ListElementObject {
-    id: number,
-    text: string,
-    toolTip: string
-}
-
 interface CounterPartyDisplay {
     counterParty: CounterParty;
     transactionCount: number;
@@ -83,9 +84,16 @@ interface CounterPartyDisplay {
     totalAmount: number;
 }
 
+interface ListElementObject {
+    id: number,
+    text: string,
+    toolTip: string
+}
+
 enum Type {
-    TRANSACTION = "TRANSACTION",
-    COUNTERPARTY = "COUNTERPARTY"
+    TRANSACTION = "transactions",
+    COUNTERPARTY = "counterParties",
+    CONTRACT = "contracts"
 }
 
 enum DataTypeForSort {

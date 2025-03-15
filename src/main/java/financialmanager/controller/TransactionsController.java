@@ -20,12 +20,12 @@ public class TransactionsController {
         return transactionService.getTransactionsForBankAccount(bankAccountId);
     }
 
-    @PostMapping("/hideTransactions")
+    @PostMapping("/hide")
     public ResponseEntity<Response> hideTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
         return transactionService.updateTransactionVisibility(bankAccountId, transactionIds, true);
     }
 
-    @PostMapping("/unHideTransactions")
+    @PostMapping("/unHide")
     public ResponseEntity<Response> unHideTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
         return transactionService.updateTransactionVisibility(bankAccountId, transactionIds, false);
     }

@@ -185,7 +185,7 @@ function moveElements(sourceContainer: HTMLElement, targetContainer: HTMLElement
 }
 
 function createCheckBoxForRowGroup(rowGroup: HTMLElement, newRow: HTMLElement, id: number, isHidden: boolean) {
-    const trCheckBox = createAndAppendElement(newRow, "td", null, "", {style: "width: 5%"});
+    const trCheckBox = createAndAppendElement(newRow, "td", "", "", {style: "width: 2%"});
 
     if (isHidden) {
         createAndAppendElement(trCheckBox, "span", "bi bi-eye-slash");
@@ -350,4 +350,11 @@ function chooseHeader(dialogContent: HTMLElement, messages: Record<string, strin
 
     moveElements(moveToContainer, updatedContainer);
     moveElements(selectedElement, moveToContainer, selectedElement);
+}
+
+function setMonths(messages: Record<string, string>): void {
+    monthAbbreviations = messages["monthAbbreviations"]
+        .split("', '")
+        .map((month: string) => month.replace(/'/g, ''));
+    transactionsHiddenToggle = false;
 }

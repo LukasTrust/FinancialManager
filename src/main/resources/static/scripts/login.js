@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         currentLanguage = navigator.language;
     }
     // Load localization messages
-    const messages = await fetchLocalization("login&signup");
+    const messages = await loadLocalization("login&signup");
     if (!messages)
         return;
     // Check if the error parameter is present in the URL

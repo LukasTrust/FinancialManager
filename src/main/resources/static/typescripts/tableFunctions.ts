@@ -102,6 +102,8 @@ function updateUI(data: any[], currentPageIndex: number, itemsPerPage: number, n
         addRowsToTransactionTable(paginatedData, messages);
     } else if (type === Type.COUNTERPARTY) {
         addRowsToCounterPartyTable(paginatedData, messages);
+    } else if (type === Type.CONTRACT) {
+        addRowsToContractTable(paginatedData, messages)
     }
 
     const currentPage = document.getElementById("currentPage") as HTMLElement | null;
@@ -301,7 +303,7 @@ function updateRowGroupStyle(rowGroup: HTMLElement, checkBox: HTMLInputElement) 
 }
 
 function updateCachedDataAndUI(type: Type, messages: Record<string, string>, ids: number[]): void {
-    const idSet = new Set(ids); // Use Set for efficient lookup
+    const idSet = new Set(ids);
 
     if (type === Type.TRANSACTION) {
         filteredTransactionData.forEach(transaction => {
@@ -335,4 +337,12 @@ function changeRowVisibility(type: Type): void {
     }
 
     rows.forEach(row => row.classList.toggle("hidden"));
+}
+
+function getIdsFromContainer(container: HTMLElement): number[] {
+    return Array.from(
+        container.querySelectorAll<HTMLElement>(".normalText")
+    )
+        .map(span => Number(span.id))
+        .filter(id => !isNaN(id) && id !== 0);
 }

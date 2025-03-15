@@ -1,68 +1,19 @@
 async function buildTransactions() {
     var _a, _b, _c, _d;
-    const messages = await fetchLocalization("transactions");
+    const messages = await loadLocalization("transactions");
     if (!messages)
         return;
-    monthAbbreviations = messages["monthAbbreviations"]
-        .split("', '")
-        .map((month) => month.replace(/'/g, ''));
-    transactionsHiddenToggle = false;
-    await loadTransactions(messages);
-    splitDataIntoPages(messages, Type.TRANSACTION, transactionData);
+    setMonths(messages);
+    const type = Type.TRANSACTION;
+    await loadData(type, messages);
+    splitDataIntoPages(messages, type, transactionData);
     setUpSorting();
-    (_a = document.getElementById("searchBarInput")) === null || _a === void 0 ? void 0 : _a.addEventListener("input", () => searchTable(messages, Type.TRANSACTION));
-    (_b = document.getElementById("changeHiddenButton")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => showChangeHiddenDialog(Type.TRANSACTION, messages));
+    (_a = document.getElementById("searchBarInput")) === null || _a === void 0 ? void 0 : _a.addEventListener("input", () => searchTable(messages, type));
+    (_b = document.getElementById("changeHiddenButton")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => showChangeHiddenDialog(type, messages));
     (_c = document.getElementById("changeContractButton")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", async () => {
-        await buildChangeContract("/transactions", getCheckedData(Type.TRANSACTION));
+        await buildChangeContract("/transactions", getCheckedData(type));
     });
-    (_d = document.getElementById("showHiddenRows")) === null || _d === void 0 ? void 0 : _d.addEventListener("change", () => changeRowVisibility(Type.TRANSACTION));
-}
-async function loadTransactions(messages) {
-    try {
-        const response = await fetch(`/transactions/${bankAccountId}/data`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        if (!response.ok) {
-            await showAlertFromResponse(response);
-            return;
-        }
-        transactionData = await response.json();
-        filteredTransactionData = transactionData;
-    }
-    catch (error) {
-        console.error("There was an error loading the transactions:", error);
-        showAlert('error', messages["error_generic"]);
-    }
-}
-async function updateTransactionVisibility(messages, model, updatedContainer, moveToContainer, hide) {
-    try {
-        // Get all transaction IDs
-        const transactionIds = Array.from(updatedContainer.querySelectorAll(".normalText"))
-            .map(span => Number(span.id))
-            .filter(id => !isNaN(id) && id !== 0); // Ensure valid IDs
-        if (transactionIds.length === 0) {
-            showAlert("INFO", messages["noTransactionsUpdated"], model);
-            return;
-        }
-        const endpoint = hide ? "hideTransactions" : "unHideTransactions";
-        const response = await fetch(`/transactions/${bankAccountId}/data/${endpoint}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(transactionIds),
-        });
-        const responseBody = await response.json();
-        showAlert(responseBody.alertType, responseBody.message, model);
-        if (responseBody.alertType === AlertType.SUCCESS) {
-            // Animate and move elements
-            moveElements(updatedContainer, moveToContainer);
-            updateCachedDataAndUI(Type.TRANSACTION, messages, transactionIds);
-        }
-    }
-    catch (error) {
-        console.error("Unexpected error in updateTransactionVisibility:", error);
-        showAlert("ERROR", messages["error_generic"], model);
-    }
+    (_d = document.getElementById("showHiddenRows")) === null || _d === void 0 ? void 0 : _d.addEventListener("change", () => changeRowVisibility(type));
 }
 function addRowsToTransactionTable(data, messages) {
     try {
@@ -86,7 +37,7 @@ function addRowsToTransactionTable(data, messages) {
             // Counterparty cell
             const counterparty = createAndAppendElement(newRow, "td", "", "", { style: "width: 25%" });
             createAndAppendElement(counterparty, "span", "tdMargin", transaction.counterParty.name, {
-                style: "font-weight: bold;",
+                style: "font-weight: bold; width: 25%",
             });
             // Contract cell
             const contract = createAndAppendElement(newRow, "td", "", "", { style: "width: 15%" });

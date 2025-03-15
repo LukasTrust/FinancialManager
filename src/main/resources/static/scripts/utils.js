@@ -126,7 +126,7 @@ function moveElements(sourceContainer, targetContainer, soloItem = null) {
     });
 }
 function createCheckBoxForRowGroup(rowGroup, newRow, id, isHidden) {
-    const trCheckBox = createAndAppendElement(newRow, "td", null, "", { style: "width: 5%" });
+    const trCheckBox = createAndAppendElement(newRow, "td", "", "", { style: "width: 2%" });
     if (isHidden) {
         createAndAppendElement(trCheckBox, "span", "bi bi-eye-slash");
     }
@@ -249,5 +249,11 @@ function chooseHeader(dialogContent, messages, updatedContainer, moveToContainer
     selectedElement.classList.remove("selected");
     moveElements(moveToContainer, updatedContainer);
     moveElements(selectedElement, moveToContainer, selectedElement);
+}
+function setMonths(messages) {
+    monthAbbreviations = messages["monthAbbreviations"]
+        .split("', '")
+        .map((month) => month.replace(/'/g, ''));
+    transactionsHiddenToggle = false;
 }
 //# sourceMappingURL=utils.js.map

@@ -52,6 +52,9 @@ async function loadURL(url: string): Promise<void> {
             case "/counterParties":
                 await buildCounterParties();
                 break;
+            case "/contracts":
+                await buildContracts();
+                break;
         }
     } catch (error) {
         console.error("Error loading content:", error);
@@ -70,4 +73,51 @@ async function loadBankAccounts(): Promise<AnyBankAccount[]> {
         console.error("Error fetching bank accounts:", error);
     }
     return [];
+}
+
+async function loadData(type: Type, messages: Record<string, string>): Promise<void> {
+    try {
+        let url: string = `/${type.toString()}`;
+
+        if (type !== Type.COUNTERPARTY)
+            url += `/${bankAccountId}`;
+        url += `/data`;
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {'Content-Type': 'application/json'}
+        });
+
+        if (!response.ok) {
+            await showAlertFromResponse(response);
+            return;
+        }
+
+        const data = await response.json();
+        contractsHiddenToggle = false;
+        counterPartiesHiddenToggle = false;
+        transactionsHiddenToggle = false;
+
+        switch (type) {
+            case Type.CONTRACT: {
+                contractData = data;
+                filteredContractData = data;
+                break;
+            }
+            case Type.COUNTERPARTY: {
+                counterPartyData = data;
+                filteredCounterPartyData = data;
+                break;
+            }
+            case Type.TRANSACTION: {
+                transactionData = data;
+                filteredTransactionData = data;
+                break;
+            }
+        }
+    } catch (error) {
+        console.error("There was an error loading the data:", error);
+        console.error("Type:", type);
+        showAlert('error', messages["error_generic"]);
+    }
 }

@@ -1,4 +1,5 @@
 package financialmanager.objectFolder.transactionFolder;
+import financialmanager.objectFolder.contractFolder.ContractDisplay;
 import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.Utils.Utils;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
@@ -185,5 +186,29 @@ public class TransactionService {
 
         return responseService.createResponseWithPlaceHolders(HttpStatus.OK, hide ? "transactionsHidden" : "transactionsUnhidden",
                 AlertType.SUCCESS, List.of(String.valueOf(transactionIds.size())));
+    }
+
+    public ResponseEntity<?> getContractDisplaysForBankAccount(Long bankAccountId) {
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+
+        if (bankAccountResult.isErr()) {
+            return bankAccountResult.getError();
+        }
+
+        List<Contract> contracts = contractService.findByBankAccountId(bankAccountId);
+        List<Transaction> transactions = findByBankAccountId(bankAccountId);
+        List<ContractDisplay> contractDisplays = new ArrayList<>();
+
+        for (Contract contract : contracts) {
+            List<Transaction> transactionsOfContract = transactions.stream().filter(transaction -> transaction.getContract() != null && transaction.getContract().equals(contract)).toList();
+
+            Integer transactionCount = transactionsOfContract.size();
+            Double totalAmount = transactionsOfContract.stream().map(Transaction::getAmount).reduce(0.0, Double::sum);
+
+            ContractDisplay contractDisplay = new ContractDisplay(contract, transactionCount, totalAmount);
+            contractDisplays.add(contractDisplay);
+        }
+
+        return ResponseEntity.ok(contractDisplays);
     }
 }

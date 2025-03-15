@@ -17,9 +17,14 @@ public class ContractController {
     private final ContractService contractService;
     private final TransactionService transactionService;
 
-    @GetMapping("")
+    @GetMapping("/onlyContract")
     public ResponseEntity<?> getContractsForBankAccount(@PathVariable Long bankAccountId) {
         return contractService.getContractsForBankAccount(bankAccountId);
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> getContractDisplaysForBankAccount(@PathVariable Long bankAccountId) {
+        return transactionService.getContractDisplaysForBankAccount(bankAccountId);
     }
 
     @PostMapping("/removeContractFromTransaction/{transactionId}")
