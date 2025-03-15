@@ -8,7 +8,7 @@ async function buildCounterParties() {
     splitDataIntoPages(messages, type, counterPartyData);
     setUpSorting(true);
     (_a = document.getElementById("changeHiddenButton")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => showChangeHiddenDialog(type, messages));
-    (_b = document.getElementById("mergeCounterParties")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => showMergeDialog(type, messages));
+    (_b = document.getElementById("mergeButton")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => showMergeDialog(type, messages));
     (_c = document.getElementById("searchBarInput")) === null || _c === void 0 ? void 0 : _c.addEventListener("input", () => searchTable(messages, type));
     (_d = document.getElementById("showHiddenRows")) === null || _d === void 0 ? void 0 : _d.addEventListener("change", () => changeRowVisibility(type));
 }
@@ -28,21 +28,6 @@ async function addSearchString(counterPartyId, newSearchString, messages, parent
     }
     catch (error) {
         console.error(`There was an error adding a searchString to the counterParty:`, error);
-        showAlert('error', messages["error_generic"]);
-    }
-}
-async function updateCounterPartyField(counterPartyId, field, newValue, messages) {
-    try {
-        const response = await fetch(`/counterParties/data/${counterPartyId}/change/${field}/${newValue}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-        });
-        if (!response.ok) {
-            await showAlertFromResponse(response);
-        }
-    }
-    catch (error) {
-        console.error(`There was an error changing the ${field} of a counterParty:`, error);
         showAlert('error', messages["error_generic"]);
     }
 }
@@ -130,19 +115,19 @@ function createCounterPartyRow(tableBody, counterPartyDisplay, currency, toolTip
         return;
     }
     const counterParty = counterPartyDisplay.counterParty;
-    let rowGroupClass = counterParty.hidden ? "rowGroup hiddenRow" : "rowGroup";
+    let rowGroupClass = counterParty.hidden ? " hiddenRow" : "";
     if (counterParty.hidden && !counterPartiesHiddenToggle) {
         rowGroupClass += " hidden";
     }
-    const rowGroup = createAndAppendElement(tableBody, "div", rowGroupClass);
+    const rowGroup = createAndAppendElement(tableBody, "div", "rowGroup");
     animateElement(rowGroup);
-    const newRow = createAndAppendElement(rowGroup, "tr", "rowWithSubRow", "", { id: counterParty.id.toString() });
-    createAndAppendElement(newRow, "td", "", "", { style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px" });
-    createCheckBoxForRowGroup(rowGroup, newRow, counterParty.id, counterParty.hidden);
+    const newRow = createAndAppendElement(rowGroup, "tr", "rowWithSubRow" + rowGroupClass, "", { id: counterParty.id.toString() });
+    createAndAppendElement(newRow, "td", "bi bi-eye-slash", "", { style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px" });
+    createCheckBoxForRowGroup(rowGroup, newRow, counterParty.id);
     // Name cell
     const name = createAndAppendElement(newRow, "td", "", "", { style: "width: 23%" });
     const nameInput = createInputBox(name, "bi bi-pencil-fill", "name", "text", counterParty.name);
-    debounceInputChange(nameInput, (id, newValue, messages) => updateCounterPartyField(id, "name", newValue, messages), counterParty.id, messages);
+    debounceInputChange(nameInput, (id, newValue, messages) => updateField(id, "name", newValue, messages, Type.COUNTERPARTY), counterParty.id, messages);
     // Transaction count
     const transactionCount = createAndAppendElement(newRow, "td", "rightAligned", "", { style: "width: 15%" });
     createAndAppendElement(transactionCount, "span", "tdMargin", counterPartyDisplay.transactionCount.toString());
@@ -155,9 +140,9 @@ function createCounterPartyRow(tableBody, counterPartyDisplay, currency, toolTip
     // Description Cell
     const description = createAndAppendElement(newRow, "td", "", "", { style: "width: 30%; padding-right: 20px" });
     const descriptionInput = createInputBox(description, "bi bi-pencil-fill", "name", "text", counterParty.description);
-    debounceInputChange(descriptionInput, (id, newValue, messages) => updateCounterPartyField(id, "description", newValue, messages), counterParty.id, messages);
+    debounceInputChange(descriptionInput, (id, newValue, messages) => updateField(id, "description", newValue, messages, Type.COUNTERPARTY), counterParty.id, messages);
     // Secondary Row for Search Strings
-    const searchStringRow = createAndAppendElement(rowGroup, "tr", "subRow", "");
+    const searchStringRow = createAndAppendElement(rowGroup, "tr", "subRow" + rowGroupClass);
     const counterpartySearchStrings = createAndAppendElement(searchStringRow, "td", "", "", { style: "width: 20%" });
     createAndAppendElement(counterpartySearchStrings, "h3", "", messages["counterpartySearchStrings"]);
     const searchString = createAndAppendElement(searchStringRow, "td", "", "", { style: "width: 20%" });

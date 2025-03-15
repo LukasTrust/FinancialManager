@@ -173,23 +173,17 @@ function moveElements(sourceContainer: HTMLElement, targetContainer: HTMLElement
         items.push(soloItem);
     }
 
-    items.forEach((item, index) => {
-        setTimeout(() => {
-            item.addEventListener('transitionend', () => {
-                targetContainer.appendChild(item);
-                item.classList.remove('moving');
-                animateElement(item); // Animate the item back into view
-            }, {once: true});
-        }, index * 150);
+    items.forEach((item) => {
+        item.addEventListener('transitionend', () => {
+            animateElement(item);
+        }, { once: true });
+
+        targetContainer.appendChild(item);
     });
 }
 
-function createCheckBoxForRowGroup(rowGroup: HTMLElement, newRow: HTMLElement, id: number, isHidden: boolean) {
+function createCheckBoxForRowGroup(rowGroup: HTMLElement, newRow: HTMLElement, id: number) {
     const trCheckBox = createAndAppendElement(newRow, "td", "", "", {style: "width: 2%"});
-
-    if (isHidden) {
-        createAndAppendElement(trCheckBox, "span", "bi bi-eye-slash");
-    }
 
     const checkBox = createAndAppendElement(trCheckBox, "input", "tableCheckbox", "", {
         type: "checkbox",
@@ -231,6 +225,29 @@ function addHoverToOtherElement(newRow: HTMLElement, subRow: HTMLElement) {
 
     subRow.addEventListener('mouseleave', () => {
         newRow.classList.remove('hover'); // Remove the class from newRow
+    });
+}
+
+function addHoverToSiblings(element: HTMLElement) {
+    const parent = element.parentElement;
+    if (!parent) return;
+
+    const siblings = Array.from(parent.children) as HTMLElement[];
+
+    function addHover() {
+        siblings.forEach(sibling => sibling.classList.add('hover'));
+    }
+
+    function removeHover() {
+        // Check if the mouse is still within any of the siblings or the original element
+        if ([...siblings].some(sib => sib.matches(':hover'))) return;
+
+        siblings.forEach(sibling => sibling.classList.remove('hover'));
+    }
+
+    siblings.forEach(sibling => {
+        sibling.addEventListener('mouseenter', addHover);
+        sibling.addEventListener('mouseleave', removeHover);
     });
 }
 
@@ -287,7 +304,7 @@ function createListSection(
     parent: HTMLElement,
     title: string,
     type: Type,
-    data: Transaction[] | CounterPartyDisplay[],
+    data: Transaction[] | CounterPartyDisplay[] | ContractDisplay[],
     withSelect: boolean = false
 ): HTMLElement {
     const container = createAndAppendElement(parent, "div", "flexContainerColumn", "", {style: "width: 45%"});
@@ -298,6 +315,8 @@ function createListSection(
         createListContainer(header, transactionToListElementObjectArray(data as Transaction[]), withSelect);
     } else if (type === Type.COUNTERPARTY) {
         createListContainer(header, counterPartyToListElementObjectArray(data as CounterPartyDisplay[]), withSelect);
+    } else if (type === Type.CONTRACT) {
+        createListContainer(header, contractToListElementObjectArray(data as ContractDisplay[]), withSelect);
     }
 
     return container;

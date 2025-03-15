@@ -127,6 +127,14 @@ tr:hover {
     width: auto;
 }
 
+.middleRow {
+    display: flex;
+    margin-left: 20px;
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+    border-bottom: none;
+    width: auto;
+}
+
 .hover {
     background-color: rgba(255, 255, 255, 0.05);
     transition: background-color 0.2s ease-in-out;

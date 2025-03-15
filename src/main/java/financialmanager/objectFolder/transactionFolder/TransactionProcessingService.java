@@ -113,20 +113,22 @@ public class TransactionProcessingService {
                     AlertType.INFO, Collections.singletonList(fileName));
         }
 
-        processAndSaveTransactions(currentUser, newTransactions, existingTransactions);
+        processAndSaveTransactions(bankAccount, newTransactions, existingTransactions);
 
         log.info("{} transactions found", newTransactions.size());
         return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "filesProcessed",
                 AlertType.SUCCESS, Arrays.asList(fileName, String.valueOf(newTransactions.size())));
     }
 
-    private void processAndSaveTransactions(Users currentUser, List<Transaction> newTransactions, List<Transaction> existingTransactions) {
+    private void processAndSaveTransactions(BankAccount bankAccount, List<Transaction> newTransactions, List<Transaction> existingTransactions) {
+        Users currentUser = bankAccount.getUsers();
+
         counterPartyService.setCounterPartyForNewTransactions(currentUser, newTransactions);
         categoryService.addTransactionsToCategories(currentUser, newTransactions);
 
         newTransactions.addAll(getTransactionsWithoutContract(existingTransactions));
 
-        contractProcessingService.checkIfTransactionsBelongToContract(currentUser, newTransactions);
+        contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, newTransactions);
         transactionService.saveAll(newTransactions);
     }
 

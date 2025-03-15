@@ -66,9 +66,9 @@ function showMessageBox(headerText, headerIcon, mainText, leftButtonText, leftIc
 }
 function showChangeHiddenDialog(type, messages) {
     const { alreadyHidden, notHidden } = classifyHiddenOrNot(type);
-    const height = type === Type.COUNTERPARTY ? 70 : "";
+    const height = type !== Type.TRANSACTION ? 70 : "";
     const dialogContent = createDialogContent(messages["changeHiddenHeader"], "bi bi-eye", "", height);
-    if (type === Type.COUNTERPARTY) {
+    if (type !== Type.TRANSACTION) {
         createAndAppendElement(dialogContent, "h2", "", messages["infoTransactionsWillAlsoBeAffected"], { style: "margin-right: auto; margin-left: 30px; margin-top: 10px; margin-top: 10px;" });
     }
     const listContainer = createAndAppendElement(dialogContent, "div", "flexContainerSpaced");
@@ -84,17 +84,16 @@ function showChangeHiddenDialog(type, messages) {
 function showMergeDialog(type, messages) {
     const checkedData = getCheckedData(type);
     const dialogContent = createDialogContent(messages["mergeHeader"], "bi bi-arrows-collapse-vertical", "", 70);
-    const info = type === Type.COUNTERPARTY ? messages["mergeCounterPartiesInfo"] : messages[""];
+    const info = messages["mergeInfo"];
     createAndAppendElement(dialogContent, "h2", "", info, { style: "margin-right: auto; margin-left: 30px; margin-top: 10px; margin-top: 10px;" });
     const listContainer = createAndAppendElement(dialogContent, "div", "flexContainerSpaced");
-    const leftSide = createListSection(listContainer, messages["counterPartyHeader"], type, []);
-    const rightSide = createListSection(listContainer, messages["counterPartiesToMerge"], type, checkedData, true);
-    createDialogButton(leftSide, "bi bi-arrows-collapse-vertical", messages["mergeCounterParties"], "left", async () => {
+    const leftSide = createListSection(listContainer, messages["leftHeader"], type, []);
+    const rightSide = createListSection(listContainer, messages["rightHeader"], type, checkedData, true);
+    createDialogButton(leftSide, "bi bi-arrows-collapse-vertical", messages["mergeButton"], "left", async () => {
         await mergeData(dialogContent, messages, leftSide, rightSide, type);
     });
     createDialogButton(rightSide, "bi bi-bar-chart-steps", messages["chooseHeader"], "right", () => {
-        if (type === Type.COUNTERPARTY)
-            chooseHeader(dialogContent, messages, rightSide.querySelector(".listContainerColumn"), leftSide.querySelector(".listContainerColumn"));
+        chooseHeader(dialogContent, messages, rightSide.querySelector(".listContainerColumn"), leftSide.querySelector(".listContainerColumn"));
     });
 }
 //# sourceMappingURL=dialog.js.map

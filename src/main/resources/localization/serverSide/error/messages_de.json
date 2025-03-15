@@ -10,9 +10,10 @@
   "transactionDoesNotBelongToBankAccount": "Die Transaktion gehört nicht zum Bank Konto",
   "transactionHasNoContract": "Die Transaktion hat keinen Vertrag",
   "contractNotFound": "Der Vertrag wurde nicht gefunden",
+  "contractsNotFound": "Die Verräge wurden nicht gefunden",
   "counterPartyNotFound": "Die Gegenpartei wurde nicht gefunden",
   "searchStringNotFoundInCounterParty": "Der Suchebegriff '{}' wurde nicht in der Gegenpartei gefunden",
   "counterPartiesNotFound": "Die Gegenparteien wurden nicht gefunden",
   "counterPartySearchStringAlreadyInCounterParty": "Der Suchbegriff ist bereits in einer Gegenpatei vorhanden. Bitte ihn erst dort entfernen before er hier hinzugefügt werden kann",
-  "searchStringNotInCounterParty": "Der Suchbegriff ist nicht in der Gegenpartei gespeichert"
+  "searchStringNotInCounterParty": "Der Suchbegriff ist nicht in der Gegenpartei gespeichert",
 }

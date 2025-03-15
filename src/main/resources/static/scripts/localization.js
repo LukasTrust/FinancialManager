@@ -6,7 +6,7 @@ async function setLocale() {
         });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }
 async function loadLocalization(subDirectory) {

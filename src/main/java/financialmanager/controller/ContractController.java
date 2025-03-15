@@ -1,5 +1,6 @@
 package financialmanager.controller;
 
+import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.contractFolder.ContractService;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
@@ -43,5 +44,31 @@ public class ContractController {
     @PostMapping("/removeContractFromTransactions")
     public ResponseEntity<Response> removeContractFromTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
         return transactionService.removeContractFromTransactions(bankAccountId, transactionIds);
+    }
+
+    @PostMapping("/{contractId}/change/name/{newValue}")
+    public ResponseEntity<Response> updateContractName(@PathVariable Long bankAccountId,
+                                                       @PathVariable Long contractId,
+                                                           @PathVariable String newValue) {
+        return contractService.updateContractField(bankAccountId, contractId, newValue, Contract::setName);
+    }
+
+    @PostMapping("/{contractId}/change/description/{newValue}")
+    public ResponseEntity<Response> updateContractDescription(@PathVariable Long bankAccountId,
+                                                              @PathVariable Long contractId,
+                                                                  @PathVariable String newValue) {
+        return contractService.updateContractField(bankAccountId, contractId, newValue, Contract::setDescription);
+    }
+
+    @PostMapping("/hide")
+    public ResponseEntity<Response> hideContracts(@PathVariable Long bankAccountId,
+                                                       @RequestBody List<Long> contractIds) {
+        return transactionService.updateContractVisibility(bankAccountId, contractIds, true);
+    }
+
+    @PostMapping("/unHide")
+    public ResponseEntity<Response> unHideContracts(@PathVariable Long bankAccountId,
+                                                         @RequestBody List<Long> contractIds) {
+        return transactionService.updateContractVisibility(bankAccountId, contractIds, false);
     }
 }

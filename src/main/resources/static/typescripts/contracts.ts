@@ -10,27 +10,13 @@ async function buildContracts(): Promise<void> {
     splitDataIntoPages(messages, type, contractData);
 
     setUpSorting(true);
-}
 
-async function updateContractField(
-    contractId: number,
-    field: "name" | "description",
-    newValue: string,
-    messages: Record<string, string>
-): Promise<void> {
-    try {
-        const response = await fetch(`/contract/data/${contractId}/change/${field}/${newValue}`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-        });
+    document.getElementById("showHiddenRows")?.addEventListener("change", () => changeRowVisibility(type));
 
-        if (!response.ok) {
-            await showAlertFromResponse(response);
-        }
-    } catch (error) {
-        console.error(`There was an error changing the ${field} of a contract:`, error);
-        showAlert('error', messages["error_generic"]);
-    }
+    document.getElementById("changeHiddenButton")?.addEventListener("click", () => showChangeHiddenDialog(type, messages));
+
+    document.getElementById("mergeButton")?.addEventListener("click", () => showMergeDialog(type, messages));
+
 }
 
 function addRowsToContractTable(data: ContractDisplay[], messages: Record<string, string>): void {
@@ -57,31 +43,31 @@ function createContractRow(tableBody: HTMLElement, contractDisplay: ContractDisp
 
     const contract = contractDisplay.contract;
 
-    let rowGroupClass: string = contract.hidden ? "rowGroup hiddenRow" : "rowGroup";
+    let hidden: string = contract.hidden ? " hiddenRow" : "";
 
     if (contract.hidden && !counterPartiesHiddenToggle) {
-        rowGroupClass += " hidden";
+        hidden += " hidden";
     }
 
-    const rowGroup = createAndAppendElement(tableBody, "tbody", rowGroupClass);
+    const rowGroup = createAndAppendElement(tableBody, "div", "rowGroup");
     animateElement(rowGroup);
 
-    const newRow = createAndAppendElement(rowGroup, "tr", "rowWithSubRow", "", {id: contract.id.toString()});
-    createAndAppendElement(newRow, "td", "", "", {style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px"});
+    const newRow = createAndAppendElement(rowGroup, "tr", "rowWithSubRow" + hidden, "", {id: contract.id.toString()});
+    createAndAppendElement(newRow, "td", contract.hidden ? "bi bi-eye-slash" : "", "", {style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px"});
 
-    createCheckBoxForRowGroup(rowGroup, newRow, contract.id, contract.hidden);
+    createCheckBoxForRowGroup(rowGroup, newRow, contract.id);
 
     // Name cell
     const name = createAndAppendElement(newRow, "td", "", "", {style: "width: 20%; padding-right: 20px"});
     const nameInput = createInputBox(name, "bi bi-pencil-fill", "name", "text", contract.name);
     debounceInputChange(nameInput, (id, newValue, messages) =>
-        updateContractField(id, "name", newValue, messages), contract.id, messages);
+        updateField(id, "name", newValue, messages, Type.CONTRACT), contract.id, messages);
 
     // Description Cell
     const description = createAndAppendElement(newRow, "td" , "", "", {style: "width: 16%"});
     const descriptionInput = createInputBox(description, "bi bi-pencil-fill", "name", "text", contract.description);
     debounceInputChange(descriptionInput, (id, newValue, messages) =>
-        updateContractField(id, "description", newValue, messages), contract.id, messages);
+        updateField(id, "description", newValue, messages, Type.CONTRACT), contract.id, messages);
 
     // Transaction count
     const transactionCount = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 17%; padding-right: 20px"});
@@ -102,4 +88,68 @@ function createContractRow(tableBody: HTMLElement, contractDisplay: ContractDisp
     // Last payment date
     const lastPaymentDate = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 15%; padding-right: 10px"});
     createAndAppendElement(lastPaymentDate, "span", "tdMargin", formatDateString(contract.lastPaymentDate));
+
+    const count = contractDisplay.contractHistories.length;
+    let current = 1;
+    contractDisplay.contractHistories.forEach(contractHistory => {
+        createContractSubRow(rowGroup, contractHistory, messages, currency, count === current, hidden);
+        current++;
+    });
+
+    if (count === 0) {
+        rowGroup.style.borderBottom = "1px solid rgba(255, 255, 255, 0.1)";
+    }
+
+    addHoverToSiblings(newRow);
+}
+
+function createContractSubRow(parent: HTMLElement, contractHistory: ContractHistory, messages: Record<string, string>, currency: string, last: boolean, hidden: string): void {
+    const subRow = createAndAppendElement(parent, "tr", last ? "subRow" + hidden: "middleRow" + hidden);
+
+    // Changed at
+    const changedAt = createAndAppendElement(subRow, "td", "", "", {style: "width: 30%; padding-left: 20px"});
+    createAndAppendElement(changedAt, "span", "normalText", messages["changedAt"], {style: "padding-right: 30px"});
+    createAndAppendElement(changedAt, "span", "", formatDateString(contractHistory.changedAt));
+
+    // Previous amount
+    const previousAmount = createAndAppendElement(subRow, "td", "", "", {style: "width: 30%"});
+    createAndAppendElement(previousAmount, "span", "normalText", messages["previousAmount"], {style: "padding-right: 30px"});
+    createAndAppendElement(previousAmount, "span", "", formatNumber(contractHistory.previousAmount, currency));
+
+    // Previous amount
+    const newAmount = createAndAppendElement(subRow, "td", "", "", {style: "width: 20%"});
+    createAndAppendElement(newAmount, "span", "normalText", messages["newAmount"], {style: "padding-right: 30px"});
+    createAndAppendElement(newAmount, "span", "", formatNumber(contractHistory.newAmount, currency));
+}
+
+function updateContract(contractDisplay: ContractDisplay, data: ContractDisplay[]): void {
+    const item = data.find(item => item.contract.id === contractDisplay.contract.id);
+    if (item) {
+        Object.assign(item, contractDisplay);
+    }
+}
+
+function removeMergedContracts(contractIds: number[], messages: Record<string, string>): void {
+    contractData = contractData.filter(item => !contractIds.includes(item.contract.id));
+    filteredContractData = filteredContractData.filter(item => !contractIds.includes(item.contract.id));
+
+    splitDataIntoPages(messages, Type.CONTRACT, filteredContractData);
+}
+
+function contractToListElementObjectArray(contracts: ContractDisplay[]): ListElementObject[] {
+    let listElementObjects: ListElementObject[] = [];
+
+    const currency = getCurrentCurrencySymbol();
+
+    contracts.forEach(contract => {
+        const listElementObject: ListElementObject = {
+            id: contract.contract.id,
+            text: contract.contract.name,
+            toolTip: formatNumber(contract.totalAmount, currency).toString()
+        };
+
+        listElementObjects.push(listElementObject);
+    });
+
+    return listElementObjects;
 }

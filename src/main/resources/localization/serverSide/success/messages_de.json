@@ -9,5 +9,7 @@
   "counterPartiesHidden": "{} Gegenparteien, {} dazugehörigen Transaktionen und {} dazugehörige Verträge wurden verborgen",
   "counterPartiesUnHidden": "{} Gegenparteien, {} dazugehörigen Transaktionen und {} dazugehörige Verträge wurden sichtbar gemacht",
   "counterPartiesMerged": "{} Gegenparteien wurden vereinigt, {} dazugehörigen Transaktionen und {} dazugehörige Verträge wurden geupdated",
-  "addedSearchStringToCounterParty": "Der Suchbegriff wurde der Gegenpartei hinzugefügt"
+  "addedSearchStringToCounterParty": "Der Suchbegriff wurde der Gegenpartei hinzugefügt",
+  "contractsHidden": "{} Verträge, {} dazugehörige Transaktionen wurde verborgen",
+  "contractsUnhidden": "{} Verträge, {} dazugehörige Transaktionen wurden sichtbar gemacht"
 }

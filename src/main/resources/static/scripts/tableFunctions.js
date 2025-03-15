@@ -218,18 +218,36 @@ function classifyHiddenOrNot(type) {
     const alreadyHidden = [];
     const notHidden = [];
     data.forEach(item => {
-        const isHidden = type === Type.TRANSACTION
-            ? item.hidden
-            : item.counterParty.hidden;
+        let isHidden;
+        switch (type) {
+            case Type.TRANSACTION:
+                isHidden = item.hidden;
+                break;
+            case Type.COUNTERPARTY:
+                isHidden = item.counterParty.hidden;
+                break;
+            case Type.CONTRACT:
+                isHidden = item.contract.hidden;
+                break;
+            default:
+                isHidden = false;
+        }
         isHidden ? alreadyHidden.push(item) : notHidden.push(item);
     });
     return { alreadyHidden, notHidden };
 }
 function getCheckedData(type) {
     const checkedRows = new Set(getCheckedRows());
-    return (type === Type.TRANSACTION
-        ? filteredTransactionData.filter(t => checkedRows.has(t.id))
-        : filteredCounterPartyData.filter(c => checkedRows.has(c.counterParty.id)));
+    switch (type) {
+        case Type.TRANSACTION:
+            return filteredTransactionData.filter(t => checkedRows.has(t.id));
+        case Type.COUNTERPARTY:
+            return filteredCounterPartyData.filter(c => checkedRows.has(c.counterParty.id));
+        case Type.CONTRACT:
+            return filteredContractData.filter(c => checkedRows.has(c.contract.id));
+        default:
+            return [];
+    }
 }
 function updateRowStyle(newRow, checkBox) {
     newRow.classList.toggle("selectedRow", checkBox.checked);
@@ -249,21 +267,30 @@ function updateRowGroupStyle(rowGroup, checkBox) {
 }
 function updateCachedDataAndUI(type, messages, ids) {
     const idSet = new Set(ids);
-    if (type === Type.TRANSACTION) {
-        filteredTransactionData.forEach(transaction => {
-            if (idSet.has(transaction.id)) {
-                transaction.hidden = !transaction.hidden;
-            }
-        });
-        splitDataIntoPages(messages, Type.TRANSACTION, filteredTransactionData);
-    }
-    else {
-        filteredCounterPartyData.forEach(counterParty => {
-            if (idSet.has(counterParty.counterParty.id)) {
-                counterParty.counterParty.hidden = !counterParty.counterParty.hidden;
-            }
-        });
-        splitDataIntoPages(messages, Type.COUNTERPARTY, filteredCounterPartyData);
+    switch (type) {
+        case Type.TRANSACTION:
+            filteredTransactionData = filteredTransactionData.map(transaction => idSet.has(transaction.id)
+                ? Object.assign(Object.assign({}, transaction), { hidden: !transaction.hidden }) : transaction);
+            transactionData = transactionData.map(transaction => idSet.has(transaction.id)
+                ? Object.assign(Object.assign({}, transaction), { hidden: !transaction.hidden }) : transaction);
+            splitDataIntoPages(messages, Type.TRANSACTION, filteredTransactionData);
+            break;
+        case Type.COUNTERPARTY:
+            console.log(filteredCounterPartyData);
+            filteredCounterPartyData = filteredCounterPartyData.map(counterParty => idSet.has(counterParty.counterParty.id)
+                ? Object.assign(Object.assign({}, counterParty), { counterParty: Object.assign(Object.assign({}, counterParty.counterParty), { hidden: !counterParty.counterParty.hidden }) }) : counterParty);
+            console.log(filteredCounterPartyData);
+            counterPartyData = counterPartyData.map(counterParty => idSet.has(counterParty.counterParty.id)
+                ? Object.assign(Object.assign({}, counterParty), { counterParty: Object.assign(Object.assign({}, counterParty.counterParty), { hidden: !counterParty.counterParty.hidden }) }) : counterParty);
+            splitDataIntoPages(messages, Type.COUNTERPARTY, filteredCounterPartyData);
+            break;
+        case Type.CONTRACT:
+            filteredContractData = filteredContractData.map(contract => idSet.has(contract.contract.id)
+                ? Object.assign(Object.assign({}, contract), { contract: Object.assign(Object.assign({}, contract.contract), { hidden: !contract.contract.hidden }) }) : contract);
+            contractData = contractData.map(contract => idSet.has(contract.contract.id)
+                ? Object.assign(Object.assign({}, contract), { contract: Object.assign(Object.assign({}, contract.contract), { hidden: !contract.contract.hidden }) }) : contract);
+            splitDataIntoPages(messages, Type.CONTRACT, filteredContractData);
+            break;
     }
 }
 function changeRowVisibility(type) {
@@ -274,8 +301,11 @@ function changeRowVisibility(type) {
     if (type === Type.TRANSACTION) {
         transactionsHiddenToggle = !transactionsHiddenToggle;
     }
-    else {
+    else if (type === Type.COUNTERPARTY) {
         counterPartiesHiddenToggle = !counterPartiesHiddenToggle;
+    }
+    else {
+        contractsHiddenToggle = !contractsHiddenToggle;
     }
     rows.forEach(row => row.classList.toggle("hidden"));
 }

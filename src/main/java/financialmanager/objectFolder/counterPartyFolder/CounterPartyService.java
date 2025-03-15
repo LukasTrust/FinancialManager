@@ -195,16 +195,24 @@ public class CounterPartyService {
     //<editor-fold desc="update functions">
     //<editor-fold desc="visibility functions">
     public ResponseEntity<Response> updateCounterPartyVisibility(List<Long> counterPartyIds, boolean hide) {
-        return usersService.getCurrentUser()
-                .flatMap(user -> findByIdInAndUsers(counterPartyIds, user))
-                .map(counterParties -> {
-                    List<String> updatedData = updateVisibilityForCounterParties(counterParties, hide);
-                    return responseService.createResponseWithPlaceHolders(
-                            HttpStatus.OK, hide ? "counterPartiesHidden" : "counterPartiesUnHidden",
-                            AlertType.SUCCESS, updatedData
-                    );
-                })
-                .orElseGet(usersService.getCurrentUser()::getError);
+        Result<Users, ResponseEntity<Response>> currentUserResult = usersService.getCurrentUser();
+
+        if (currentUserResult.isErr()) return currentUserResult.getError();
+
+        Users currentUser = currentUserResult.getValue();
+
+        Result<List<CounterParty>, ResponseEntity<Response>>  counterPartiesResult = findByIdInAndUsers(counterPartyIds, currentUser);
+        if (counterPartiesResult.isErr()) {
+            return counterPartiesResult.getError();
+        }
+
+        List<CounterParty> counterParties = counterPartiesResult.getValue();
+
+        List<String> updatedData = updateVisibilityForCounterParties(counterParties, hide);
+        return responseService.createResponseWithPlaceHolders(
+                HttpStatus.OK, hide ? "counterPartiesHidden" : "counterPartiesUnHidden",
+                AlertType.SUCCESS, updatedData
+        );
     }
 
     private List<String> updateVisibilityForCounterParties(List<CounterParty> counterParties, boolean isHidden) {
@@ -310,6 +318,10 @@ public class CounterPartyService {
     //<editor-fold desc="edit counterParty">
     public ResponseEntity<Response> updateCounterPartyField(Long counterPartyId, String newValue,
                                                             BiConsumer<CounterParty, String> fieldUpdater) {
+        if (Objects.equals(newValue, "null")) {
+            newValue = null;
+        }
+
         Result<CounterParty, ResponseEntity<Response>> counterPartyResult = getCounterParty(counterPartyId);
 
         if (counterPartyResult.isErr()) {

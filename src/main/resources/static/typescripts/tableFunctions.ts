@@ -258,7 +258,7 @@ function compareValues(valueA: string | number | Date, valueB: string | number |
     return isAscending ? valueA.toString().localeCompare(valueB.toString()) : valueB.toString().localeCompare(valueA.toString());
 }
 
-function classifyHiddenOrNot<T extends Transaction | CounterPartyDisplay>(
+function classifyHiddenOrNot<T extends Transaction | CounterPartyDisplay | ContractDisplay>(
     type: Type
 ): { alreadyHidden: T[]; notHidden: T[] } {
     const data = getCheckedData(type) as T[];
@@ -266,22 +266,41 @@ function classifyHiddenOrNot<T extends Transaction | CounterPartyDisplay>(
     const notHidden: T[] = [];
 
     data.forEach(item => {
-        const isHidden = type === Type.TRANSACTION
-            ? (item as Transaction).hidden
-            : (item as CounterPartyDisplay).counterParty.hidden;
+        let isHidden: boolean;
+
+        switch (type) {
+            case Type.TRANSACTION:
+                isHidden = (item as Transaction).hidden;
+                break;
+            case Type.COUNTERPARTY:
+                isHidden = (item as CounterPartyDisplay).counterParty.hidden;
+                break;
+            case Type.CONTRACT:
+                isHidden = (item as ContractDisplay).contract.hidden;
+                break;
+            default:
+                isHidden = false;
+        }
 
         isHidden ? alreadyHidden.push(item) : notHidden.push(item);
     });
 
-    return { alreadyHidden, notHidden };
+    return {alreadyHidden, notHidden};
 }
 
-function getCheckedData(type: Type): Transaction[] | CounterPartyDisplay[] {
+function getCheckedData(type: Type): Transaction[] | CounterPartyDisplay[] | ContractDisplay[] {
     const checkedRows = new Set(getCheckedRows());
 
-    return (type === Type.TRANSACTION
-        ? filteredTransactionData.filter(t => checkedRows.has(t.id))
-        : filteredCounterPartyData.filter(c => checkedRows.has(c.counterParty.id))) as Transaction[] | CounterPartyDisplay[];
+    switch (type) {
+        case Type.TRANSACTION:
+            return filteredTransactionData.filter(t => checkedRows.has(t.id));
+        case Type.COUNTERPARTY:
+            return filteredCounterPartyData.filter(c => checkedRows.has(c.counterParty.id));
+        case Type.CONTRACT:
+            return filteredContractData.filter(c => checkedRows.has(c.contract.id));
+        default:
+            return [];
+    }
 }
 
 function updateRowStyle(newRow: HTMLElement, checkBox: HTMLInputElement): void {
@@ -305,22 +324,82 @@ function updateRowGroupStyle(rowGroup: HTMLElement, checkBox: HTMLInputElement) 
 function updateCachedDataAndUI(type: Type, messages: Record<string, string>, ids: number[]): void {
     const idSet = new Set(ids);
 
-    if (type === Type.TRANSACTION) {
-        filteredTransactionData.forEach(transaction => {
-            if (idSet.has(transaction.id)) {
-                transaction.hidden = !transaction.hidden;
-            }
-        });
+    switch (type) {
+        case Type.TRANSACTION:
+            filteredTransactionData = filteredTransactionData.map(transaction =>
+                idSet.has(transaction.id)
+                    ? { ...transaction, hidden: !transaction.hidden }
+                    : transaction
+            );
 
-        splitDataIntoPages(messages, Type.TRANSACTION, filteredTransactionData);
-    } else {
-        filteredCounterPartyData.forEach(counterParty => {
-            if (idSet.has(counterParty.counterParty.id)) {
-                counterParty.counterParty.hidden = !counterParty.counterParty.hidden;
-            }
-        });
+            transactionData = transactionData.map(transaction =>
+                idSet.has(transaction.id)
+                    ? { ...transaction, hidden: !transaction.hidden }
+                    : transaction
+            );
 
-        splitDataIntoPages(messages, Type.COUNTERPARTY, filteredCounterPartyData);
+            splitDataIntoPages(messages, Type.TRANSACTION, filteredTransactionData);
+            break;
+
+        case Type.COUNTERPARTY:
+            console.log(filteredCounterPartyData);
+
+            filteredCounterPartyData = filteredCounterPartyData.map(counterParty =>
+                idSet.has(counterParty.counterParty.id)
+                    ? {
+                        ...counterParty,
+                        counterParty: {
+                            ...counterParty.counterParty,
+                            hidden: !counterParty.counterParty.hidden
+                        }
+                    }
+                    : counterParty
+            );
+
+            console.log(filteredCounterPartyData);
+
+            counterPartyData = counterPartyData.map(counterParty =>
+                idSet.has(counterParty.counterParty.id)
+                    ? {
+                        ...counterParty,
+                        counterParty: {
+                            ...counterParty.counterParty,
+                            hidden: !counterParty.counterParty.hidden
+                        }
+                    }
+                    : counterParty
+            );
+
+            splitDataIntoPages(messages, Type.COUNTERPARTY, filteredCounterPartyData);
+            break;
+
+        case Type.CONTRACT:
+            filteredContractData = filteredContractData.map(contract =>
+                idSet.has(contract.contract.id)
+                    ? {
+                        ...contract,
+                        contract: {
+                            ...contract.contract,
+                            hidden: !contract.contract.hidden
+                        }
+                    }
+                    : contract
+            );
+
+            contractData = contractData.map(contract =>
+                idSet.has(contract.contract.id)
+                    ? {
+                        ...contract,
+                        contract: {
+                            ...contract.contract,
+                            hidden: !contract.contract.hidden
+                        }
+                    }
+                    : contract
+            );
+
+            splitDataIntoPages(messages, Type.CONTRACT, filteredContractData);
+            break;
     }
 }
 
@@ -331,9 +410,10 @@ function changeRowVisibility(type: Type): void {
 
     if (type === Type.TRANSACTION) {
         transactionsHiddenToggle = !transactionsHiddenToggle;
-    }
-    else {
+    } else if (type === Type.COUNTERPARTY) {
         counterPartiesHiddenToggle = !counterPartiesHiddenToggle;
+    } else {
+        contractsHiddenToggle = !contractsHiddenToggle;
     }
 
     rows.forEach(row => row.classList.toggle("hidden"));

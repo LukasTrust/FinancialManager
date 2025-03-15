@@ -37,7 +37,7 @@ interface Contract {
     id: number;
     name: string;
     description?: string;
-    startDate: string; // LocalDate is represented as a string in JSON
+    startDate: string;
     endDate?: string;
     monthsBetweenPayments: number;
     amount: number;
@@ -50,8 +50,17 @@ interface Contract {
 
 interface ContractDisplay {
     contract: Contract;
+    contractHistories: ContractHistory[];
     transactionCount: number;
     totalAmount: number;
+}
+
+interface ContractHistory {
+    id: number;
+    contract: Contract;
+    previousAmount: number;
+    newAmount: number;
+    changedAt: string
 }
 
 interface Transaction {

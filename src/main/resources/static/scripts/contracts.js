@@ -1,4 +1,5 @@
 async function buildContracts() {
+    var _a, _b, _c;
     const messages = await loadLocalization("contracts");
     if (!messages)
         return;
@@ -7,21 +8,9 @@ async function buildContracts() {
     await loadData(type, messages);
     splitDataIntoPages(messages, type, contractData);
     setUpSorting(true);
-}
-async function updateContractField(contractId, field, newValue, messages) {
-    try {
-        const response = await fetch(`/contract/data/${contractId}/change/${field}/${newValue}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-        });
-        if (!response.ok) {
-            await showAlertFromResponse(response);
-        }
-    }
-    catch (error) {
-        console.error(`There was an error changing the ${field} of a contract:`, error);
-        showAlert('error', messages["error_generic"]);
-    }
+    (_a = document.getElementById("showHiddenRows")) === null || _a === void 0 ? void 0 : _a.addEventListener("change", () => changeRowVisibility(type));
+    (_b = document.getElementById("changeHiddenButton")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => showChangeHiddenDialog(type, messages));
+    (_c = document.getElementById("mergeButton")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => showMergeDialog(type, messages));
 }
 function addRowsToContractTable(data, messages) {
     try {
@@ -44,25 +33,25 @@ function createContractRow(tableBody, contractDisplay, currency, messages) {
         return;
     }
     const contract = contractDisplay.contract;
-    let rowGroupClass = contract.hidden ? "rowGroup hiddenRow" : "rowGroup";
+    let hidden = contract.hidden ? " hiddenRow" : "";
     if (contract.hidden && !counterPartiesHiddenToggle) {
-        rowGroupClass += " hidden";
+        hidden += " hidden";
     }
-    const rowGroup = createAndAppendElement(tableBody, "tbody", rowGroupClass);
+    const rowGroup = createAndAppendElement(tableBody, "div", "rowGroup");
     animateElement(rowGroup);
-    const newRow = createAndAppendElement(rowGroup, "tr", "rowWithSubRow", "", { id: contract.id.toString() });
-    createAndAppendElement(newRow, "td", "", "", { style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px" });
-    createCheckBoxForRowGroup(rowGroup, newRow, contract.id, contract.hidden);
+    const newRow = createAndAppendElement(rowGroup, "tr", "rowWithSubRow" + hidden, "", { id: contract.id.toString() });
+    createAndAppendElement(newRow, "td", "bi bi-eye-slash", "", { style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px" });
+    createCheckBoxForRowGroup(rowGroup, newRow, contract.id);
     // Name cell
     const name = createAndAppendElement(newRow, "td", "", "", { style: "width: 20%; padding-right: 20px" });
     const nameInput = createInputBox(name, "bi bi-pencil-fill", "name", "text", contract.name);
-    debounceInputChange(nameInput, (id, newValue, messages) => updateContractField(id, "name", newValue, messages), contract.id, messages);
+    debounceInputChange(nameInput, (id, newValue, messages) => updateField(id, "name", newValue, messages, Type.CONTRACT), contract.id, messages);
     // Description Cell
-    const description = createAndAppendElement(newRow, "td", "", "", { style: "width: 18%" });
+    const description = createAndAppendElement(newRow, "td", "", "", { style: "width: 16%" });
     const descriptionInput = createInputBox(description, "bi bi-pencil-fill", "name", "text", contract.description);
-    debounceInputChange(descriptionInput, (id, newValue, messages) => updateContractField(id, "description", newValue, messages), contract.id, messages);
+    debounceInputChange(descriptionInput, (id, newValue, messages) => updateField(id, "description", newValue, messages, Type.CONTRACT), contract.id, messages);
     // Transaction count
-    const transactionCount = createAndAppendElement(newRow, "td", "rightAligned", "", { style: "width: 15%; padding-right: 20px" });
+    const transactionCount = createAndAppendElement(newRow, "td", "rightAligned", "", { style: "width: 17%; padding-right: 20px" });
     createAndAppendElement(transactionCount, "span", "tdMargin", contractDisplay.transactionCount.toString());
     // Total amount
     const totalAmount = createAndAppendElement(newRow, "td", "rightAligned", "", { style: "width: 10%" });
@@ -76,5 +65,54 @@ function createContractRow(tableBody, contractDisplay, currency, messages) {
     // Last payment date
     const lastPaymentDate = createAndAppendElement(newRow, "td", "rightAligned", "", { style: "width: 15%; padding-right: 10px" });
     createAndAppendElement(lastPaymentDate, "span", "tdMargin", formatDateString(contract.lastPaymentDate));
+    const count = contractDisplay.contractHistories.length;
+    let current = 1;
+    contractDisplay.contractHistories.forEach(contractHistory => {
+        createContractSubRow(rowGroup, contractHistory, messages, currency, count === current, hidden);
+        current++;
+    });
+    if (count === 0) {
+        rowGroup.style.borderBottom = "1px solid rgba(255, 255, 255, 0.1)";
+    }
+    addHoverToSiblings(newRow);
+}
+function createContractSubRow(parent, contractHistory, messages, currency, last, hidden) {
+    const subRow = createAndAppendElement(parent, "tr", last ? "subRow" + hidden : "middleRow" + hidden);
+    // Changed at
+    const changedAt = createAndAppendElement(subRow, "td", "", "", { style: "width: 30%; padding-left: 20px" });
+    createAndAppendElement(changedAt, "span", "normalText", messages["changedAt"], { style: "padding-right: 30px" });
+    createAndAppendElement(changedAt, "span", "", formatDateString(contractHistory.changedAt));
+    // Previous amount
+    const previousAmount = createAndAppendElement(subRow, "td", "", "", { style: "width: 30%" });
+    createAndAppendElement(previousAmount, "span", "normalText", messages["previousAmount"], { style: "padding-right: 30px" });
+    createAndAppendElement(previousAmount, "span", "", formatNumber(contractHistory.previousAmount, currency));
+    // Previous amount
+    const newAmount = createAndAppendElement(subRow, "td", "", "", { style: "width: 20%" });
+    createAndAppendElement(newAmount, "span", "normalText", messages["newAmount"], { style: "padding-right: 30px" });
+    createAndAppendElement(newAmount, "span", "", formatNumber(contractHistory.newAmount, currency));
+}
+function updateContract(contractDisplay, data) {
+    const item = data.find(item => item.contract.id === contractDisplay.contract.id);
+    if (item) {
+        Object.assign(item, contractDisplay);
+    }
+}
+function removeMergedContracts(contractIds, messages) {
+    contractData = contractData.filter(item => !contractIds.includes(item.contract.id));
+    filteredContractData = filteredContractData.filter(item => !contractIds.includes(item.contract.id));
+    splitDataIntoPages(messages, Type.CONTRACT, filteredContractData);
+}
+function contractToListElementObjectArray(contracts) {
+    let listElementObjects = [];
+    const currency = getCurrentCurrencySymbol();
+    contracts.forEach(contract => {
+        const listElementObject = {
+            id: contract.contract.id,
+            text: contract.contract.name,
+            toolTip: formatNumber(contract.totalAmount, currency).toString()
+        };
+        listElementObjects.push(listElementObject);
+    });
+    return listElementObjects;
 }
 //# sourceMappingURL=contracts.js.map

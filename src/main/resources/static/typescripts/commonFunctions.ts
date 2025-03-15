@@ -14,9 +14,17 @@ async function updateVisibility(
             showAlert("INFO", messages["noDataToMerge"], model);
             return;
         }
-
         const endpoint = hide ? "hide" : "unHide";
-        const response = await fetch(`/${type.toString()}/data/${endpoint}`, {
+
+        let url = `/${type.toString()}`;
+
+        if (type !== Type.COUNTERPARTY) {
+            url += `/${bankAccountId}`;
+        }
+
+        url += `/data/${endpoint}`;
+
+        const response = await fetch(url, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(ids),
@@ -35,6 +43,29 @@ async function updateVisibility(
         console.error("Unexpected error in updateVisibility:", error);
         console.error("Type:", type);
         showAlert("ERROR", messages["error_generic"], model);
+    }
+}
+
+async function updateField(
+    id: number,
+    field: "name" | "description",
+    newValue: string,
+    messages: Record<string, string>,
+    type: Type
+): Promise<void> {
+    try {
+        const response = await fetch(`/${type.toString()}/data/${id}/change/${field}/${newValue}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+        });
+
+        if (!response.ok) {
+            await showAlertFromResponse(response);
+        }
+    } catch (error) {
+        console.error("Unexpected error in updateField:", error);
+        console.error("Type:", type);
+        showAlert('error', messages["error_generic"]);
     }
 }
 
@@ -62,11 +93,20 @@ async function mergeData(model: HTMLElement, messages: Record<string, string>, l
 
         showAlert(responseBody.alertType, responseBody.message, model);
 
-        updateCounterParty(responseBody.data, counterPartyData);
-        updateCounterParty(responseBody.data, filteredCounterPartyData);
+        if (response.ok) {
+            removeElements(updatedContainer);
 
-        removeElements(updatedContainer);
-        removeMergedCounterParties(ids, messages);
+            if (type === Type.COUNTERPARTY) {
+                updateCounterParty(responseBody.data, counterPartyData);
+                updateCounterParty(responseBody.data, filteredCounterPartyData);
+                removeMergedCounterParties(ids, messages);
+            }
+            else if (type === Type.CONTRACT) {
+                updateContract(response.data, contractData);
+                updateContract(response.data, filteredContractData);
+                removeMergedContracts(ids, messages);
+            }
+        }
     } catch (error) {
         console.error("There was an error merging the counterParties:", error);
         showAlert('error', messages["error_generic"], model);

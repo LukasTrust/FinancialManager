@@ -6,7 +6,7 @@ async function setLocale(): Promise<void> {
             method: 'POST',
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
 }
 

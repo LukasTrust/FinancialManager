@@ -115,21 +115,15 @@ function moveElements(sourceContainer, targetContainer, soloItem = null) {
     if (soloItem) {
         items.push(soloItem);
     }
-    items.forEach((item, index) => {
-        setTimeout(() => {
-            item.addEventListener('transitionend', () => {
-                targetContainer.appendChild(item);
-                item.classList.remove('moving');
-                animateElement(item); // Animate the item back into view
-            }, { once: true });
-        }, index * 150);
+    items.forEach((item) => {
+        item.addEventListener('transitionend', () => {
+            animateElement(item);
+        }, { once: true });
+        targetContainer.appendChild(item);
     });
 }
-function createCheckBoxForRowGroup(rowGroup, newRow, id, isHidden) {
+function createCheckBoxForRowGroup(rowGroup, newRow, id) {
     const trCheckBox = createAndAppendElement(newRow, "td", "", "", { style: "width: 2%" });
-    if (isHidden) {
-        createAndAppendElement(trCheckBox, "span", "bi bi-eye-slash");
-    }
     const checkBox = createAndAppendElement(trCheckBox, "input", "tableCheckbox", "", {
         type: "checkbox",
         id: id.toString(),
@@ -162,6 +156,25 @@ function addHoverToOtherElement(newRow, subRow) {
     });
     subRow.addEventListener('mouseleave', () => {
         newRow.classList.remove('hover'); // Remove the class from newRow
+    });
+}
+function addHoverToSiblings(element) {
+    const parent = element.parentElement;
+    if (!parent)
+        return;
+    const siblings = Array.from(parent.children);
+    function addHover() {
+        siblings.forEach(sibling => sibling.classList.add('hover'));
+    }
+    function removeHover() {
+        // Check if the mouse is still within any of the siblings or the original element
+        if ([...siblings].some(sib => sib.matches(':hover')))
+            return;
+        siblings.forEach(sibling => sibling.classList.remove('hover'));
+    }
+    siblings.forEach(sibling => {
+        sibling.addEventListener('mouseenter', addHover);
+        sibling.addEventListener('mouseleave', removeHover);
     });
 }
 function createCheckBoxForTable(newRow, id, isHidden) {
@@ -212,6 +225,9 @@ function createListSection(parent, title, type, data, withSelect = false) {
     }
     else if (type === Type.COUNTERPARTY) {
         createListContainer(header, counterPartyToListElementObjectArray(data), withSelect);
+    }
+    else if (type === Type.CONTRACT) {
+        createListContainer(header, contractToListElementObjectArray(data), withSelect);
     }
     return container;
 }

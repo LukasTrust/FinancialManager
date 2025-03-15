@@ -1,4 +1,8 @@
 package financialmanager.objectFolder.contractFolder;
 
-public record ContractDisplay(Contract contract, Integer transactionCount, Double totalAmount) {
+import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistory;
+
+import java.util.List;
+
+public record ContractDisplay(Contract contract, List<ContractHistory> contractHistories, Integer transactionCount, Double totalAmount) {
 }

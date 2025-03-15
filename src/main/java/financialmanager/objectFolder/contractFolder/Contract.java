@@ -1,5 +1,6 @@
 package financialmanager.objectFolder.contractFolder;
 
+import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import financialmanager.objectFolder.usersFolder.Users;
 import jakarta.persistence.*;
@@ -51,10 +52,9 @@ public class Contract {
     @Column(nullable = false)
     private boolean isHidden;
 
-    @Setter
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Users users;
+    @JoinColumn(name = "bank_account_Id", nullable = false)
+    private BankAccount bankAccount;
 
     @Setter
     @ManyToOne
@@ -62,7 +62,7 @@ public class Contract {
     private CounterParty counterParty;
 
     public Contract(LocalDate startDate, LocalDate lastPaymentDate, Integer monthsBetweenPayments, Double amount,
-                    CounterParty counterParty, Users users) {
+                    CounterParty counterParty, BankAccount bankAccount) {
         this.name = counterParty.getName();
         this.startDate = startDate;
         this.lastUpdatedAt = startDate;
@@ -70,6 +70,6 @@ public class Contract {
         this.monthsBetweenPayments = monthsBetweenPayments;
         this.amount = amount;
         this.counterParty = counterParty;
-        this.users = users;
+        this.bankAccount = bankAccount;
     }
 }

@@ -67,9 +67,9 @@ create table if not exists contract
     counter_party_id        bigint not null
                                            constraint contract_counter_party
                                                references counter_party,
-    user_id                 bigint not null
-                                           constraint contract_user
-                                               references users,
+    bank_account_Id                 bigint not null
+                                           constraint contract_bank_account_Id
+                                               references bank_account,
     description             varchar(255),
     name                    varchar(255) not null,
     amount double precision not null,

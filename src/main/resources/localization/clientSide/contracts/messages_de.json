@@ -2,8 +2,8 @@
   "showHiddenContracts": "Zeige verborgene Verträge",
   "changeHiddenButton": "Verstecken/Sichtbar",
   "changeHiddenButtonTooltip": "Verborgene Verträge ein- oder ausblenden",
-  "mergeCounterParties": "Verträge zusammenführen",
-  "mergeCounterPartiesTooltip": "Hier können die ausgewählent Verträge zusammen geführt werden",
+  "mergeButton": "Verträge zusammenführen",
+  "mergeButtonTooltip": "Hier können die ausgewählent Verträge zusammen geführt werden",
   "changeHiddenHeader": "Verändere Sichtbarkeit von Verträge",
   "alreadyHiddenHeader": "Bereits verborgene Verträge",
   "notHiddenHeader": "Noch nicht verborgene Verträge",
@@ -12,9 +12,9 @@
   "noDataToMerge": "Keine Verträge wurden geupdated",
   "infoTransactionsWillAlsoBeAffected": "Diese Aktionen haben auswirkungen auf die Sichtbarkeit der Transaktionen",
   "mergeHeader": "Vereingien von Verträge",
-  "mergeCounterPartiesInfo": "Wähle eine Vertrag aus in die die anderen zusammen geführt werden",
-  "counterPartyHeader": "Kopf Vertrag",
-  "counterPartiesToMerge": "Verträge zum vereinigen",
+  "mergeInfo": "Wähle eine Vertrag aus in die die anderen zusammen geführt werden",
+  "leftHeader": "Kopf Vertrag",
+  "rightHeader": "Verträge zum vereinigen",
   "chooseHeader": "Auswahl as Kopf auswählen",
   "error_SelectAHeader": "Bitte einen Kopf auswählen",
   "contracts": "Verträge",
@@ -33,5 +33,8 @@
   "startDate": "Start Datum",
   "lastPaymentDate": "Letzer Zahl Datum",
   "transactionCount": "Anzahl der Transaktionen",
-  "monthAbbreviations": "'Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'"
+  "monthAbbreviations": "'Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'",
+  "changedAt": "Geändert am:",
+  "previousAmount": "Vorherige Betrag:",
+  "newAmount": "Neuer Betrag:"
 }

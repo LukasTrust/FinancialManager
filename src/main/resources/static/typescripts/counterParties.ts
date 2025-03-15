@@ -11,7 +11,7 @@ async function buildCounterParties(): Promise<void> {
 
     document.getElementById("changeHiddenButton")?.addEventListener("click", () => showChangeHiddenDialog(type, messages));
 
-    document.getElementById("mergeCounterParties")?.addEventListener("click", () => showMergeDialog(type, messages));
+    document.getElementById("mergeButton")?.addEventListener("click", () => showMergeDialog(type, messages));
 
     document.getElementById("searchBarInput")?.addEventListener("input", () => searchTable(messages, type));
 
@@ -54,28 +54,6 @@ async function addSearchString(
         showAlert('error', messages["error_generic"]);
     }
 }
-
-async function updateCounterPartyField(
-    counterPartyId: number,
-    field: "name" | "description",
-    newValue: string,
-    messages: Record<string, string>
-): Promise<void> {
-    try {
-        const response = await fetch(`/counterParties/data/${counterPartyId}/change/${field}/${newValue}`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-        });
-
-        if (!response.ok) {
-            await showAlertFromResponse(response);
-        }
-    } catch (error) {
-        console.error(`There was an error changing the ${field} of a counterParty:`, error);
-        showAlert('error', messages["error_generic"]);
-    }
-}
-
 
 async function removeSearchStringFromCounterParty(counterPartyId: number, searchString: string, messages: Record<string, string>): Promise<void> {
     try {
@@ -176,25 +154,24 @@ function createCounterPartyRow(tableBody: HTMLElement, counterPartyDisplay: Coun
 
     const counterParty = counterPartyDisplay.counterParty;
 
-    let rowGroupClass: string = counterParty.hidden ? "rowGroup hiddenRow" : "rowGroup";
+    let rowGroupClass: string = counterParty.hidden ? " hiddenRow" : "";
 
     if (counterParty.hidden && !counterPartiesHiddenToggle) {
         rowGroupClass += " hidden";
     }
 
-    const rowGroup = createAndAppendElement(tableBody, "div", rowGroupClass);
+    const rowGroup = createAndAppendElement(tableBody, "div", "rowGroup");
     animateElement(rowGroup);
 
-    const newRow = createAndAppendElement(rowGroup, "tr", "rowWithSubRow", "", {id: counterParty.id.toString()});
-    createAndAppendElement(newRow, "td", "", "", {style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px"});
-
-    createCheckBoxForRowGroup(rowGroup, newRow, counterParty.id, counterParty.hidden);
+    const newRow = createAndAppendElement(rowGroup, "tr", "rowWithSubRow" + rowGroupClass, "", {id: counterParty.id.toString()});
+    createAndAppendElement(newRow, "td", counterParty.hidden ? "bi bi-eye-slash" : "", "", {style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px"});
+    createCheckBoxForRowGroup(rowGroup, newRow, counterParty.id);
 
     // Name cell
     const name = createAndAppendElement(newRow, "td", "", "", {style: "width: 23%"});
     const nameInput = createInputBox(name, "bi bi-pencil-fill", "name", "text", counterParty.name);
     debounceInputChange(nameInput, (id, newValue, messages) =>
-        updateCounterPartyField(id, "name", newValue, messages), counterParty.id, messages);
+        updateField(id, "name", newValue, messages, Type.COUNTERPARTY), counterParty.id, messages);
 
     // Transaction count
     const transactionCount = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 15%"});
@@ -214,10 +191,10 @@ function createCounterPartyRow(tableBody: HTMLElement, counterPartyDisplay: Coun
         {style: "width: 30%; padding-right: 20px"});
     const descriptionInput = createInputBox(description, "bi bi-pencil-fill", "name", "text", counterParty.description);
     debounceInputChange(descriptionInput, (id, newValue, messages) =>
-        updateCounterPartyField(id, "description", newValue, messages), counterParty.id, messages);
+        updateField(id, "description", newValue, messages, Type.COUNTERPARTY), counterParty.id, messages);
 
     // Secondary Row for Search Strings
-    const searchStringRow = createAndAppendElement(rowGroup, "tr", "subRow", "");
+    const searchStringRow = createAndAppendElement(rowGroup, "tr", "subRow" + rowGroupClass);
 
     const counterpartySearchStrings = createAndAppendElement(searchStringRow, "td", "", "", {style: "width: 20%"});
     createAndAppendElement(counterpartySearchStrings, "h3", "", messages["counterpartySearchStrings"]);

@@ -1,5 +1,6 @@
 package financialmanager.objectFolder.transactionFolder;
 
+import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -18,4 +19,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     List<Transaction> findByCounterPartyIn(List<CounterParty> counterParties);
 
     List<Transaction> findByOriginalCounterParty(String originalCounterParty);
+
+    List<Transaction> findByContract(Contract contract);
 }
