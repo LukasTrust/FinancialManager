@@ -44,13 +44,11 @@ public class SecurityConfig {
         return httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .logout((logout) -> logout.logoutSuccessUrl("/login"))
                 .formLogin(
-                        httpForm -> {
-                            httpForm
-                                    .loginPage("/login")
-                                    .failureUrl("/login?error=true") // Redirect with error parameter
-                                    .defaultSuccessUrl("/", true)
-                                    .permitAll();
-                        })
+                        httpForm -> httpForm
+                                .loginPage("/login")
+                                .failureUrl("/login?error=true") // Redirect with error parameter
+                                .defaultSuccessUrl("/", true)
+                                .permitAll())
                 .authorizeHttpRequests(registry -> {
                     registry.requestMatchers("/signup", "/css/**", "/scripts/**", "/images/**", "/localization/**").permitAll();
 

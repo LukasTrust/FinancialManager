@@ -1,12 +1,10 @@
 package financialmanager.objectFolder.counterPartyFolder;
 
-import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.usersFolder.Users;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor

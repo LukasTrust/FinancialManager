@@ -13,10 +13,6 @@ public class BaseTransactionService {
 
     private final TransactionRepository transactionRepository;
 
-    public Transaction findById(Long id) {
-        return transactionRepository.findById(id).orElse(null);
-    }
-
     public List<Transaction> findByBankAccountId(Long bankAccountId) {
         return transactionRepository.findByBankAccountId(bankAccountId);
     }
@@ -37,20 +33,12 @@ public class BaseTransactionService {
         return transactionRepository.findByOriginalCounterParty(originalCounterParty);
     }
 
-    public List<Transaction> findByContract(Contract contract) {
-        return transactionRepository.findByContract(contract);
-    }
-
     public List<Transaction> findByContractIn(List<Contract> contracts) {
         return transactionRepository.findByContractIn(contracts);
     }
 
     public void saveAll(List<Transaction> transactions) {
         transactionRepository.saveAll(transactions);
-    }
-
-    public void save(Transaction transaction) {
-        transactionRepository.save(transaction);
     }
 
     public void setContract(Contract contract, List<Transaction> transactions) {
