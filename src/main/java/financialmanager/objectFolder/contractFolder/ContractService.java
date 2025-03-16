@@ -1,23 +1,21 @@
 package financialmanager.objectFolder.contractFolder;
 
 import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistory;
-import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistoryService;
+import financialmanager.objectFolder.contractFolder.contractHistoryFolder.BaseContractHistoryService;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.ResponseService;
-import financialmanager.objectFolder.resultFolder.Err;
-import financialmanager.objectFolder.resultFolder.Ok;
+import financialmanager.objectFolder.resultFolder.ResultService;
 import financialmanager.objectFolder.resultFolder.Result;
-import financialmanager.Utils.Utils;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.responseFolder.Response;
+import financialmanager.objectFolder.transactionFolder.BaseTransactionService;
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.function.BiConsumer;
 
@@ -25,93 +23,71 @@ import java.util.function.BiConsumer;
 @AllArgsConstructor
 public class ContractService {
 
-    private final ContractRepository contractRepository;
-    private final BankAccountService bankAccountService;
-    private final ContractHistoryService contractHistoryService;
+    private final BaseContractService baseContractService;
+    private final BaseContractHistoryService baseContractHistoryService;
+    private final BaseTransactionService baseTransactionService;
+
+    private final ResultService resultService;
     private final ResponseService responseService;
+    private final BankAccountService bankAccountService;
 
-    public List<Contract> findByBankAccountId(Long bankAccountId) {
-        return contractRepository.findByBankAccountId(bankAccountId);
-    }
+    private Map<Contract, List<Transaction>> findTransactionsByContract(List<Contract> contracts) {
+        Map<Contract, List<Transaction>> contractTransactionMap = new HashMap<>();
 
-    public void saveAll(List<Contract> contracts) {
-        contractRepository.saveAll(contracts);
-    }
+        List<Transaction> transactions = baseTransactionService.findByContractIn(contracts);
 
-    public void save(Contract contract) {contractRepository.save(contract);}
-
-    public void deleteAll(List<Contract> contracts) {
-        contractRepository.deleteAll(contracts);
-    }
-
-    public List<Contract> findByBankAccountIdBetweenDates(Long bankAccountId, LocalDate startDate, LocalDate endDate) {
-        List<Contract> contracts = findByBankAccountId(bankAccountId);
-
-        if (startDate == null && endDate == null) {
-            return contracts;
+        for (Contract contract : contracts) {
+            List<Transaction> transactionsOfContract = transactions.stream().filter(t -> t.getContract().equals(contract)).toList();
+            contractTransactionMap.put(contract, transactionsOfContract);
         }
 
-        LocalDate[] dates = Utils.getRightDateRange(startDate, endDate);
-        LocalDate finalStartDate = dates[0];
-        LocalDate finalEndDate = dates[1];
-
-        // Filter contracts that fall within the date range (inclusive)
-        return contracts.stream()
-                .filter(contract -> !contract.getStartDate().isBefore(finalStartDate) && (contract.getEndDate() == null || !contract.getEndDate().isAfter(finalEndDate)))
-                .toList();
+        return contractTransactionMap;
     }
 
-    public ResponseEntity<?> getContractsForBankAccount(Long bankAccountId) {
+    //<editor-fold desc="find functions">
+    public ResponseEntity<?> findContractsForBankAccountAsResponse(Long bankAccountId) {
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+
+        if (bankAccountResult.isErr())
+            return bankAccountResult.getError();
+
+        return ResponseEntity.ok(baseContractService.findByBankAccountId(bankAccountId));
+    }
+
+    public ResponseEntity<?> findContractDisplaysForBankAccount(Long bankAccountId) {
         Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
         if (bankAccountResult.isErr()) {
             return bankAccountResult.getError();
         }
 
-        return ResponseEntity.ok(findByBankAccountId(bankAccountId));
-    }
+        List<Contract> contracts = baseContractService.findByBankAccountId(bankAccountId);
+        Map<Contract, List<Transaction>> contractTransactionMap = findTransactionsByContract(contracts);
 
-    public List<ContractHistory> getContractHistoryForContract(Contract contract) {
-        return contractHistoryService.getContractHistoryForContract(contract);
-    }
+        List<ContractDisplay> contractDisplays = new ArrayList<>();
 
-    public Result<List<Contract>, ResponseEntity<Response>> findByIdInAndBankAccountId(List<Long> contractIds, Long bankAccountId) {
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+        for (Map.Entry<Contract, List<Transaction>> contractTransactions : contractTransactionMap.entrySet()) {
+            Contract contract = contractTransactions.getKey();
+            List<ContractHistory> contractHistories = baseContractHistoryService.findByContract(contract);
 
-        if (bankAccountResult.isErr()) {
-            return new Err<>(bankAccountResult.getError());
+            List<Transaction> transactions = contractTransactions.getValue();
+            Integer transactionCount = transactions.size();
+            Double totalAmount = transactions.stream().map(Transaction::getAmount).reduce(0.0, Double::sum);
+
+            ContractDisplay contractDisplay = new ContractDisplay(contract, contractHistories, transactionCount, totalAmount);
+            contractDisplays.add(contractDisplay);
         }
 
-        List<Contract> contracts = contractRepository.findByIdInAndBankAccountId(contractIds, bankAccountId);
-
-        if (contracts.isEmpty()) {
-            return new Err<>(responseService.createResponse(HttpStatus.NOT_FOUND, "contractsNotFound", AlertType.ERROR));
-        }
-
-        return new Ok<>(contracts);
+        return ResponseEntity.ok(contractDisplays);
     }
+    //</editor-fold>
 
-    public Result<Contract, ResponseEntity<Response>> findByIdAndBankAccountId(Long contractId, Long bankAccountId) {
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
-
-        if (bankAccountResult.isErr()) {
-            return new Err<>(bankAccountResult.getError());
-        }
-
-        Contract contract = contractRepository.findByIdAndBankAccountId(contractId, bankAccountId);
-
-        if (contract == null) {
-            return new Err<>(responseService.createResponse(HttpStatus.NOT_FOUND, "contractNotFound", AlertType.ERROR));
-        }
-
-        return new Ok<>(contract);
-    }
-
+    //<editor-fold desc="update functions">
     public ResponseEntity<Response> updateContractField(Long bankAccountId, Long contractId, Map<String, String> requestBody,
-                                                            BiConsumer<Contract, String> fieldUpdater) {
+                                                        BiConsumer<Contract, String> fieldUpdater) {
         String newValue = requestBody.get("newValue");
 
-        Result<Contract, ResponseEntity<Response>> contractResult = findByIdAndBankAccountId(contractId, bankAccountId);
+        Result<Contract, ResponseEntity<Response>> contractResult = resultService.findContractByIdAndBankAccountId(contractId, bankAccountId);
 
         if (contractResult.isErr()) {
             return contractResult.getError();
@@ -120,8 +96,80 @@ public class ContractService {
         Contract contract = contractResult.getValue();
         fieldUpdater.accept(contract, newValue);
 
-        save(contract);
+        baseContractService.save(contract);
 
         return ResponseEntity.ok().build();
     }
+
+    public ResponseEntity<Response> updateContractVisibility(Long bankAccountId, List<Long> contractIds, boolean hide) {
+        Result<List<Contract>, ResponseEntity<Response>> contractResult = resultService.findContractsByIdInAndBankAccountId(bankAccountId, contractIds);
+
+        if (contractResult.isErr()) {
+            return contractResult.getError();
+        }
+
+        List<Contract> contracts = contractResult.getValue();
+        Map<Contract, List<Transaction>> contractTransactionMap = findTransactionsByContract(contracts);
+
+        int transactionCount = 0;
+
+        for (Map.Entry<Contract, List<Transaction>> contractTransactions : contractTransactionMap.entrySet()) {
+            Contract contract = contractTransactions.getKey();
+            List<Transaction> transactions = contractTransactions.getValue();
+
+            baseTransactionService.setHiddenForTransactions(hide, transactions);
+            contract.setHidden(hide);
+
+            baseContractService.save(contract);
+            transactionCount += transactions.size();
+        }
+
+        List<String> placeHolder = new ArrayList<>();
+        placeHolder.add(String.valueOf(contractIds.size()));
+        placeHolder.add(String.valueOf(transactionCount));
+
+        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, hide ? "contractsHidden" : "contractsUnhidden", AlertType.SUCCESS, placeHolder);
+    }
+
+    public ResponseEntity<Response> mergeContracts(Long bankAccountId, Long headerId, List<Long> counterPartyIds) {
+        Result<Contract, ResponseEntity<Response>> headerContractResult = resultService.findContractByIdAndBankAccountId(headerId, bankAccountId);
+
+        if (headerContractResult.isErr()) {
+            return headerContractResult.getError();
+        }
+
+        Result<List<Contract>, ResponseEntity<Response>> contractsResult = resultService.findContractsByIdInAndBankAccountId(bankAccountId, counterPartyIds);
+
+        if (contractsResult.isErr()) {
+            return contractsResult.getError();
+        }
+
+        Contract headerContract = headerContractResult.getValue();
+        List<Contract> contracts = contractsResult.getValue().stream().filter(contract ->
+                contract.getBankAccount().equals(headerContract.getBankAccount())
+                        && contract.getCounterParty().equals(headerContract.getCounterParty()
+                )).toList();
+
+        Map<Contract, List<Transaction>> contractTransactionMap = findTransactionsByContract(contracts);
+
+        int transactionCount = 0;
+
+        for (Map.Entry<Contract, List<Transaction>> contractTransactions : contractTransactionMap.entrySet()) {
+            Contract contract = contractTransactions.getKey();
+            List<Transaction> transactions = contractTransactions.getValue();
+
+            baseTransactionService.setContractForTransactions(contract, transactions);
+
+            transactionCount += transactions.size();
+        }
+
+        baseContractService.deleteAll(contracts);
+
+        List<String> placeHolder = new ArrayList<>();
+        placeHolder.add(String.valueOf(contracts.size()));
+        placeHolder.add(String.valueOf(transactionCount));
+
+        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "mergeContracts", AlertType.INFO, placeHolder);
+    }
+    //</editor-fold>
 }

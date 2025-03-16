@@ -7,7 +7,7 @@ import java.util.List;
 
 
 @Repository
-public interface ContractRepository extends JpaRepository<Contract, Long> {
+interface ContractRepository extends JpaRepository<Contract, Long> {
 
     List<Contract> findByBankAccountId(Long bankAccountId);
 

@@ -21,7 +21,7 @@ public class ContractController {
 
     @GetMapping("/onlyContract")
     public ResponseEntity<?> getContractsForBankAccount(@PathVariable Long bankAccountId) {
-        return contractService.getContractsForBankAccount(bankAccountId);
+        return contractService.findContractsForBankAccountAsResponse(bankAccountId);
     }
 
     @GetMapping("")

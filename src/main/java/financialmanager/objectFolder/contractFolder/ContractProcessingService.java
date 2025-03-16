@@ -2,7 +2,7 @@ package financialmanager.objectFolder.contractFolder;
 
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistory;
-import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistoryService;
+import financialmanager.objectFolder.contractFolder.contractHistoryFolder.BaseContractHistoryService;
 import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import lombok.AllArgsConstructor;
@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ContractProcessingService {
 
-    private final ContractService contractService;
-    private final ContractHistoryService contractHistoryService;
+    private final BaseContractService baseContractService;
+    private final BaseContractHistoryService baseContractHistoryService;
 
     public void checkIfTransactionsBelongToContract(BankAccount bankAccount, List<Transaction> transactions) {
         Optional<Transaction> lastTransaction = transactions.stream().max(Comparator.comparing(Transaction::getDate));
@@ -31,7 +31,7 @@ public class ContractProcessingService {
         }
 
         Long bankAccountId = changeableList.getFirst().getBankAccount().getId();
-        List<Contract> contracts = contractService.findByBankAccountId(bankAccountId);
+        List<Contract> contracts = baseContractService.findByBankAccountId(bankAccountId);
 
         assignTransactionsToExistingContracts(changeableList, contracts);
 
@@ -47,7 +47,7 @@ public class ContractProcessingService {
 
         closeContracts(lastTransactionDate, contracts);
 
-        contractService.saveAll(contracts);
+        baseContractService.saveAll(contracts);
     }
 
     private List<Transaction> checkIfExistingContractsChanged(List<Transaction> transactionsWithOutContract, List<Contract> contracts) {
@@ -80,7 +80,7 @@ public class ContractProcessingService {
         }
 
         if (!changedContracts.isEmpty()) {
-            contractHistoryService.saveAll(contractHistories);
+            baseContractHistoryService.saveAll(contractHistories);
         }
 
         return newTransactions;

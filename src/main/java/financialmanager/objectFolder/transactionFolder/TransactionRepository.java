@@ -21,4 +21,6 @@ interface TransactionRepository extends JpaRepository<Transaction, Long> {
     List<Transaction> findByOriginalCounterParty(String originalCounterParty);
 
     List<Transaction> findByContract(Contract contract);
+
+    List<Transaction> findByContractIn(List<Contract> contracts);
 }

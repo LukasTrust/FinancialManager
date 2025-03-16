@@ -8,11 +8,11 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class ContractHistoryService {
+public class BaseContractHistoryService {
 
     private final ContractHistoryRepository contractHistoryRepository;
 
-    public List<ContractHistory> getContractHistoryForContract(Contract contract) {
+    public List<ContractHistory> findByContract(Contract contract) {
         return contractHistoryRepository.findByContract(contract);
     }
 

@@ -41,11 +41,25 @@ public class BaseTransactionService {
         return transactionRepository.findByContract(contract);
     }
 
+    public List<Transaction> findByContractIn(List<Contract> contracts) {
+        return transactionRepository.findByContractIn(contracts);
+    }
+
     public void saveAll(List<Transaction> transactions) {
         transactionRepository.saveAll(transactions);
     }
 
     public void save(Transaction transaction) {
         transactionRepository.save(transaction);
+    }
+
+    public void setContractForTransactions(Contract contract, List<Transaction> transactions) {
+        transactions.forEach(transaction -> transaction.setContract(contract));
+        saveAll(transactions);
+    }
+
+    public void setHiddenForTransactions(boolean hide, List<Transaction> transactions) {
+        transactions.forEach(transaction -> transaction.setHidden(hide));
+        saveAll(transactions);
     }
 }
