@@ -1,4 +1,4 @@
-package financialmanager.locale;
+package financialmanager.objectFolder.localeFolder;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +23,7 @@ public class LocaleConfig implements WebMvcConfigurer {
     @Bean
     public LocaleChangeInterceptor localeChangeInterceptor() {
         LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
-        interceptor.setParamName("lang"); // Query parameter to change the locale, e.g., ?lang=fr
+        interceptor.setParamName("lang");
         return interceptor;
     }
 

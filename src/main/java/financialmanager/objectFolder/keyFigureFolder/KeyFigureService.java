@@ -2,13 +2,12 @@ package financialmanager.objectFolder.keyFigureFolder;
 
 import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.Utils.Utils;
-import financialmanager.locale.LocaleService;
+import financialmanager.objectFolder.localeFolder.LocaleService;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
-import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.bankAccountFolder.savingsBankAccountFolder.SavingsBankAccount;
 import financialmanager.objectFolder.contractFolder.Contract;
-import financialmanager.objectFolder.contractFolder.ContractService;
 import financialmanager.objectFolder.responseFolder.Response;
+import financialmanager.objectFolder.resultFolder.ResultService;
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
 import lombok.AllArgsConstructor;
@@ -23,10 +22,10 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class KeyFigureService {
+
     private final TransactionService transactionService;
-    private final ContractService contractService;
-    private final BankAccountService bankAccountService;
     private final LocaleService localeService;
+    private final ResultService resultService;
 
     public List<KeyFigure> getKeyFiguresOfBankAccounts(List<Long> bankAccountIds, LocalDate startDate, LocalDate endDate) {
         LocalDate[] dates = Utils.normalizeDateRange(startDate, endDate);
@@ -42,7 +41,7 @@ public class KeyFigureService {
         boolean isSavingsAccount = false;
 
         for (Long bankAccountId : bankAccountIds) {
-            Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+            Result<BankAccount, ResponseEntity<Response>> bankAccountResult = resultService.findBankAccountById(bankAccountId);
 
             if (bankAccountResult.isErr()) {
                 continue;
@@ -55,7 +54,7 @@ public class KeyFigureService {
                 discrepancy += getDiscrepancy(bankAccountTransactions);
                 isSavingsAccount = true;
             } else {
-                List<Contract> contracts = contractService.findByBankAccountIdBetweenDates(bankAccountId, start, end);
+                List<Contract> contracts = resultService.findContractsByBankAccountIdBetweenDates(bankAccountId, start, end);
                 contractCostPerMonth += getContractCostPerMonth(contracts);
             }
         }

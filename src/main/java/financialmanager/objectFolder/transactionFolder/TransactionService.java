@@ -4,7 +4,6 @@ import financialmanager.objectFolder.resultFolder.ResultService;
 import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.Utils.Utils;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
-import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
@@ -23,7 +22,6 @@ public class TransactionService {
 
     private final BaseTransactionService baseTransactionService;
 
-    private final BankAccountService bankAccountService;
     private final ResultService resultService;
     private final ResponseService responseService;
 
@@ -45,7 +43,7 @@ public class TransactionService {
     }
 
     public ResponseEntity<?> findTransactionsByBankAccountAsResponse(Long bankAccountId) {
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = resultService.findBankAccountById(bankAccountId);
 
         if (bankAccountResult.isErr())
             return bankAccountResult.getError();
@@ -76,7 +74,7 @@ public class TransactionService {
         if (transactionResult.isErr())
             return transactionResult.getError();
 
-        baseTransactionService.setContractForTransactions(contract, transactionResult.getValue());
+        baseTransactionService.setContract(contract, transactionResult.getValue());
 
         return contract != null ?
                 responseService.createResponseWithPlaceHolders(HttpStatus.OK, "transactionsAddedContract", AlertType.SUCCESS, List.of(contract.getName())) :
@@ -84,7 +82,7 @@ public class TransactionService {
     }
 
     public ResponseEntity<Response> updateTransactionVisibility(Long bankAccountId, List<Long> transactionIds, boolean hide) {
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = resultService.findBankAccountById(bankAccountId);
 
         if (bankAccountResult.isErr())
             return bankAccountResult.getError();
@@ -94,7 +92,7 @@ public class TransactionService {
         if (transactionResult.isErr())
             return transactionResult.getError();
 
-        baseTransactionService.setHiddenForTransactions(hide, transactionResult.getValue());
+        baseTransactionService.setHidden(hide, transactionResult.getValue());
 
         return responseService.createResponseWithPlaceHolders(HttpStatus.OK, hide ? "transactionsHidden" : "transactionsUnhidden",
                 AlertType.SUCCESS, List.of(String.valueOf(transactionIds.size())));

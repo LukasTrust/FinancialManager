@@ -20,16 +20,16 @@ public class CounterPartyController {
 
     @GetMapping("")
     public ResponseEntity<?> getCounterPartyDisplays() {
-        return counterPartyService.getCounterPartyDisplays();
+        return counterPartyService.findCounterPartyDisplaysAsResponse();
     }
 
-    @PostMapping("/{counterPartyId}/change/name/{newValue}")
+    @PostMapping("/{counterPartyId}/change/name")
     public ResponseEntity<Response> updateCounterPartyName(@PathVariable Long counterPartyId,
                                                            @RequestBody Map<String, String> requestBody) {
         return counterPartyService.updateCounterPartyField(counterPartyId, requestBody, CounterParty::setName);
     }
 
-    @PostMapping("/{counterPartyId}/change/description/{newValue}")
+    @PostMapping("/{counterPartyId}/change/description")
     public ResponseEntity<Response> updateCounterPartyDescription(@PathVariable Long counterPartyId,
                                                                   @RequestBody Map<String, String> requestBody) {
         return counterPartyService.updateCounterPartyField(counterPartyId, requestBody, CounterParty::setDescription);

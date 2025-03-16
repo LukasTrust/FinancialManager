@@ -1,11 +1,11 @@
 package financialmanager.controller;
 
+import financialmanager.objectFolder.bankAccountFolder.BaseBankAccountService;
 import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
-import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.responseFolder.Response;
+import financialmanager.objectFolder.resultFolder.ResultService;
 import financialmanager.objectFolder.usersFolder.Users;
-import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,12 +17,13 @@ import java.util.List;
 @AllArgsConstructor
 public class SidebarController {
 
-    private final UsersService usersService;
-    private final BankAccountService bankAccountService;
+    private final BaseBankAccountService baseBankAccountService;
+
+    private final ResultService resultService;
 
     @GetMapping("/getBankAccountsOfUser")
     public ResponseEntity<?> getBankAccountsOfUser() {
-        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+        Result<Users, ResponseEntity<Response>> currentUserResponse = resultService.getCurrentUser();
 
         if (currentUserResponse.isErr()) {
             return currentUserResponse.getError();
@@ -30,7 +31,7 @@ public class SidebarController {
 
         Users currentUser = currentUserResponse.getValue();
 
-        List<BankAccount> bankAccounts = bankAccountService.findAllByUsers(currentUser);
+        List<BankAccount> bankAccounts = baseBankAccountService.findAllByUsers(currentUser);
 
         return ResponseEntity.ok(bankAccounts);
     }

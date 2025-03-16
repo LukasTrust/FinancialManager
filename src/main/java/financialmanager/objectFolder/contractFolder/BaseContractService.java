@@ -1,5 +1,7 @@
 package financialmanager.objectFolder.contractFolder;
 
+import financialmanager.objectFolder.counterPartyFolder.CounterParty;
+import financialmanager.objectFolder.transactionFolder.Transaction;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,5 +35,15 @@ public class BaseContractService {
 
     public void deleteAll(List<Contract> contracts) {
         contractRepository.deleteAll(contracts);
+    }
+
+    public void setCounterParty(CounterParty counterParty, List<Contract> contracts) {
+        contracts.forEach(contract -> contract.setCounterParty(counterParty));
+        contractRepository.saveAll(contracts);
+    }
+
+    public void setHidden(boolean hide, List<Contract> contracts) {
+        contracts.forEach(contract -> contract.setHidden(hide));
+        saveAll(contracts);
     }
 }

@@ -6,12 +6,12 @@ import financialmanager.Utils.fileParser.DataColumns;
 import financialmanager.Utils.fileParser.FileParserFactory;
 import financialmanager.Utils.fileParser.IFileParser;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
-import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.contractFolder.ContractProcessingService;
 import financialmanager.objectFolder.counterPartyFolder.CounterPartyService;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.ResponseService;
+import financialmanager.objectFolder.resultFolder.ResultService;
 import financialmanager.objectFolder.usersFolder.Users;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -31,12 +31,12 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class TransactionProcessingService {
 
-    private final BankAccountService bankAccountService;
     private final BaseTransactionService baseTransactionService;
-    private final ResponseService responseService;
     private final ContractProcessingService contractProcessingService;
     private final CategoryService categoryService;
     private final FileParserFactory fileParserFactory;
+    private final ResponseService responseService;
+    private final ResultService resultService;
 
     private static final Logger log = LoggerFactory.getLogger(TransactionProcessingService.class);
     private final CounterPartyService counterPartyService;
@@ -60,7 +60,7 @@ public class TransactionProcessingService {
         String fileName = fileParser.getFileName();
         String[] header;
 
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = resultService.findBankAccountById(bankAccountId);
 
         if (bankAccountResult.isErr()) {
             return bankAccountResult.getError();

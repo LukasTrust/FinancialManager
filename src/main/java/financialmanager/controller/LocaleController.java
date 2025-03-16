@@ -1,12 +1,12 @@
 package financialmanager.controller;
 
 import financialmanager.objectFolder.resultFolder.Result;
-import financialmanager.locale.LocaleService;
+import financialmanager.objectFolder.localeFolder.LocaleService;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.ResponseService;
+import financialmanager.objectFolder.resultFolder.ResultService;
 import financialmanager.objectFolder.usersFolder.Users;
-import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,13 +22,13 @@ import java.util.Map;
 @AllArgsConstructor
 public class LocaleController {
 
-    private LocaleService localeService;
-    private ResponseService responseService;
-    private final UsersService usersService;
+    private final LocaleService localeService;
+    private final ResponseService responseService;
+    private final ResultService resultService;
 
     @PostMapping("/update/locale/{locale}")
     public void updateLocale(@PathVariable Locale locale) {
-        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+        Result<Users, ResponseEntity<Response>> currentUserResponse = resultService.getCurrentUser();
 
         if (currentUserResponse.isErr()) {
             return;

@@ -1,6 +1,6 @@
 package financialmanager.objectFolder.responseFolder;
 
-import financialmanager.locale.LocaleService;
+import financialmanager.objectFolder.localeFolder.LocaleService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

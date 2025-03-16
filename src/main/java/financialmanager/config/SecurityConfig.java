@@ -1,6 +1,6 @@
 package financialmanager.config;
 
-import financialmanager.objectFolder.usersFolder.UsersService;
+import financialmanager.objectFolder.usersFolder.BaseUsersService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,17 +19,17 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final UsersService usersService;
+    private final BaseUsersService baseUsersService;
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return usersService;
+        return baseUsersService;
     }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(usersService);
+        authProvider.setUserDetailsService(baseUsersService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

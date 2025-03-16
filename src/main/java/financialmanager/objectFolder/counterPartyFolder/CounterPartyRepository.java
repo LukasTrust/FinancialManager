@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CounterPartyRepository extends JpaRepository<CounterParty, Long> {
+interface CounterPartyRepository extends JpaRepository<CounterParty, Long> {
 
     List<CounterParty> findByUsers(Users users);
 

@@ -2,10 +2,10 @@ package financialmanager.objectFolder.chartFolder;
 
 import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.Utils.Utils;
-import financialmanager.locale.LocaleService;
+import financialmanager.objectFolder.localeFolder.LocaleService;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
-import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.responseFolder.Response;
+import financialmanager.objectFolder.resultFolder.ResultService;
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import financialmanager.objectFolder.transactionFolder.TransactionService;
 import lombok.AllArgsConstructor;
@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 public class ChartService {
 
     private final TransactionService transactionService;
-    private final BankAccountService bankAccountService;
     private final LocaleService localeService;
+    private final ResultService resultService;
 
     public ChartData getTransactionDate(List<Long> bankAccountIds, LocalDate startDate, LocalDate endDate) {
         LocalDate[] dates = Utils.normalizeDateRange(startDate, endDate);
@@ -58,7 +58,7 @@ public class ChartService {
     private Optional<ChartSeries> getChartSeries(Long bankAccountId, LocalDate startDate, LocalDate endDate) {
         Optional<ChartSeries> chartSeriesOptional = Optional.empty();
 
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = resultService.findBankAccountById(bankAccountId);
 
         if (bankAccountResult.isOk()) {
             BankAccount bankAccount = bankAccountResult.getValue();

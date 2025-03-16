@@ -1,16 +1,15 @@
 package financialmanager.objectFolder.counterPartyFolder;
 
-import financialmanager.objectFolder.resultFolder.Err;
-import financialmanager.objectFolder.resultFolder.Ok;
+import financialmanager.objectFolder.contractFolder.BaseContractService;
 import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.ResponseService;
+import financialmanager.objectFolder.resultFolder.ResultService;
+import financialmanager.objectFolder.transactionFolder.BaseTransactionService;
 import financialmanager.objectFolder.transactionFolder.Transaction;
-import financialmanager.objectFolder.transactionFolder.TransactionService;
 import financialmanager.objectFolder.usersFolder.Users;
-import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,101 +26,37 @@ import java.util.stream.Collectors;
 public class CounterPartyService {
 
     //<editor-fold desc="properties">
-    private final CounterPartyRepository counterPartyRepository;
+    private final BaseCounterPartyService baseCounterPartyService;
+    private final BaseTransactionService baseTransactionService;
+    private final BaseContractService baseContractService;
+
     private final ResponseService responseService;
-    private final UsersService usersService;
-    private final TransactionService transactionService;
+    private final ResultService resultService;
 
     private static final Logger log = LoggerFactory.getLogger(CounterPartyService.class);
     //</editor-fold>
 
-    //<editor-fold desc="repository functions">
-    public void saveAll(List<CounterParty> counterParties) {
-        counterPartyRepository.saveAll(counterParties);
-    }
-
-    public void save(CounterParty counterParty) {
-        counterPartyRepository.save(counterParty);
-    }
-
-    public List<CounterParty> findByUsers(Users user) {
-        return counterPartyRepository.findByUsers(user);
-    }
-
-    public void deleteAll(List<CounterParty> counterParties) {
-        counterPartyRepository.deleteAll(counterParties);
-    }
-
-    public boolean existsByCounterPartySearchStringsContaining(String searchString) {
-        return !counterPartyRepository.findByCounterPartySearchStringsContaining(searchString).isEmpty();
-    }
-
-    //</editor-fold>
-
     //<editor-fold desc="find functions">
-    public Result<List<CounterParty>, ResponseEntity<Response>> findByIdInAndUsers(List<Long> counterPartyIds, Users user) {
-        List<CounterParty> counterParties = counterPartyRepository.findByIdInAndUsers(counterPartyIds, user);
+    public ResponseEntity<?> findCounterPartyDisplaysAsResponse() {
+        Result<Users, ResponseEntity<Response>> currentUserResult = resultService.getCurrentUser();
 
-        if (counterParties.isEmpty()) {
-            log.warn("Counter parties not found");
-            return new Err<>(responseService.createResponse(HttpStatus.NOT_FOUND, "counterPartiesNotFound", AlertType.ERROR));
-        }
+        if (currentUserResult.isErr())
+            return currentUserResult.getError();
 
-        return new Ok<>(counterParties);
-    }
-
-    public Result<CounterParty, ResponseEntity<Response>> findByIdAndUsers(Long counterPartyId, Users currentUser) {
-        Optional<CounterParty> counterPartyOpt = counterPartyRepository.findByIdAndUsers(counterPartyId, currentUser);
-
-        if (counterPartyOpt.isPresent()) {
-            CounterParty counterParty = counterPartyOpt.get();
-            return new Ok<>(counterParty);
-        } else {
-            log.warn("User {} does not own the bank account {}", currentUser, counterPartyId);
-            ResponseEntity<Response> errorResponse = responseService.createResponse(
-                    HttpStatus.NOT_FOUND, "counterPartyNotFound", AlertType.ERROR
-            );
-            return new Err<>(errorResponse);
-        }
-    }
-
-    //</editor-fold>
-
-    //<editor-fold desc="get functions">
-    public ResponseEntity<?> getCounterPartyDisplays() {
-        return usersService.getCurrentUser()
-                .map(this::createCounterPartyDisplay)
-                .map(counterPartyDisplays -> ResponseEntity.ok((Object) counterPartyDisplays))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(usersService.getCurrentUser().getError()));
-    }
-
-    public Result<CounterParty, ResponseEntity<Response>> getCounterParty(Long counterPartyId) {
-        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
-
-        if (currentUserResponse.isErr()) {
-            return new Err<>(currentUserResponse.getError());
-        }
-
-        Users currentUser = currentUserResponse.getValue();
-
-        return findByIdAndUsers(counterPartyId, currentUser);
-    }
-
-    private List<CounterPartyDisplay> createCounterPartyDisplay(Users users) {
         List<CounterPartyDisplay> counterPartyDisplays = new ArrayList<>();
 
-        List<CounterParty> counterParties = findByUsers(users);
+        List<CounterParty> counterParties = baseCounterPartyService.findByUsers(currentUserResult.getValue());
 
         for (CounterParty counterParty : counterParties) {
             CounterPartyDisplay counterPartyDisplay = createCounterPartyDisplay(counterParty);
             counterPartyDisplays.add(counterPartyDisplay);
         }
 
-        return counterPartyDisplays;
+        return ResponseEntity.ok(counterPartyDisplays);
     }
 
     private CounterPartyDisplay createCounterPartyDisplay(CounterParty counterParty) {
-        List<Transaction> transactions = transactionService.findByCounterParty(counterParty);
+        List<Transaction> transactions = baseTransactionService.findByCounterParty(counterParty);
         List<Contract> contracts = getContractsFromTransactions(transactions);
 
         Integer transactionCount = transactions.size();
@@ -143,18 +78,13 @@ public class CounterPartyService {
 
     //<editor-fold desc="merge functions">
     public ResponseEntity<Response> mergeCounterParties(Long headerId, List<Long> counterPartyIds) {
-        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
-        if (currentUserResponse.isErr()) return currentUserResponse.getError();
-
-        Users currentUser = currentUserResponse.getValue();
-
-        Result<CounterParty, ResponseEntity<Response>> headerResult = findByIdAndUsers(headerId, currentUser);
+        Result<CounterParty, ResponseEntity<Response>> headerResult = resultService.findCounterPartyById(headerId);
         if (headerResult.isErr()) {
             log.error("Error loading the header counter party, id: {}", headerId);
             return headerResult.getError();
         }
 
-        Result<List<CounterParty>, ResponseEntity<Response>> counterPartiesResult = findByIdInAndUsers(counterPartyIds, currentUser);
+        Result<List<CounterParty>, ResponseEntity<Response>> counterPartiesResult = resultService.findCounterPartiesByIdInAndUsers(counterPartyIds);
         if (counterPartiesResult.isErr()) {
             log.error("Error loading the counter parties, ids: {}", counterPartyIds);
             return counterPartiesResult.getError();
@@ -169,10 +99,9 @@ public class CounterPartyService {
     }
 
     private List<String> mergeCounterPartiesIntoHeader(List<CounterParty> mergingCounterParties, CounterParty targetCounterParty) {
-        List<Transaction> transactions = transactionService.findByCounterPartyIn(mergingCounterParties);
+        List<Transaction> transactions = baseTransactionService.findByCounterPartyIn(mergingCounterParties);
 
         int contractCount = setCounterParty(targetCounterParty, transactions);
-        transactionService.saveAll(transactions);
 
         // Merge unique search strings
         Set<String> mergedSearchStrings = mergingCounterParties.stream()
@@ -182,7 +111,7 @@ public class CounterPartyService {
         mergedSearchStrings.addAll(targetCounterParty.getCounterPartySearchStrings());
         targetCounterParty.setCounterPartySearchStrings(new ArrayList<>(mergedSearchStrings));
 
-        deleteAll(mergingCounterParties);
+        baseCounterPartyService.deleteAll(mergingCounterParties);
 
         return List.of(
                 String.valueOf(mergingCounterParties.size()),
@@ -195,16 +124,9 @@ public class CounterPartyService {
     //<editor-fold desc="update functions">
     //<editor-fold desc="visibility functions">
     public ResponseEntity<Response> updateCounterPartyVisibility(List<Long> counterPartyIds, boolean hide) {
-        Result<Users, ResponseEntity<Response>> currentUserResult = usersService.getCurrentUser();
-
-        if (currentUserResult.isErr()) return currentUserResult.getError();
-
-        Users currentUser = currentUserResult.getValue();
-
-        Result<List<CounterParty>, ResponseEntity<Response>>  counterPartiesResult = findByIdInAndUsers(counterPartyIds, currentUser);
-        if (counterPartiesResult.isErr()) {
+        Result<List<CounterParty>, ResponseEntity<Response>> counterPartiesResult = resultService.findCounterPartiesByIdInAndUsers(counterPartyIds);
+        if (counterPartiesResult.isErr())
             return counterPartiesResult.getError();
-        }
 
         List<CounterParty> counterParties = counterPartiesResult.getValue();
 
@@ -215,15 +137,13 @@ public class CounterPartyService {
         );
     }
 
-    private List<String> updateVisibilityForCounterParties(List<CounterParty> counterParties, boolean isHidden) {
-        List<Transaction> transactions = transactionService.findByCounterPartyIn(counterParties);
+    private List<String> updateVisibilityForCounterParties(List<CounterParty> counterParties, boolean hide) {
+        List<Transaction> transactions = baseTransactionService.findByCounterPartyIn(counterParties);
         List<Contract> contracts = getContractsFromTransactions(transactions);
 
-        transactions.forEach(transaction -> transaction.setHidden(isHidden));
-        contracts.forEach(contract -> contract.setHidden(isHidden));
-        counterParties.forEach(counterParty -> counterParty.setHidden(isHidden));
-
-        transactionService.saveAll(transactions);
+        baseTransactionService.setHidden(hide, transactions);
+        baseContractService.setHidden(hide, contracts);
+        baseCounterPartyService.setHidden(hide, counterParties);
 
         return List.of(
                 String.valueOf(counterParties.size()),
@@ -235,12 +155,12 @@ public class CounterPartyService {
 
     //<editor-fold desc="change searchString functions">
     public ResponseEntity<Response> addSearchStringToCounterParty(Long counterPartyId, String searchString) {
-        if (existsByCounterPartySearchStringsContaining(searchString)) {
+        if (baseCounterPartyService.existsByCounterPartySearchStringsContaining(searchString)) {
             log.warn("Counter parties contains search string {}", searchString);
             return responseService.createResponse(HttpStatus.CONFLICT, "counterPartySearchStringAlreadyInCounterParty", AlertType.ERROR);
         }
 
-        Result<CounterParty, ResponseEntity<Response>> counterPartyResult = getCounterParty(counterPartyId);
+        Result<CounterParty, ResponseEntity<Response>> counterPartyResult = resultService.findCounterPartyById(counterPartyId);
 
         if (counterPartyResult.isErr()) {
             return counterPartyResult.getError();
@@ -248,13 +168,13 @@ public class CounterPartyService {
 
         CounterParty counterParty = counterPartyResult.getValue();
         counterParty.getCounterPartySearchStrings().add(searchString);
-        save(counterParty);
+        baseCounterPartyService.save(counterParty);
 
         return responseService.createResponse(HttpStatus.OK, "addedSearchStringToCounterParty", AlertType.SUCCESS);
     }
 
     public ResponseEntity<Response> removeSearchStringFromCounterParty(Long counterPartyId, String searchString) {
-        Result<CounterParty, ResponseEntity<Response>> counterPartyResult = getCounterParty(counterPartyId);
+        Result<CounterParty, ResponseEntity<Response>> counterPartyResult = resultService.findCounterPartyById(counterPartyId);
 
         if (counterPartyResult.isErr()) {
             return counterPartyResult.getError();
@@ -300,7 +220,7 @@ public class CounterPartyService {
             CounterPartyDisplay updatedDisplay = createCounterPartyDisplay(counterParty);
             counterPartyDisplays.add(updatedDisplay);
 
-            CounterParty splitCounterParty = changeCounterPartyOfTransactions(counterParty.getUsers(), searchString);
+            CounterParty splitCounterParty = createNewCounterPartyForTransactions(counterParty.getUsers(), searchString);
 
             // Create and add the split counterparty second
             if (splitCounterParty != null) {
@@ -309,7 +229,7 @@ public class CounterPartyService {
             }
         }
 
-        save(counterParty);
+        baseCounterPartyService.save(counterParty);
 
         return responseService.createResponseWithData(HttpStatus.OK, "removedSearchStringFromCounterParty", AlertType.SUCCESS, counterPartyDisplays);
     }
@@ -320,7 +240,7 @@ public class CounterPartyService {
                                                             BiConsumer<CounterParty, String> fieldUpdater) {
         String newValue = requestBody.get("newValue");
 
-        Result<CounterParty, ResponseEntity<Response>> counterPartyResult = getCounterParty(counterPartyId);
+        Result<CounterParty, ResponseEntity<Response>> counterPartyResult = resultService.findCounterPartyById(counterPartyId);
 
         if (counterPartyResult.isErr()) {
             return counterPartyResult.getError();
@@ -329,7 +249,7 @@ public class CounterPartyService {
         CounterParty counterParty = counterPartyResult.getValue();
         fieldUpdater.accept(counterParty, newValue);
 
-        save(counterParty);
+        baseCounterPartyService.save(counterParty);
 
         return ResponseEntity.ok().build();
     }
@@ -337,7 +257,7 @@ public class CounterPartyService {
 
     //<editor-fold desc="edit transactions">
     public void setCounterPartyForNewTransactions(Users currentUser, List<Transaction> transactions) {
-        List<CounterParty> existingCounterParties = findByUsers(currentUser);
+        List<CounterParty> existingCounterParties = baseCounterPartyService.findByUsers(currentUser);
         Map<String, CounterParty> counterPartyLookup = new HashMap<>();
 
         // Populate lookup for quick search
@@ -370,31 +290,27 @@ public class CounterPartyService {
             }
         }
 
-        // Save new counterparties if needed
-        if (!newCounterParties.isEmpty()) {
-            saveAll(newCounterParties);
-        }
+        baseCounterPartyService.saveAll(newCounterParties);
     }
 
     private boolean checkIfOtherSearchStringsAreInUse(List<String> searchStrings) {
         for (String searchString : searchStrings) {
-            if (!transactionService.findByOriginalCounterParty(searchString).isEmpty()) {
+            if (!baseTransactionService.findByOriginalCounterParty(searchString).isEmpty()) {
                 return true;
             }
         }
         return false;
     }
 
-    private CounterParty changeCounterPartyOfTransactions(Users currentUser, String counterPartyName) {
-        List<Transaction> transactions = transactionService.findByOriginalCounterParty(counterPartyName);
+    private CounterParty createNewCounterPartyForTransactions(Users currentUser, String originalCounterParty) {
+        List<Transaction> transactions = baseTransactionService.findByOriginalCounterParty(originalCounterParty);
         if (transactions.isEmpty()) return null;
 
-        CounterParty splitCounterParty = new CounterParty(currentUser, counterPartyName);
+        CounterParty splitCounterParty = new CounterParty(currentUser, originalCounterParty);
         setCounterParty(splitCounterParty, transactions);
 
-        save(splitCounterParty);
-
-        transactionService.saveAll(transactions);
+        baseCounterPartyService.save(splitCounterParty);
+        baseTransactionService.saveAll(transactions);
 
         return splitCounterParty;
     }
@@ -402,10 +318,9 @@ public class CounterPartyService {
     private int setCounterParty(CounterParty counterParty, List<Transaction> transactions) {
         if (transactions.isEmpty()) return 0;
 
-        transactions.forEach(transaction -> transaction.setCounterParty(counterParty));
-
+        baseTransactionService.setCounterParty(counterParty, transactions);
         List<Contract> uniqueContracts = getContractsFromTransactions(transactions);
-        uniqueContracts.forEach(contract -> contract.setCounterParty(counterParty));
+        baseContractService.setCounterParty(counterParty, uniqueContracts);
 
         return uniqueContracts.size();
     }

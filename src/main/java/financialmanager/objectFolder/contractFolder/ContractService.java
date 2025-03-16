@@ -7,7 +7,6 @@ import financialmanager.objectFolder.responseFolder.ResponseService;
 import financialmanager.objectFolder.resultFolder.ResultService;
 import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
-import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.transactionFolder.BaseTransactionService;
 import financialmanager.objectFolder.transactionFolder.Transaction;
@@ -29,7 +28,6 @@ public class ContractService {
 
     private final ResultService resultService;
     private final ResponseService responseService;
-    private final BankAccountService bankAccountService;
 
     private Map<Contract, List<Transaction>> findTransactionsByContract(List<Contract> contracts) {
         Map<Contract, List<Transaction>> contractTransactionMap = new HashMap<>();
@@ -46,7 +44,7 @@ public class ContractService {
 
     //<editor-fold desc="find functions">
     public ResponseEntity<?> findContractsForBankAccountAsResponse(Long bankAccountId) {
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = resultService.findBankAccountById(bankAccountId);
 
         if (bankAccountResult.isErr())
             return bankAccountResult.getError();
@@ -55,7 +53,7 @@ public class ContractService {
     }
 
     public ResponseEntity<?> findContractDisplaysForBankAccount(Long bankAccountId) {
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = resultService.findBankAccountById(bankAccountId);
 
         if (bankAccountResult.isErr()) {
             return bankAccountResult.getError();
@@ -117,7 +115,7 @@ public class ContractService {
             Contract contract = contractTransactions.getKey();
             List<Transaction> transactions = contractTransactions.getValue();
 
-            baseTransactionService.setHiddenForTransactions(hide, transactions);
+            baseTransactionService.setHidden(hide, transactions);
             contract.setHidden(hide);
 
             baseContractService.save(contract);
@@ -158,7 +156,7 @@ public class ContractService {
             Contract contract = contractTransactions.getKey();
             List<Transaction> transactions = contractTransactions.getValue();
 
-            baseTransactionService.setContractForTransactions(contract, transactions);
+            baseTransactionService.setContract(contract, transactions);
 
             transactionCount += transactions.size();
         }

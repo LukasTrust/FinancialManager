@@ -47,7 +47,7 @@ async function addGroupToContract(messages) {
         return;
     }
     try {
-        const response = await fetch(`/contracts/${bankAccountId}/data/addContractToTransactions/${contractId}`, {
+        const response = await fetch(`/transactions/${bankAccountId}/data/addContractToTransactions/${contractId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(transactionIds)
@@ -78,7 +78,7 @@ async function removeContractFromTransactions(messages) {
         return;
     }
     try {
-        const response = await fetch(`/contracts/${bankAccountId}/data/removeContractFromTransactions`, {
+        const response = await fetch(`/transactions/${bankAccountId}/data/removeContractFromTransactions`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(transactionIds)
@@ -100,7 +100,7 @@ async function removeContractFromTransactions(messages) {
 async function removeContractFromTransaction(messages, transaction, secondRow) {
     try {
         const transactionId = transaction.id;
-        const url = `/contracts/${bankAccountId}/data/removeContractFromTransaction/${transactionId}`;
+        const url = `/transactions/${bankAccountId}/data/removeContractFromTransaction/${transactionId}`;
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }

@@ -13,9 +13,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class UsersServiceTest {
+class BaseUsersServiceTest {
 
-    private UsersService usersService;
+    private BaseUsersService baseUsersService;
     private UsersRepository usersRepository;
     private Optional<Users> usersOptional;
     private Users user;
@@ -24,7 +24,7 @@ class UsersServiceTest {
     @BeforeEach
     void setup() {
         usersRepository = mock(UsersRepository.class);
-        usersService = new UsersService(usersRepository);
+        baseUsersService = new BaseUsersService(usersRepository);
 
         user = mock(Users.class);
         when(user.getEmail()).thenReturn(email);
@@ -39,14 +39,14 @@ class UsersServiceTest {
     @Test
     void loadUserByUsername_null(){
         assertThrows(UsernameNotFoundException.class,
-                () -> usersService.loadUserByUsername(null));
+                () -> baseUsersService.loadUserByUsername(null));
     }
 
     @Test
     void loadUserByUsername_userFound(){
         when(usersRepository.findByEmail(email)).thenReturn(usersOptional);
 
-        UserDetails userDetails = usersService.loadUserByUsername(email);
+        UserDetails userDetails = baseUsersService.loadUserByUsername(email);
 
         assertNotNull(userDetails);
         assert(userDetails.getUsername().equals(email));
@@ -56,11 +56,11 @@ class UsersServiceTest {
     @Test
     void loadUserByUsername_noUserFound(){
         assertThrows(UsernameNotFoundException.class,
-                () -> usersService.loadUserByUsername(email));
+                () -> baseUsersService.loadUserByUsername(email));
     }
 
     @Test
     void save_null(){
-        usersService.save(null);
+        baseUsersService.save(null);
     }
 }

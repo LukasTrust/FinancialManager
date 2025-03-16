@@ -29,4 +29,22 @@ public class TransactionsController {
     public ResponseEntity<Response> unHideTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
         return transactionService.updateTransactionVisibility(bankAccountId, transactionIds, false);
     }
+
+    @PostMapping("/removeContractFromTransaction/{transactionId}")
+    public ResponseEntity<Response> removeContractFromTransaction(
+            @PathVariable Long bankAccountId,
+            @PathVariable Long transactionId) {
+        return transactionService.changeContractOfTransactions(bankAccountId, List.of(transactionId), null);
+    }
+
+    @PostMapping("/addContractToTransactions/{contractId}")
+    public ResponseEntity<Response> addContractToTransactions(@PathVariable Long bankAccountId, @PathVariable Long contractId,
+                                                              @RequestBody List<Long> transactionIds) {
+        return transactionService.changeContractOfTransactions(bankAccountId, transactionIds, contractId);
+    }
+
+    @PostMapping("/removeContractFromTransactions")
+    public ResponseEntity<Response> removeContractFromTransactions(@PathVariable Long bankAccountId, @RequestBody List<Long> transactionIds) {
+        return transactionService.changeContractOfTransactions(bankAccountId, transactionIds, null);
+    }
 }

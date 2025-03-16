@@ -1,38 +1,41 @@
-package financialmanager.locale;
+package financialmanager.objectFolder.localeFolder;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import financialmanager.objectFolder.resultFolder.Result;
-import financialmanager.objectFolder.responseFolder.Response;
+import financialmanager.objectFolder.usersFolder.BaseUsersService;
 import financialmanager.objectFolder.usersFolder.Users;
-import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
 public class LocaleService {
+
     private final Map<Long, Locale> locales = new HashMap<>();
     private final ObjectMapper objectMapper;
-    private final UsersService usersService;
+    private final BaseUsersService baseUsersService;
 
     public Locale getCurrentLocale() {
-        Result<Users, ResponseEntity<Response>> currentUserResponse = usersService.getCurrentUser();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String username = userDetails.getUsername();
 
-        if (currentUserResponse.isErr()) {
+        Optional<Users> usersOptional = baseUsersService.findByEmail(username);
+
+        if (usersOptional.isEmpty()) {
             return Locale.ENGLISH;
         }
 
-        Users currentUser = currentUserResponse.getValue();
+        Users currentUser = usersOptional.get();
         Long userId = currentUser.getId();
 
         if (locales.containsKey(userId)) {
@@ -49,8 +52,7 @@ public class LocaleService {
 
         if (locales.containsKey(userId)) {
             locales.replace(userId, locale);
-        }
-        else {
+        } else {
             locales.put(userId, locale);
         }
     }
@@ -74,7 +76,7 @@ public class LocaleService {
         }
     }
 
-    public String getMessageWithPlaceHolder(String subDirectory, String key, List<String> placeHolders){
+    public String getMessageWithPlaceHolder(String subDirectory, String key, List<String> placeHolders) {
         try {
             Map<String, String> messages = loadMessages("serverSide", subDirectory, null);
 
@@ -89,7 +91,7 @@ public class LocaleService {
         }
     }
 
-    public String getMessageWithPlaceHolder(String key, List<String> placeHolders){
+    public String getMessageWithPlaceHolder(String key, List<String> placeHolders) {
         try {
             Map<String, String> messages = loadMessages("serverSide", "info", null);
 
@@ -116,6 +118,6 @@ public class LocaleService {
         }
 
         File file = resource.getFile();
-        return objectMapper.readValue(file, Map.class);
+        return objectMapper.readValue(file, new TypeReference<>() {});
     }
 }

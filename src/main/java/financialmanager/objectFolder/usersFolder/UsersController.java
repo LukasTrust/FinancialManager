@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 public class UsersController {
 
-    private final UsersService usersService;
+    private final BaseUsersService baseUsersService;
     private final PasswordEncoder passwordEncoder;
 
     private final Pattern passwordPattern =
@@ -43,7 +43,7 @@ public class UsersController {
             user.setPassword(passwordEncoder.encode(password));
 
             // Save user
-            usersService.save(user);
+            baseUsersService.save(user);
 
             // Success response
             return ResponseEntity.status(HttpStatus.OK).body("success_signUp");

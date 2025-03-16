@@ -53,12 +53,17 @@ public class BaseTransactionService {
         transactionRepository.save(transaction);
     }
 
-    public void setContractForTransactions(Contract contract, List<Transaction> transactions) {
+    public void setContract(Contract contract, List<Transaction> transactions) {
         transactions.forEach(transaction -> transaction.setContract(contract));
         saveAll(transactions);
     }
 
-    public void setHiddenForTransactions(boolean hide, List<Transaction> transactions) {
+    public void setCounterParty(CounterParty counterParty, List<Transaction> transactions) {
+        transactions.forEach(transaction -> transaction.setCounterParty(counterParty));
+        saveAll(transactions);
+    }
+
+    public void setHidden(boolean hide, List<Transaction> transactions) {
         transactions.forEach(transaction -> transaction.setHidden(hide));
         saveAll(transactions);
     }
