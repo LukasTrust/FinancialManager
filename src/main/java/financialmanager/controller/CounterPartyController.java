@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @AllArgsConstructor
@@ -24,14 +25,14 @@ public class CounterPartyController {
 
     @PostMapping("/{counterPartyId}/change/name/{newValue}")
     public ResponseEntity<Response> updateCounterPartyName(@PathVariable Long counterPartyId,
-                                                    @PathVariable String newValue) {
-        return counterPartyService.updateCounterPartyField(counterPartyId, newValue, CounterParty::setName);
+                                                           @RequestBody Map<String, String> requestBody) {
+        return counterPartyService.updateCounterPartyField(counterPartyId, requestBody, CounterParty::setName);
     }
 
     @PostMapping("/{counterPartyId}/change/description/{newValue}")
     public ResponseEntity<Response> updateCounterPartyDescription(@PathVariable Long counterPartyId,
-                                                           @PathVariable String newValue) {
-        return counterPartyService.updateCounterPartyField(counterPartyId, newValue, CounterParty::setDescription);
+                                                                  @RequestBody Map<String, String> requestBody) {
+        return counterPartyService.updateCounterPartyField(counterPartyId, requestBody, CounterParty::setDescription);
     }
 
     @PostMapping("/hide")

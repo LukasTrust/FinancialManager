@@ -1,13 +1,15 @@
 package financialmanager.objectFolder.transactionFolder;
+
 import financialmanager.objectFolder.contractFolder.ContractDisplay;
 import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistory;
+import financialmanager.objectFolder.resultFolder.Err;
+import financialmanager.objectFolder.resultFolder.Ok;
 import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.Utils.Utils;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.contractFolder.ContractService;
-import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.ResponseService;
@@ -23,124 +25,84 @@ import java.util.*;
 @AllArgsConstructor
 public class TransactionService {
 
-    private final TransactionRepository transactionRepository;
     private final BankAccountService bankAccountService;
     private final ResponseService responseService;
     private final ContractService contractService;
+    private final BaseTransactionService baseTransactionService;
 
-    public List<Transaction> findByBankAccountId(Long bankAccountId) {
-        return transactionRepository.findByBankAccountId(bankAccountId);
+    private Result<List<Transaction>, ResponseEntity<Response>> findByIdInAndBankAccountId(Long bankAccountId, List<Long> transactionIds) {
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
+
+        if (bankAccountResult.isErr())
+            return new Err<>(bankAccountResult.getError());
+
+        List<Transaction> transactions = baseTransactionService.findByIdInAndBankAccountId(transactionIds, bankAccountId);
+
+        if (transactions.isEmpty())
+            return new Err<>(responseService.createResponse(HttpStatus.NOT_FOUND, "transactionNotFound", AlertType.ERROR));
+
+
+        return new Ok<>(transactions);
     }
 
-    public List<Transaction> findByIdInAndBankAccountId(List<Long> ids, Long bankAccountId) {
-        return transactionRepository.findByIdInAndBankAccountId(ids, bankAccountId);
-    }
+    private Result<List<Transaction>, ResponseEntity<Response>> findByIdInAndBankAccountIdAndHidden(Long bankAccountId, List<Long> transactionIds, boolean hide) {
+        Result<List<Transaction>, ResponseEntity<Response>> transactionResult = findByIdInAndBankAccountId(bankAccountId, transactionIds);
 
-    public List<Transaction> findByCounterParty(CounterParty counterParty) {
-        return transactionRepository.findByCounterParty(counterParty);
-    }
+        if (transactionResult.isErr())
+            return new Err<>(transactionResult.getError());
 
-    public List<Transaction> findByCounterPartyIn(List<CounterParty> counterParties) {
-        return transactionRepository.findByCounterPartyIn(counterParties);
-    }
-
-    public List<Transaction> findByOriginalCounterParty(String originalCounterParty) {
-        return transactionRepository.findByOriginalCounterParty(originalCounterParty);
-    }
-
-    public List<Transaction> findByContract(Contract contract) {
-        return transactionRepository.findByContract(contract);
-    }
-
-    public Transaction findById(Long id) {
-        return transactionRepository.findById(id).orElse(null);
-    }
-
-    public void saveAll(List<Transaction> transactions) {
-        transactionRepository.saveAll(transactions);
-    }
-
-    public void save(Transaction transaction) {
-        transactionRepository.save(transaction);
-    }
-
-    public ResponseEntity<Response> addContractToTransactions(Long bankAccountId, Long contractId, List<Long> transactionIds) {
-        Result<Contract, ResponseEntity<Response>> contractResult = contractService.findByIdAndBankAccountId(bankAccountId, contractId);
-
-        if (contractResult.isErr()) {
-            return contractResult.getError();
-        }
-
-        Contract contract = contractResult.getValue();
-
-        List<Transaction> transactions = findByIdInAndBankAccountId(transactionIds, bankAccountId);
+        List<Transaction> transactions = transactionResult.getValue().stream()
+                .filter(transaction -> transaction.isHidden() != hide)
+                .toList();
 
         if (transactions.isEmpty()) {
-            return responseService.createResponse(HttpStatus.NOT_FOUND, "transactionNotFound", AlertType.ERROR);
+            return new Err<>(responseService.createResponse(HttpStatus.CONFLICT, "noTransactionsUpdated", AlertType.INFO));
         }
 
+        return new Ok<>(transactions);
+    }
+
+    private void setContractForTransactions(Contract contract, List<Transaction> transactions) {
         transactions.forEach(transaction -> transaction.setContract(contract));
-
-        saveAll(transactions);
-
-        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "transactionsAddedContract", AlertType.SUCCESS,
-                List.of(contract.getName()));
+        baseTransactionService.saveAll(transactions);
     }
 
-    public ResponseEntity<Response> removeContractFromTransactions(Long bankAccountId, List<Long> transactionIds) {
+    private void setHiddenForTransactions(boolean hide, List<Transaction> transactions) {
+        transactions.forEach(transaction -> transaction.setHidden(hide));
+        baseTransactionService.saveAll(transactions);
+    }
+
+    public ResponseEntity<Response> changeContractOfTransactions(Long bankAccountId, List<Long> transactionIds, Long contractId) {
+        Contract contract = null;
+
+        if (contractId != null) {
+            Result<Contract, ResponseEntity<Response>> contractResult = contractService.findByIdAndBankAccountId(bankAccountId, contractId);
+            if (contractResult.isErr())
+                return contractResult.getError();
+
+            contract = contractResult.getValue();
+        }
+
+        Result<List<Transaction>, ResponseEntity<Response>> transactionResult = findByIdInAndBankAccountId(bankAccountId, transactionIds);
+        if (transactionResult.isErr())
+            return transactionResult.getError();
+        List<Transaction> transactions = transactionResult.getValue();
+
+        setContractForTransactions(contract, transactions);
+
+        return contract != null ?
+                responseService.createResponseWithPlaceHolders(HttpStatus.OK, "transactionsAddedContract", AlertType.SUCCESS, List.of(contract.getName())) :
+                responseService.createResponse(HttpStatus.OK, "transactionsRemovedContract", AlertType.SUCCESS);
+    }
+
+    public ResponseEntity<?> findTransactionsByBankAccountAsResponse(Long bankAccountId) {
         Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
         if (bankAccountResult.isErr()) {
             return bankAccountResult.getError();
         }
 
-        List<Transaction> transactions = findByIdInAndBankAccountId(transactionIds, bankAccountId);
-
-        if (transactions.isEmpty()) {
-            return responseService.createResponse(HttpStatus.NOT_FOUND, "transactionNotFound", AlertType.ERROR);
-        }
-
-        transactions.forEach(transaction -> transaction.setContract(null));
-
-        saveAll(transactions);
-
-        return responseService.createResponse(HttpStatus.OK, "transactionsRemovedContract", AlertType.SUCCESS);
-    }
-
-    public ResponseEntity<Response> removeContractFromTransaction(Long bankAccountId, Long transactionId) {
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
-
-        if (bankAccountResult.isErr()) {
-            return bankAccountResult.getError();
-        }
-
-        Transaction transaction = findById(transactionId);
-        if (transaction == null) {
-            return responseService.createResponse(HttpStatus.NOT_FOUND, "transactionNotFound", AlertType.ERROR);
-        }
-
-        if (!transaction.getBankAccount().equals(bankAccountResult.getValue())) {
-            return responseService.createResponse(HttpStatus.NOT_ACCEPTABLE, "transactionDoesNotBelongToBankAccount", AlertType.ERROR);
-        }
-
-        if (transaction.getContract() == null) {
-            return responseService.createResponse(HttpStatus.NOT_FOUND, "transactionHasNoContract", AlertType.ERROR);
-        }
-
-        transaction.setContract(null);
-        save(transaction);
-
-        return ResponseEntity.ok().build();
-    }
-
-    public ResponseEntity<?> getTransactionsForBankAccount(Long bankAccountId) {
-        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
-
-        if (bankAccountResult.isErr()) {
-            return bankAccountResult.getError();
-        }
-
-        List<Transaction> transactions = findByBankAccountId(bankAccountId)
+        List<Transaction> transactions = baseTransactionService.findByBankAccountId(bankAccountId)
                 .stream()
                 .sorted(Comparator.comparing(Transaction::getDate, Comparator.reverseOrder()))
                 .toList();
@@ -149,7 +111,7 @@ public class TransactionService {
     }
 
     public List<Transaction> findByBankAccountIdBetweenDates(Long bankAccountId, LocalDate startDate, LocalDate endDate) {
-        List<Transaction> transactions = findByBankAccountId(bankAccountId);
+        List<Transaction> transactions = baseTransactionService.findByBankAccountId(bankAccountId);
 
         if (startDate == null && endDate == null) {
             return transactions;
@@ -165,57 +127,21 @@ public class TransactionService {
                 .toList();
     }
 
-    public ResponseEntity<Response> updateContractVisibility(Long bankAccountId, List<Long> contractIds, boolean hide) {
-        Result<List<Contract>, ResponseEntity<Response>> contractResult = contractService.findByIdInAndBankAccountId(contractIds, bankAccountId);
-
-        if (contractResult.isErr()) {
-            return contractResult.getError();
-        }
-
-        List<Contract> contracts = contractResult.getValue();
-        int transactionCount = 0;
-
-        for (Contract contract : contracts) {
-            List<Transaction> transactions = findByContract(contract);
-            transactionCount += transactions.size();
-
-            setTransactionVisibility(transactions, hide);
-            contract.setHidden(hide);
-
-            contractService.save(contract);
-        }
-
-        List<String> data = new ArrayList<>();
-        data.add(String.valueOf(contractIds.size()));
-        data.add(String.valueOf(transactionCount));
-
-        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, hide ? "contractsHidden" : "contractsUnhidden", AlertType.SUCCESS, data);
-    }
-
     public ResponseEntity<Response> updateTransactionVisibility(Long bankAccountId, List<Long> transactionIds, boolean hide) {
         Result<BankAccount, ResponseEntity<Response>> bankAccountResult = bankAccountService.findById(bankAccountId);
 
-        if (bankAccountResult.isErr()) {
+        if (bankAccountResult.isErr())
             return bankAccountResult.getError();
-        }
 
-        List<Transaction> transactions = findByIdInAndBankAccountId(transactionIds, bankAccountId).stream()
-                .filter(transaction -> transaction.isHidden() != hide)
-                .toList();
+        Result<List<Transaction>, ResponseEntity<Response>> transactionResult = findByIdInAndBankAccountIdAndHidden(bankAccountId, transactionIds, hide);
 
-        if (transactions.isEmpty()) {
-            return responseService.createResponse(HttpStatus.CONFLICT, "noTransactionsUpdated", AlertType.INFO);
-        }
+        if (transactionResult.isErr())
+            return transactionResult.getError();
 
-        setTransactionVisibility(transactions, hide);
+        setHiddenForTransactions(hide, transactionResult.getValue());
 
         return responseService.createResponseWithPlaceHolders(HttpStatus.OK, hide ? "transactionsHidden" : "transactionsUnhidden",
                 AlertType.SUCCESS, List.of(String.valueOf(transactionIds.size())));
-    }
-
-    private void setTransactionVisibility(List<Transaction> transactions, boolean hide) {
-        transactions.forEach(transaction -> transaction.setHidden(hide));
-        saveAll(transactions);
     }
 
     public ResponseEntity<?> getContractDisplaysForBankAccount(Long bankAccountId) {
@@ -226,7 +152,7 @@ public class TransactionService {
         }
 
         List<Contract> contracts = contractService.findByBankAccountId(bankAccountId);
-        List<Transaction> transactions = findByBankAccountId(bankAccountId);
+        List<Transaction> transactions = baseTransactionService.findByBankAccountId(bankAccountId);
         List<ContractDisplay> contractDisplays = new ArrayList<>();
 
         for (Contract contract : contracts) {
@@ -242,5 +168,68 @@ public class TransactionService {
         }
 
         return ResponseEntity.ok(contractDisplays);
+    }
+
+    public ResponseEntity<Response> mergeContracts(Long bankAccountId, Long headerId, List<Long> counterPartyIds) {
+        Result<Contract, ResponseEntity<Response>> headerContractResult = contractService.findByIdAndBankAccountId(headerId, bankAccountId);
+
+        if (headerContractResult.isErr()) {
+            return headerContractResult.getError();
+        }
+
+        Result<List<Contract>, ResponseEntity<Response>> contractsResult = contractService.findByIdInAndBankAccountId(counterPartyIds, bankAccountId);
+
+        if (contractsResult.isErr()) {
+            return contractsResult.getError();
+        }
+
+        Contract headerContract = headerContractResult.getValue();
+        List<Contract> contracts = contractsResult.getValue();
+        int countOfTransactions = 0;
+
+        for (Contract contract : contracts) {
+            if (contract.getBankAccount().equals(headerContract.getBankAccount()) && contract.getCounterParty().equals(headerContract.getCounterParty())) {
+                List<Transaction> transactions = baseTransactionService.findByContract(contract);
+
+                transactions.forEach(transaction -> transaction.setContract(headerContract));
+
+                baseTransactionService.saveAll(transactions);
+                countOfTransactions += transactions.size();
+            }
+        }
+
+        contractService.deleteAll(contracts);
+        List<String> placeHolder = new ArrayList<>();
+        placeHolder.add(String.valueOf(contracts.size()));
+        placeHolder.add(String.valueOf(countOfTransactions));
+
+        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "mergeContracts", AlertType.INFO, placeHolder);
+    }
+
+    public ResponseEntity<Response> updateContractVisibility(Long bankAccountId, List<Long> contractIds, boolean hide) {
+        Result<List<Contract>, ResponseEntity<Response>> contractResult = contractService.findByIdInAndBankAccountId(contractIds, bankAccountId);
+
+        if (contractResult.isErr()) {
+            return contractResult.getError();
+        }
+
+        List<Contract> contracts = contractResult.getValue();
+        int transactionCount = 0;
+
+        for (Contract contract : contracts) {
+            List<Transaction> transactions = baseTransactionService.findByContract(contract);
+            transactionCount += transactions.size();
+
+            setHiddenForTransactions(transactions, hide);
+            contract.setHidden(hide);
+
+            contractService.save(contract);
+        }
+
+        List<String> placeHolder = new ArrayList<>();
+        placeHolder.add(String.valueOf(contractIds.size()));
+        placeHolder.add(String.valueOf(transactionCount));
+
+        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, hide ? "contractsHidden" : "contractsUnhidden", AlertType.SUCCESS, placeHolder);
     }
 }

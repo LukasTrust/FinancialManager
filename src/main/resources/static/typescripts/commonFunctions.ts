@@ -1,3 +1,15 @@
+function getBaseURL(type: Type): string {
+    let url = `/${type.toString()}`;
+
+    if (type !== Type.COUNTERPARTY) {
+        url += `/${bankAccountId}`;
+    }
+
+    url += `/data`;
+
+    return url;
+}
+
 async function updateVisibility(
     messages: Record<string, string>,
     model: HTMLElement,
@@ -16,13 +28,8 @@ async function updateVisibility(
         }
         const endpoint = hide ? "hide" : "unHide";
 
-        let url = `/${type.toString()}`;
-
-        if (type !== Type.COUNTERPARTY) {
-            url += `/${bankAccountId}`;
-        }
-
-        url += `/data/${endpoint}`;
+        let url = getBaseURL(type);
+        url += `/${endpoint}`;
 
         const response = await fetch(url, {
             method: "POST",
@@ -54,9 +61,14 @@ async function updateField(
     type: Type
 ): Promise<void> {
     try {
-        const response = await fetch(`/${type.toString()}/data/${id}/change/${field}/${newValue}`, {
+        let url = getBaseURL(type);
+        url += `/${id}/change/${field}`
+
+
+        const response = await fetch(url, {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ newValue })
         });
 
         if (!response.ok) {
@@ -83,7 +95,10 @@ async function mergeData(model: HTMLElement, messages: Record<string, string>, l
             return;
         }
 
-        const response = await fetch(`/${type.toString()}/data/merge/${headerId}`, {
+        let url = getBaseURL(type);
+        url += `/merge/${headerId}`
+
+        const response = await fetch(url, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(ids),

@@ -13,13 +13,11 @@ import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.ResponseService;
 import financialmanager.objectFolder.usersFolder.Users;
-import financialmanager.objectFolder.usersFolder.UsersService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +25,6 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,8 +32,7 @@ import java.util.stream.Collectors;
 public class TransactionProcessingService {
 
     private final BankAccountService bankAccountService;
-    private final UsersService usersService;
-    private final TransactionService transactionService;
+    private final BaseTransactionService baseTransactionService;
     private final ResponseService responseService;
     private final ContractProcessingService contractProcessingService;
     private final CategoryService categoryService;
@@ -46,27 +42,21 @@ public class TransactionProcessingService {
     private final CounterPartyService counterPartyService;
 
     public ResponseEntity<?> uploadDataForTransactions(Long bankAccountId, MultipartFile[] files) {
-        List<CompletableFuture<ResponseEntity<Response>>> futures = new ArrayList<>();
+        List<ResponseEntity<Response>> responses = new ArrayList<>();
 
         for (MultipartFile file : files) {
-            futures.add(processFileAsync(file, bankAccountId));
+            responses.add(processFileAsync(file, bankAccountId));
         }
-
-        List<ResponseEntity<Response>> responses = futures.stream()
-                .map(CompletableFuture::join)
-                .collect(Collectors.toList());
 
         return ResponseEntity.ok(responses);
     }
 
-    @Async
-    protected CompletableFuture<ResponseEntity<Response>> processFileAsync(MultipartFile file, Long bankAccountId) {
+    private ResponseEntity<Response> processFileAsync(MultipartFile file, Long bankAccountId) {
         IFileParser fileParser = fileParserFactory.getFileParser(file);
-        ResponseEntity<Response> response = createTransactionsFromData(fileParser, bankAccountId);
-        return CompletableFuture.completedFuture(response);
+        return createTransactionsFromData(fileParser, bankAccountId);
     }
 
-    public ResponseEntity<Response> createTransactionsFromData(IFileParser fileParser, Long bankAccountId) {
+    private ResponseEntity<Response> createTransactionsFromData(IFileParser fileParser, Long bankAccountId) {
         String fileName = fileParser.getFileName();
         String[] header;
 
@@ -98,7 +88,7 @@ public class TransactionProcessingService {
             return responseService.createResponse(HttpStatus.BAD_REQUEST, "noValidTransactions", AlertType.ERROR);
         }
 
-        List<Transaction> existingTransactions  = transactionService.findByBankAccountId(bankAccountId);
+        List<Transaction> existingTransactions  = baseTransactionService.findByBankAccountId(bankAccountId);
         newTransactions = filterNewTransactions(newTransactions, existingTransactions );
         if (newTransactions.isEmpty()) {
             log.info("{} could not find any transactions", fileName);
@@ -122,7 +112,7 @@ public class TransactionProcessingService {
         newTransactions.addAll(getTransactionsWithoutContract(existingTransactions));
 
         contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, newTransactions);
-        transactionService.saveAll(newTransactions);
+        baseTransactionService.saveAll(newTransactions);
     }
 
     private List<Transaction> getTransactionsWithoutContract(List<Transaction> existingTransactions) {

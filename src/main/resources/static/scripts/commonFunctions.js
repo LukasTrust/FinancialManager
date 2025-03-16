@@ -1,3 +1,11 @@
+function getBaseURL(type) {
+    let url = `/${type.toString()}`;
+    if (type !== Type.COUNTERPARTY) {
+        url += `/${bankAccountId}`;
+    }
+    url += `/data`;
+    return url;
+}
 async function updateVisibility(messages, model, updatedContainer, moveToContainer, hide, type) {
     try {
         // Get all IDs
@@ -7,11 +15,8 @@ async function updateVisibility(messages, model, updatedContainer, moveToContain
             return;
         }
         const endpoint = hide ? "hide" : "unHide";
-        let url = `/${type.toString()}`;
-        if (type !== Type.COUNTERPARTY) {
-            url += `/${bankAccountId}`;
-        }
-        url += `/data/${endpoint}`;
+        let url = getBaseURL(type);
+        url += `/${endpoint}`;
         const response = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -33,9 +38,12 @@ async function updateVisibility(messages, model, updatedContainer, moveToContain
 }
 async function updateField(id, field, newValue, messages, type) {
     try {
-        const response = await fetch(`/${type.toString()}/data/${id}/change/${field}/${newValue}`, {
+        let url = getBaseURL(type);
+        url += `/${id}/change/${field}`;
+        const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ newValue })
         });
         if (!response.ok) {
             await showAlertFromResponse(response);
@@ -58,7 +66,9 @@ async function mergeData(model, messages, leftSide, updatedContainer, type) {
             showAlert("INFO", messages["noDataToMerge"], model);
             return;
         }
-        const response = await fetch(`/${type.toString()}/data/merge/${headerId}`, {
+        let url = getBaseURL(type);
+        url += `/merge/${headerId}`;
+        const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(ids),

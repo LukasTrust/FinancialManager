@@ -44,7 +44,7 @@ async function removeSearchStringFromCounterParty(counterPartyId, searchString, 
         showAlert(responseBody.alertType, responseBody.message);
         if (responseBody.alertType === AlertType.SUCCESS) {
             const updatedCounterParty = responseBody.data[0];
-            if (responseBody.data.length === 2) {
+            if (responseBody.data.length == 2) {
                 const createdCounterParty = responseBody.data[1];
                 counterPartyData.push(createdCounterParty);
                 filteredCounterPartyData.push(createdCounterParty);
@@ -122,7 +122,7 @@ function createCounterPartyRow(tableBody, counterPartyDisplay, currency, toolTip
     const rowGroup = createAndAppendElement(tableBody, "div", "rowGroup");
     animateElement(rowGroup);
     const newRow = createAndAppendElement(rowGroup, "tr", "rowWithSubRow" + rowGroupClass, "", { id: counterParty.id.toString() });
-    createAndAppendElement(newRow, "td", "bi bi-eye-slash", "", { style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px" });
+    createAndAppendElement(newRow, "td", counterParty.hidden ? "bi bi-eye-slash" : "", "", { style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px" });
     createCheckBoxForRowGroup(rowGroup, newRow, counterParty.id);
     // Name cell
     const name = createAndAppendElement(newRow, "td", "", "", { style: "width: 23%" });

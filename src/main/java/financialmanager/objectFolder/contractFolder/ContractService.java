@@ -11,6 +11,7 @@ import financialmanager.Utils.Utils;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.responseFolder.Response;
+import financialmanager.objectFolder.transactionFolder.Transaction;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,10 @@ public class ContractService {
     }
 
     public void save(Contract contract) {contractRepository.save(contract);}
+
+    public void deleteAll(List<Contract> contracts) {
+        contractRepository.deleteAll(contracts);
+    }
 
     public List<Contract> findByBankAccountIdBetweenDates(Long bankAccountId, LocalDate startDate, LocalDate endDate) {
         List<Contract> contracts = findByBankAccountId(bankAccountId);
@@ -102,11 +107,9 @@ public class ContractService {
         return new Ok<>(contract);
     }
 
-    public ResponseEntity<Response> updateContractField(Long bankAccountId, Long contractId, String newValue,
+    public ResponseEntity<Response> updateContractField(Long bankAccountId, Long contractId, Map<String, String> requestBody,
                                                             BiConsumer<Contract, String> fieldUpdater) {
-        if (Objects.equals(newValue, "null")) {
-            newValue = null;
-        }
+        String newValue = requestBody.get("newValue");
 
         Result<Contract, ResponseEntity<Response>> contractResult = findByIdAndBankAccountId(contractId, bankAccountId);
 

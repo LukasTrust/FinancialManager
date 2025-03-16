@@ -17,7 +17,7 @@ public class TransactionsController {
 
     @GetMapping("")
     public ResponseEntity<?> getTransactionsForBankAccount(@PathVariable Long bankAccountId) {
-        return transactionService.getTransactionsForBankAccount(bankAccountId);
+        return transactionService.findTransactionsByBankAccountAsResponse(bankAccountId);
     }
 
     @PostMapping("/hide")

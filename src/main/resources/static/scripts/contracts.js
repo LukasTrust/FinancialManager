@@ -40,7 +40,7 @@ function createContractRow(tableBody, contractDisplay, currency, messages) {
     const rowGroup = createAndAppendElement(tableBody, "div", "rowGroup");
     animateElement(rowGroup);
     const newRow = createAndAppendElement(rowGroup, "tr", "rowWithSubRow" + hidden, "", { id: contract.id.toString() });
-    createAndAppendElement(newRow, "td", "bi bi-eye-slash", "", { style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px" });
+    createAndAppendElement(newRow, "td", contract.hidden ? "bi bi-eye-slash" : "", "", { style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px" });
     createCheckBoxForRowGroup(rowGroup, newRow, contract.id);
     // Name cell
     const name = createAndAppendElement(newRow, "td", "", "", { style: "width: 20%; padding-right: 20px" });

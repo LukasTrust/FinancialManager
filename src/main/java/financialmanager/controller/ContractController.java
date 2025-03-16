@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -46,18 +47,18 @@ public class ContractController {
         return transactionService.removeContractFromTransactions(bankAccountId, transactionIds);
     }
 
-    @PostMapping("/{contractId}/change/name/{newValue}")
+    @PostMapping("/{contractId}/change/name")
     public ResponseEntity<Response> updateContractName(@PathVariable Long bankAccountId,
                                                        @PathVariable Long contractId,
-                                                           @PathVariable String newValue) {
-        return contractService.updateContractField(bankAccountId, contractId, newValue, Contract::setName);
+                                                       @RequestBody Map<String, String> requestBody) {
+        return contractService.updateContractField(bankAccountId, contractId, requestBody, Contract::setName);
     }
 
-    @PostMapping("/{contractId}/change/description/{newValue}")
+    @PostMapping("/{contractId}/change/description")
     public ResponseEntity<Response> updateContractDescription(@PathVariable Long bankAccountId,
                                                               @PathVariable Long contractId,
-                                                                  @PathVariable String newValue) {
-        return contractService.updateContractField(bankAccountId, contractId, newValue, Contract::setDescription);
+                                                              @RequestBody Map<String, String> requestBody) {
+        return contractService.updateContractField(bankAccountId, contractId, requestBody, Contract::setDescription);
     }
 
     @PostMapping("/hide")
@@ -70,5 +71,10 @@ public class ContractController {
     public ResponseEntity<Response> unHideContracts(@PathVariable Long bankAccountId,
                                                          @RequestBody List<Long> contractIds) {
         return transactionService.updateContractVisibility(bankAccountId, contractIds, false);
+    }
+
+    @PostMapping("/merge/{headerId}")
+    public ResponseEntity<Response> mergeContracts(@PathVariable Long bankAccountId, @PathVariable Long headerId, @RequestBody List<Long> contractIds) {
+        return transactionService.mergeContracts(bankAccountId, headerId, contractIds);
     }
 }

@@ -11,5 +11,6 @@
   "counterPartiesMerged": "{} Gegenparteien wurden vereinigt, {} dazugehörigen Transaktionen und {} dazugehörige Verträge wurden geupdated",
   "addedSearchStringToCounterParty": "Der Suchbegriff wurde der Gegenpartei hinzugefügt",
   "contractsHidden": "{} Verträge, {} dazugehörige Transaktionen wurde verborgen",
-  "contractsUnhidden": "{} Verträge, {} dazugehörige Transaktionen wurden sichtbar gemacht"
+  "contractsUnhidden": "{} Verträge, {} dazugehörige Transaktionen wurden sichtbar gemacht",
+  "mergeContracts": "{} Verträge wurden vereinigt, {} dazugehörige Transaktionen wurden geupdated"
 }

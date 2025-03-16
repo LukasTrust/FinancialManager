@@ -7,8 +7,6 @@
   "noValidTransactions": "Die Daten konnten nicht korrekt gelesen und Transaktionen erstellt werden.",
   "localizationNotFound": "Die Lokalisierung Datei wurde nicht gefunden",
   "transactionNotFound": "Die Transaction wurde nicht gefunden",
-  "transactionDoesNotBelongToBankAccount": "Die Transaktion gehört nicht zum Bank Konto",
-  "transactionHasNoContract": "Die Transaktion hat keinen Vertrag",
   "contractNotFound": "Der Vertrag wurde nicht gefunden",
   "contractsNotFound": "Die Verräge wurden nicht gefunden",
   "counterPartyNotFound": "Die Gegenpartei wurde nicht gefunden",

@@ -316,11 +316,9 @@ public class CounterPartyService {
     //</editor-fold>
 
     //<editor-fold desc="edit counterParty">
-    public ResponseEntity<Response> updateCounterPartyField(Long counterPartyId, String newValue,
+    public ResponseEntity<Response> updateCounterPartyField(Long counterPartyId, Map<String, String> requestBody,
                                                             BiConsumer<CounterParty, String> fieldUpdater) {
-        if (Objects.equals(newValue, "null")) {
-            newValue = null;
-        }
+        String newValue = requestBody.get("newValue");
 
         Result<CounterParty, ResponseEntity<Response>> counterPartyResult = getCounterParty(counterPartyId);
 
