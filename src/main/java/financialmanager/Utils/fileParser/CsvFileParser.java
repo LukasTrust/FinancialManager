@@ -48,8 +48,12 @@ public class CsvFileParser extends FileParser {
                 return null;
             }
 
-            // Split by commas and trim spaces
-            return line.split(";");
+            String[] split = line.split(",");
+            if (split.length == 1) {
+                split = line.split(";");
+            }
+
+            return split;
         } catch (IOException e) {
             log.error("Error in reading data", e);
             return new String[0];

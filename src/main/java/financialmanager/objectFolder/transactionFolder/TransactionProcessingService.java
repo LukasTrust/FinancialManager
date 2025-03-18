@@ -110,20 +110,18 @@ public class TransactionProcessingService {
     }
 
     private DataColumns findColumnsInData(String[] header, BankAccount bankAccount) {
-        int counterPartyColumn = 0, amountColumn = 0, amountAfterTransactionColumn = 0, dateColumn = 0;
+        Integer counterPartyColumn = null, amountColumn = null,
+                amountAfterTransactionColumn = null, dateColumn = null;
 
         for (int i = 0; i < header.length; i++) {
             String headerLine = header[i];
             if (bankAccount.getCounterPartySearchStrings().contains(headerLine)) {
                 counterPartyColumn = i;
-            }
-            if (bankAccount.getAmountSearchStrings().contains(headerLine)) {
+            } else if (bankAccount.getAmountSearchStrings().contains(headerLine)) {
                 amountColumn = i;
-            }
-            if (bankAccount.getDateSearchStrings().contains(headerLine)) {
+            } else if (bankAccount.getDateSearchStrings().contains(headerLine)) {
                 dateColumn = i;
-            }
-            if (bankAccount.getAmountInBankAfterSearchStrings().contains(headerLine)) {
+            } else if (bankAccount.getAmountInBankAfterSearchStrings().contains(headerLine)) {
                 amountAfterTransactionColumn = i;
             }
         }

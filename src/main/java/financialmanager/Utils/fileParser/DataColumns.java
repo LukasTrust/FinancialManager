@@ -1,8 +1,8 @@
 package financialmanager.Utils.fileParser;
 
-public record DataColumns(int counterPartyColumn, int amountColumn, int amountAfterTransactionColumn, int dateColumn) {
+public record DataColumns(Integer counterPartyColumn, Integer amountColumn, Integer amountAfterTransactionColumn, Integer dateColumn) {
 
     public boolean checkIfAllAreFound() {
-        return counterPartyColumn != 0 && amountColumn != 0 && amountAfterTransactionColumn != 0 && dateColumn != 0;
+        return counterPartyColumn != null && amountColumn != null && amountAfterTransactionColumn != null && dateColumn != null;
     }
 }
