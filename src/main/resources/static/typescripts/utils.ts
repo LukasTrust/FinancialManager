@@ -377,3 +377,34 @@ function setMonths(messages: Record<string, string>): void {
         .map((month: string) => month.replace(/'/g, ''));
     transactionsHiddenToggle = false;
 }
+
+function createContractList(messages: Record<string, string>, contracts: Contract[]): void {
+    const contractsContainer = document.getElementById("contractsContainer");
+
+    if (!contractsContainer) {
+        console.error("Contracts container not found!");
+        return;
+    }
+
+    const currency = getCurrentCurrencySymbol();
+
+    contracts.forEach((contract: Contract) => {
+        const listItem = createAndAppendElement(contractsContainer, "div", "listItem tooltip tooltipBottom");
+        listItem.addEventListener("click", () => toggleContractSelection(listItem));
+        listItem.id = contract.id.toString();
+        listItem.dataset.counterPartyId = contract.counterParty.id.toString();
+
+        const startDate = formatDateString(contract.startDate);
+        const lastPaymentDate = formatDateString(contract.lastPaymentDate);
+        const amount = formatNumber(contract.amount, currency);
+
+        listItem.dataset.startDate = startDate;
+        listItem.dataset.lastPaymentDate = lastPaymentDate;
+        createAndAppendElement(listItem, "div", "normalText", `${contract.name}, ${messages["amount"]}: ${amount}`);
+        createAndAppendElement(listItem, "div", "tooltipText", `${messages["startDate"]}: ${startDate}   ${messages["lastPaymentDate"]}: ${lastPaymentDate}`);
+    });
+}
+
+function toggleContractSelection(selectedElement: HTMLElement) {
+    selectedContract = toggleSelection(selectedElement, selectedContract, "selected");
+}

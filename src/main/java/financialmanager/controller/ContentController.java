@@ -59,4 +59,10 @@ public class ContentController {
         model.addAttribute("title", "Contracts");
         return "contracts";
     }
+
+    @GetMapping("/mergeContracts")
+    public String getMergeContracts(Model model) {
+        model.addAttribute("title", "Merge Contracts");
+        return "mergeContracts";
+    }
 }

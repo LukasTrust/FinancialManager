@@ -163,36 +163,9 @@ async function removeContractFromTransaction(
 
 async function fillContracts(messages: Record<string, string>): Promise<void> {
     const contractData: Contract[] | undefined = await loadOnlyContracts(messages);
-    const contractsContainer = document.getElementById("contractsContainer");
 
-    if (!contractsContainer) {
-        console.error("Contracts container not found!");
-        return;
-    }
-
-    const currency = getCurrentCurrencySymbol();
-
-    contractData?.forEach((contract: Contract) => {
-        const listItem = createAndAppendElement(contractsContainer, "div", "listItem tooltip tooltipBottom");
-        listItem.addEventListener("click", () => toggleContractSelection(listItem));
-        listItem.id = contract.id.toString();
-        listItem.dataset.counterPartyId = contract.counterParty.id.toString();
-
-        const startDate = formatDateString(contract.startDate);
-        const lastPaymentDate = formatDateString(contract.lastPaymentDate);
-        const amount = formatNumber(contract.amount, currency);
-
-        listItem.dataset.startDate = startDate;
-        listItem.dataset.lastPaymentDate = lastPaymentDate;
-        createAndAppendElement(listItem, "div", "normalText", `${contract.name}, ${messages["amount"]}: ${amount}`);
-        createAndAppendElement(listItem, "div", "tooltipText", `${messages["startDate"]}: ${startDate}   ${messages["lastPaymentDate"]}: ${lastPaymentDate}`);
-    });
-
+    createContractList(messages, contractData);
     updateContractAvailability();
-}
-
-function toggleContractSelection(selectedElement: HTMLElement) {
-    selectedContract = toggleSelection(selectedElement, selectedContract, "selected");
 }
 
 function createGroupedTransactions(messages: Record<string, string>, transactions: Transaction[]): void {

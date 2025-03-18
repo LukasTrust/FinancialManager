@@ -16,7 +16,6 @@ async function buildContracts(): Promise<void> {
     document.getElementById("changeHiddenButton")?.addEventListener("click", () => showChangeHiddenDialog(type, messages));
 
     document.getElementById("mergeButton")?.addEventListener("click", () => showMergeDialog(type, messages));
-
 }
 
 function addRowsToContractTable(data: ContractDisplay[], messages: Record<string, string>): void {

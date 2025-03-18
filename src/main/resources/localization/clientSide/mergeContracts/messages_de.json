@@ -1,0 +1,14 @@
+{
+  "mergeContractsHeader": "Verträge vereinen",
+  "mergeContractsHeaderTooltip": "Dadurch werden die Verträge vereinigt",
+  "headerContract": "Kopf Vertrag",
+  "headerContractTooltip": "Das ist der Spätere Kopf vertrag in dem die anderen überfürht werden",
+  "contractsToMerge": "Verträge die Gemerget werden sollen",
+  "contractsToMergeTooltip": "Diese Verträge sollen gemerget werden",
+  "amount": "Betrag",
+  "startDate": "Start Datum",
+  "lastPaymentDate": "Letztes Zahlungs Datum",
+  "selectHeader": "Kopf auswählen",
+  "selectHeaderTooltip": "Dadurch kann der Vertrag ausgewählt werden der als Kopf verwendet werden soll",
+  "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut."
+}
