@@ -153,8 +153,7 @@ async function backToOtherView(cameFromUrl: string | null): Promise<void> {
 function removeElements(sourceContainer: HTMLElement, soloItem: HTMLElement = null): void {
     let items = soloItem ? [soloItem] : Array.from(sourceContainer.querySelectorAll<HTMLElement>('.listItem'));
 
-    items.forEach((item, index) => {
-        setTimeout(() => {
+    items.forEach((item) => {
             // Animate the item before removing it
             animateElement(item);
 
@@ -162,7 +161,6 @@ function removeElements(sourceContainer: HTMLElement, soloItem: HTMLElement = nu
             item.addEventListener('transitionend', () => {
                 item.remove(); // Remove the item from the DOM
             }, {once: true});
-        }, index * 150); // 150ms delay between items for a smoother stagger
     });
 }
 

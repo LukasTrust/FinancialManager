@@ -217,10 +217,10 @@ public class CounterPartyService {
             // Updated counterparty should be first
             counterParty.setCounterPartySearchStrings(searchStrings);
 
+            CounterParty splitCounterParty = createNewCounterPartyForTransactions(counterParty.getUsers(), searchString);
+
             CounterPartyDisplay updatedDisplay = createCounterPartyDisplay(counterParty);
             counterPartyDisplays.add(updatedDisplay);
-
-            CounterParty splitCounterParty = createNewCounterPartyForTransactions(counterParty.getUsers(), searchString);
 
             // Create and add the split counterparty second
             if (splitCounterParty != null) {
@@ -307,10 +307,8 @@ public class CounterPartyService {
         if (transactions.isEmpty()) return null;
 
         CounterParty splitCounterParty = new CounterParty(currentUser, originalCounterParty);
-        setCounterParty(splitCounterParty, transactions, true);
-
         baseCounterPartyService.save(splitCounterParty);
-        baseTransactionService.saveAll(transactions);
+        setCounterParty(splitCounterParty, transactions, true);
 
         return splitCounterParty;
     }

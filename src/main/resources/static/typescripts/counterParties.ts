@@ -68,7 +68,6 @@ async function removeSearchStringFromCounterParty(counterPartyId: number, search
 
         const responseBody: Response = await response.json();
 
-
         showAlert(responseBody.alertType, responseBody.message);
         if (responseBody.alertType === AlertType.SUCCESS) {
             const updatedCounterParty: CounterPartyDisplay = responseBody.data[0];
