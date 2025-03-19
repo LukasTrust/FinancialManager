@@ -421,7 +421,7 @@ function changeRowVisibility(type: Type): void {
 
 function getIdsFromContainer(container: HTMLElement): number[] {
     return Array.from(
-        container.querySelectorAll<HTMLElement>(".normalText")
+        container.querySelectorAll<HTMLElement>(".normalText, .listItem, .listItemSmall")
     )
         .map(span => Number(span.id))
         .filter(id => !isNaN(id) && id !== 0);

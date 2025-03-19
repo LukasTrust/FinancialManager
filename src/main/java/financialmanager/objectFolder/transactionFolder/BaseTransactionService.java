@@ -46,9 +46,10 @@ public class BaseTransactionService {
         saveAll(transactions);
     }
 
-    public void setCounterParty(CounterParty counterParty, List<Transaction> transactions) {
+    public void setCounterParty(CounterParty counterParty, List<Transaction> transactions, boolean instanceSave) {
         transactions.forEach(transaction -> transaction.setCounterParty(counterParty));
-        saveAll(transactions);
+
+        if (instanceSave) saveAll(transactions);
     }
 
     public void setHidden(boolean hide, List<Transaction> transactions) {

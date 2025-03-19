@@ -36,9 +36,9 @@ public class BaseContractService {
         contractRepository.deleteAll(contracts);
     }
 
-    public void setCounterParty(CounterParty counterParty, List<Contract> contracts) {
+    public void setCounterParty(CounterParty counterParty, List<Contract> contracts, boolean instanceSave) {
         contracts.forEach(contract -> contract.setCounterParty(counterParty));
-        contractRepository.saveAll(contracts);
+        if (instanceSave) contractRepository.saveAll(contracts);
     }
 
     public void setHidden(boolean hide, List<Contract> contracts) {

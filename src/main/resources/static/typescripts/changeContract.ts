@@ -345,7 +345,5 @@ function getIdsOfTransactionGroup(messages: Record<string, string>): number[] {
         return [];
     }
 
-    return Array.from(selectedTransactionGroup.querySelectorAll<HTMLElement>(".listItemSmall"))
-        .map(transaction => Number(transaction.id))
-        .filter(id => id !== 0);
+    return getIdsFromContainer(selectedTransactionGroup);
 }

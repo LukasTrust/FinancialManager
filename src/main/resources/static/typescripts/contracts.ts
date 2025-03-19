@@ -15,7 +15,8 @@ async function buildContracts(): Promise<void> {
 
     document.getElementById("changeHiddenButton")?.addEventListener("click", () => showChangeHiddenDialog(type, messages));
 
-    document.getElementById("mergeButton")?.addEventListener("click", () => showMergeDialog(type, messages));
+    document.getElementById("mergeButton")?.addEventListener("click", async () =>
+        await buildMergeContracts("/contracts", getCheckedData(Type.CONTRACT).map(c => c.contract)));
 }
 
 function addRowsToContractTable(data: ContractDisplay[], messages: Record<string, string>): void {

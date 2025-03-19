@@ -1,8 +1,8 @@
-function toggleSelection<T extends HTMLElement>(
-    selectedElement: T,
-    currentSelection: T | null,
+function toggleSelection(
+    selectedElement: HTMLElement,
+    currentSelection: HTMLElement | null,
     className: string
-): T | null {
+): HTMLElement | null {
     if (currentSelection === selectedElement) {
         currentSelection.classList.remove(className);
         return null;
@@ -167,7 +167,10 @@ function removeElements(sourceContainer: HTMLElement, soloItem: HTMLElement = nu
 }
 
 function moveElements(sourceContainer: HTMLElement, targetContainer: HTMLElement, soloItem: HTMLElement = null): void {
-    let items = Array.from(sourceContainer.querySelectorAll<HTMLElement>(`.listItem`));
+    let items = [];
+    if (sourceContainer) {
+        items = Array.from(sourceContainer.querySelectorAll<HTMLElement>(`.listItem`));
+    }
 
     if (soloItem) {
         items.push(soloItem);

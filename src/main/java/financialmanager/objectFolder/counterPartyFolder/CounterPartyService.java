@@ -101,7 +101,7 @@ public class CounterPartyService {
     private List<String> mergeCounterPartiesIntoHeader(List<CounterParty> mergingCounterParties, CounterParty targetCounterParty) {
         List<Transaction> transactions = baseTransactionService.findByCounterPartyIn(mergingCounterParties);
 
-        int contractCount = setCounterParty(targetCounterParty, transactions);
+        int contractCount = setCounterParty(targetCounterParty, transactions, true);
 
         // Merge unique search strings
         Set<String> mergedSearchStrings = mergingCounterParties.stream()
@@ -281,11 +281,11 @@ public class CounterPartyService {
 
             if (counterParty != null) {
                 // If existing counterparty found, assign it to transactions
-                setCounterParty(counterParty, counterPartyTransactions);
+                setCounterParty(counterParty, counterPartyTransactions, true);
             } else {
                 // If not found, create a new one
                 counterParty = new CounterParty(currentUser, counterPartyName);
-                setCounterParty(counterParty, counterPartyTransactions);
+                setCounterParty(counterParty, counterPartyTransactions, false);
                 newCounterParties.add(counterParty);
             }
         }
@@ -307,7 +307,7 @@ public class CounterPartyService {
         if (transactions.isEmpty()) return null;
 
         CounterParty splitCounterParty = new CounterParty(currentUser, originalCounterParty);
-        setCounterParty(splitCounterParty, transactions);
+        setCounterParty(splitCounterParty, transactions, true);
 
         baseCounterPartyService.save(splitCounterParty);
         baseTransactionService.saveAll(transactions);
@@ -315,12 +315,13 @@ public class CounterPartyService {
         return splitCounterParty;
     }
 
-    private int setCounterParty(CounterParty counterParty, List<Transaction> transactions) {
+    private int setCounterParty(CounterParty counterParty, List<Transaction> transactions, boolean instanceSave) {
         if (transactions.isEmpty()) return 0;
 
-        baseTransactionService.setCounterParty(counterParty, transactions);
         List<Contract> uniqueContracts = getContractsFromTransactions(transactions);
-        baseContractService.setCounterParty(counterParty, uniqueContracts);
+
+        baseTransactionService.setCounterParty(counterParty, transactions, instanceSave);
+        baseContractService.setCounterParty(counterParty, uniqueContracts, instanceSave);
 
         return uniqueContracts.size();
     }
