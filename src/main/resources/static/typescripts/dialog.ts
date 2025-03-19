@@ -1,6 +1,6 @@
 function createModal(
     contentHTML: HTMLElement,
-    closeButton: HTMLElement | null,
+    closeButton?: HTMLElement | null,
     width: number | string = "",
     height: number | string = ""
 ): HTMLDialogElement {
@@ -158,4 +158,25 @@ function showMergeDialog<T extends CounterPartyDisplay>(type: Type, messages: Re
     createDialogButton(rightSide, "bi bi-bar-chart-steps", messages["chooseHeader"], "right", () => {
         chooseHeader(dialogContent, messages, rightSide.querySelector(".listContainerColumn"), leftSide.querySelector(".listContainerColumn"));
     });
+}
+
+function showLoadingBar(messages: Record<string, string>) {
+    // Create modal content container
+    const modalContent = document.createElement("div");
+    modalContent.classList.add("loadingBarContent");
+
+    // Create loading bar container
+    const loadingBarContainer = document.createElement("div");
+    loadingBarContainer.classList.add("loadingBarContainer");
+
+    // Create moving loading bar
+    const loadingBar = document.createElement("div");
+    loadingBar.classList.add("loadingBar");
+
+    // Append elements
+    loadingBarContainer.appendChild(loadingBar);
+    modalContent.appendChild(loadingBarContainer);
+
+    // Show modal
+    createModal(modalContent);
 }
