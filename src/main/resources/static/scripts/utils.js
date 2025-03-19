@@ -99,19 +99,20 @@ async function backToOtherView(cameFromUrl) {
 }
 function removeElements(sourceContainer, soloItem = null) {
     let items = soloItem ? [soloItem] : Array.from(sourceContainer.querySelectorAll('.listItem'));
-    items.forEach((item, index) => {
-        setTimeout(() => {
-            // Animate the item before removing it
-            animateElement(item);
-            // Wait for the transition to complete
-            item.addEventListener('transitionend', () => {
-                item.remove(); // Remove the item from the DOM
-            }, { once: true });
-        }, index * 150); // 150ms delay between items for a smoother stagger
+    items.forEach((item) => {
+        // Animate the item before removing it
+        animateElement(item);
+        // Wait for the transition to complete
+        item.addEventListener('transitionend', () => {
+            item.remove(); // Remove the item from the DOM
+        }, { once: true });
     });
 }
 function moveElements(sourceContainer, targetContainer, soloItem = null) {
-    let items = Array.from(sourceContainer.querySelectorAll(`.listItem`));
+    let items = [];
+    if (sourceContainer) {
+        items = Array.from(sourceContainer.querySelectorAll(`.listItem`));
+    }
     if (soloItem) {
         items.push(soloItem);
     }
@@ -271,5 +272,29 @@ function setMonths(messages) {
         .split("', '")
         .map((month) => month.replace(/'/g, ''));
     transactionsHiddenToggle = false;
+}
+function createContractList(messages, contracts) {
+    const contractsContainer = document.getElementById("contractsContainer");
+    if (!contractsContainer) {
+        console.error("Contracts container not found!");
+        return;
+    }
+    const currency = getCurrentCurrencySymbol();
+    contracts.forEach((contract) => {
+        const listItem = createAndAppendElement(contractsContainer, "div", "listItem tooltip tooltipBottom");
+        listItem.addEventListener("click", () => toggleContractSelection(listItem));
+        listItem.id = contract.id.toString();
+        listItem.dataset.counterPartyId = contract.counterParty.id.toString();
+        const startDate = formatDateString(contract.startDate);
+        const lastPaymentDate = formatDateString(contract.lastPaymentDate);
+        const amount = formatNumber(contract.amount, currency);
+        listItem.dataset.startDate = startDate;
+        listItem.dataset.lastPaymentDate = lastPaymentDate;
+        createAndAppendElement(listItem, "div", "normalText", `${contract.name}, ${messages["amount"]}: ${amount}`);
+        createAndAppendElement(listItem, "div", "tooltipText", `${messages["startDate"]}: ${startDate}   ${messages["lastPaymentDate"]}: ${lastPaymentDate}`);
+    });
+}
+function toggleContractSelection(selectedElement) {
+    selectedContract = toggleSelection(selectedElement, selectedContract, "selected");
 }
 //# sourceMappingURL=utils.js.map

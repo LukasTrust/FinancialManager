@@ -310,7 +310,7 @@ function changeRowVisibility(type) {
     rows.forEach(row => row.classList.toggle("hidden"));
 }
 function getIdsFromContainer(container) {
-    return Array.from(container.querySelectorAll(".normalText"))
+    return Array.from(container.querySelectorAll(".normalText, .listItem, .listItemSmall"))
         .map(span => Number(span.id))
         .filter(id => !isNaN(id) && id !== 0);
 }

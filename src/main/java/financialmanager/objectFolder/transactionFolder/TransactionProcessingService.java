@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.text.DecimalFormat;
@@ -81,6 +82,7 @@ public class TransactionProcessingService {
 
         BankAccount bankAccount = bankAccountResult.getValue();
         DataColumns dataColumns = findColumnsInData(header, bankAccount);
+
         if (!dataColumns.checkIfAllAreFound()) {
             log.error("{} could not find the date columns", fileName);
             log.error("Header line: {}", Arrays.toString(header));
@@ -88,6 +90,7 @@ public class TransactionProcessingService {
         }
 
         List<Transaction> newTransactions = parseTransactions(fileParser, bankAccount, dataColumns);
+
         if (newTransactions.isEmpty()) {
             log.error("{} could not find any transactions", fileName);
             return responseService.createResponse(HttpStatus.BAD_REQUEST, "noValidTransactions", AlertType.ERROR);
@@ -95,6 +98,7 @@ public class TransactionProcessingService {
 
         List<Transaction> existingTransactions  = baseTransactionService.findByBankAccountId(bankAccountId);
         newTransactions = filterNewTransactions(newTransactions, existingTransactions );
+
         if (newTransactions.isEmpty()) {
             log.info("{} could not find any transactions", fileName);
             return responseService.createResponseWithPlaceHolders(HttpStatus.NOT_FOUND, "noNewTransactionsFound",
@@ -111,12 +115,30 @@ public class TransactionProcessingService {
     private void processAndSaveTransactions(BankAccount bankAccount, List<Transaction> newTransactions, List<Transaction> existingTransactions) {
         Users currentUser = bankAccount.getUsers();
 
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         counterPartyService.setCounterPartyForNewTransactions(currentUser, newTransactions);
+        stopWatch.stop();
+        log.info("{} for setCounterPartyForNewTransactions", stopWatch.getTotalTimeMillis());
+
+        stopWatch = new StopWatch();
+        stopWatch.start();
         categoryService.addTransactionsToCategories(currentUser, newTransactions);
+        stopWatch.stop();
+        log.info("{} for addTransactionsToCategories", stopWatch.getTotalTimeMillis());
 
+        stopWatch = new StopWatch();
+        stopWatch.start();
         newTransactions.addAll(getTransactionsWithoutContract(existingTransactions));
+        stopWatch.stop();
+        log.info("{} for addTransactionsToCategories", stopWatch.getTotalTimeMillis());
 
+        stopWatch = new StopWatch();
+        stopWatch.start();
         contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, newTransactions);
+        stopWatch.stop();
+        log.info("{} for checkIfTransactionsBelongToContract", stopWatch.getTotalTimeMillis());
+
         baseTransactionService.saveAll(newTransactions);
     }
 
@@ -154,6 +176,7 @@ public class TransactionProcessingService {
         // Determine the direction of the lines
         boolean directionOfLine = findDirectionOfLines(lines, columns);
 
+
         // If the direction is bottom-to-top, reverse the lines
         if (!directionOfLine) {
             Collections.reverse(lines);
@@ -162,9 +185,14 @@ public class TransactionProcessingService {
         Double amountBeforeTransaction = 0.0;
 
         // Iterate over the lines in the correct direction
+        Locale currentLocale = localeService.getCurrentLocale();
+
+        // Define date formatter based on locale
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", currentLocale);
+
         for (String[] line : lines) {
                 // Create and add a transaction for each line
-                Transaction transaction = createTransactionFromLine(line, columns, bankAccount, amountBeforeTransaction);
+                Transaction transaction = createTransactionFromLine(line, columns, bankAccount, amountBeforeTransaction, currentLocale, formatter);
                 if (transaction != null) {
                     amountBeforeTransaction = transaction.getAmountInBankAfter();
                     newTransactions.add(transaction);
@@ -215,11 +243,7 @@ public class TransactionProcessingService {
     }
 
     private Transaction createTransactionFromLine(String[] line, DataColumns columns, BankAccount bankAccount,
-                                                  Double amountBeforeTransaction) {
-        Locale currentLocale = localeService.getCurrentLocale();
-
-        // Define date formatter based on locale
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", currentLocale);
+                                                  Double amountBeforeTransaction, Locale currentLocale, DateTimeFormatter formatter ) {
         LocalDate date;
         Double amount;
         Double amountAfterTransaction;

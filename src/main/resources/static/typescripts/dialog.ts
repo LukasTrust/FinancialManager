@@ -1,21 +1,20 @@
 function createModal(
     contentHTML: HTMLElement,
     closeButton?: HTMLElement | null,
-    width: number | string = "",
-    height: number | string = ""
+    width: number = 0,
+    height: number = 0
 ): HTMLDialogElement {
     // Create the dialog element
     const modal = document.createElement("dialog") as HTMLDialogElement;
     modal.appendChild(contentHTML);
     document.body.appendChild(modal);
 
-    // Apply styling for width and height
-    if (typeof width === "number") {
-        modal.style.width = `${width}%`;
+    // Set modal size
+    if (width !== 0) {
+        modal.style.width =`${width}px`;
     }
-
-    if (typeof height === "number") {
-        modal.style.height = `${height}%`;
+    if (height !== 0) {
+        modal.style.height = `${height}px`;
     }
 
     // Add event listener to close the modal
@@ -66,8 +65,8 @@ function createDialogButton(
 function createDialogContent(
     headerText: string,
     headerIcon: string,
-    width: number | string = "",
-    height: number | string = ""
+    width: number,
+    height: number
 ): HTMLElement {
     const flexContainerColumn = createAndAppendElement(document.body, "div", "flexContainerColumn");
     const header = createDialogHeader(flexContainerColumn, headerText, headerIcon);
@@ -113,9 +112,9 @@ function showMessageBox(
 function showChangeHiddenDialog(type: Type, messages: Record<string, string>): void {
     const {alreadyHidden, notHidden} = classifyHiddenOrNot<Transaction>(type);
 
-    const height = type !== Type.TRANSACTION ? 70 : "";
+    const height = type !== Type.TRANSACTION ? 70 : 0;
 
-    const dialogContent = createDialogContent(messages["changeHiddenHeader"], "bi bi-eye", "", height);
+    const dialogContent = createDialogContent(messages["changeHiddenHeader"], "bi bi-eye", 0, height);
 
     if (type !== Type.TRANSACTION) {
         createAndAppendElement(dialogContent, "h2", "", messages["infoTransactionsWillAlsoBeAffected"],
@@ -139,7 +138,7 @@ function showChangeHiddenDialog(type: Type, messages: Record<string, string>): v
 function showMergeDialog<T extends CounterPartyDisplay>(type: Type, messages: Record<string, string>): void {
     const checkedData = getCheckedData(type) as T[];
 
-    const dialogContent = createDialogContent(messages["mergeHeader"], "bi bi-arrows-collapse-vertical", "", 70);
+    const dialogContent = createDialogContent(messages["mergeHeader"], "bi bi-arrows-collapse-vertical", 0, 70);
 
     const info = messages["mergeInfo"];
 
@@ -160,23 +159,20 @@ function showMergeDialog<T extends CounterPartyDisplay>(type: Type, messages: Re
     });
 }
 
-function showLoadingBar(messages: Record<string, string>) {
+function showLoadingBar(messages: Record<string, string>, width: number = 350, height: number = 100) {
     // Create modal content container
     const modalContent = document.createElement("div");
     modalContent.classList.add("loadingBarContent");
 
+    // Create and add the h1 heading
+    createAndAppendElement(modalContent, "h1", "", messages["loadingHeader"], {style: "margin-top: 10px; margin-bottom: 20px"});
+
     // Create loading bar container
-    const loadingBarContainer = document.createElement("div");
-    loadingBarContainer.classList.add("loadingBarContainer");
+    const loadingBarContainer = createAndAppendElement(modalContent, "div", "loadingBarContainer");
 
     // Create moving loading bar
-    const loadingBar = document.createElement("div");
-    loadingBar.classList.add("loadingBar");
+    createAndAppendElement(loadingBarContainer, "div", "loadingBar");
 
-    // Append elements
-    loadingBarContainer.appendChild(loadingBar);
-    modalContent.appendChild(loadingBarContainer);
-
-    // Show modal
-    createModal(modalContent);
+    // Show modal with specified size
+    createModal(modalContent, null, width, height);
 }

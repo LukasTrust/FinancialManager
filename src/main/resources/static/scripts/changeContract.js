@@ -130,29 +130,8 @@ async function removeContractFromTransaction(messages, transaction, secondRow) {
 }
 async function fillContracts(messages) {
     const contractData = await loadOnlyContracts(messages);
-    const contractsContainer = document.getElementById("contractsContainer");
-    if (!contractsContainer) {
-        console.error("Contracts container not found!");
-        return;
-    }
-    const currency = getCurrentCurrencySymbol();
-    contractData === null || contractData === void 0 ? void 0 : contractData.forEach((contract) => {
-        const listItem = createAndAppendElement(contractsContainer, "div", "listItem tooltip tooltipBottom");
-        listItem.addEventListener("click", () => toggleContractSelection(listItem));
-        listItem.id = contract.id.toString();
-        listItem.dataset.counterPartyId = contract.counterParty.id.toString();
-        const startDate = formatDateString(contract.startDate);
-        const lastPaymentDate = formatDateString(contract.lastPaymentDate);
-        const amount = formatNumber(contract.amount, currency);
-        listItem.dataset.startDate = startDate;
-        listItem.dataset.lastPaymentDate = lastPaymentDate;
-        createAndAppendElement(listItem, "div", "normalText", `${contract.name}, ${messages["amount"]}: ${amount}`);
-        createAndAppendElement(listItem, "div", "tooltipText", `${messages["startDate"]}: ${startDate}   ${messages["lastPaymentDate"]}: ${lastPaymentDate}`);
-    });
+    createContractList(messages, contractData);
     updateContractAvailability();
-}
-function toggleContractSelection(selectedElement) {
-    selectedContract = toggleSelection(selectedElement, selectedContract, "selected");
 }
 function createGroupedTransactions(messages, transactions) {
     const transactionGroups = document.getElementById("transactionGroups");
@@ -269,8 +248,6 @@ function getIdsOfTransactionGroup(messages) {
         showAlert("ERROR", messages["error_noTransactionGroupSelected"]);
         return [];
     }
-    return Array.from(selectedTransactionGroup.querySelectorAll(".listItemSmall"))
-        .map(transaction => Number(transaction.id))
-        .filter(id => id !== 0);
+    return getIdsFromContainer(selectedTransactionGroup);
 }
 //# sourceMappingURL=changeContract.js.map

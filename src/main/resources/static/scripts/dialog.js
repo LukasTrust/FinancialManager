@@ -1,14 +1,14 @@
-function createModal(contentHTML, closeButton, width = "", height = "") {
+function createModal(contentHTML, closeButton, width = 0, height = 0) {
     // Create the dialog element
     const modal = document.createElement("dialog");
     modal.appendChild(contentHTML);
     document.body.appendChild(modal);
-    // Apply styling for width and height
-    if (typeof width === "number") {
-        modal.style.width = `${width}%`;
+    // Set modal size
+    if (width !== 0) {
+        modal.style.width = `${width}px`;
     }
-    if (typeof height === "number") {
-        modal.style.height = `${height}%`;
+    if (height !== 0) {
+        modal.style.height = `${height}px`;
     }
     // Add event listener to close the modal
     if (closeButton) {
@@ -42,7 +42,7 @@ function createDialogButton(parent, iconClass, text, alignment, callback) {
     }
     return button;
 }
-function createDialogContent(headerText, headerIcon, width = "", height = "") {
+function createDialogContent(headerText, headerIcon, width, height) {
     const flexContainerColumn = createAndAppendElement(document.body, "div", "flexContainerColumn");
     const header = createDialogHeader(flexContainerColumn, headerText, headerIcon);
     const closeButton = createAndAppendElement(header, "button", "closeButton");
@@ -66,8 +66,8 @@ function showMessageBox(headerText, headerIcon, mainText, leftButtonText, leftIc
 }
 function showChangeHiddenDialog(type, messages) {
     const { alreadyHidden, notHidden } = classifyHiddenOrNot(type);
-    const height = type !== Type.TRANSACTION ? 70 : "";
-    const dialogContent = createDialogContent(messages["changeHiddenHeader"], "bi bi-eye", "", height);
+    const height = type !== Type.TRANSACTION ? 70 : 0;
+    const dialogContent = createDialogContent(messages["changeHiddenHeader"], "bi bi-eye", 0, height);
     if (type !== Type.TRANSACTION) {
         createAndAppendElement(dialogContent, "h2", "", messages["infoTransactionsWillAlsoBeAffected"], { style: "margin-right: auto; margin-left: 30px; margin-top: 10px; margin-top: 10px;" });
     }
@@ -83,7 +83,7 @@ function showChangeHiddenDialog(type, messages) {
 }
 function showMergeDialog(type, messages) {
     const checkedData = getCheckedData(type);
-    const dialogContent = createDialogContent(messages["mergeHeader"], "bi bi-arrows-collapse-vertical", "", 70);
+    const dialogContent = createDialogContent(messages["mergeHeader"], "bi bi-arrows-collapse-vertical", 0, 70);
     const info = messages["mergeInfo"];
     createAndAppendElement(dialogContent, "h2", "", info, { style: "margin-right: auto; margin-left: 30px; margin-top: 10px; margin-top: 10px;" });
     const listContainer = createAndAppendElement(dialogContent, "div", "flexContainerSpaced");
@@ -95,5 +95,18 @@ function showMergeDialog(type, messages) {
     createDialogButton(rightSide, "bi bi-bar-chart-steps", messages["chooseHeader"], "right", () => {
         chooseHeader(dialogContent, messages, rightSide.querySelector(".listContainerColumn"), leftSide.querySelector(".listContainerColumn"));
     });
+}
+function showLoadingBar(messages, width = 350, height = 100) {
+    // Create modal content container
+    const modalContent = document.createElement("div");
+    modalContent.classList.add("loadingBarContent");
+    // Create and add the h1 heading
+    createAndAppendElement(modalContent, "h1", "", messages["loadingHeader"], { style: "margin-top: 10px; margin-bottom: 20px" });
+    // Create loading bar container
+    const loadingBarContainer = createAndAppendElement(modalContent, "div", "loadingBarContainer");
+    // Create moving loading bar
+    createAndAppendElement(loadingBarContainer, "div", "loadingBar");
+    // Show modal with specified size
+    createModal(modalContent, null, width, height);
 }
 //# sourceMappingURL=dialog.js.map

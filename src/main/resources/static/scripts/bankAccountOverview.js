@@ -71,7 +71,9 @@ async function handleSelectedFiles(messages, files) {
         validFiles.push(file);
     });
     if (validFiles.length > 0) {
+        showLoadingBar(messages);
         const newDate = await sendFiles(messages, validFiles);
+        closeDialog();
         if (newDate) {
             await updateVisuals(messages);
         }

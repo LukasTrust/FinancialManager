@@ -11,5 +11,6 @@
   "startDateTooltip": "Wählen Sie ein Startdatum aus, um die Transaktionen entsprechend zu filtern",
   "endDateText": "Enddatum:",
   "endDateTooltip": "Wählen Sie ein Enddatum aus, um die Transaktionen entsprechend zu filtern",
-  "clearDateButton": "Daten löschen"
+  "clearDateButton": "Daten löschen",
+  "loadingHeader": "Bitte warten..."
 }

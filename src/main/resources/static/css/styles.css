@@ -593,36 +593,33 @@ dialog[open] {
     filter: grayscale(80%);
 }
 
-.loadingBarContent {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    width: 300px;
-    height: 100px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
+/* Styling für den Ladebalken-Container */
 .loadingBarContainer {
     width: 100%;
-    height: 10px;
-    background-color: #ddd;
-    border-radius: 5px;
+    height: 12px;
+    background-color: #e0e0e0;
     overflow: hidden;
+    position: relative;
 }
 
+/* Styling für den beweglichen Ladebalken */
 .loadingBar {
-    width: 0%;
+    width: 30%; /* Startbreite */
     height: 100%;
-    background-color: #007bff;
-    animation: loadingAnimation 1.5s linear infinite;
+    background-color: #4caf50;
+    border-radius: 6px;
+    animation: loadingAnimation 2s linear infinite;
+    position: absolute;
+    left: 0;
+    top: 0;
 }
 
+/* Animation für den Ladebalken */
 @keyframes loadingAnimation {
-    0% { width: 0%; }
-    50% { width: 100%; }
-    100% { width: 0%; }
+    0% {
+        left: -30%; /* Startet außerhalb des Containers */
+    }
+    100% {
+        left: 100%; /* Bewegt sich komplett nach rechts */
+    }
 }

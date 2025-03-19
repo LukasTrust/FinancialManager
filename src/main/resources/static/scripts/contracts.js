@@ -1,5 +1,5 @@
 async function buildContracts() {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     const messages = await loadLocalization("contracts");
     if (!messages)
         return;
@@ -10,7 +10,43 @@ async function buildContracts() {
     setUpSorting(true);
     (_a = document.getElementById("showHiddenRows")) === null || _a === void 0 ? void 0 : _a.addEventListener("change", () => changeRowVisibility(type));
     (_b = document.getElementById("changeHiddenButton")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => showChangeHiddenDialog(type, messages));
-    (_c = document.getElementById("mergeButton")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => showMergeDialog(type, messages));
+    (_c = document.getElementById("mergeButton")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", async () => await buildMergeContracts("/contracts", getCheckedData(Type.CONTRACT).map(c => c.contract)));
+    (_d = document.getElementById("deleteButton")) === null || _d === void 0 ? void 0 : _d.addEventListener("click", () => deleteContractsDialogs(messages));
+}
+async function deleteContracts(messages) {
+    try {
+        const contracts = getCheckedData(Type.CONTRACT);
+        const ids = contracts
+            .map(contract => Number(contract.contract.id))
+            .filter(id => !isNaN(id) && id !== 0);
+        const response = await fetch(`/contracts/${bankAccountId}/data/deleteContracts`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ids)
+        });
+        if (!response.ok) {
+            await showAlertFromResponse(response);
+            return;
+        }
+        const responseBody = await response.json();
+        if (responseBody.alertType === AlertType.SUCCESS) {
+            const idSet = new Set(ids);
+            contractData = contractData.filter(contract => !idSet.has(contract.contract.id));
+            filteredContractData = filteredContractData.filter(contract => !idSet.has(contract.contract.id));
+            splitDataIntoPages(messages, Type.CONTRACT, filteredContractData);
+        }
+    }
+    catch (error) {
+        console.error("There was an error merging the contracts", error);
+        showAlert('error', messages["error_generic"]);
+    }
+}
+function deleteContractsDialogs(messages) {
+    const selectedContracts = getCheckedData(Type.CONTRACT);
+    if (!selectedContracts || selectedContracts.length === 0) {
+        return;
+    }
+    showMessageBox(messages["deleteButton"], "bi bi-trash-fill", messages["deleteText"], messages["yes"], "bi bi-trash-fill", messages["no"], "bi bi-x-circle-fill", (async () => await deleteContracts(messages)), (() => closeDialog()), messages["yesTooltip"], messages["noTooltip"]);
 }
 function addRowsToContractTable(data, messages) {
     try {
