@@ -129,14 +129,14 @@ public class ContractService {
         return responseService.createResponseWithPlaceHolders(HttpStatus.OK, hide ? "contractsHidden" : "contractsUnhidden", AlertType.SUCCESS, placeHolder);
     }
 
-    public ResponseEntity<Response> mergeContracts(Long bankAccountId, Long headerId, List<Long> counterPartyIds) {
+    public ResponseEntity<Response> mergeContracts(Long bankAccountId, Long headerId, List<Long> contractIds) {
         Result<Contract, ResponseEntity<Response>> headerContractResult = resultService.findContractByIdAndBankAccountId(headerId, bankAccountId);
 
         if (headerContractResult.isErr()) {
             return headerContractResult.getError();
         }
 
-        Result<List<Contract>, ResponseEntity<Response>> contractsResult = resultService.findContractsByIdInAndBankAccountId(bankAccountId, counterPartyIds);
+        Result<List<Contract>, ResponseEntity<Response>> contractsResult = resultService.findContractsByIdInAndBankAccountId(bankAccountId, contractIds);
 
         if (contractsResult.isErr()) {
             return contractsResult.getError();
@@ -170,4 +170,30 @@ public class ContractService {
         return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "mergeContracts", AlertType.INFO, placeHolder);
     }
     //</editor-fold>
+
+    public ResponseEntity<Response> deleteContracts(Long bankAccountId, List<Long> contractIds) {
+        Result<List<Contract>, ResponseEntity<Response>> contractsResult = resultService.findContractsByIdInAndBankAccountId(bankAccountId, contractIds);
+
+        if (contractsResult.isErr()) {
+            return contractsResult.getError();
+        }
+
+        List<Contract> contracts = contractsResult.getValue();
+        Map<Contract, List<Transaction>> contractTransactionMap = findTransactionsByContract(contracts);
+
+        int transactionCount = 0;
+
+        for (Map.Entry<Contract, List<Transaction>> contractTransactions : contractTransactionMap.entrySet()) {
+            List<Transaction> transactions = contractTransactions.getValue();
+
+            baseTransactionService.setContract(null, transactions);
+            transactionCount += transactions.size();
+        }
+
+        List<String> placeHolder = new ArrayList<>();
+        placeHolder.add(String.valueOf(contracts.size()));
+        placeHolder.add(String.valueOf(transactionCount));
+
+        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "deleteContracts", AlertType.INFO, placeHolder);
+    }
 }

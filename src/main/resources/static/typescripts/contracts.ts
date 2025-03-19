@@ -17,6 +17,44 @@ async function buildContracts(): Promise<void> {
 
     document.getElementById("mergeButton")?.addEventListener("click", async () =>
         await buildMergeContracts("/contracts", getCheckedData(Type.CONTRACT).map(c => c.contract)));
+
+    document.getElementById("deleteButton")?.addEventListener("click", () => deleteContractsDialogs(messages));
+}
+
+async function deleteContracts(messages: Record<string, string>): Promise<void> {
+    try {
+        const ids = getIdsFromContainer(contractsContainer);
+
+        const response = await fetch(`/contracts/${bankAccountId}/data/mergeContracts`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ids)
+        });
+
+        if (!response.ok) {
+            await showAlertFromResponse(response);
+            return;
+        }
+
+        const responseBody: Response = await response.json();
+
+        if (responseBody.alertType === AlertType.SUCCESS) {
+            removeElements(contractsContainer)
+        }
+    } catch (error) {
+        console.error("There was an error merging the contracts", error);
+        showAlert('error', messages["error_generic"]);
+    }
+}
+
+function deleteContractsDialogs(messages: Record<string, string>): void {
+    const selectedContracts = getCheckedData(Type.CONTRACT) as ContractDisplay[];
+
+    if (!selectedContracts || selectedContracts.length === 0) {
+        return;
+    }
+
+    showMessageBox(messages["deleteButton"], "", messages["deleteText"], messages["yes"], "", messages["no"], "", );
 }
 
 function addRowsToContractTable(data: ContractDisplay[], messages: Record<string, string>): void {

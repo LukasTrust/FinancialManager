@@ -57,4 +57,9 @@ public class ContractController {
     public ResponseEntity<Response> mergeContracts(@PathVariable Long bankAccountId, @PathVariable Long headerId, @RequestBody List<Long> contractIds) {
         return contractService.mergeContracts(bankAccountId, headerId, contractIds);
     }
+
+    @PostMapping("/deleteContracts")
+    public ResponseEntity<Response> deleteContracts(@PathVariable Long bankAccountId, @RequestBody List<Long> contractIds) {
+        return contractService.deleteContracts(bankAccountId, contractIds);
+    }
 }

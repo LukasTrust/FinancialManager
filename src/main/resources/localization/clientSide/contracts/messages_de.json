@@ -37,5 +37,10 @@
   "monthAbbreviations": "'Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'",
   "changedAt": "Geändert am:",
   "previousAmount": "Vorherige Betrag:",
-  "newAmount": "Neuer Betrag:"
+  "newAmount": "Neuer Betrag:",
+  "deleteButton": "Verträge löschen",
+  "deleteButtonTooltip": "Die ausgewählten Verträge werden hier gelöscht",
+  "deleteText": "Sind Sie sicher das Sie die Verträge löschen möchten",
+  "yes": "Ja",
+  "no": "Nein"
 }
