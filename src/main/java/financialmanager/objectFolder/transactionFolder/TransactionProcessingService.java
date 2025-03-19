@@ -163,15 +163,12 @@ public class TransactionProcessingService {
 
         // Iterate over the lines in the correct direction
         for (String[] line : lines) {
-            try {
                 // Create and add a transaction for each line
                 Transaction transaction = createTransactionFromLine(line, columns, bankAccount, amountBeforeTransaction);
-                amountBeforeTransaction = transaction.getAmountInBankAfter();
-                newTransactions.add(transaction);
-            } catch (Exception e) {
-                log.error(e.getMessage());
-                log.error("Error parsing line: {}", Arrays.toString(line));
-            }
+                if (transaction != null) {
+                    amountBeforeTransaction = transaction.getAmountInBankAfter();
+                    newTransactions.add(transaction);
+                }
         }
 
         return newTransactions;
@@ -218,7 +215,7 @@ public class TransactionProcessingService {
     }
 
     private Transaction createTransactionFromLine(String[] line, DataColumns columns, BankAccount bankAccount,
-                                                  Double amountBeforeTransaction) throws Exception {
+                                                  Double amountBeforeTransaction) {
         Locale currentLocale = localeService.getCurrentLocale();
 
         // Define date formatter based on locale
@@ -242,7 +239,8 @@ public class TransactionProcessingService {
                 amountBeforeTransaction = Math.round((amountAfterTransaction - amount) * 100) / 100.0;
             }
         } catch (Exception e) {
-            log.error("Transaction could not be parsed: {}", e.getMessage());
+            log.error(e.getMessage());
+            log.error("Error parsing line: {}", Arrays.toString(line));
             return null;
         }
 
