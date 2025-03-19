@@ -23,9 +23,13 @@ async function buildContracts(): Promise<void> {
 
 async function deleteContracts(messages: Record<string, string>): Promise<void> {
     try {
-        const ids = getIdsFromContainer(contractsContainer);
+        const contracts = getCheckedData(Type.CONTRACT) as ContractDisplay[];
 
-        const response = await fetch(`/contracts/${bankAccountId}/data/mergeContracts`, {
+        const ids = contracts
+            .map(contract => Number(contract.contract.id))
+            .filter(id => !isNaN(id) && id !== 0);
+
+        const response = await fetch(`/contracts/${bankAccountId}/data/deleteContracts`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(ids)
@@ -39,7 +43,11 @@ async function deleteContracts(messages: Record<string, string>): Promise<void> 
         const responseBody: Response = await response.json();
 
         if (responseBody.alertType === AlertType.SUCCESS) {
-            removeElements(contractsContainer)
+            const idSet = new Set(ids);
+
+            contractData = contractData.filter(contract => !idSet.has(contract.contract.id));
+            filteredContractData = filteredContractData.filter(contract => !idSet.has(contract.contract.id));
+            splitDataIntoPages(messages, Type.CONTRACT, filteredContractData);
         }
     } catch (error) {
         console.error("There was an error merging the contracts", error);
@@ -54,7 +62,9 @@ function deleteContractsDialogs(messages: Record<string, string>): void {
         return;
     }
 
-    showMessageBox(messages["deleteButton"], "", messages["deleteText"], messages["yes"], "", messages["no"], "", );
+    showMessageBox(messages["deleteButton"], "bi bi-trash-fill", messages["deleteText"], messages["yes"], "bi bi-trash-fill", messages["no"],
+        "bi bi-x-circle-fill", (async () => await deleteContracts(messages)), (() => closeDialog()),
+        messages["yesTooltip"], messages["noTooltip"]);
 }
 
 function addRowsToContractTable(data: ContractDisplay[], messages: Record<string, string>): void {

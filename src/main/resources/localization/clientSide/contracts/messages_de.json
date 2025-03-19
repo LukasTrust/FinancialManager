@@ -42,5 +42,7 @@
   "deleteButtonTooltip": "Die ausgewählten Verträge werden hier gelöscht",
   "deleteText": "Sind Sie sicher das Sie die Verträge löschen möchten",
   "yes": "Ja",
-  "no": "Nein"
+  "no": "Nein",
+  "yesTooltip": "Dadurch werden die Verträge permanent gelöscht",
+  "noTooltip": "Der Dialog wird geschlossen"
 }
