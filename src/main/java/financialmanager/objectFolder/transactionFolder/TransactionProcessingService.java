@@ -1,6 +1,7 @@
 package financialmanager.objectFolder.transactionFolder;
 
 import financialmanager.objectFolder.categoryFolder.CategoryService;
+import financialmanager.objectFolder.localeFolder.LocaleService;
 import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.Utils.fileParser.DataColumns;
 import financialmanager.Utils.fileParser.FileParserFactory;
@@ -21,7 +22,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -37,6 +41,7 @@ public class TransactionProcessingService {
     private final FileParserFactory fileParserFactory;
     private final ResponseService responseService;
     private final ResultService resultService;
+    private final LocaleService localeService;
 
     private static final Logger log = LoggerFactory.getLogger(TransactionProcessingService.class);
     private final CounterPartyService counterPartyService;
@@ -214,19 +219,47 @@ public class TransactionProcessingService {
 
     private Transaction createTransactionFromLine(String[] line, DataColumns columns, BankAccount bankAccount,
                                                   Double amountBeforeTransaction) throws Exception {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        NumberFormat numberFormat = NumberFormat.getInstance(Locale.GERMANY);
+        Locale currentLocale = localeService.getCurrentLocale();
 
-        LocalDate date = LocalDate.parse(line[columns.dateColumn()], formatter);
-        Double amount = numberFormat.parse(line[columns.amountColumn()]).doubleValue();
-        Double amountAfterTransaction = numberFormat.parse(line[columns.amountAfterTransactionColumn()]).doubleValue();
-        String counterPartyName = line[columns.counterPartyColumn()];
+        // Define date formatter based on locale
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", currentLocale);
+        LocalDate date;
+        Double amount;
+        Double amountAfterTransaction;
+        String counterPartyName;
 
-        if (amountBeforeTransaction == 0.0) {
-            amountBeforeTransaction = Math.round((amountAfterTransaction - amount) * 100) / 100.0;
+        try {
+            // Parse date
+            date = LocalDate.parse(line[columns.dateColumn()], formatter);
+
+            // Parse amount
+            amount = parseLocalizedNumber(line[columns.amountColumn()], currentLocale);
+            amountAfterTransaction = parseLocalizedNumber(line[columns.amountAfterTransactionColumn()], currentLocale);
+
+            counterPartyName = line[columns.counterPartyColumn()];
+
+            if (amountBeforeTransaction == 0.0) {
+                amountBeforeTransaction = Math.round((amountAfterTransaction - amount) * 100) / 100.0;
+            }
+        } catch (Exception e) {
+            log.error("Transaction could not be parsed: {}", e.getMessage());
+            return null;
         }
 
         return new Transaction(bankAccount, counterPartyName, date, amount, amountAfterTransaction,
                 amountBeforeTransaction);
+    }
+
+    private static Double parseLocalizedNumber(String numberString, Locale locale) throws ParseException {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
+        char decimalSeparator = symbols.getDecimalSeparator();
+
+        // Normalize decimal separator to the locale-specific one
+        numberString = numberString.replace('.', decimalSeparator).replace(',', decimalSeparator);
+
+        DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getInstance(locale);
+        decimalFormat.setParseBigDecimal(true);
+
+        return decimalFormat.parse(numberString).doubleValue();
     }
 }
