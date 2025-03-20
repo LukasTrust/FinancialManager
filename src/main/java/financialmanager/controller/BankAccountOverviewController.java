@@ -40,9 +40,14 @@ public class BankAccountOverviewController {
         return ResponseEntity.ok(chartService.getTransactionDate(Collections.singletonList(bankAccountId), startDate, endDate));
     }
 
-    @PostMapping(value = "/{bankAccountId}/upload/data")
+    @PostMapping("/{bankAccountId}/data/upload")
     @ResponseBody
     public ResponseEntity<?> uploadDataForTransactions(@PathVariable Long bankAccountId, @RequestParam("files") MultipartFile[] files) {
         return transactionProcessingService.uploadDataForTransactions(bankAccountId, files);
+    }
+
+    @PostMapping("/{bankAccountId}/data/delete")
+    public ResponseEntity<?> deleteData(@PathVariable Long bankAccountId) {
+
     }
 }

@@ -5,10 +5,10 @@ function createModal(contentHTML, closeButton, width = 0, height = 0) {
     document.body.appendChild(modal);
     // Set modal size
     if (width !== 0) {
-        modal.style.width = `${width}px`;
+        modal.style.width = `${width}%`;
     }
     if (height !== 0) {
-        modal.style.height = `${height}px`;
+        modal.style.height = `${height}%`;
     }
     // Add event listener to close the modal
     if (closeButton) {
@@ -51,7 +51,7 @@ function createDialogContent(headerText, headerIcon, width, height) {
     return flexContainerColumn;
 }
 function showMessageBox(headerText, headerIcon, mainText, leftButtonText, leftIcon, rightButtonText, rightIcon, leftButtonCallback, rightButtonCallback, toolTipLeft, toolTipRight) {
-    const content = createDialogContent(headerText, headerIcon, 30, 25);
+    const content = createDialogContent(headerText, headerIcon, 30, 20);
     content.style.overflow = "visible";
     createAndAppendElement(content, "h2", "", mainText, { style: "margin-top: 30px; margin-bottom: 30px" });
     const buttonContainer = createAndAppendElement(content, "div", "flexContainerSpaced");
@@ -96,17 +96,19 @@ function showMergeDialog(type, messages) {
         chooseHeader(dialogContent, messages, rightSide.querySelector(".listContainerColumn"), leftSide.querySelector(".listContainerColumn"));
     });
 }
-function showLoadingBar(messages, width = 350, height = 100) {
-    // Create modal content container
-    const modalContent = document.createElement("div");
-    modalContent.classList.add("loadingBarContent");
-    // Create and add the h1 heading
-    createAndAppendElement(modalContent, "h1", "", messages["loadingHeader"], { style: "margin-top: 10px; margin-bottom: 20px" });
-    // Create loading bar container
-    const loadingBarContainer = createAndAppendElement(modalContent, "div", "loadingBarContainer");
-    // Create moving loading bar
-    createAndAppendElement(loadingBarContainer, "div", "loadingBar");
-    // Show modal with specified size
-    createModal(modalContent, null, width, height);
+function showLoadingBar(messages, width = 30, height = 10) {
+    window.setTimeout(() => {
+        // Create modal content container
+        const modalContent = document.createElement("div");
+        modalContent.classList.add("loadingBarContent");
+        // Create and add the h1 heading
+        createAndAppendElement(modalContent, "h1", "", messages["loadingHeader"], { style: "margin-top: 10px; margin-bottom: 20px" });
+        // Create loading bar container
+        const loadingBarContainer = createAndAppendElement(modalContent, "div", "loadingBarContainer");
+        // Create moving loading bar
+        createAndAppendElement(loadingBarContainer, "div", "loadingBar");
+        // Show modal with specified size
+        createModal(modalContent, null, width, height);
+    }, 500);
 }
 //# sourceMappingURL=dialog.js.map

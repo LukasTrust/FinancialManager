@@ -11,10 +11,10 @@ function createModal(
 
     // Set modal size
     if (width !== 0) {
-        modal.style.width =`${width}px`;
+        modal.style.width =`${width}%`;
     }
     if (height !== 0) {
-        modal.style.height = `${height}px`;
+        modal.style.height = `${height}%`;
     }
 
     // Add event listener to close the modal
@@ -91,7 +91,7 @@ function showMessageBox(
     toolTipLeft?: string,
     toolTipRight?: string
 ): void {
-    const content = createDialogContent(headerText, headerIcon, 30, 25);
+    const content = createDialogContent(headerText, headerIcon, 30, 20);
     content.style.overflow = "visible";
 
     createAndAppendElement(content, "h2", "", mainText, {style: "margin-top: 30px; margin-bottom: 30px"});
@@ -159,7 +159,8 @@ function showMergeDialog<T extends CounterPartyDisplay>(type: Type, messages: Re
     });
 }
 
-function showLoadingBar(messages: Record<string, string>, width: number = 350, height: number = 100) {
+function showLoadingBar(messages: Record<string, string>, width: number = 30, height: number = 10) {
+    window.setTimeout(() => {
     // Create modal content container
     const modalContent = document.createElement("div");
     modalContent.classList.add("loadingBarContent");
@@ -175,4 +176,5 @@ function showLoadingBar(messages: Record<string, string>, width: number = 350, h
 
     // Show modal with specified size
     createModal(modalContent, null, width, height);
+    }, 500);
 }

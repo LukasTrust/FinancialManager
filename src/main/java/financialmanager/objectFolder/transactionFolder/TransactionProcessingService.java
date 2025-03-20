@@ -15,6 +15,7 @@ import financialmanager.objectFolder.responseFolder.ResponseService;
 import financialmanager.objectFolder.resultFolder.ResultService;
 import financialmanager.objectFolder.usersFolder.Users;
 import lombok.AllArgsConstructor;
+import org.hibernate.validator.internal.util.Contracts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -47,6 +48,15 @@ public class TransactionProcessingService {
     private static final Logger log = LoggerFactory.getLogger(TransactionProcessingService.class);
     private final CounterPartyService counterPartyService;
 
+    public ResponseEntity<?> deleteData(Long bankAccountId) {
+        Result<BankAccount, ResponseEntity<Response>> bankAccountResult = resultService.findBankAccountById(bankAccountId);
+
+        if (bankAccountResult.isErr())
+            return bankAccountResult.getError();
+
+        Contracts contracts
+    }
+
     public ResponseEntity<?> uploadDataForTransactions(Long bankAccountId, MultipartFile[] files) {
         List<ResponseEntity<Response>> responses = new ArrayList<>();
 
@@ -68,9 +78,9 @@ public class TransactionProcessingService {
 
         Result<BankAccount, ResponseEntity<Response>> bankAccountResult = resultService.findBankAccountById(bankAccountId);
 
-        if (bankAccountResult.isErr()) {
+        if (bankAccountResult.isErr())
             return bankAccountResult.getError();
-        }
+
 
         header = fileParser.getNextLineOfData();
 
@@ -259,9 +269,9 @@ public class TransactionProcessingService {
 
             counterPartyName = line[columns.counterPartyColumn()];
 
-            if (amountBeforeTransaction == 0.0) {
+            if (amountBeforeTransaction == 0.0)
                 amountBeforeTransaction = Math.round((amountAfterTransaction - amount) * 100) / 100.0;
-            }
+
         } catch (Exception e) {
             log.error(e.getMessage());
             log.error("Error parsing line: {}", Arrays.toString(line));

@@ -86,6 +86,7 @@ async function handleSelectedFiles(messages: Record<string, string>, files: File
         showLoadingBar(messages);
 
         const newDate = await sendFiles(messages, validFiles);
+
         closeDialog();
 
         if (newDate) {
@@ -99,7 +100,7 @@ async function sendFiles(messages: Record<string, string>, files: File[]): Promi
         const formData = new FormData();
         files.forEach((file) => formData.append("files", file));
 
-        const response = await fetch(`/bankAccountOverview/${bankAccountId}/upload/data`, {
+        const response = await fetch(`/bankAccountOverview/${bankAccountId}/data/upload`, {
             method: 'POST',
             body: formData,
         });
