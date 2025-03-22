@@ -34,7 +34,6 @@ public class CsvFileParser extends FileParser {
             lines.add(line);
         }
 
-        log.info("Total {} lines read", lineNumber);
         log.info("Successfully read {} lines without errors", lineNumber - errorCount);
         log.info("Encountered errors in {} lines", errorCount);
 

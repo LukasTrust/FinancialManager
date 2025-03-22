@@ -47,7 +47,9 @@ public class ContractProcessingService {
 
         closeContracts(lastTransactionDate, contracts);
 
-        baseContractService.saveAll(contracts);
+        if (!contracts.isEmpty()) {
+            baseContractService.saveAll(contracts);
+        }
     }
 
     private List<Transaction> checkIfExistingContractsChanged(List<Transaction> transactionsWithOutContract, List<Contract> contracts) {
@@ -179,7 +181,7 @@ public class ContractProcessingService {
 
             groupedByCounterParty.forEach((_, possibleMatches) -> {
                 if (possibleMatches.size() > 2) {
-                    tryToIdentifyPattern(bankAccount, possibleMatches).ifPresent(potentialContracts::add);
+                     tryToIdentifyPattern(bankAccount, possibleMatches).ifPresent(potentialContracts::add);
                 }
             });
         });
@@ -233,7 +235,7 @@ public class ContractProcessingService {
         Contract newContract = new Contract(firstTransaction.getDate(), transactions.getLast().getDate(), monthsBetweenPayments,
                 firstTransaction.getAmount(), firstTransaction.getCounterParty(), bankAccount);
 
-       setContractForTransactions(newContract, transactions);
+        setContractForTransactions(newContract, transactions);
 
         return newContract;
     }

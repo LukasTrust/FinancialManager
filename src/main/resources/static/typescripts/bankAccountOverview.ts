@@ -5,6 +5,28 @@ async function buildBankAccountOverview(): Promise<void> {
     handleFileBrowser(messages);
     handleDateRangeSelection(messages);
     await updateVisuals(messages);
+
+    document.getElementById("deleteDataButton")?.addEventListener("click", async () => await deleteData(messages));
+}
+
+async function deleteData(messages: Record<string, string>) {
+    try {
+        const response = await fetch(`/bankAccountOverview/${bankAccountId}/data/deleteData`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        });
+
+        const responseBody: Response = await response.json();
+
+        showAlert(responseBody.alertType, response.message);
+
+        if (responseBody.alertType === AlertType.SUCCESS)
+            await updateVisuals(messages);
+
+    } catch (error) {
+        console.error("There was an error deleting the data", error);
+        showAlert('error', messages["error_generic"]);
+    }
 }
 
 async function updateVisuals(messages: Record<string, string>, startDate: string | null = null, endDate: string | null = null): Promise<void> {

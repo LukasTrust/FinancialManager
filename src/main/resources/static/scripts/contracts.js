@@ -37,7 +37,7 @@ async function deleteContracts(messages) {
         }
     }
     catch (error) {
-        console.error("There was an error merging the contracts", error);
+        console.error("There was an error deleting the contracts", error);
         showAlert('error', messages["error_generic"]);
     }
 }

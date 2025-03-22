@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -101,7 +102,7 @@ public class CounterPartyService {
     private List<String> mergeCounterPartiesIntoHeader(List<CounterParty> mergingCounterParties, CounterParty targetCounterParty) {
         List<Transaction> transactions = baseTransactionService.findByCounterPartyIn(mergingCounterParties);
 
-        int contractCount = setCounterParty(targetCounterParty, transactions, true);
+        int contractCount = setCounterParty(targetCounterParty, transactions);
 
         // Merge unique search strings
         Set<String> mergedSearchStrings = mergingCounterParties.stream()
@@ -260,37 +261,41 @@ public class CounterPartyService {
         List<CounterParty> existingCounterParties = baseCounterPartyService.findByUsers(currentUser);
         Map<String, CounterParty> counterPartyLookup = new HashMap<>();
 
-        // Populate lookup for quick search
+        // Build lookup map
         for (CounterParty counterParty : existingCounterParties) {
             for (String searchString : counterParty.getCounterPartySearchStrings()) {
-                counterPartyLookup.put(searchString, counterParty);
+                counterPartyLookup.putIfAbsent(searchString, counterParty);
             }
         }
 
         List<CounterParty> newCounterParties = new ArrayList<>();
 
-        // Group transactions by counterparty
-        Map<String, List<Transaction>> transactionsByCounterParty = transactions.stream()
-                .collect(Collectors.groupingBy(financialmanager.objectFolder.transactionFolder.Transaction::getOriginalCounterParty));
+        // Group transactions by counterparty name
+        Map<String, List<Transaction>> transactionsByCounterParty = transactions.parallelStream()
+                .collect(Collectors.groupingBy(Transaction::getOriginalCounterParty));
 
         for (Map.Entry<String, List<Transaction>> entry : transactionsByCounterParty.entrySet()) {
             String counterPartyName = entry.getKey();
             List<Transaction> counterPartyTransactions = entry.getValue();
 
-            CounterParty counterParty = counterPartyLookup.get(counterPartyName);
+            // Use computeIfAbsent to avoid extra containsKey calls
+            CounterParty counterParty = counterPartyLookup.computeIfAbsent(counterPartyName, name -> {
+                CounterParty newCP = new CounterParty(currentUser, name);
+                newCounterParties.add(newCP);
+                return newCP;
+            });
 
-            if (counterParty != null) {
-                // If existing counterparty found, assign it to transactions
-                setCounterParty(counterParty, counterPartyTransactions, true);
-            } else {
-                // If not found, create a new one
-                counterParty = new CounterParty(currentUser, counterPartyName);
-                setCounterParty(counterParty, counterPartyTransactions, false);
-                newCounterParties.add(counterParty);
-            }
+            baseTransactionService.setCounterParty(counterParty, counterPartyTransactions, false);
         }
 
-        baseCounterPartyService.saveAll(newCounterParties);
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        // Save new counterparties only once
+        if (!newCounterParties.isEmpty()) {
+            baseCounterPartyService.saveAll(newCounterParties);
+        }
+        stopWatch.stop();
+        log.info("{} for saveAll", stopWatch.getTotalTimeMillis());
     }
 
     private boolean checkIfOtherSearchStringsAreInUse(List<String> searchStrings) {
@@ -308,18 +313,18 @@ public class CounterPartyService {
 
         CounterParty splitCounterParty = new CounterParty(currentUser, originalCounterParty);
         baseCounterPartyService.save(splitCounterParty);
-        setCounterParty(splitCounterParty, transactions, true);
+        setCounterParty(splitCounterParty, transactions);
 
         return splitCounterParty;
     }
 
-    private int setCounterParty(CounterParty counterParty, List<Transaction> transactions, boolean instanceSave) {
+    private int setCounterParty(CounterParty counterParty, List<Transaction> transactions) {
         if (transactions.isEmpty()) return 0;
 
         List<Contract> uniqueContracts = getContractsFromTransactions(transactions);
 
-        baseTransactionService.setCounterParty(counterParty, transactions, instanceSave);
-        baseContractService.setCounterParty(counterParty, uniqueContracts, instanceSave);
+        baseTransactionService.setCounterParty(counterParty, transactions, true);
+        baseContractService.setCounterParty(counterParty, uniqueContracts, true);
 
         return uniqueContracts.size();
     }

@@ -41,6 +41,10 @@ public class BaseTransactionService {
         transactionRepository.saveAll(transactions);
     }
 
+    public void deleteAll(List<Transaction> transactions) {
+        transactionRepository.deleteAll(transactions);
+    }
+
     public void setContract(Contract contract, List<Transaction> transactions) {
         transactions.forEach(transaction -> transaction.setContract(contract));
         saveAll(transactions);
@@ -48,7 +52,6 @@ public class BaseTransactionService {
 
     public void setCounterParty(CounterParty counterParty, List<Transaction> transactions, boolean instanceSave) {
         transactions.forEach(transaction -> transaction.setCounterParty(counterParty));
-
         if (instanceSave) saveAll(transactions);
     }
 

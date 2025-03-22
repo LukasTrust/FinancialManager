@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class BaseContractService {
 
-    private ContractRepository contractRepository;
+    private final ContractRepository contractRepository;
 
     public List<Contract> findByBankAccountId(Long bankAccountId) {
         return contractRepository.findByBankAccountId(bankAccountId);
