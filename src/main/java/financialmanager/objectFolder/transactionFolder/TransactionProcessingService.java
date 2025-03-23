@@ -60,9 +60,11 @@ public class TransactionProcessingService {
         if (bankAccountResult.isErr())
             return bankAccountResult.getError();
 
+        BankAccount bankAccount = bankAccountResult.getValue();
+
         try {
-            List<Transaction> transactions = baseTransactionService.findByBankAccountId(bankAccountId);
-            List<Contract> contracts = baseContractService.findByBankAccountId(bankAccountId);
+            List<Transaction> transactions = baseTransactionService.findByBankAccount(bankAccount);
+            List<Contract> contracts = baseContractService.findByBankAccount(bankAccount);
             List<ContractHistory> contractHistories = baseContractHistoryService.findByContractIn(contracts);
 
             baseTransactionService.deleteAll(transactions);
@@ -101,7 +103,6 @@ public class TransactionProcessingService {
         if (bankAccountResult.isErr())
             return bankAccountResult.getError();
 
-
         header = fileParser.getNextLineOfData();
 
         if (header == null) {
@@ -131,7 +132,7 @@ public class TransactionProcessingService {
         }
 
         stopWatch.start();
-        List<Transaction> existingTransactions = baseTransactionService.findByBankAccountId(bankAccountId);
+        List<Transaction> existingTransactions = baseTransactionService.findByBankAccountAndContractEmpty(bankAccount);
         newTransactions = filterNewTransactions(newTransactions, existingTransactions);
         stopWatch.stop();
         log.info("{} for filterNewTransactions", stopWatch.getTotalTimeMillis());
@@ -164,11 +165,7 @@ public class TransactionProcessingService {
         stopWatch.stop();
         log.info("{} for addTransactionsToCategories", stopWatch.getTotalTimeMillis());
 
-        stopWatch = new StopWatch();
-        stopWatch.start();
-        newTransactions.addAll(getTransactionsWithoutContract(existingTransactions));
-        stopWatch.stop();
-        log.info("{} for addTransactionsToCategories", stopWatch.getTotalTimeMillis());
+        newTransactions.addAll(existingTransactions);
 
         stopWatch = new StopWatch();
         stopWatch.start();
@@ -177,12 +174,6 @@ public class TransactionProcessingService {
         log.info("{} for checkIfTransactionsBelongToContract", stopWatch.getTotalTimeMillis());
 
         baseTransactionService.saveAll(newTransactions);
-    }
-
-    private List<Transaction> getTransactionsWithoutContract(List<Transaction> existingTransactions) {
-        return existingTransactions.stream()
-                .filter(transaction -> transaction.getContract() == null)
-                .toList();
     }
 
     private DataColumns findColumnsInData(String[] header, BankAccount bankAccount) {

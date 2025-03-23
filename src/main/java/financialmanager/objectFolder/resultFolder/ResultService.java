@@ -49,7 +49,7 @@ public class ResultService {
         if (bankAccountResult.isErr())
             return new Err<>(bankAccountResult.getError());
 
-        List<Transaction> transactions = baseTransactionService.findByIdInAndBankAccountId(transactionIds, bankAccountId);
+        List<Transaction> transactions = baseTransactionService.findByIdInAndBankAccount(transactionIds, bankAccountResult.getValue());
 
         if (transactions.isEmpty()) {
             log.warn("No transactions found for id: {}", bankAccountId);
@@ -112,8 +112,8 @@ public class ResultService {
         return new Ok<>(contracts);
     }
 
-    public List<Contract> findContractsByBankAccountIdBetweenDates(Long bankAccountId, LocalDate startDate, LocalDate endDate) {
-        List<Contract> contracts = baseContractService.findByBankAccountId(bankAccountId);
+    public List<Contract> findContractsByBankAccountIdBetweenDates(BankAccount bankAccount, LocalDate startDate, LocalDate endDate) {
+        List<Contract> contracts = baseContractService.findByBankAccount(bankAccount);
 
         if (startDate == null && endDate == null) {
             return contracts;

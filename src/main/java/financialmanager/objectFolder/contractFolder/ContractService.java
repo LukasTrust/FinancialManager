@@ -49,7 +49,7 @@ public class ContractService {
         if (bankAccountResult.isErr())
             return bankAccountResult.getError();
 
-        return ResponseEntity.ok(baseContractService.findByBankAccountId(bankAccountId));
+        return ResponseEntity.ok(baseContractService.findByBankAccount(bankAccountResult.getValue()));
     }
 
     public ResponseEntity<?> findContractDisplaysForBankAccount(Long bankAccountId) {
@@ -59,7 +59,7 @@ public class ContractService {
             return bankAccountResult.getError();
         }
 
-        List<Contract> contracts = baseContractService.findByBankAccountId(bankAccountId);
+        List<Contract> contracts = baseContractService.findByBankAccount(bankAccountResult.getValue());
         Map<Contract, List<Transaction>> contractTransactionMap = findTransactionsByContract(contracts);
 
         List<ContractDisplay> contractDisplays = new ArrayList<>();

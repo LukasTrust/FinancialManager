@@ -30,10 +30,10 @@ public class ContractHistory {
         @Column(nullable = false)
         private LocalDate changedAt;
 
-        public ContractHistory(Contract contract, Double newAmount, LocalDate changedAt) {
+        public ContractHistory(Contract contract, Double newAmount, Double previousAmount, LocalDate changedAt) {
                 this.contract = contract;
-                this.previousAmount = contract.getAmount();
                 this.newAmount = newAmount;
+                this.previousAmount = previousAmount;
                 this.changedAt = changedAt;
         }
 }

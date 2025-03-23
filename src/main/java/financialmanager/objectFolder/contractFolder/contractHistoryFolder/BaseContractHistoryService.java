@@ -3,6 +3,7 @@ package financialmanager.objectFolder.contractFolder.contractHistoryFolder;
 import financialmanager.objectFolder.contractFolder.Contract;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +28,11 @@ public class BaseContractHistoryService {
 
     public void saveAll(List<ContractHistory> contractHistoryList) {
         contractHistoryRepository.saveAll(contractHistoryList);
+    }
+
+    @Async
+    public void save(ContractHistory contractHistory) {
+        contractHistoryRepository.save(contractHistory);
     }
 
     public void deleteAll(List<ContractHistory> contractHistoryList) {

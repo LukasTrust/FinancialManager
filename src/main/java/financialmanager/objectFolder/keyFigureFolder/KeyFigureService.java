@@ -47,14 +47,16 @@ public class KeyFigureService {
                 continue;
             }
 
-            List<Transaction> bankAccountTransactions = transactionService.findByBankAccountIdBetweenDates(bankAccountId, start, end);
+            BankAccount bankAccount = bankAccountResult.getValue();
+
+            List<Transaction> bankAccountTransactions = transactionService.findByBankAccountBetweenDates(bankAccount, start, end);
             allTransactions.addAll(bankAccountTransactions);
 
             if (bankAccountResult.getValue() instanceof SavingsBankAccount) {
                 discrepancy += getDiscrepancy(bankAccountTransactions);
                 isSavingsAccount = true;
             } else {
-                List<Contract> contracts = resultService.findContractsByBankAccountIdBetweenDates(bankAccountId, start, end);
+                List<Contract> contracts = resultService.findContractsByBankAccountIdBetweenDates(bankAccount, start, end);
                 contractCostPerMonth += getContractCostPerMonth(contracts);
             }
         }
