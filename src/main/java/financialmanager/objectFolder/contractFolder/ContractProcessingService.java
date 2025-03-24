@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -62,37 +63,20 @@ public class ContractProcessingService {
     }
 
     private Map<Double, List<Transaction>> mapTransactionByAmount(List<Transaction> transactions) {
-        Map<Double, List<Transaction>> transactionsByAmount = new HashMap<>();
-
-        for (Transaction transaction : transactions) {
-            if (transactionsByAmount.containsKey(transaction.getAmount())) {
-                transactionsByAmount.get(transaction.getAmount()).add(transaction);
-            } else {
-                transactionsByAmount.put(transaction.getAmount(), new ArrayList<>());
-            }
-        }
-
-        return transactionsByAmount;
+        return transactions.stream()
+                .collect(Collectors.groupingBy(Transaction::getAmount))
+                .entrySet().stream()
+                .filter(entry -> entry.getValue().size() > 2)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private void updateContract(Contract contract, Double amount, LocalDate lastPaymentDate, LocalDate changedAt) {
-        contract.setAmount(amount);
-        contract.setLastPaymentDate(lastPaymentDate);
-        contract.setLastUpdatedAt(changedAt);
-        baseContractService.save(contract);
-    }
-
-    private ContractHistory handleAfterCurrentContractStartNoHistory(Contract contract, Double amount, LocalDate changedAt, LocalDate lastPaymentDate) {
-        updateContract(contract, amount, lastPaymentDate, changedAt);
-
-        return new ContractHistory(contract, amount, contract.getAmount(), changedAt);
-    }
-
-    private ContractHistory handleBeforeCurrentContractStart(Contract contract, Double previousAmount, LocalDate newStartDate) {
-        contract.setStartDate(newStartDate);
-        baseContractService.save(contract);
-
-        return new ContractHistory(contract, contract.getAmount(), previousAmount, contract.getStartDate());
+    private Map<CounterParty, Map<Double, List<Transaction>>> mapTransactionByAmountAndCounterParty(List<Transaction> transactions) {
+        return transactions.stream()
+                .collect(Collectors.groupingBy(Transaction::getCounterParty))
+                .entrySet().stream()
+                .map(entry -> Map.entry(entry.getKey(), mapTransactionByAmount(entry.getValue())))
+                .filter(entry -> !entry.getValue().isEmpty())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private LocalDate getEarliestTransactionDate(List<Transaction> transactions) {
@@ -117,40 +101,57 @@ public class ContractProcessingService {
         return transaction.getAmount().compareTo(amount) == 0;
     }
 
-    private boolean hasValidTransactionDate(Transaction transaction, LocalDate startDate, int monthsBetween) {
+    private boolean hasSameDateDay(LocalDate transactionDate, LocalDate date) {
+        return transactionDate.isEqual(date) ||
+                transactionDate.isEqual(date.minusDays(1)) ||
+                transactionDate.isEqual(date.plusDays(1));
+    }
+
+    private boolean hasSameDateDifference(LocalDate transactionDate, LocalDate date, int monthsBetweenPayments) {
+        int monthsElapsed = (transactionDate.getYear() - date.getYear()) * 12 +
+                (transactionDate.getMonthValue() - date.getMonthValue());
+
+        return monthsElapsed % monthsBetweenPayments == 0;
+    }
+
+    private int calculateMonthsDifference(LocalDate startDate, LocalDate endDate) {
+        int monthsBetween = (endDate.getYear() - startDate.getYear()) * 12 + (endDate.getMonthValue() - startDate.getMonthValue());
+        return Math.abs(monthsBetween);
+    }
+
+    private boolean hasValidTransactionDate(Transaction transaction, LocalDate date, int monthsBetweenPayments) {
         LocalDate transactionDate = transaction.getDate();
 
         // Check if transaction date is within ±1 day of the start date
-        if (!(transactionDate.isEqual(startDate) ||
-                transactionDate.isEqual(startDate.minusDays(1)) ||
-                transactionDate.isEqual(startDate.plusDays(1)))) {
-            return false;
-        }
-
         // Validate if the month difference is a multiple of `monthsBetween`
-        int monthsElapsed = (transactionDate.getYear() - startDate.getYear()) * 12 +
-                (transactionDate.getMonthValue() - startDate.getMonthValue());
-
-        return monthsElapsed % monthsBetween == 0;
+        return hasSameDateDay(transactionDate, date) && hasSameDateDifference(transactionDate, date, monthsBetweenPayments);
     }
     //</editor-fold>
     //</editor-fold>
 
     //<editor-fold desc="create contract">
+    private void createNewContracts(List<Transaction> transactions) {
+        Map<CounterParty, Map<Double, List<Transaction>>> counterPartyMapMap = mapTransactionByAmountAndCounterParty(transactions);
 
-    private void createNewContracts(List<Transaction> transactions, Map<Contract, List<ContractHistory>> contractHistoryMap) {
+        for (Map.Entry<CounterParty, Map<Double, List<Transaction>>> mainEntry : counterPartyMapMap.entrySet()) {
+            CounterParty counterParty = mainEntry.getKey();
+            
+        }
+    }
+
+    private List<Contract> handleAmountMap(Map<Double, List<Transaction>> amountMap) {
 
     }
 
     //</editor-fold>
 
     //<editor-fold desc="update contract">
-    private List<Transaction> updateExistingContract(List<Transaction> transactions, Contract contract, List<ContractHistory> contractHistories) {
+    private List<Transaction> updateExistingContract(List<Transaction> transactions, Contract contract,
+                                                     List<ContractHistory> contractHistories) {
         Map<Double, List<Transaction>> transactionsByAmount = mapTransactionByAmount(transactions);
 
         for (Map.Entry<Double, List<Transaction>> entry : transactionsByAmount.entrySet()) {
             List<Transaction> existingTransactions = entry.getValue();
-            if (existingTransactions.size() <= 2) continue;
 
             ContractHistory contractHistory = null;
             LocalDate earliestTransactionDate = getEarliestTransactionDate(existingTransactions);
@@ -174,6 +175,19 @@ public class ContractProcessingService {
         }
 
         return transactions.stream().filter(transaction -> transaction.getContract() != null).toList();
+    }
+
+    private ContractHistory handleAfterCurrentContractStartNoHistory(Contract contract, Double amount, LocalDate changedAt, LocalDate lastPaymentDate) {
+        updateContract(contract, amount, lastPaymentDate, changedAt);
+
+        return new ContractHistory(contract, amount, contract.getAmount(), changedAt);
+    }
+
+    private ContractHistory handleBeforeCurrentContractStart(Contract contract, Double previousAmount, LocalDate newStartDate) {
+        contract.setStartDate(newStartDate);
+        baseContractService.save(contract);
+
+        return new ContractHistory(contract, contract.getAmount(), previousAmount, contract.getStartDate());
     }
 
     private ContractHistory handleAfterCurrentContractStartWithHistory(
@@ -202,6 +216,13 @@ public class ContractProcessingService {
         }
 
         return new ContractHistory(contract, amount, latestHistory.getNewAmount(), changedAt);
+    }
+
+    private void updateContract(Contract contract, Double amount, LocalDate lastPaymentDate, LocalDate changedAt) {
+        contract.setAmount(amount);
+        contract.setLastPaymentDate(lastPaymentDate);
+        contract.setLastUpdatedAt(changedAt);
+        baseContractService.save(contract);
     }
     //</editor-fold>
 
