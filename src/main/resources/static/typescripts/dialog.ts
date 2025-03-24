@@ -11,7 +11,7 @@ function createModal(
 
     // Set modal size
     if (width !== 0) {
-        modal.style.width =`${width}%`;
+        modal.style.width = `${width}%`;
     }
     if (height !== 0) {
         modal.style.height = `${height}%`;
@@ -31,7 +31,9 @@ function createModal(
 }
 
 function closeDialog(): void {
-    document.querySelector("dialog")?.close();
+    window.setTimeout(() => {
+        document.querySelector("dialog")?.close();
+    }, 1000);
 }
 
 function createDialogHeader(parent: HTMLElement, text: string, icon: string): HTMLElement {
@@ -161,20 +163,20 @@ function showMergeDialog<T extends CounterPartyDisplay>(type: Type, messages: Re
 
 function showLoadingBar(messages: Record<string, string>, width: number = 30, height: number = 10) {
     window.setTimeout(() => {
-    // Create modal content container
-    const modalContent = document.createElement("div");
-    modalContent.classList.add("loadingBarContent");
+        // Create modal content container
+        const modalContent = document.createElement("div");
+        modalContent.classList.add("loadingBarContent");
 
-    // Create and add the h1 heading
-    createAndAppendElement(modalContent, "h1", "", messages["loadingHeader"], {style: "margin-top: 10px; margin-bottom: 20px"});
+        // Create and add the h1 heading
+        createAndAppendElement(modalContent, "h1", "", messages["loadingHeader"], {style: "margin-top: 10px; margin-bottom: 20px"});
 
-    // Create loading bar container
-    const loadingBarContainer = createAndAppendElement(modalContent, "div", "loadingBarContainer");
+        // Create loading bar container
+        const loadingBarContainer = createAndAppendElement(modalContent, "div", "loadingBarContainer");
 
-    // Create moving loading bar
-    createAndAppendElement(loadingBarContainer, "div", "loadingBar");
+        // Create moving loading bar
+        createAndAppendElement(loadingBarContainer, "div", "loadingBar");
 
-    // Show modal with specified size
-    createModal(modalContent, null, width, height);
+        // Show modal with specified size
+        createModal(modalContent, null, width, height);
     }, 500);
 }

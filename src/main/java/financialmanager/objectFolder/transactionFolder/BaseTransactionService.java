@@ -1,8 +1,10 @@
 package financialmanager.objectFolder.transactionFolder;
 
+import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import lombok.AllArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,12 +15,16 @@ public class BaseTransactionService {
 
     private final TransactionRepository transactionRepository;
 
-    public List<Transaction> findByBankAccountId(Long bankAccountId) {
-        return transactionRepository.findByBankAccountId(bankAccountId);
+    public List<Transaction> findByBankAccount(BankAccount bankAccount) {
+        return transactionRepository.findByBankAccount(bankAccount);
     }
 
-    public List<Transaction> findByIdInAndBankAccountId(List<Long> ids, Long bankAccountId) {
-        return transactionRepository.findByIdInAndBankAccountId(ids, bankAccountId);
+    public List<Transaction> findByBankAccountAndContractEmpty(BankAccount bankAccount) {
+        return transactionRepository.findByBankAccountAndContractEmpty(bankAccount);
+    }
+
+    public List<Transaction> findByIdInAndBankAccount(List<Long> ids, BankAccount bankAccount) {
+        return transactionRepository.findByIdInAndBankAccount(ids, bankAccount);
     }
 
     public List<Transaction> findByCounterParty(CounterParty counterParty) {
@@ -41,17 +47,23 @@ public class BaseTransactionService {
         transactionRepository.saveAll(transactions);
     }
 
+    public void deleteAll(List<Transaction> transactions) {
+        transactionRepository.deleteAll(transactions);
+    }
+
+    @Async
     public void setContract(Contract contract, List<Transaction> transactions) {
         transactions.forEach(transaction -> transaction.setContract(contract));
         saveAll(transactions);
     }
 
+    @Async
     public void setCounterParty(CounterParty counterParty, List<Transaction> transactions, boolean instanceSave) {
         transactions.forEach(transaction -> transaction.setCounterParty(counterParty));
-
         if (instanceSave) saveAll(transactions);
     }
 
+    @Async
     public void setHidden(boolean hide, List<Transaction> transactions) {
         transactions.forEach(transaction -> transaction.setHidden(hide));
         saveAll(transactions);

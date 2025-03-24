@@ -1,10 +1,28 @@
 async function buildBankAccountOverview() {
+    var _a;
     const messages = await loadLocalization("bankAccountOverview");
     if (!messages)
         return;
     handleFileBrowser(messages);
     handleDateRangeSelection(messages);
     await updateVisuals(messages);
+    (_a = document.getElementById("deleteDataButton")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", async () => await deleteData(messages));
+}
+async function deleteData(messages) {
+    try {
+        const response = await fetch(`/bankAccountOverview/${bankAccountId}/data/deleteData`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const responseBody = await response.json();
+        showAlert(responseBody.alertType, response.message);
+        if (responseBody.alertType === AlertType.SUCCESS)
+            await updateVisuals(messages);
+    }
+    catch (error) {
+        console.error("There was an error deleting the data", error);
+        showAlert('error', messages["error_generic"]);
+    }
 }
 async function updateVisuals(messages, startDate = null, endDate = null) {
     await loadLineChart(messages, startDate, endDate);
@@ -83,7 +101,7 @@ async function sendFiles(messages, files) {
     try {
         const formData = new FormData();
         files.forEach((file) => formData.append("files", file));
-        const response = await fetch(`/bankAccountOverview/${bankAccountId}/upload/data`, {
+        const response = await fetch(`/bankAccountOverview/${bankAccountId}/data/upload`, {
             method: 'POST',
             body: formData,
         });

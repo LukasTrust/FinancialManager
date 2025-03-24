@@ -2,6 +2,7 @@ package financialmanager.objectFolder.counterPartyFolder;
 
 import financialmanager.objectFolder.usersFolder.Users;
 import lombok.AllArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,6 +41,7 @@ public class BaseCounterPartyService {
         counterPartyRepository.deleteAll(counterParties);
     }
 
+    @Async
     public void setHidden(boolean hide, List<CounterParty> counterParties) {
         counterParties.forEach(counterParty -> counterParty.setHidden(hide));
         saveAll(counterParties);

@@ -22,8 +22,10 @@ function createModal(contentHTML, closeButton, width = 0, height = 0) {
     return modal;
 }
 function closeDialog() {
-    var _a;
-    (_a = document.querySelector("dialog")) === null || _a === void 0 ? void 0 : _a.close();
+    window.setTimeout(() => {
+        var _a;
+        (_a = document.querySelector("dialog")) === null || _a === void 0 ? void 0 : _a.close();
+    }, 1000);
 }
 function createDialogHeader(parent, text, icon) {
     const header = createAndAppendElement(parent, "h1", "flexContainer");

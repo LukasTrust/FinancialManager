@@ -26,8 +26,8 @@ public class TransactionService {
     private final ResponseService responseService;
 
     //<editor-fold desc="find functions">
-    public List<Transaction> findByBankAccountIdBetweenDates(Long bankAccountId, LocalDate startDate, LocalDate endDate) {
-        List<Transaction> transactions = baseTransactionService.findByBankAccountId(bankAccountId);
+    public List<Transaction> findByBankAccountBetweenDates(BankAccount bankAccount, LocalDate startDate, LocalDate endDate) {
+        List<Transaction> transactions = baseTransactionService.findByBankAccount(bankAccount);
 
         if (startDate == null && endDate == null) {
             return transactions;
@@ -48,7 +48,7 @@ public class TransactionService {
         if (bankAccountResult.isErr())
             return bankAccountResult.getError();
 
-        List<Transaction> transactions = baseTransactionService.findByBankAccountId(bankAccountId)
+        List<Transaction> transactions = baseTransactionService.findByBankAccount(bankAccountResult.getValue())
                 .stream()
                 .sorted(Comparator.comparing(Transaction::getDate, Comparator.reverseOrder()))
                 .toList();

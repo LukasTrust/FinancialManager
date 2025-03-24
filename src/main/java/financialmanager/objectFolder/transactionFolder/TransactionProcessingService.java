@@ -1,21 +1,24 @@
 package financialmanager.objectFolder.transactionFolder;
 
 import financialmanager.objectFolder.categoryFolder.CategoryService;
+import financialmanager.objectFolder.contractFolder.BaseContractService;
+import financialmanager.objectFolder.contractFolder.Contract;
+import financialmanager.objectFolder.contractFolder.ContractProcessingService;
+import financialmanager.objectFolder.contractFolder.contractHistoryFolder.BaseContractHistoryService;
+import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistory;
 import financialmanager.objectFolder.localeFolder.LocaleService;
 import financialmanager.objectFolder.resultFolder.Result;
+import financialmanager.objectFolder.resultFolder.ResultService;
 import financialmanager.Utils.fileParser.DataColumns;
 import financialmanager.Utils.fileParser.FileParserFactory;
 import financialmanager.Utils.fileParser.IFileParser;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
-import financialmanager.objectFolder.contractFolder.ContractProcessingService;
 import financialmanager.objectFolder.counterPartyFolder.CounterPartyService;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.ResponseService;
-import financialmanager.objectFolder.resultFolder.ResultService;
 import financialmanager.objectFolder.usersFolder.Users;
 import lombok.AllArgsConstructor;
-import org.hibernate.validator.internal.util.Contracts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -38,6 +41,9 @@ import java.util.stream.Collectors;
 public class TransactionProcessingService {
 
     private final BaseTransactionService baseTransactionService;
+    private final BaseContractService baseContractService;
+    private final BaseContractHistoryService baseContractHistoryService;
+
     private final ContractProcessingService contractProcessingService;
     private final CategoryService categoryService;
     private final FileParserFactory fileParserFactory;
@@ -54,7 +60,23 @@ public class TransactionProcessingService {
         if (bankAccountResult.isErr())
             return bankAccountResult.getError();
 
-        Contracts contracts
+        BankAccount bankAccount = bankAccountResult.getValue();
+
+        try {
+            List<Transaction> transactions = baseTransactionService.findByBankAccount(bankAccount);
+            List<Contract> contracts = baseContractService.findByBankAccount(bankAccount);
+            List<ContractHistory> contractHistories = baseContractHistoryService.findByContractIn(contracts);
+
+            baseTransactionService.deleteAll(transactions);
+            baseContractHistoryService.deleteAll(contractHistories);
+
+            baseContractService.deleteAll(contracts);
+
+            return responseService.createResponse(HttpStatus.OK, "deletedData", AlertType.SUCCESS);
+        } catch (Exception e) {
+            log.error("Error deleting data", e);
+            return responseService.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, "deletedData", AlertType.ERROR);
+        }
     }
 
     public ResponseEntity<?> uploadDataForTransactions(Long bankAccountId, MultipartFile[] files) {
@@ -81,7 +103,6 @@ public class TransactionProcessingService {
         if (bankAccountResult.isErr())
             return bankAccountResult.getError();
 
-
         header = fileParser.getNextLineOfData();
 
         if (header == null) {
@@ -99,15 +120,22 @@ public class TransactionProcessingService {
             return responseService.createResponse(HttpStatus.NOT_FOUND, "notFourColumnsFound", AlertType.ERROR);
         }
 
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         List<Transaction> newTransactions = parseTransactions(fileParser, bankAccount, dataColumns);
+        stopWatch.stop();
+        log.info("{} for parseTransactions", stopWatch.getTotalTimeMillis());
 
         if (newTransactions.isEmpty()) {
             log.error("{} could not find any transactions", fileName);
             return responseService.createResponse(HttpStatus.BAD_REQUEST, "noValidTransactions", AlertType.ERROR);
         }
 
-        List<Transaction> existingTransactions  = baseTransactionService.findByBankAccountId(bankAccountId);
-        newTransactions = filterNewTransactions(newTransactions, existingTransactions );
+        stopWatch.start();
+        List<Transaction> existingTransactions = baseTransactionService.findByBankAccountAndContractEmpty(bankAccount);
+        newTransactions = filterNewTransactions(newTransactions, existingTransactions);
+        stopWatch.stop();
+        log.info("{} for filterNewTransactions", stopWatch.getTotalTimeMillis());
 
         if (newTransactions.isEmpty()) {
             log.info("{} could not find any transactions", fileName);
@@ -137,11 +165,7 @@ public class TransactionProcessingService {
         stopWatch.stop();
         log.info("{} for addTransactionsToCategories", stopWatch.getTotalTimeMillis());
 
-        stopWatch = new StopWatch();
-        stopWatch.start();
-        newTransactions.addAll(getTransactionsWithoutContract(existingTransactions));
-        stopWatch.stop();
-        log.info("{} for addTransactionsToCategories", stopWatch.getTotalTimeMillis());
+        newTransactions.addAll(existingTransactions);
 
         stopWatch = new StopWatch();
         stopWatch.start();
@@ -150,12 +174,6 @@ public class TransactionProcessingService {
         log.info("{} for checkIfTransactionsBelongToContract", stopWatch.getTotalTimeMillis());
 
         baseTransactionService.saveAll(newTransactions);
-    }
-
-    private List<Transaction> getTransactionsWithoutContract(List<Transaction> existingTransactions) {
-        return existingTransactions.stream()
-                .filter(transaction -> transaction.getContract() == null)
-                .toList();
     }
 
     private DataColumns findColumnsInData(String[] header, BankAccount bankAccount) {
@@ -201,12 +219,12 @@ public class TransactionProcessingService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy", currentLocale);
 
         for (String[] line : lines) {
-                // Create and add a transaction for each line
-                Transaction transaction = createTransactionFromLine(line, columns, bankAccount, amountBeforeTransaction, currentLocale, formatter);
-                if (transaction != null) {
-                    amountBeforeTransaction = transaction.getAmountInBankAfter();
-                    newTransactions.add(transaction);
-                }
+            // Create and add a transaction for each line
+            Transaction transaction = createTransactionFromLine(line, columns, bankAccount, amountBeforeTransaction, currentLocale, formatter);
+            if (transaction != null) {
+                amountBeforeTransaction = transaction.getAmountInBankAfter();
+                newTransactions.add(transaction);
+            }
         }
 
         return newTransactions;
@@ -253,7 +271,7 @@ public class TransactionProcessingService {
     }
 
     private Transaction createTransactionFromLine(String[] line, DataColumns columns, BankAccount bankAccount,
-                                                  Double amountBeforeTransaction, Locale currentLocale, DateTimeFormatter formatter ) {
+                                                  Double amountBeforeTransaction, Locale currentLocale, DateTimeFormatter formatter) {
         LocalDate date;
         Double amount;
         Double amountAfterTransaction;

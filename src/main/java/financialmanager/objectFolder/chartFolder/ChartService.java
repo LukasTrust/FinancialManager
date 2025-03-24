@@ -62,8 +62,8 @@ public class ChartService {
 
         if (bankAccountResult.isOk()) {
             BankAccount bankAccount = bankAccountResult.getValue();
-            List<Transaction> transactions = new ArrayList<>(transactionService.findByBankAccountIdBetweenDates(
-                    bankAccount.getId(), startDate, endDate));
+            List<Transaction> transactions = new ArrayList<>(transactionService.findByBankAccountBetweenDates(
+                    bankAccount, startDate, endDate));
 
             transactions.sort(Comparator.comparing(financialmanager.objectFolder.transactionFolder.Transaction::getDate));
 

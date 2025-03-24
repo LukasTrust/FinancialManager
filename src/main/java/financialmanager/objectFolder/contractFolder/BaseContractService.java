@@ -1,7 +1,9 @@
 package financialmanager.objectFolder.contractFolder;
 
+import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import lombok.AllArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,10 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 public class BaseContractService {
 
-    private ContractRepository contractRepository;
+    private final ContractRepository contractRepository;
 
-    public List<Contract> findByBankAccountId(Long bankAccountId) {
-        return contractRepository.findByBankAccountId(bankAccountId);
+    public List<Contract> findByBankAccount(BankAccount bankAccount) {
+        return contractRepository.findByBankAccount(bankAccount);
     }
 
     public List<Contract> findByIdInAndBankAccountId(List<Long> ids, Long bankAccountId) {
@@ -28,6 +30,7 @@ public class BaseContractService {
         contractRepository.saveAll(contracts);
     }
 
+    @Async
     public void save(Contract contract) {
         contractRepository.save(contract);
     }
@@ -36,11 +39,13 @@ public class BaseContractService {
         contractRepository.deleteAll(contracts);
     }
 
+    @Async
     public void setCounterParty(CounterParty counterParty, List<Contract> contracts, boolean instanceSave) {
         contracts.forEach(contract -> contract.setCounterParty(counterParty));
         if (instanceSave) contractRepository.saveAll(contracts);
     }
 
+    @Async
     public void setHidden(boolean hide, List<Contract> contracts) {
         contracts.forEach(contract -> contract.setHidden(hide));
         saveAll(contracts);

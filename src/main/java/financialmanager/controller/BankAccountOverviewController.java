@@ -46,8 +46,8 @@ public class BankAccountOverviewController {
         return transactionProcessingService.uploadDataForTransactions(bankAccountId, files);
     }
 
-    @PostMapping("/{bankAccountId}/data/delete")
+    @PostMapping("/{bankAccountId}/data/deleteData")
     public ResponseEntity<?> deleteData(@PathVariable Long bankAccountId) {
-
+        return transactionProcessingService.deleteData(bankAccountId);
     }
 }
