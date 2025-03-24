@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.Period;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,10 +33,7 @@ public class ContractProcessingService {
         Map<Contract, List<ContractHistory>> contractHistoryMap = mapContractHistoryToContract(existingContract, existingContractHistories);
         transactionsWithoutContracts = matchTransactionsToExistingContract(transactionsWithoutContracts, contractHistoryMap);
 
-        existingContractHistories = baseContractHistoryService.findByContractIn(existingContract);
-        contractHistoryMap = mapContractHistoryToContract(existingContract, existingContractHistories);
-
-        createNewContracts(transactionsWithoutContracts, contractHistoryMap);
+        createNewContracts(transactionsWithoutContracts);
     }
 
     //<editor-fold desc="help methods">
@@ -134,43 +129,96 @@ public class ContractProcessingService {
         Map<CounterParty, Map<Double, List<Transaction>>> counterPartyMapMap = mapTransactionByAmountAndCounterParty(transactions);
 
         for (Map.Entry<CounterParty, Map<Double, List<Transaction>>> mainEntry : counterPartyMapMap.entrySet()) {
-            CounterParty counterParty = mainEntry.getKey();
-            
+            handleAmountMap(mainEntry.getValue());
         }
     }
 
-    private List<Contract> handleAmountMap(Map<Double, List<Transaction>> amountMap) {
-        List<Contract> contracts = new LinkedList<>();
+    private void handleAmountMap(Map<Double, List<Transaction>> amountMap) {
+        for (Map.Entry<Double, List<Transaction>> mainEntry : amountMap.entrySet()) {
+            processMainEntry(amountMap, mainEntry);
+        }
+    }
 
-        for (Map.Entry<Double, List<Transaction>> entry : amountMap.entrySet()) {
-            Double amount = entry.getKey();
-            LocalDate firstDate = getEarliestTransactionDate(entry.getValue());
-            List<Transaction> transactionsWithSameDay = new ArrayList<>();
-            transactionsWithSameDay.add(entry.getValue().getFirst());
+    private void processMainEntry(Map<Double, List<Transaction>> amountMap, Map.Entry<Double, List<Transaction>> mainEntry) {
+        List<Transaction> transactions = mainEntry.getValue();
 
-            for (Transaction transaction : entry.getValue().stream().skip(1).toList()) {
-                if (hasSameDateDay(transaction.getDate(), firstDate))
-                    transactionsWithSameDay.add(transaction);
-            }
+        LocalDate firstDate = getEarliestTransactionDate(transactions);
+        List<Transaction> transactionsWithSameDay = filterTransactionsBySameDay(transactions, firstDate);
 
-            if (transactionsWithSameDay.size() < 2) {
-                continue;
-            }
+        if (transactionsWithSameDay.size() < 2) return;
 
-            List<Transaction> transactionsWithSameMonth = new ArrayList<>();
-            transactionsWithSameMonth.add(transactionsWithSameDay.getFirst());
+        int monthsBetween = calculateMonthsDifference(
+                firstDate,
+                getLatestTransactionDate(transactionsWithSameDay)
+        );
 
-            int monthsBetween = calculateMonthsDifference(transactionsWithSameMonth.getFirst().getDate(),
-                    transactionsWithSameMonth.getLast().getDate());
+        List<Transaction> transactionsWithSameMonth = getTransactionsWithSameMonth(transactionsWithSameDay, monthsBetween);
 
-            Transaction firstTransaction = transactionsWithSameMonth.getFirst();
+        removeAndMergeMatchingSubEntries(amountMap, mainEntry, transactionsWithSameMonth, monthsBetween);
 
-            for (Transaction transaction : transactionsWithSameMonth) {
-                if (hasSameDateDifference(transaction.getDate(), firstTransaction.getDate(), monthsBetween)) {
-                    transactionsWithSameMonth.add(transaction);
-                }
+        finalizeContract(transactionsWithSameMonth, firstDate, monthsBetween);
+    }
+
+    private List<Transaction> filterTransactionsBySameDay(List<Transaction> transactions, LocalDate firstDate) {
+        return transactions.stream()
+                .filter(transaction -> hasSameDateDay(transaction.getDate(), firstDate))
+                .collect(Collectors.toList());
+    }
+
+    private List<Transaction> getTransactionsWithSameMonth(List<Transaction> transactionsWithSameDay, int monthsBetween) {
+        List<Transaction> transactionsWithSameMonth = new ArrayList<>();
+        transactionsWithSameMonth.add(transactionsWithSameDay.getFirst());
+
+        Transaction firstTransaction = transactionsWithSameMonth.getFirst();
+        transactionsWithSameDay.stream()
+                .filter(transaction -> hasSameDateDifference(transaction.getDate(), firstTransaction.getDate(), monthsBetween))
+                .forEach(transactionsWithSameMonth::add);
+
+        return transactionsWithSameMonth;
+    }
+
+    private void removeAndMergeMatchingSubEntries(Map<Double, List<Transaction>> amountMap,
+                                                  Map.Entry<Double, List<Transaction>> mainEntry,
+                                                  List<Transaction> transactionsWithSameMonth,
+                                                  int monthsBetween) {
+        List<Transaction> matchingSubTransactions = new ArrayList<>();
+        Iterator<Map.Entry<Double, List<Transaction>>> subIterator = amountMap.entrySet().iterator();
+
+        while (subIterator.hasNext()) {
+            Map.Entry<Double, List<Transaction>> subEntry = subIterator.next();
+            if (mainEntry.equals(subEntry)) continue;
+
+            List<Transaction> subTransactions = subEntry.getValue();
+            matchingSubTransactions.clear();
+
+            subTransactions.stream()
+                    .filter(transaction -> hasValidTransactionDate(transaction, transactionsWithSameMonth.getFirst().getDate(), monthsBetween))
+                    .forEach(matchingSubTransactions::add);
+
+            if (matchingSubTransactions.size() == subTransactions.size()) {
+                subIterator.remove();
+                transactionsWithSameMonth.addAll(matchingSubTransactions);
             }
         }
+    }
+
+    private void finalizeContract(List<Transaction> transactionsWithSameMonth, LocalDate firstDate, int monthsBetween) {
+        LocalDate lastPaymentDate = getLatestTransactionDate(transactionsWithSameMonth);
+        Double amount = transactionsWithSameMonth.stream()
+                .max(Comparator.comparing(Transaction::getDate))
+                .map(Transaction::getAmount)
+                .orElse(0.0);
+
+        Transaction firstTransaction = transactionsWithSameMonth.getFirst();
+        Contract contract = new Contract(
+                firstDate, lastPaymentDate,
+                monthsBetween,
+                amount, firstTransaction.getCounterParty(), firstTransaction.getBankAccount()
+        );
+
+        updateExistingContract(transactionsWithSameMonth, contract, new ArrayList<>());
+        baseTransactionService.setContract(contract, transactionsWithSameMonth);
+        baseContractService.save(contract);
     }
 
     //</editor-fold>
