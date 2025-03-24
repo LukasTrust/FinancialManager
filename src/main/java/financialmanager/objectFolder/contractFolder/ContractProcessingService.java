@@ -140,7 +140,37 @@ public class ContractProcessingService {
     }
 
     private List<Contract> handleAmountMap(Map<Double, List<Transaction>> amountMap) {
+        List<Contract> contracts = new LinkedList<>();
 
+        for (Map.Entry<Double, List<Transaction>> entry : amountMap.entrySet()) {
+            Double amount = entry.getKey();
+            LocalDate firstDate = getEarliestTransactionDate(entry.getValue());
+            List<Transaction> transactionsWithSameDay = new ArrayList<>();
+            transactionsWithSameDay.add(entry.getValue().getFirst());
+
+            for (Transaction transaction : entry.getValue().stream().skip(1).toList()) {
+                if (hasSameDateDay(transaction.getDate(), firstDate))
+                    transactionsWithSameDay.add(transaction);
+            }
+
+            if (transactionsWithSameDay.size() < 2) {
+                continue;
+            }
+
+            List<Transaction> transactionsWithSameMonth = new ArrayList<>();
+            transactionsWithSameMonth.add(transactionsWithSameDay.getFirst());
+
+            int monthsBetween = calculateMonthsDifference(transactionsWithSameMonth.getFirst().getDate(),
+                    transactionsWithSameMonth.getLast().getDate());
+
+            Transaction firstTransaction = transactionsWithSameMonth.getFirst();
+
+            for (Transaction transaction : transactionsWithSameMonth) {
+                if (hasSameDateDifference(transaction.getDate(), firstTransaction.getDate(), monthsBetween)) {
+                    transactionsWithSameMonth.add(transaction);
+                }
+            }
+        }
     }
 
     //</editor-fold>
