@@ -22,7 +22,6 @@ public class ContractProcessingService {
     private final BaseContractService baseContractService;
     private final BaseContractHistoryService baseContractHistoryService;
     private final BaseTransactionService baseTransactionService;
-    private final ContractService contractService;
 
     private static final Logger log = LoggerFactory.getLogger(ContractProcessingService.class);
 
@@ -231,7 +230,7 @@ public class ContractProcessingService {
         for (Map.Entry<Double, List<Transaction>> entry : transactionsByAmount.entrySet()) {
             List<Transaction> existingTransactions = entry.getValue();
 
-            ContractHistory contractHistory = null;
+            ContractHistory contractHistory;
             LocalDate earliestTransactionDate = getEarliestTransactionDate(existingTransactions);
             Double amount = entry.getKey();
 

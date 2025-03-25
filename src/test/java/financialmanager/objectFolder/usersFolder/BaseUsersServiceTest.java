@@ -18,7 +18,6 @@ class BaseUsersServiceTest {
     private BaseUsersService baseUsersService;
     private UsersRepository usersRepository;
     private Optional<Users> usersOptional;
-    private Users user;
     private final String email = "test@test.com";
 
     @BeforeEach
@@ -26,7 +25,7 @@ class BaseUsersServiceTest {
         usersRepository = mock(UsersRepository.class);
         baseUsersService = new BaseUsersService(usersRepository);
 
-        user = mock(Users.class);
+        Users user = mock(Users.class);
         when(user.getEmail()).thenReturn(email);
         when(user.getId()).thenReturn(1L);
         when(user.getPassword()).thenReturn("password");
@@ -50,6 +49,7 @@ class BaseUsersServiceTest {
 
         assertNotNull(userDetails);
         assert(userDetails.getUsername().equals(email));
+        assert(usersOptional.isPresent());
         assert(userDetails.getPassword().equals(usersOptional.get().getPassword()));
     }
 
