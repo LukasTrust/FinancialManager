@@ -1,5 +1,6 @@
 package financialmanager.objectFolder.contractFolder;
 
+import financialmanager.Utils.Utils;
 import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistory;
 import financialmanager.objectFolder.contractFolder.contractHistoryFolder.BaseContractHistoryService;
 import financialmanager.objectFolder.responseFolder.AlertType;
@@ -60,19 +61,21 @@ public class ContractService {
         }
 
         List<Contract> contracts = baseContractService.findByBankAccount(bankAccountResult.getValue());
+        List<ContractHistory> contractHistories = baseContractHistoryService.findByContractIn(contracts);
         Map<Contract, List<Transaction>> contractTransactionMap = findTransactionsByContract(contracts);
+        Map<Contract, List<ContractHistory>> contractHistoryMap = Utils.mapContractHistoryToContract(contracts, contractHistories);
 
         List<ContractDisplay> contractDisplays = new ArrayList<>();
 
         for (Map.Entry<Contract, List<Transaction>> contractTransactions : contractTransactionMap.entrySet()) {
             Contract contract = contractTransactions.getKey();
-            List<ContractHistory> contractHistories = baseContractHistoryService.findByContract(contract);
+            List<ContractHistory> contractHistoriesOfContract = contractHistoryMap.get(contract);
 
             List<Transaction> transactions = contractTransactions.getValue();
             Integer transactionCount = transactions.size();
             Double totalAmount = transactions.stream().map(Transaction::getAmount).reduce(0.0, Double::sum);
 
-            ContractDisplay contractDisplay = new ContractDisplay(contract, contractHistories, transactionCount, totalAmount);
+            ContractDisplay contractDisplay = new ContractDisplay(contract, contractHistoriesOfContract, transactionCount, totalAmount);
             contractDisplays.add(contractDisplay);
         }
 

@@ -37,7 +37,7 @@ class FileParserFactoryTest {
     }
 
     @Test
-    void getFileParser_withNoInputStream() throws IOException {
+    void getFileParser_withNoInputStream() {
         MultipartFile multipartFile = mock(MultipartFile.class);
 
         when(multipartFile.getContentType()).thenReturn("image/jpeg");
