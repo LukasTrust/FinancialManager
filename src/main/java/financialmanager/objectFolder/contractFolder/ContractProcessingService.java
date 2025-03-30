@@ -120,23 +120,12 @@ public class ContractProcessingService {
         List<Transaction> transactionsWithSameCounterParty = new ArrayList<>(
                 transactions.stream().filter(transaction -> transaction.getCounterParty().equals(contract.getCounterParty())).toList());
 
-        LocalDate firstDate = getEarliestTransactionDate(transactionsWithSameCounterParty);
-        int monthsBetween = contract.getMonthsBetweenPayments();
+        if (transactionsWithSameCounterParty.isEmpty())
+            return transactionsWithSameCounterParty;
 
         int allowedOffset = 3;
-        if (firstDate.isBefore(contract.getStartDate())) {
-            LocalDate minValidDate = firstDate.plusMonths(monthsBetween).minusDays(allowedOffset);
-            LocalDate maxValidDate = firstDate.plusMonths(monthsBetween).plusDays(allowedOffset);
-
-
-
-            if (!currentDate.isBefore(minValidDate) && !currentDate.isAfter(maxValidDate)) {
-                matchingTransactions.add(transactions.get(i - 1));
-                matchingTransactions.add(transactions.get(i));
-            }
-        }
-
-        return monthsBetweenMap.get(contract.getMonthsBetweenPayments());
+        LocalDate startDate = contract.getStartDate();
+        LocalDate lastPaymentDate = contract.getLastPaymentDate();
     }
 
     private LocalDate getEarliestTransactionDate(List<Transaction> transactions) {
