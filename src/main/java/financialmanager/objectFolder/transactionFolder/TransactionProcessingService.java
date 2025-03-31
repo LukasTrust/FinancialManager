@@ -169,7 +169,7 @@ public class TransactionProcessingService {
 
         stopWatch = new StopWatch();
         stopWatch.start();
-        contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, newTransactions);
+        contractProcessingService.processAndAssociateTransactions(bankAccount, newTransactions);
         stopWatch.stop();
         log.info("{} for checkIfTransactionsBelongToContract", stopWatch.getTotalTimeMillis());
 
