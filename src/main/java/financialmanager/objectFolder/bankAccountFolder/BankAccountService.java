@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 public class BankAccountService {
 
     private final BaseBankAccountService baseBankAccountService;
-
     private final ResponseService responseService;
     private final ResultService resultService;
 

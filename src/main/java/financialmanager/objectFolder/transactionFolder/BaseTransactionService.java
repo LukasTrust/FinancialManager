@@ -19,8 +19,8 @@ public class BaseTransactionService {
         return transactionRepository.findByBankAccount(bankAccount);
     }
 
-    public List<Transaction> findByBankAccountAndContractEmpty(BankAccount bankAccount) {
-        return transactionRepository.findByBankAccountAndContractEmpty(bankAccount);
+    public List<Transaction> findByBankAccountAndContractNull(BankAccount bankAccount) {
+        return transactionRepository.findByBankAccountAndContractNull(bankAccount);
     }
 
     public List<Transaction> findByIdInAndBankAccount(List<Long> ids, BankAccount bankAccount) {
@@ -52,13 +52,13 @@ public class BaseTransactionService {
     }
 
     @Async
-    public void setContract(Contract contract, List<Transaction> transactions) {
+    public void setContractAsync(Contract contract, List<Transaction> transactions, boolean instanceSave) {
         transactions.forEach(transaction -> transaction.setContract(contract));
-        saveAll(transactions);
+        if (instanceSave) saveAll(transactions);
     }
 
     @Async
-    public void setCounterParty(CounterParty counterParty, List<Transaction> transactions, boolean instanceSave) {
+    public void setCounterPartyAsync(CounterParty counterParty, List<Transaction> transactions, boolean instanceSave) {
         transactions.forEach(transaction -> transaction.setCounterParty(counterParty));
         if (instanceSave) saveAll(transactions);
     }

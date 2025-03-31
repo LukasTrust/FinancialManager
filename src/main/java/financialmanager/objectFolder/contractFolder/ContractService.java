@@ -97,7 +97,7 @@ public class ContractService {
         Contract contract = contractResult.getValue();
         fieldUpdater.accept(contract, newValue);
 
-        baseContractService.save(contract);
+        baseContractService.saveAsync(contract);
 
         return ResponseEntity.ok().build();
     }
@@ -121,7 +121,7 @@ public class ContractService {
             baseTransactionService.setHidden(hide, transactions);
             contract.setHidden(hide);
 
-            baseContractService.save(contract);
+            baseContractService.saveAsync(contract);
             transactionCount += transactions.size();
         }
 
@@ -159,7 +159,7 @@ public class ContractService {
             Contract contract = contractTransactions.getKey();
             List<Transaction> transactions = contractTransactions.getValue();
 
-            baseTransactionService.setContract(contract, transactions);
+            baseTransactionService.setContractAsync(contract, transactions, true);
 
             transactionCount += transactions.size();
         }
@@ -189,7 +189,7 @@ public class ContractService {
         for (Map.Entry<Contract, List<Transaction>> contractTransactions : contractTransactionMap.entrySet()) {
             List<Transaction> transactions = contractTransactions.getValue();
 
-            baseTransactionService.setContract(null, transactions);
+            baseTransactionService.setContractAsync(null, transactions, true);
             transactionCount += transactions.size();
         }
 

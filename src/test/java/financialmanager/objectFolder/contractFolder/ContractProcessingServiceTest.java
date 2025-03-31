@@ -119,8 +119,8 @@ class ContractProcessingServiceTest {
     }
 
     private void verifySaveCalls(int countContract, int countHistory) {
-        verify(baseContractService, atMost(countContract)).save(any());
-        verify(baseContractHistoryService, atMost(countHistory)).save(any());
+        verify(baseContractService, atMost(countContract)).saveAsync(any());
+        verify(baseContractHistoryService, atMost(countHistory)).saveAsync(any());
     }
 
     //</editor-fold>
@@ -167,7 +167,7 @@ class ContractProcessingServiceTest {
 
         contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, allTransactions);
 
-        verifySaveCalls(1, 0);
+        verifySaveCalls(2, 0);
         transactionsWithContract.forEach(transaction -> assertTransactionContract(transaction, counterPartyForContract, startAmount));
         transactionsWithoutContract.forEach(transaction -> assertNull(transaction.getContract()));
     }
@@ -183,7 +183,7 @@ class ContractProcessingServiceTest {
 
         contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, transactionsWithContract);
 
-        verifySaveCalls(1, 0);
+        verifySaveCalls(2, 0);
         transactionsWithContract.forEach(transaction -> assertTransactionContract(transaction, counterPartyForContract, startAmount));
     }
 
@@ -209,7 +209,7 @@ class ContractProcessingServiceTest {
 
         contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, allTransactions);
 
-        verifySaveCalls(1, 0);
+        verifySaveCalls(2, 0);
         transactionsWithContract.forEach(transaction -> assertTransactionContract(transaction, counterPartyForContract, startAmount));
         transactionsWithoutContract.forEach(transaction -> assertNull(transaction.getContract()));
     }
@@ -292,7 +292,7 @@ class ContractProcessingServiceTest {
 
         contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, allTransactions);
 
-        verifySaveCalls(counterPartyAmount, 0);
+        verifySaveCalls(counterPartyAmount*2, 0);
         transactionsWithContract.forEach(transaction -> {
             double expectedAmount = startAmount + ((counterParties.indexOf(transaction.getContract().getCounterParty()) + 1) * 10);
             assertTransactionContract(transaction, transaction.getContract().getCounterParty(), expectedAmount);
@@ -322,7 +322,7 @@ class ContractProcessingServiceTest {
 
         contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, allTransactions);
 
-        verifySaveCalls(1, 1);
+        verifySaveCalls(2, 1);
         transactionsWithContract.forEach(transaction -> assertTransactionContract(transaction, transaction.getContract().getCounterParty(), newAmount));
         transactionsWithoutContract.forEach(transaction -> assertNull(transaction.getContract()));
     }
@@ -350,7 +350,7 @@ class ContractProcessingServiceTest {
 
         contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, allTransactions);
 
-        verifySaveCalls(1, 0);
+        verifySaveCalls(2, 0);
         transactionsWithContract.forEach(transaction -> assertTransactionContract(transaction,
                 transaction.getContract().getCounterParty(), oldAmount));
         transactionsWithoutContract.forEach(transaction -> assertNull(transaction.getContract()));
@@ -445,7 +445,7 @@ class ContractProcessingServiceTest {
 
         contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, allTransactions);
 
-        verifySaveCalls(1, 0);
+        verifySaveCalls(2, 0);
         transactionsWithContract.forEach(transaction -> assertTransactionContract(transaction, counterPartyForContract, contractAmount, monthsBetween));
         transactionsWithoutContract.forEach(transaction -> assertNull(transaction.getContract()));
     }
@@ -532,7 +532,7 @@ class ContractProcessingServiceTest {
 
         contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, allTransactions);
 
-        verifySaveCalls(1, 1);
+        verifySaveCalls(2, 1);
         transactionsWithContract.forEach(transaction -> assertTransactionContract(transaction, transaction.getContract().getCounterParty(), amount, monthsBetween));
         transactionsWithoutContract.forEach(transaction -> assertNull(transaction.getContract()));
     }

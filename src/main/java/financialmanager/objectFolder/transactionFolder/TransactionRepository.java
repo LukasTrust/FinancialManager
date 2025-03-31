@@ -13,7 +13,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findByBankAccount(BankAccount bankAccount);
 
-    List<Transaction> findByBankAccountAndContractEmpty(BankAccount bankAccount);
+    List<Transaction> findByBankAccountAndContractNull(BankAccount bankAccount);
 
     List<Transaction> findByIdInAndBankAccount(List<Long> ids, BankAccount bankAccount);
 

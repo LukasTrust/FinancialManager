@@ -132,7 +132,7 @@ public class TransactionProcessingService {
         }
 
         stopWatch.start();
-        List<Transaction> existingTransactions = baseTransactionService.findByBankAccountAndContractEmpty(bankAccount);
+        List<Transaction> existingTransactions = baseTransactionService.findByBankAccountAndContractNull(bankAccount);
         newTransactions = filterNewTransactions(newTransactions, existingTransactions);
         stopWatch.stop();
         log.info("{} for filterNewTransactions", stopWatch.getTotalTimeMillis());

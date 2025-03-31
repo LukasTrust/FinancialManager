@@ -143,8 +143,8 @@ public class CounterPartyService {
         List<Contract> contracts = getContractsFromTransactions(transactions);
 
         baseTransactionService.setHidden(hide, transactions);
-        baseContractService.setHidden(hide, contracts);
-        baseCounterPartyService.setHidden(hide, counterParties);
+        baseContractService.setHiddenAsync(hide, contracts);
+        baseCounterPartyService.setHiddenAsync(hide, counterParties);
 
         return List.of(
                 String.valueOf(counterParties.size()),
@@ -285,7 +285,7 @@ public class CounterPartyService {
                 return newCP;
             });
 
-            baseTransactionService.setCounterParty(counterParty, counterPartyTransactions, false);
+            baseTransactionService.setCounterPartyAsync(counterParty, counterPartyTransactions, false);
         }
 
         StopWatch stopWatch = new StopWatch();
@@ -323,8 +323,8 @@ public class CounterPartyService {
 
         List<Contract> uniqueContracts = getContractsFromTransactions(transactions);
 
-        baseTransactionService.setCounterParty(counterParty, transactions, true);
-        baseContractService.setCounterParty(counterParty, uniqueContracts, true);
+        baseTransactionService.setCounterPartyAsync(counterParty, transactions, true);
+        baseContractService.setCounterPartyAsync(counterParty, uniqueContracts, true);
 
         return uniqueContracts.size();
     }

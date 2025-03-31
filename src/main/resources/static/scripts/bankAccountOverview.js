@@ -15,7 +15,7 @@ async function deleteData(messages) {
             headers: { 'Content-Type': 'application/json' }
         });
         const responseBody = await response.json();
-        showAlert(responseBody.alertType, response.message);
+        showAlert(responseBody.alertType, responseBody.message);
         if (responseBody.alertType === AlertType.SUCCESS)
             await updateVisuals(messages);
     }

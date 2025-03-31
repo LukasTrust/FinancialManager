@@ -31,6 +31,10 @@ public class BaseContractService {
     }
 
     @Async
+    public void saveAsync(Contract contract) {
+        contractRepository.save(contract);
+    }
+
     public void save(Contract contract) {
         contractRepository.save(contract);
     }
@@ -40,13 +44,13 @@ public class BaseContractService {
     }
 
     @Async
-    public void setCounterParty(CounterParty counterParty, List<Contract> contracts, boolean instanceSave) {
+    public void setCounterPartyAsync(CounterParty counterParty, List<Contract> contracts, boolean instanceSave) {
         contracts.forEach(contract -> contract.setCounterParty(counterParty));
         if (instanceSave) contractRepository.saveAll(contracts);
     }
 
     @Async
-    public void setHidden(boolean hide, List<Contract> contracts) {
+    public void setHiddenAsync(boolean hide, List<Contract> contracts) {
         contracts.forEach(contract -> contract.setHidden(hide));
         saveAll(contracts);
     }

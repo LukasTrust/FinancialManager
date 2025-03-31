@@ -42,7 +42,7 @@ public class BaseCounterPartyService {
     }
 
     @Async
-    public void setHidden(boolean hide, List<CounterParty> counterParties) {
+    public void setHiddenAsync(boolean hide, List<CounterParty> counterParties) {
         counterParties.forEach(counterParty -> counterParty.setHidden(hide));
         saveAll(counterParties);
     }

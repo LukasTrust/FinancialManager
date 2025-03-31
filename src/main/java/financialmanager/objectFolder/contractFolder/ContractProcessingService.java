@@ -202,9 +202,8 @@ public class ContractProcessingService {
 
             LocalDate firstDate = getEarliestTransactionDate(monthTransactions);
             List<Transaction> transactionsThatAlsoMatch = removeAndMergeMatchingSubEntries(amountMap, monthsBetween);
-            monthTransactions.addAll(transactionsThatAlsoMatch);
 
-            finalizeContract(monthTransactions, firstDate, monthsBetween);
+            finalizeContract(monthTransactions, transactionsThatAlsoMatch, firstDate, monthsBetween);
         }
     }
 
@@ -227,7 +226,7 @@ public class ContractProcessingService {
         return allMatchingTransactions;
     }
 
-    private void finalizeContract(List<Transaction> transactions, LocalDate firstDate, int monthsBetween) {
+    private void finalizeContract(List<Transaction> transactions, List<Transaction> possibleTransactions, LocalDate firstDate, int monthsBetween) {
         LocalDate lastPaymentDate = getLatestTransactionDate(transactions);
 
         Transaction firstTransaction = transactions.getFirst();
@@ -237,9 +236,10 @@ public class ContractProcessingService {
                 firstTransaction.getAmount(), firstTransaction.getCounterParty(), firstTransaction.getBankAccount()
         );
 
-        updateExistingContract(transactions, contract, new ArrayList<>());
-        baseTransactionService.setContract(contract, transactions);
         baseContractService.save(contract);
+        transactions.addAll(updateExistingContract(possibleTransactions, contract, new ArrayList<>()));
+        baseContractService.saveAsync(contract);
+        baseTransactionService.setContractAsync(contract, transactions, false);
     }
 
     //</editor-fold>
@@ -248,8 +248,6 @@ public class ContractProcessingService {
     private List<Transaction> updateExistingContract(List<Transaction> transactions, Contract contract,
                                                      List<ContractHistory> contractHistories) {
         Map<Double, List<Transaction>> transactionsByAmount = mapTransactionByAmount(transactions);
-        transactionsByAmount.remove(contract.getAmount());
-
         List<Transaction> transactionsThatBelong = new ArrayList<>();
 
         for (Map.Entry<Double, List<Transaction>> entry : transactionsByAmount.entrySet()) {
@@ -274,7 +272,7 @@ public class ContractProcessingService {
                 contractHistories.add(contractHistory);
             }
 
-            baseContractHistoryService.save(contractHistory);
+            baseContractHistoryService.saveAsync(contractHistory);
         }
 
         return transactionsThatBelong;
@@ -339,7 +337,7 @@ public class ContractProcessingService {
                 .ifPresent(transaction -> contract.setLastPaymentDate(transaction.getDate()));
 
         if (!matchedTransactions.isEmpty()) {
-            baseTransactionService.setContract(contract, matchedTransactions);
+            baseTransactionService.setContractAsync(contract, matchedTransactions, false);
         }
     }
     //</editor-fold>

@@ -74,7 +74,7 @@ public class TransactionService {
         if (transactionResult.isErr())
             return transactionResult.getError();
 
-        baseTransactionService.setContract(contract, transactionResult.getValue());
+        baseTransactionService.setContractAsync(contract, transactionResult.getValue(), true);
 
         return contract != null ?
                 responseService.createResponseWithPlaceHolders(HttpStatus.OK, "transactionsAddedContract", AlertType.SUCCESS, List.of(contract.getName())) :
