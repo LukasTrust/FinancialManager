@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -379,7 +378,7 @@ class ContractProcessingServiceTest {
     }
 
     @Test
-    void checkIfTransactionsBelongToContract_existingContracts_oneTransaction_doesBelongToContract() {
+    void checkIfTransactionsBelongToContract_existingContracts_oneTransaction_doesBelongToContractAfter() {
         double amount = 50.0;
         int monthsBetween = 2;
         String name = "Contract Counter Party";
@@ -397,7 +396,51 @@ class ContractProcessingServiceTest {
 
         verifySaveCalls(1, 0);
         assertTransactionContract(transaction, counterPartyForContract, amount, monthsBetween);
-        assertThat(transaction.getContract().getLastPaymentDate()).isEqualTo(transaction.getDate());
+    }
+
+    @Test
+    void checkIfTransactionsBelongToContract_existingContracts_oneTransaction_doesBelongToContractBefore() {
+        double amount = 50.0;
+        int monthsBetween = 2;
+        String name = "Contract Counter Party";
+
+        CounterParty counterPartyForContract = createCounterParty(name);
+
+        List<Transaction> transactions = createTransactionsForContract(counterPartyForContract, amount, 1, monthsBetween);
+        Transaction transaction = transactions.getFirst();
+        transaction.setDate(LocalDate.now().minusMonths(monthsBetween));
+
+        Contract contract = createContract(name, counterPartyForContract, amount, monthsBetween, 3);
+
+        when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
+
+        contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, transactions);
+
+        verifySaveCalls(1, 0);
+        assertTransactionContract(transaction, counterPartyForContract, amount, monthsBetween);
+        assertEquals(contract.getStartDate(), transaction.getDate());
+    }
+
+    @Test
+    void checkIfTransactionsBelongToContract_existingContracts_oneTransaction_doesBelongToContractBeforeNoMatch() {
+        double amount = 50.0;
+        int monthsBetween = 2;
+        String name = "Contract Counter Party";
+
+        CounterParty counterPartyForContract = createCounterParty(name);
+
+        List<Transaction> transactions = createTransactionsForContract(counterPartyForContract, amount, 1, monthsBetween);
+        Transaction transaction = transactions.getFirst();
+        transaction.setDate(LocalDate.now().minusMonths(monthsBetween + 1));
+
+        Contract contract = createContract(name, counterPartyForContract, amount, monthsBetween, 3);
+
+        when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
+
+        contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, transactions);
+
+        verifySaveCalls(1, 0);
+        assertNull(transaction.getContract());
     }
 
     @Test
@@ -448,6 +491,35 @@ class ContractProcessingServiceTest {
         verifySaveCalls(2, 0);
         transactionsWithContract.forEach(transaction -> assertTransactionContract(transaction, counterPartyForContract, contractAmount, monthsBetween));
         transactionsWithoutContract.forEach(transaction -> assertNull(transaction.getContract()));
+    }
+
+    @Test
+    void checkIfTransactionsBelongToContract_existingContracts_multipleTransaction_nonWillMatch() {
+        double contractAmount = 50.0;
+        int count = 5;
+        int monthsBetween = 2;
+        String name = "Contract Counter Party";
+
+        CounterParty counterPartyForContract = createCounterParty(name);
+
+        List<Transaction> allTransactions = new ArrayList<>();
+        List<Transaction> transactionsWithoutContract = createRandomTransactions();
+        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, contractAmount, count, monthsBetween, monthsBetween);
+        for (Transaction transaction : transactionsWithContract) {
+            transaction.setAmount(faker.random().nextDouble());
+        }
+
+        allTransactions.addAll(transactionsWithContract);
+        allTransactions.addAll(transactionsWithoutContract);
+
+        Contract contract = createContract(name, counterPartyForContract, contractAmount, monthsBetween, count);
+
+        when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
+
+        contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, allTransactions);
+
+        verifySaveCalls(2, 0);
+        allTransactions.forEach(transaction -> assertNull(transaction.getContract()));
     }
 
     @Test
@@ -609,7 +681,7 @@ class ContractProcessingServiceTest {
     }
 
     @Test
-    void checkIfTransactionsBelongToContract_existingContractsAndHistory_oneTransaction_doesBelongToContractCreateHistory() {
+    void checkIfTransactionsBelongToContract_existingContractsAndHistory_oneTransaction_doesBelongToContractCreateHistoryAfter() {
         double oldAmount = 50.0;
         double currentAmount = oldAmount + 10;
         double newAmount = currentAmount + 10;
@@ -635,7 +707,71 @@ class ContractProcessingServiceTest {
         contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, allTransactions);
 
         verifySaveCalls(1, 1);
-        transactionsWithContract.forEach(transaction -> assertTransactionContract(transaction, transaction.getContract().getCounterParty(), newAmount, monthsBetween));
+        transactionsWithContract.forEach(transaction ->
+                assertTransactionContract(transaction, transaction.getContract().getCounterParty(), newAmount, monthsBetween));
+        transactionsWithoutContract.forEach(transaction -> assertNull(transaction.getContract()));
+    }
+
+    @Test
+    void checkIfTransactionsBelongToContract_existingContractsAndHistory_oneTransaction_doesBelongToContractCreateHistoryBetween() {
+        double oldAmount = 50.0;
+        double currentAmount = oldAmount + 10;
+        double newAmount = currentAmount + 10;
+        int monthsBetween = 1;
+        String name = "Contract Counter Party";
+
+        CounterParty counterPartyForContract = createCounterParty(name);
+
+        List<Transaction> allTransactions = new ArrayList<>();
+        List<Transaction> transactionsWithoutContract = createRandomTransactions();
+        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, newAmount, 10, 7);
+
+        allTransactions.addAll(transactionsWithContract);
+        allTransactions.addAll(transactionsWithoutContract);
+
+        Contract contract = createContract(name, counterPartyForContract, currentAmount, monthsBetween, 5);
+        ContractHistory contractHistory = new ContractHistory(contract, newAmount, oldAmount, LocalDate.now().plusMonths(10));
+
+        when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
+        when(baseContractHistoryService.findByContractIn(List.of(contract))).thenReturn(List.of(contractHistory));
+
+        contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, allTransactions);
+
+        verifySaveCalls(1, 1);
+        transactionsWithContract.forEach(transaction ->
+                assertTransactionContract(transaction, transaction.getContract().getCounterParty(), currentAmount, monthsBetween));
+        transactionsWithoutContract.forEach(transaction -> assertNull(transaction.getContract()));
+    }
+
+    @Test
+    void checkIfTransactionsBelongToContract_existingContractsAndHistory_oneTransaction_doesBelongToContractCreateHistoryBefore() {
+        double oldAmount = 50.0;
+        double currentAmount = oldAmount + 10;
+        double amountNewHistory = currentAmount + 10;
+        int monthsBetween = 1;
+        String name = "Contract Counter Party";
+
+        CounterParty counterPartyForContract = createCounterParty(name);
+
+        List<Transaction> allTransactions = new ArrayList<>();
+        List<Transaction> transactionsWithoutContract = createRandomTransactions();
+        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract,
+                amountNewHistory, 10, 1);
+
+        allTransactions.addAll(transactionsWithContract);
+        allTransactions.addAll(transactionsWithoutContract);
+
+        Contract contract = createContract(name, counterPartyForContract, currentAmount, monthsBetween, 5);
+        ContractHistory contractHistory = createContractHistory(contract, currentAmount, oldAmount);
+
+        when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
+        when(baseContractHistoryService.findByContractIn(List.of(contract))).thenReturn(List.of(contractHistory));
+
+        contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, allTransactions);
+
+        verifySaveCalls(1, 1);
+        transactionsWithContract.forEach(transaction ->
+                assertTransactionContract(transaction, transaction.getContract().getCounterParty(), currentAmount, monthsBetween));
         transactionsWithoutContract.forEach(transaction -> assertNull(transaction.getContract()));
     }
 

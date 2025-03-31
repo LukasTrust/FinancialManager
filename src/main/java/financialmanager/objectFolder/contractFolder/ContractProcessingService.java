@@ -197,9 +197,6 @@ public class ContractProcessingService {
             List<Transaction> monthTransactions = entry.getValue();
             int monthsBetween = entry.getKey();
 
-            if (monthTransactions.size() < 3)
-                continue;
-
             LocalDate firstDate = getEarliestTransactionDate(monthTransactions);
             List<Transaction> transactionsThatAlsoMatch = removeAndMergeMatchingSubEntries(amountMap, monthsBetween);
 
@@ -332,9 +329,14 @@ public class ContractProcessingService {
         if (unmatchedTransactions != null)
             matchedTransactions.addAll(updateExistingContract(unmatchedTransactions, contract, contractHistories));
 
-        matchedTransactions.stream()
-                .max(Comparator.comparing(Transaction::getDate))
-                .ifPresent(transaction -> contract.setLastPaymentDate(transaction.getDate()));
+        LocalDate lastDate = getLatestTransactionDate(matchedTransactions);
+        LocalDate firstDate = getEarliestTransactionDate(matchedTransactions);
+
+        if (lastDate.isAfter(contract.getLastPaymentDate()))
+            contract.setLastPaymentDate(lastDate);
+
+        if (firstDate.isBefore(contract.getStartDate()))
+            contract.setStartDate(firstDate);
 
         if (!matchedTransactions.isEmpty()) {
             baseTransactionService.setContractAsync(contract, matchedTransactions, false);
