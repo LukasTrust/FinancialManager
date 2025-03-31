@@ -128,8 +128,8 @@ class ContractProcessingServiceTest {
     //<editor-fold desc="no existing contracts tests">
     @Test
     void checkIfTransactionsBelongToContract_noExistingContracts_oneTransaction() {
-        Transaction transaction = createTransaction(50.0, new CounterParty(), LocalDate.now());
-        List<Transaction> transactions = List.of(transaction);
+        List<Transaction> transactions = createTransactionsForContract(new CounterParty(), 50.0, 1, 0);
+        Transaction transaction = transactions.getFirst();
 
         contractProcessingService.checkIfTransactionsBelongToContract(bankAccount, transactions);
 
@@ -363,8 +363,8 @@ class ContractProcessingServiceTest {
     void checkIfTransactionsBelongToContract_existingContracts_oneTransaction_doesNotBelongToContract() {
         double amount = 50.0;
 
-        Transaction transaction = createTransaction(amount, new CounterParty(), LocalDate.now());
-        List<Transaction> transactions = List.of(transaction);
+        List<Transaction> transactions = createTransactionsForContract(new CounterParty(), amount, 1, 0);
+        Transaction transaction = transactions.getFirst();
         String name = "Contract Counter Party";
 
         CounterParty counterPartyForContract = createCounterParty(name);
@@ -386,8 +386,8 @@ class ContractProcessingServiceTest {
 
         CounterParty counterPartyForContract = createCounterParty(name);
 
-        Transaction transaction = createTransaction(amount, counterPartyForContract, LocalDate.now());
-        List<Transaction> transactions = List.of(transaction);
+        List<Transaction> transactions = createTransactionsForContract(counterPartyForContract, amount, 1, monthsBetween);
+        Transaction transaction = transactions.getFirst();
 
         Contract contract = createContract(name, counterPartyForContract, amount, monthsBetween, 3);
 
@@ -408,8 +408,8 @@ class ContractProcessingServiceTest {
 
         CounterParty counterPartyForContract = createCounterParty(name);
 
-        Transaction transaction = createTransaction(amount, counterPartyForContract, LocalDate.now().plusMonths(9));
-        List<Transaction> transactions = List.of(transaction);
+        List<Transaction> transactions = createTransactionsForContract(counterPartyForContract, amount, 1, 9);
+        Transaction transaction = transactions.getFirst();
 
         Contract contract = createContract(name, counterPartyForContract, amount, monthsBetween, 3);
 
@@ -427,15 +427,14 @@ class ContractProcessingServiceTest {
             "50.0, 7, 3",
             "90.0, 4, 6"
     })
-    void checkIfTransactionsBelongToContract_existingContracts_multipleTransaction_doesBelongToContract(
-            double contractAmount, int count, int monthsBetween) {
+    void checkIfTransactionsBelongToContract_existingContracts_multipleTransaction_doesBelongToContract(double contractAmount, int count, int monthsBetween) {
         String name = "Contract Counter Party";
 
         CounterParty counterPartyForContract = createCounterParty(name);
 
         List<Transaction> allTransactions = new ArrayList<>();
         List<Transaction> transactionsWithoutContract = createRandomTransactions();
-        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, contractAmount, count, 0, monthsBetween);
+        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, contractAmount, count, monthsBetween, monthsBetween);
 
         allTransactions.addAll(transactionsWithContract);
         allTransactions.addAll(transactionsWithoutContract);
@@ -471,7 +470,7 @@ class ContractProcessingServiceTest {
                 .mapToObj(i -> {
                     CounterParty counterParty = counterParties.get(i);
                     double transactionAmount = baseAmount + (i * amountIncrement);
-                    return createTransactionsForContract(counterParty, transactionAmount, transactionCount, 0);
+                    return createTransactionsForContract(counterParty, transactionAmount, transactionCount, 1);
                 })
                 .flatMap(List::stream)
                 .toList();
@@ -544,8 +543,9 @@ class ContractProcessingServiceTest {
     void checkIfTransactionsBelongToContract_existingContractsAndHistory_oneTransaction_doesNotBelongToHistory() {
         double amount = 50.0;
 
-        Transaction transaction = createTransaction(amount, new CounterParty(), LocalDate.now());
-        List<Transaction> transactions = List.of(transaction);
+        List<Transaction> transactions = createTransactionsForContract(new CounterParty(), amount, 1, 0);
+        Transaction transaction = transactions.getFirst();
+
         String name = "Contract Counter Party";
 
         CounterParty counterPartyForContract = createCounterParty(name);
@@ -570,8 +570,8 @@ class ContractProcessingServiceTest {
 
         CounterParty counterPartyForContract = createCounterParty(name);
 
-        Transaction transaction = createTransaction(amount + 20, counterPartyForContract, LocalDate.now());
-        List<Transaction> transactions = List.of(transaction);
+        List<Transaction> transactions = createTransactionsForContract(counterPartyForContract, amount + 20, 1, 0);
+        Transaction transaction = transactions.getFirst();
 
         Contract contract = createContract(name, counterPartyForContract, amount);
         ContractHistory contractHistory = createContractHistory(contract, amount + 10, amount);
@@ -593,8 +593,8 @@ class ContractProcessingServiceTest {
 
         CounterParty counterPartyForContract = createCounterParty(name);
 
-        Transaction transaction = createTransaction(oldAmount, counterPartyForContract, LocalDate.now());
-        List<Transaction> transactions = List.of(transaction);
+        List<Transaction> transactions = createTransactionsForContract(counterPartyForContract, oldAmount, 1, 1);
+        Transaction transaction = transactions.getFirst();
 
         Contract contract = createContract(name, counterPartyForContract, newAmount);
         ContractHistory contractHistory = createContractHistory(contract, newAmount, oldAmount);

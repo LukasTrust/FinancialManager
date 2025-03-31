@@ -26,16 +26,20 @@ public class ContractProcessingService {
 
     private static final Logger log = LoggerFactory.getLogger(ContractProcessingService.class);
 
-    public void checkIfTransactionsBelongToContract(BankAccount bankAccount, List<Transaction> transactionsWithoutContracts) {
+    public void checkIfTransactionsBelongToContract(BankAccount bankAccount, List<Transaction> transactions) {
+        List<Transaction> mutableTransactions = new ArrayList<>(transactions);
+
+        mutableTransactions.sort(Comparator.comparing(Transaction::getDate));
+
         List<Contract> existingContract = baseContractService.findByBankAccount(bankAccount);
         List<ContractHistory> existingContractHistories = baseContractHistoryService.findByContractIn(existingContract);
 
         Map<Contract, List<ContractHistory>> contractHistoryMap = Utils.mapContractHistoryToContract(existingContract, existingContractHistories);
-        matchTransactionsToExistingContract(transactionsWithoutContracts, contractHistoryMap);
+        matchTransactionsToExistingContract(mutableTransactions, contractHistoryMap);
 
-        transactionsWithoutContracts = transactionsWithoutContracts.stream().filter(transaction -> transaction.getContract() == null).toList();
+        mutableTransactions = mutableTransactions.stream().filter(transaction -> transaction.getContract() == null).toList();
 
-        createNewContracts(transactionsWithoutContracts);
+        createNewContracts(mutableTransactions);
     }
 
     private void matchTransactionsToExistingContract(List<Transaction> transactions,
@@ -67,8 +71,8 @@ public class ContractProcessingService {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private Map<Boolean, List<Transaction>> matchTransactionToContractAmount(
-            List<Transaction> transactions, Contract contract, List<ContractHistory> contractHistories) {
+    private Map<Boolean, List<Transaction>> matchTransactionToContractAmount(List<Transaction> transactions, Contract contract,
+                                                                             List<ContractHistory> contractHistories) {
 
         Map<Boolean, List<Transaction>> matchedAndUnmatchedTransactions = new HashMap<>();
 
@@ -84,11 +88,7 @@ public class ContractProcessingService {
     }
 
     private Map<Integer, List<Transaction>> calculateMostFrequentMonthsBetween(List<Transaction> transactions) {
-        transactions.sort(Comparator.comparing(Transaction::getDate));
-
         Map<Integer, List<Transaction>> monthFrequencyMap = new HashMap<>();
-
-        int allowedOffset = 3;
 
         for (int monthsBetween = 1; monthsBetween <= 12; monthsBetween++) {
             List<Transaction> matchingTransactions = new ArrayList<>();
@@ -97,11 +97,7 @@ public class ContractProcessingService {
                 LocalDate previousDate = transactions.get(i - 1).getDate();
                 LocalDate currentDate = transactions.get(i).getDate();
 
-                // Adjust date range with ±2-day tolerance
-                LocalDate minValidDate = previousDate.plusMonths(monthsBetween).minusDays(allowedOffset);
-                LocalDate maxValidDate = previousDate.plusMonths(monthsBetween).plusDays(allowedOffset);
-
-                if (!currentDate.isBefore(minValidDate) && !currentDate.isAfter(maxValidDate)) {
+                if (seeIfDateIsInRange(previousDate, currentDate, monthsBetween)) {
                     matchingTransactions.add(transactions.get(i - 1));
                     matchingTransactions.add(transactions.get(i));
                 }
@@ -116,6 +112,15 @@ public class ContractProcessingService {
         return monthFrequencyMap;
     }
 
+    private boolean seeIfDateIsInRange(LocalDate previousDate, LocalDate currentDate, int monthsBetween) {
+        int allowedDayOffset = 3;
+
+        LocalDate minValidDate = previousDate.plusMonths(monthsBetween).minusDays(allowedDayOffset);
+        LocalDate maxValidDate = previousDate.plusMonths(monthsBetween).plusDays(allowedDayOffset);
+
+        return !currentDate.isBefore(minValidDate) && !currentDate.isAfter(maxValidDate);
+    }
+
     private List<Transaction> getCandidatesForExistingContract(List<Transaction> transactions, Contract contract) {
         List<Transaction> transactionsWithSameCounterParty = new ArrayList<>(
                 transactions.stream().filter(transaction -> transaction.getCounterParty().equals(contract.getCounterParty())).toList());
@@ -123,9 +128,44 @@ public class ContractProcessingService {
         if (transactionsWithSameCounterParty.isEmpty())
             return transactionsWithSameCounterParty;
 
-        int allowedOffset = 3;
         LocalDate startDate = contract.getStartDate();
         LocalDate lastPaymentDate = contract.getLastPaymentDate();
+        int monthsBetween = contract.getMonthsBetweenPayments();
+
+        Transaction firstTransaction = transactionsWithSameCounterParty.getFirst();
+        Transaction lastTransaction = transactionsWithSameCounterParty.getLast();
+
+        List<Transaction> matchingTransactions = new ArrayList<>();
+
+        if (lastTransaction.getDate().isBefore(startDate)) {
+            for(int current = transactionsWithSameCounterParty.size() - 1; current >= 0; current--) {
+               Transaction currentTransaction = transactionsWithSameCounterParty.get(current);
+
+               if (seeIfDateIsInRange(currentTransaction.getDate(), startDate, monthsBetween)) {
+                   matchingTransactions.add(currentTransaction);
+                   startDate = currentTransaction.getDate();
+               }
+            }
+        }
+        else if (firstTransaction.getDate().isAfter(lastPaymentDate)) {
+            for (Transaction currentTransaction : transactionsWithSameCounterParty) {
+                if (seeIfDateIsInRange(lastPaymentDate, currentTransaction.getDate(), monthsBetween)) {
+                    matchingTransactions.add(currentTransaction);
+                    lastPaymentDate = currentTransaction.getDate();
+                }
+            }
+        }
+        else {
+            LocalDate currentDate = startDate;
+            for (Transaction currentTransaction : transactionsWithSameCounterParty) {
+                if (seeIfDateIsInRange(currentDate, currentTransaction.getDate(), monthsBetween)) {
+                    matchingTransactions.add(currentTransaction);
+                }
+                currentDate = currentTransaction.getDate();
+            }
+        }
+
+        return matchingTransactions;
     }
 
     private LocalDate getEarliestTransactionDate(List<Transaction> transactions) {
@@ -145,12 +185,12 @@ public class ContractProcessingService {
         for (Map.Entry<CounterParty, Map<Double, List<Transaction>>> mainEntry : counterPartyMapMap.entrySet()) {
             for (Map.Entry<Double, List<Transaction>> subEntry : mainEntry.getValue().entrySet()) {
                 if (!subEntry.getValue().isEmpty())
-                    processMainEntry(mainEntry.getValue(), subEntry.getKey(), subEntry.getValue());
+                    processMainEntry(mainEntry.getValue(), subEntry.getValue());
             }
         }
     }
 
-    private void processMainEntry(Map<Double, List<Transaction>> amountMap, Double key, List<Transaction> transactions) {
+    private void processMainEntry(Map<Double, List<Transaction>> amountMap, List<Transaction> transactions) {
         Map<Integer, List<Transaction>> monthsBetweenMap = calculateMostFrequentMonthsBetween(transactions);
 
         for (Map.Entry<Integer, List<Transaction>> entry : monthsBetweenMap.entrySet()) {
@@ -279,7 +319,7 @@ public class ContractProcessingService {
     private void matchTransactionsToExistingContract(List<Transaction> transactions, Contract contract, List<ContractHistory> contractHistories) {
         List<Transaction> candidateTransactions = getCandidatesForExistingContract(transactions, contract);
 
-        if (candidateTransactions == null || candidateTransactions.isEmpty())
+        if (candidateTransactions.isEmpty())
             return;
 
         // Partition transactions into matched and unmatched
@@ -288,9 +328,11 @@ public class ContractProcessingService {
         List<Transaction> matchedTransactions = partitionedTransactions.get(true);
         List<Transaction> unmatchedTransactions = partitionedTransactions.get(false);
 
-        if (!unmatchedTransactions.isEmpty()) {
+        if (matchedTransactions == null)
+            matchedTransactions = new ArrayList<>();
+
+        if (unmatchedTransactions != null)
             matchedTransactions.addAll(updateExistingContract(unmatchedTransactions, contract, contractHistories));
-        }
 
         matchedTransactions.stream()
                 .max(Comparator.comparing(Transaction::getDate))
