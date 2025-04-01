@@ -25,11 +25,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
-class ContractProcessingServiceTest {
+class ContractAssociationServiceTest {
 
     private final String counterPartyName = "Contract Counter Party";
 
-    private ContractProcessingService contractProcessingService;
+    private ContractAssociationService contractAssociationService;
     private BaseContractService baseContractService;
     private BaseContractHistoryService baseContractHistoryService;
     private BankAccount bankAccount;
@@ -49,7 +49,7 @@ class ContractProcessingServiceTest {
         counterPartyForContract = new CounterParty(users, counterPartyName);
         faker = new Faker();
 
-        contractProcessingService = new ContractProcessingService(baseContractService, baseContractHistoryService, baseTransactionService);
+        contractAssociationService = new ContractAssociationService(baseContractService, baseContractHistoryService, baseTransactionService);
     }
 
     @AfterEach
@@ -137,7 +137,7 @@ class ContractProcessingServiceTest {
         List<Transaction> transactions = createTransactionsForContract(new CounterParty(), 50.0, 1, 0);
         Transaction transaction = transactions.getFirst();
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, transactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, transactions);
 
         verifySaveCalls(0, 0);
         assertNull(transaction.getContract());
@@ -147,7 +147,7 @@ class ContractProcessingServiceTest {
     void processAndAssociateTransactionsBelongToContract_noExistingContracts_multipleTransactions_noContractToFind() {
         List<Transaction> transactionsWithoutContract = createRandomTransactions();
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, transactionsWithoutContract);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, transactionsWithoutContract);
 
         verifySaveCalls(0, 0);
         transactionsWithoutContract.forEach(transaction -> assertNull(transaction.getContract()));
@@ -167,7 +167,7 @@ class ContractProcessingServiceTest {
         allTransactions.addAll(transactionsWithContract);
         allTransactions.addAll(transactionsWithoutContract);
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, allTransactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, allTransactions);
 
         verifySaveCalls(2, 0);
         transactionsWithContract.forEach(transaction -> assertTransactionContract(transaction, counterPartyForContract, startAmount));
@@ -181,7 +181,7 @@ class ContractProcessingServiceTest {
 
         List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, startAmount, count, 0);
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, transactionsWithContract);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, transactionsWithContract);
 
         verifySaveCalls(2, 0);
         transactionsWithContract.forEach(transaction -> assertTransactionContract(transaction, counterPartyForContract, startAmount));
@@ -203,7 +203,7 @@ class ContractProcessingServiceTest {
         allTransactions.addAll(transactionsWithContract);
         allTransactions.addAll(transactionsWithoutContract);
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, allTransactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, allTransactions);
 
         verifySaveCalls(2, 0);
         transactionsWithContract.forEach(transaction -> assertTransactionContract(transaction, counterPartyForContract, startAmount));
@@ -227,7 +227,7 @@ class ContractProcessingServiceTest {
         allTransactions.addAll(transactionsWithContract);
         allTransactions.addAll(transactionsWithoutContract);
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, allTransactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, allTransactions);
 
         verifySaveCalls(0, 0);
         transactionsWithContract.forEach(transaction -> assertNull(transaction.getContract()));
@@ -250,7 +250,7 @@ class ContractProcessingServiceTest {
         allTransactions.addAll(transactionsWithContract);
         allTransactions.addAll(transactionsWithoutContract);
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, allTransactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, allTransactions);
 
         verifySaveCalls(0, 0);
         transactionsWithContract.forEach(transaction -> assertNull(transaction.getContract()));
@@ -280,7 +280,7 @@ class ContractProcessingServiceTest {
         allTransactions.addAll(transactionsWithContract);
         allTransactions.addAll(transactionsWithoutContract);
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, allTransactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, allTransactions);
 
         verifySaveCalls(counterPartyAmount*2, 0);
         transactionsWithContract.forEach(transaction -> {
@@ -309,7 +309,7 @@ class ContractProcessingServiceTest {
         allTransactions.addAll(transactionsWithContract);
         allTransactions.addAll(transactionsWithoutContract);
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, allTransactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, allTransactions);
 
         verifySaveCalls(2, 1);
         transactionsWithContract.forEach(transaction -> assertTransactionContract(transaction, transaction.getContract().getCounterParty(), newAmount));
@@ -335,7 +335,7 @@ class ContractProcessingServiceTest {
         allTransactions.addAll(transactionsWithContract);
         allTransactions.addAll(transactionsWithoutContract);
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, allTransactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, allTransactions);
 
         verifySaveCalls(2, 0);
         transactionsWithContract.forEach(transaction -> assertTransactionContract(transaction,
@@ -357,7 +357,7 @@ class ContractProcessingServiceTest {
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, transactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, transactions);
 
         verifySaveCalls(0, 0);
         assertNull(transaction.getContract());
@@ -375,7 +375,7 @@ class ContractProcessingServiceTest {
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, transactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, transactions);
 
         verifySaveCalls(1, 0);
         assertTransactionContract(transaction, counterPartyForContract, amount, monthsBetween);
@@ -394,7 +394,7 @@ class ContractProcessingServiceTest {
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, transactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, transactions);
 
         verifySaveCalls(1, 0);
         assertTransactionContract(transaction, counterPartyForContract, amount, monthsBetween);
@@ -414,7 +414,7 @@ class ContractProcessingServiceTest {
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, transactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, transactions);
 
         verifySaveCalls(1, 0);
         assertNull(transaction.getContract());
@@ -432,7 +432,7 @@ class ContractProcessingServiceTest {
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, transactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, transactions);
 
         verifySaveCalls(0, 0);
         assertNull(transaction.getContract());
@@ -458,7 +458,7 @@ class ContractProcessingServiceTest {
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, allTransactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, allTransactions);
 
         verifySaveCalls(2, 0);
         transactionsWithContract.forEach(transaction ->
@@ -486,7 +486,7 @@ class ContractProcessingServiceTest {
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, allTransactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, allTransactions);
 
         verifySaveCalls(2, 0);
         allTransactions.forEach(transaction -> assertNull(transaction.getContract()));
@@ -523,7 +523,7 @@ class ContractProcessingServiceTest {
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(contracts);
 
         // Process transactions
-        contractProcessingService.processAndAssociateTransactions(bankAccount, allTransactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, allTransactions);
 
         // Validate transactions with contracts
         IntStream.range(0, counterPartyAmount).forEach(i -> {
@@ -563,7 +563,7 @@ class ContractProcessingServiceTest {
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, allTransactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, allTransactions);
 
         verifySaveCalls(2, 1);
         transactionsWithContract.forEach(transaction ->
@@ -586,7 +586,7 @@ class ContractProcessingServiceTest {
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
         when(baseContractHistoryService.findByContractIn(List.of(contract))).thenReturn(List.of(contractHistory));
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, transactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, transactions);
 
         verifySaveCalls(0, 0);
         assertNull(transaction.getContract());
@@ -605,7 +605,7 @@ class ContractProcessingServiceTest {
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
         when(baseContractHistoryService.findByContractIn(List.of(contract))).thenReturn(List.of(contractHistory));
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, transactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, transactions);
 
         verifySaveCalls(0, 0);
         assertNull(transaction.getContract());
@@ -625,7 +625,7 @@ class ContractProcessingServiceTest {
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
         when(baseContractHistoryService.findByContractIn(List.of(contract))).thenReturn(List.of(contractHistory));
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, transactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, transactions);
 
         verifySaveCalls(0, 0);
         assertTransactionContract(transaction, counterPartyForContract, newAmount);
@@ -650,7 +650,7 @@ class ContractProcessingServiceTest {
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
         when(baseContractHistoryService.findByContractIn(List.of(contract))).thenReturn(List.of(contractHistory));
 
-        contractProcessingService.processAndAssociateTransactions(bankAccount, allTransactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, allTransactions);
 
         verifySaveCalls(1, 1);
         transactionsWithContract.forEach(transaction ->

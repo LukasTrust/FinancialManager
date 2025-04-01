@@ -16,15 +16,22 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service responsible for associating transactions with existing contracts.
+ * If no matching contract is found, it creates new contracts.
+ * This service retrieves existing contracts and their histories,
+ * attempts to match transactions with contracts, and processes
+ * unmatched transactions by generating new contracts.
+ */
 @Service
 @AllArgsConstructor
-public class ContractProcessingService {
+public class ContractAssociationService {
 
     private final BaseContractService baseContractService;
     private final BaseContractHistoryService baseContractHistoryService;
     private final BaseTransactionService baseTransactionService;
 
-    private static final Logger log = LoggerFactory.getLogger(ContractProcessingService.class);
+    private static final Logger log = LoggerFactory.getLogger(ContractAssociationService.class);
 
     /**
      * Processes and associates transactions with existing contracts if applicable.

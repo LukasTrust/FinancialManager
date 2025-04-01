@@ -4,7 +4,7 @@ import financialmanager.objectFolder.chartFolder.ChartData;
 import financialmanager.objectFolder.chartFolder.ChartService;
 import financialmanager.objectFolder.keyFigureFolder.KeyFigure;
 import financialmanager.objectFolder.keyFigureFolder.KeyFigureService;
-import financialmanager.objectFolder.transactionFolder.TransactionProcessingService;
+import financialmanager.objectFolder.transactionFolder.TransactionUploadService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ public class BankAccountOverviewController {
 
     private final ChartService chartService;
     private final KeyFigureService keyFigureService;
-    private final TransactionProcessingService transactionProcessingService;
+    private final TransactionUploadService transactionUploadService;
 
     @GetMapping("/{bankAccountId}/data/keyFigures")
     public ResponseEntity<List<KeyFigure>> getKeyFigures(
@@ -43,11 +43,11 @@ public class BankAccountOverviewController {
     @PostMapping("/{bankAccountId}/data/upload")
     @ResponseBody
     public ResponseEntity<?> uploadDataForTransactions(@PathVariable Long bankAccountId, @RequestParam("files") MultipartFile[] files) {
-        return transactionProcessingService.uploadDataForTransactions(bankAccountId, files);
+        return transactionUploadService.uploadDataForTransactions(bankAccountId, files);
     }
 
     @PostMapping("/{bankAccountId}/data/deleteData")
     public ResponseEntity<?> deleteData(@PathVariable Long bankAccountId) {
-        return transactionProcessingService.deleteData(bankAccountId);
+        return transactionUploadService.deleteData(bankAccountId);
     }
 }

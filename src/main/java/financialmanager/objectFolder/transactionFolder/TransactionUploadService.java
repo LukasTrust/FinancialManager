@@ -3,7 +3,7 @@ package financialmanager.objectFolder.transactionFolder;
 import financialmanager.objectFolder.categoryFolder.CategoryService;
 import financialmanager.objectFolder.contractFolder.BaseContractService;
 import financialmanager.objectFolder.contractFolder.Contract;
-import financialmanager.objectFolder.contractFolder.ContractProcessingService;
+import financialmanager.objectFolder.contractFolder.ContractAssociationService;
 import financialmanager.objectFolder.contractFolder.contractHistoryFolder.BaseContractHistoryService;
 import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistory;
 import financialmanager.objectFolder.localeFolder.LocaleService;
@@ -38,22 +38,23 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class TransactionProcessingService {
+public class TransactionUploadService {
 
     private final BaseTransactionService baseTransactionService;
     private final BaseContractService baseContractService;
     private final BaseContractHistoryService baseContractHistoryService;
 
-    private final ContractProcessingService contractProcessingService;
+    private final ContractAssociationService contractAssociationService;
+    private final CounterPartyService counterPartyService;
     private final CategoryService categoryService;
     private final FileParserFactory fileParserFactory;
     private final ResponseService responseService;
     private final ResultService resultService;
     private final LocaleService localeService;
 
-    private static final Logger log = LoggerFactory.getLogger(TransactionProcessingService.class);
-    private final CounterPartyService counterPartyService;
+    private static final Logger log = LoggerFactory.getLogger(TransactionUploadService.class);
 
+    //<editor-fold desc="delete data">
     public ResponseEntity<?> deleteData(Long bankAccountId) {
         Result<BankAccount, ResponseEntity<Response>> bankAccountResult = resultService.findBankAccountById(bankAccountId);
 
@@ -78,20 +79,18 @@ public class TransactionProcessingService {
             return responseService.createResponse(HttpStatus.INTERNAL_SERVER_ERROR, "deletedData", AlertType.ERROR);
         }
     }
+    //</editor-fold>
 
+    //<editor-fold desc="create transactions">
     public ResponseEntity<?> uploadDataForTransactions(Long bankAccountId, MultipartFile[] files) {
         List<ResponseEntity<Response>> responses = new ArrayList<>();
 
         for (MultipartFile file : files) {
-            responses.add(processFileAsync(file, bankAccountId));
+            IFileParser fileParser = fileParserFactory.getFileParser(file);
+            responses.add(createTransactionsFromData(fileParser, bankAccountId));
         }
 
         return ResponseEntity.ok(responses);
-    }
-
-    private ResponseEntity<Response> processFileAsync(MultipartFile file, Long bankAccountId) {
-        IFileParser fileParser = fileParserFactory.getFileParser(file);
-        return createTransactionsFromData(fileParser, bankAccountId);
     }
 
     private ResponseEntity<Response> createTransactionsFromData(IFileParser fileParser, Long bankAccountId) {
@@ -169,7 +168,7 @@ public class TransactionProcessingService {
 
         stopWatch = new StopWatch();
         stopWatch.start();
-        contractProcessingService.processAndAssociateTransactions(bankAccount, newTransactions);
+        contractAssociationService.processAndAssociateTransactions(bankAccount, newTransactions);
         stopWatch.stop();
         log.info("{} for checkIfTransactionsBelongToContract", stopWatch.getTotalTimeMillis());
 
@@ -312,4 +311,6 @@ public class TransactionProcessingService {
 
         return decimalFormat.parse(numberString).doubleValue();
     }
+
+    //</editor-fold>
 }
