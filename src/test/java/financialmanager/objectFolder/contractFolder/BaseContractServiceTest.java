@@ -1,6 +1,7 @@
 package financialmanager.objectFolder.contractFolder;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -11,6 +12,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.mock;
 
 @Testcontainers
 @DataJpaTest
@@ -21,8 +23,13 @@ class BaseContractServiceTest {
     @ServiceConnection
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest");
 
-    @Autowired
     BaseContractService baseContractService;
+
+
+    @BeforeEach
+    void setup() {
+        baseContractService = new BaseContractService(mock(ContractRepository.class));
+    }
 
     @BeforeAll
     static void setUp() {
