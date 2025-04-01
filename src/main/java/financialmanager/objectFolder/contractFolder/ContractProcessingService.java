@@ -58,9 +58,6 @@ public class ContractProcessingService {
                 .filter(transaction -> transaction.getContract() == null)
                 .toList();
 
-        log.info("{} transactions could not be matched to an existing contract and will be used to create new contracts.",
-                unmatchedTransactions.size());
-
         generateNewContracts(unmatchedTransactions);
     }
 
@@ -127,12 +124,8 @@ public class ContractProcessingService {
                     contractHistories.stream()
                             .anyMatch(ch -> ch.getPreviousAmount().equals(transaction.getAmount()));
 
-            matchedTransactions.computeIfAbsent(isMatching, k -> new ArrayList<>()).add(transaction);
+            matchedTransactions.computeIfAbsent(isMatching, _ -> new ArrayList<>()).add(transaction);
         }
-
-        log.info("Matching complete: {} transactions matched, {} transactions unmatched.",
-                matchedTransactions.getOrDefault(true, Collections.emptyList()).size(),
-                matchedTransactions.getOrDefault(false, Collections.emptyList()).size());
 
         return matchedTransactions;
     }
@@ -330,8 +323,6 @@ public class ContractProcessingService {
         contract.setAmount(amount);
         contract.setLastPaymentDate(lastPaymentDate);
         contract.setLastUpdatedAt(changedAt);
-
-        log.info("Contract ID: {} updated successfully.", contract.getId());
     }
 
     //</editor-fold>
@@ -558,7 +549,7 @@ public class ContractProcessingService {
         List<Transaction> candidateTransactions = findCandidateTransactionsForContract(transactions, contract);
 
         if (candidateTransactions.isEmpty()) {
-            log.info("No candidate transactions found for contract with CounterParty: {}", contract.getCounterParty());
+            log.info("No candidate transactions found for contract with CounterParty ID: {}", contract.getCounterParty().getId());
             return;
         }
 
