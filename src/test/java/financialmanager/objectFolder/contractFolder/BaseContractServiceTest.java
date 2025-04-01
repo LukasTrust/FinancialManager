@@ -25,7 +25,6 @@ class BaseContractServiceTest {
 
     BaseContractService baseContractService;
 
-
     @BeforeEach
     void setup() {
         baseContractService = new BaseContractService(mock(ContractRepository.class));
@@ -37,6 +36,11 @@ class BaseContractServiceTest {
         assertThat(postgres.isRunning()).isTrue();
     }
 
+    //<editor-fold desc="help methods">
+
+    private
+
+    //</editor-fold>
     @Test
     void findByBankAccount() {
     }
