@@ -1,5 +1,6 @@
 package financialmanager.objectFolder.contractFolder;
 
+import dataCreator.DataCreator;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.contractFolder.contractHistoryFolder.BaseContractHistoryService;
 import financialmanager.objectFolder.contractFolder.contractHistoryFolder.ContractHistory;
@@ -8,7 +9,6 @@ import financialmanager.objectFolder.transactionFolder.BaseTransactionService;
 import financialmanager.objectFolder.transactionFolder.Transaction;
 import financialmanager.objectFolder.transactionFolder.TransactionRepository;
 import financialmanager.objectFolder.usersFolder.Users;
-import net.datafaker.Faker;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,22 +32,24 @@ class ContractAssociationServiceTest {
     private ContractAssociationService contractAssociationService;
     private BaseContractService baseContractService;
     private BaseContractHistoryService baseContractHistoryService;
+
     private BankAccount bankAccount;
-    private Users users;
-    private Faker faker;
     private CounterParty counterPartyForContract;
+    private DataCreator dataCreator;
 
     @BeforeEach
     void setup() {
+        Users users = mock(Users.class);
+
+        dataCreator = new DataCreator(COUNTER_PARTY_NAME, users);
+
         TransactionRepository transactionRepository = mock(TransactionRepository.class);
         baseContractService = mock(BaseContractService.class);
         baseContractHistoryService = mock(BaseContractHistoryService.class);
         BaseTransactionService baseTransactionService = new BaseTransactionService(transactionRepository);
 
         bankAccount = mock(BankAccount.class);
-        users = mock(Users.class);
-        counterPartyForContract = new CounterParty(users, COUNTER_PARTY_NAME);
-        faker = new Faker();
+        counterPartyForContract = dataCreator.createCounterParty(users, COUNTER_PARTY_NAME);
 
         contractAssociationService = new ContractAssociationService(baseContractService, baseContractHistoryService, baseTransactionService);
     }
@@ -58,58 +60,7 @@ class ContractAssociationServiceTest {
         verify(baseContractHistoryService, atMost(1)).findByContractIn(anyList());
     }
 
-    //<editor-fold desc="help methods">
-    private List<Transaction> createRandomTransactions() {
-        return IntStream.range(0, 10)
-                .mapToObj(i -> createTransaction(faker.random().nextDouble(),
-                        new CounterParty(users, faker.company().name()), LocalDate.now().plusDays(i)))
-                .toList();
-    }
-
-    private Transaction createTransaction(double amount, CounterParty counterParty, LocalDate date) {
-        Transaction transaction = new Transaction();
-        transaction.setAmount(amount);
-        transaction.setCounterParty(counterParty);
-        transaction.setDate(date);
-        return transaction;
-    }
-
-    private Contract createContract(String name, CounterParty counterParty, double amount) {
-        return createContract(name, counterParty, amount, 1, 1);
-    }
-
-    private Contract createContract(String name, CounterParty counterParty, double amount, int monthsBetween, int lastPaymentOffset) {
-        Contract contract = new Contract();
-        contract.setName(name);
-        contract.setCounterParty(counterParty);
-        contract.setAmount(amount);
-        contract.setStartDate(LocalDate.now());
-        contract.setLastPaymentDate(LocalDate.now().plusMonths(lastPaymentOffset + 1));
-        contract.setMonthsBetweenPayments(monthsBetween);
-
-        return contract;
-    }
-
-    private ContractHistory createContractHistory(Contract contract, double newAmount, double oldAmount) {
-        return new ContractHistory(contract, newAmount, oldAmount, LocalDate.now().plusMonths(5));
-    }
-
-    private List<Transaction> createTransactionsForContract(CounterParty counterParty, double amount, int count, int startMonth) {
-        return createTransactionsForContract(counterParty, amount, count, startMonth, 1);
-    }
-
-    private List<Transaction> createTransactionsForContract(CounterParty counterParty, double amount, int count, int startMonth, int monthsBetween) {
-        return IntStream.range(0, count)
-                .mapToObj(i -> createTransaction(amount, counterParty, LocalDate.now().plusMonths(startMonth + (long) i * monthsBetween)))
-                .toList();
-    }
-
-    private List<CounterParty> createCounterParties(int counterPartyAmount) {
-        return IntStream.range(0, counterPartyAmount)
-                .mapToObj(i -> new CounterParty(users, COUNTER_PARTY_NAME + " " + i))
-                .toList();
-    }
-
+    //<editor-fold desc="help assert methods">
     private void assertTransactionContract(Transaction transaction, CounterParty expectedCounterParty, double expectedAmount) {
         assertTransactionContract(transaction, expectedCounterParty, expectedAmount, 1);
     }
@@ -134,7 +85,7 @@ class ContractAssociationServiceTest {
     //<editor-fold desc="no existing contracts tests">
     @Test
     void processAndAssociateTransactions_noExistingContracts_oneTransaction() {
-        List<Transaction> transactions = createTransactionsForContract(new CounterParty(), 50.0, 1, 0);
+        List<Transaction> transactions = dataCreator.createTransactionsForContract(new CounterParty(), 50.0, 1, 0);
         Transaction transaction = transactions.getFirst();
 
         contractAssociationService.processAndAssociateTransactions(bankAccount, transactions);
@@ -145,7 +96,7 @@ class ContractAssociationServiceTest {
 
     @Test
     void processAndAssociateTransactionsBelongToContract_noExistingContracts_multipleTransactions_noContractToFind() {
-        List<Transaction> transactionsWithoutContract = createRandomTransactions();
+        List<Transaction> transactionsWithoutContract = dataCreator.createRandomTransactions();
 
         contractAssociationService.processAndAssociateTransactions(bankAccount, transactionsWithoutContract);
 
@@ -161,8 +112,8 @@ class ContractAssociationServiceTest {
     })
     void processAndAssociateTransactionsBelongToContract_noExistingContracts_multipleTransactions_oneContractToFind(double startAmount, int count) {
         List<Transaction> allTransactions = new ArrayList<>();
-        List<Transaction> transactionsWithoutContract = createRandomTransactions();
-        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, startAmount, count, 0);
+        List<Transaction> transactionsWithoutContract = dataCreator.createRandomTransactions();
+        List<Transaction> transactionsWithContract = dataCreator.createTransactionsForContract(counterPartyForContract, startAmount, count, 0);
 
         allTransactions.addAll(transactionsWithContract);
         allTransactions.addAll(transactionsWithoutContract);
@@ -179,7 +130,7 @@ class ContractAssociationServiceTest {
         double startAmount = 50.0;
         int count = 5;
 
-        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, startAmount, count, 0);
+        List<Transaction> transactionsWithContract = dataCreator.createTransactionsForContract(counterPartyForContract, startAmount, count, 0);
 
         contractAssociationService.processAndAssociateTransactions(bankAccount, transactionsWithContract);
 
@@ -195,8 +146,8 @@ class ContractAssociationServiceTest {
     })
     void processAndAssociateTransactionsBelongToContract_noExistingContracts_multipleTransactions_oneContractToFindWithDayDifference(double startAmount, int count) {
         List<Transaction> allTransactions = new ArrayList<>();
-        List<Transaction> transactionsWithoutContract = createRandomTransactions();
-        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, startAmount, count, 0);
+        List<Transaction> transactionsWithoutContract = dataCreator.createRandomTransactions();
+        List<Transaction> transactionsWithContract = dataCreator.createTransactionsForContract(counterPartyForContract, startAmount, count, 0);
         transactionsWithContract.get(1).setDate(transactionsWithContract.get(1).getDate().plusDays(1));
         transactionsWithContract.get(2).setDate(transactionsWithContract.get(2).getDate().minusDays(1));
 
@@ -220,8 +171,8 @@ class ContractAssociationServiceTest {
             double startAmount, int count) {
 
         List<Transaction> allTransactions = new ArrayList<>();
-        List<Transaction> transactionsWithoutContract = createRandomTransactions();
-        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, startAmount, count, 0);
+        List<Transaction> transactionsWithoutContract = dataCreator.createRandomTransactions();
+        List<Transaction> transactionsWithContract = dataCreator.createTransactionsForContract(counterPartyForContract, startAmount, count, 0);
         transactionsWithContract.getLast().setDate(LocalDate.now().plusDays(10));
 
         allTransactions.addAll(transactionsWithContract);
@@ -243,8 +194,8 @@ class ContractAssociationServiceTest {
             double startAmount, int count) {
 
         List<Transaction> allTransactions = new ArrayList<>();
-        List<Transaction> transactionsWithoutContract = createRandomTransactions();
-        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, startAmount, count, 0);
+        List<Transaction> transactionsWithoutContract = dataCreator.createRandomTransactions();
+        List<Transaction> transactionsWithContract = dataCreator.createTransactionsForContract(counterPartyForContract, startAmount, count, 0);
         transactionsWithContract.getLast().setDate(LocalDate.now().plusMonths(10));
 
         allTransactions.addAll(transactionsWithContract);
@@ -266,14 +217,14 @@ class ContractAssociationServiceTest {
             double startAmount, int count, int counterPartyAmount) {
 
         List<Transaction> allTransactions = new ArrayList<>();
-        List<Transaction> transactionsWithoutContract = createRandomTransactions();
+        List<Transaction> transactionsWithoutContract = dataCreator.createRandomTransactions();
 
-        List<CounterParty> counterParties = createCounterParties(counterPartyAmount);
+        List<CounterParty> counterParties = dataCreator.createCounterParties(counterPartyAmount);
 
         List<Transaction> transactionsWithContract = counterParties.stream()
                 .flatMap(counterParty -> {
                     double transactionAmount = startAmount + ((counterParties.indexOf(counterParty) + 1) * 10);
-                    return createTransactionsForContract(counterParty, transactionAmount, count, 0).stream();
+                    return dataCreator.createTransactionsForContract(counterParty, transactionAmount, count, 0).stream();
                 })
                 .toList();
 
@@ -300,11 +251,11 @@ class ContractAssociationServiceTest {
             double oldAmount, double newAmount, int oldCount, int newCount) {
 
         List<Transaction> allTransactions = new ArrayList<>();
-        List<Transaction> transactionsWithoutContract = createRandomTransactions();
+        List<Transaction> transactionsWithoutContract = dataCreator.createRandomTransactions();
         List<Transaction> transactionsWithContract = new ArrayList<>();
 
-        transactionsWithContract.addAll(createTransactionsForContract(counterPartyForContract, oldAmount, oldCount, 0));
-        transactionsWithContract.addAll(createTransactionsForContract(counterPartyForContract, newAmount, newCount, 3));
+        transactionsWithContract.addAll(dataCreator.createTransactionsForContract(counterPartyForContract, oldAmount, oldCount, 0));
+        transactionsWithContract.addAll(dataCreator.createTransactionsForContract(counterPartyForContract, newAmount, newCount, 3));
 
         allTransactions.addAll(transactionsWithContract);
         allTransactions.addAll(transactionsWithoutContract);
@@ -326,9 +277,9 @@ class ContractAssociationServiceTest {
             double oldAmount, double newAmount, int oldCount, int newCount) {
 
         List<Transaction> allTransactions = new ArrayList<>();
-        List<Transaction> transactionsWithoutContract = createRandomTransactions();
-        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, oldAmount, oldCount, 0);
-        List<Transaction> transactionsForHistory = createTransactionsForContract(counterPartyForContract, newAmount, newCount, oldCount);
+        List<Transaction> transactionsWithoutContract = dataCreator.createRandomTransactions();
+        List<Transaction> transactionsWithContract = dataCreator.createTransactionsForContract(counterPartyForContract, oldAmount, oldCount, 0);
+        List<Transaction> transactionsForHistory = dataCreator.createTransactionsForContract(counterPartyForContract, newAmount, newCount, oldCount);
         transactionsForHistory.getLast().setDate(transactionsForHistory.getLast().getDate().plusDays(4));
 
         allTransactions.addAll(transactionsForHistory);
@@ -350,10 +301,10 @@ class ContractAssociationServiceTest {
     void processAndAssociateTransactionsBelongToContract_existingContracts_oneTransaction_doesNot() {
         double amount = 50.0;
 
-        List<Transaction> transactions = createTransactionsForContract(new CounterParty(), amount, 1, 0);
+        List<Transaction> transactions = dataCreator.createTransactionsForContract(new CounterParty(), amount, 1, 0);
         Transaction transaction = transactions.getFirst();
 
-        Contract contract = createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount);
+        Contract contract = dataCreator.createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount);
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
@@ -368,10 +319,10 @@ class ContractAssociationServiceTest {
         double amount = 50.0;
         int monthsBetween = 2;
 
-        List<Transaction> transactions = createTransactionsForContract(counterPartyForContract, amount, 1, monthsBetween);
+        List<Transaction> transactions = dataCreator.createTransactionsForContract(counterPartyForContract, amount, 1, monthsBetween);
         Transaction transaction = transactions.getFirst();
 
-        Contract contract = createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount, monthsBetween, 3);
+        Contract contract = dataCreator.createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount, monthsBetween, 3);
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
@@ -386,11 +337,11 @@ class ContractAssociationServiceTest {
         double amount = 50.0;
         int monthsBetween = 2;
 
-        List<Transaction> transactions = createTransactionsForContract(counterPartyForContract, amount, 1, monthsBetween);
+        List<Transaction> transactions = dataCreator.createTransactionsForContract(counterPartyForContract, amount, 1, monthsBetween);
         Transaction transaction = transactions.getFirst();
         transaction.setDate(LocalDate.now().minusMonths(monthsBetween));
 
-        Contract contract = createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount, monthsBetween, 3);
+        Contract contract = dataCreator.createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount, monthsBetween, 3);
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
@@ -406,11 +357,11 @@ class ContractAssociationServiceTest {
         double amount = 50.0;
         int monthsBetween = 2;
 
-        List<Transaction> transactions = createTransactionsForContract(counterPartyForContract, amount, 1, monthsBetween);
+        List<Transaction> transactions = dataCreator.createTransactionsForContract(counterPartyForContract, amount, 1, monthsBetween);
         Transaction transaction = transactions.getFirst();
         transaction.setDate(LocalDate.now().minusMonths(monthsBetween + 1));
 
-        Contract contract = createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount, monthsBetween, 3);
+        Contract contract = dataCreator.createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount, monthsBetween, 3);
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
@@ -421,14 +372,14 @@ class ContractAssociationServiceTest {
     }
 
     @Test
-    void processAndAssociateTransactions() {
+    void processAndAssociateTransactions_oneTransaction_toFarFromLastPayDate() {
         double amount = 50.0;
         int monthsBetween = 2;
 
-        List<Transaction> transactions = createTransactionsForContract(counterPartyForContract, amount, 1, 9);
+        List<Transaction> transactions = dataCreator.createTransactionsForContract(counterPartyForContract, amount, 1, 9);
         Transaction transaction = transactions.getFirst();
 
-        Contract contract = createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount, monthsBetween, 3);
+        Contract contract = dataCreator.createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount, monthsBetween, 3);
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
@@ -448,13 +399,13 @@ class ContractAssociationServiceTest {
             double contractAmount, int count, int monthsBetween) {
 
         List<Transaction> allTransactions = new ArrayList<>();
-        List<Transaction> transactionsWithoutContract = createRandomTransactions();
-        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, contractAmount, count, monthsBetween, monthsBetween);
+        List<Transaction> transactionsWithoutContract = dataCreator.createRandomTransactions();
+        List<Transaction> transactionsWithContract = dataCreator.createTransactionsForContract(counterPartyForContract, contractAmount, count, monthsBetween, monthsBetween);
 
         allTransactions.addAll(transactionsWithContract);
         allTransactions.addAll(transactionsWithoutContract);
 
-        Contract contract = createContract(COUNTER_PARTY_NAME, counterPartyForContract, contractAmount, monthsBetween, count);
+        Contract contract = dataCreator.createContract(COUNTER_PARTY_NAME, counterPartyForContract, contractAmount, monthsBetween, count);
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
@@ -473,16 +424,18 @@ class ContractAssociationServiceTest {
         int monthsBetween = 2;
 
         List<Transaction> allTransactions = new ArrayList<>();
-        List<Transaction> transactionsWithoutContract = createRandomTransactions();
-        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, contractAmount, count, monthsBetween, monthsBetween);
+        List<Transaction> transactionsWithoutContract = dataCreator.createRandomTransactions();
+        List<Transaction> transactionsWithContract = dataCreator.createTransactionsForContract(counterPartyForContract, contractAmount, count, monthsBetween, monthsBetween);
+        double counter = 100.0;
         for (Transaction transaction : transactionsWithContract) {
-            transaction.setAmount(faker.random().nextDouble());
+            counter += transaction.getAmount();
+            transaction.setAmount(counter);
         }
 
         allTransactions.addAll(transactionsWithContract);
         allTransactions.addAll(transactionsWithoutContract);
 
-        Contract contract = createContract(COUNTER_PARTY_NAME, counterPartyForContract, contractAmount, monthsBetween, count);
+        Contract contract = dataCreator.createContract(COUNTER_PARTY_NAME, counterPartyForContract, contractAmount, monthsBetween, count);
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
@@ -493,21 +446,21 @@ class ContractAssociationServiceTest {
     }
 
     @Test
-    void processAndAssociateTransactionsBelongToContract_MultipleContracts_multipleTransactions() {
+    void processAndAssociateTransactionsBelongToContract_multipleContracts_multipleTransactions() {
         int counterPartyAmount = 5;
         int transactionCount = 3;
         double baseAmount = 50.0;
         double amountIncrement = 10.0;
-        List<CounterParty> counterParties = createCounterParties(counterPartyAmount);
+        List<CounterParty> counterParties = dataCreator.createCounterParties(counterPartyAmount);
 
         // Create transactions (some with contracts, some without)
         List<Transaction> allTransactions = new ArrayList<>();
-        List<Transaction> transactionsWithoutContract = createRandomTransactions();
+        List<Transaction> transactionsWithoutContract = dataCreator.createRandomTransactions();
         List<Transaction> transactionsWithContract = IntStream.range(0, counterPartyAmount)
                 .mapToObj(i -> {
                     CounterParty counterParty = counterParties.get(i);
                     double transactionAmount = baseAmount + (i * amountIncrement);
-                    return createTransactionsForContract(counterParty, transactionAmount, transactionCount, 1);
+                    return dataCreator.createTransactionsForContract(counterParty, transactionAmount, transactionCount, 1);
                 })
                 .flatMap(List::stream)
                 .toList();
@@ -517,7 +470,7 @@ class ContractAssociationServiceTest {
 
         // Ensure contracts match the corresponding transaction amount
         List<Contract> contracts = IntStream.range(0, counterPartyAmount)
-                .mapToObj(i -> createContract(COUNTER_PARTY_NAME + " " + i, counterParties.get(i), baseAmount + (i * amountIncrement)))
+                .mapToObj(i -> dataCreator.createContract(COUNTER_PARTY_NAME + " " + i, counterParties.get(i), baseAmount + (i * amountIncrement)))
                 .toList();
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(contracts);
@@ -545,21 +498,21 @@ class ContractAssociationServiceTest {
             "0",
             "50"
     })
-    void processAndAssociateTransactions(int offset) {
+    void processAndAssociateTransactions_multipleTransactions_matchToContract_afterLastPayDate(int offset) {
         double amount = 50.0;
         int count = 3;
         int monthsBetween = 3;
 
         List<Transaction> allTransactions = new ArrayList<>();
-        List<Transaction> transactionsWithoutContract = createRandomTransactions();
-        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, amount, count,
+        List<Transaction> transactionsWithoutContract = dataCreator.createRandomTransactions();
+        List<Transaction> transactionsWithContract = dataCreator.createTransactionsForContract(counterPartyForContract, amount, count,
                 0, monthsBetween);
         transactionsWithContract.forEach(transaction -> transaction.setDate(transaction.getDate().plusMonths(offset)));
 
         allTransactions.addAll(transactionsWithContract);
         allTransactions.addAll(transactionsWithoutContract);
 
-        Contract contract = createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount + 10, monthsBetween - 1, count);
+        Contract contract = dataCreator.createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount + 10, monthsBetween - 1, count);
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
 
@@ -577,11 +530,11 @@ class ContractAssociationServiceTest {
     void processAndAssociateTransactionsBelongToContract_existingContractsAndHistory_oneTransaction_doesNotBelongToHistory() {
         double amount = 50.0;
 
-        List<Transaction> transactions = createTransactionsForContract(new CounterParty(), amount, 1, 0);
+        List<Transaction> transactions = dataCreator.createTransactionsForContract(new CounterParty(), amount, 1, 0);
         Transaction transaction = transactions.getFirst();
 
-        Contract contract = createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount);
-        ContractHistory contractHistory = createContractHistory(contract, amount + 10, amount);
+        Contract contract = dataCreator.createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount);
+        ContractHistory contractHistory = dataCreator.createContractHistory(contract, amount + 10, amount);
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
         when(baseContractHistoryService.findByContractIn(List.of(contract))).thenReturn(List.of(contractHistory));
@@ -596,11 +549,11 @@ class ContractAssociationServiceTest {
     void processAndAssociateTransactionsBelongToContract_existingContractsAndHistory_oneTransaction_doesNotBelongToHistorySameCounterParty() {
         double amount = 50.0;
 
-        List<Transaction> transactions = createTransactionsForContract(counterPartyForContract, amount + 20, 1, 0);
+        List<Transaction> transactions = dataCreator.createTransactionsForContract(counterPartyForContract, amount + 20, 1, 0);
         Transaction transaction = transactions.getFirst();
 
-        Contract contract = createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount);
-        ContractHistory contractHistory = createContractHistory(contract, amount + 10, amount);
+        Contract contract = dataCreator.createContract(COUNTER_PARTY_NAME, counterPartyForContract, amount);
+        ContractHistory contractHistory = dataCreator.createContractHistory(contract, amount + 10, amount);
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
         when(baseContractHistoryService.findByContractIn(List.of(contract))).thenReturn(List.of(contractHistory));
@@ -616,11 +569,11 @@ class ContractAssociationServiceTest {
         double oldAmount = 50.0;
         double newAmount = oldAmount + 10;
 
-        List<Transaction> transactions = createTransactionsForContract(counterPartyForContract, oldAmount, 1, 1);
+        List<Transaction> transactions = dataCreator.createTransactionsForContract(counterPartyForContract, oldAmount, 1, 1);
         Transaction transaction = transactions.getFirst();
 
-        Contract contract = createContract(COUNTER_PARTY_NAME, counterPartyForContract, newAmount);
-        ContractHistory contractHistory = createContractHistory(contract, newAmount, oldAmount);
+        Contract contract = dataCreator.createContract(COUNTER_PARTY_NAME, counterPartyForContract, newAmount);
+        ContractHistory contractHistory = dataCreator.createContractHistory(contract, newAmount, oldAmount);
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
         when(baseContractHistoryService.findByContractIn(List.of(contract))).thenReturn(List.of(contractHistory));
@@ -636,16 +589,17 @@ class ContractAssociationServiceTest {
             "50.0, 60.0, 70.0, 70.0, 1, 7",
             "50.0, 60.0, 70.0, 60.0, 1, 1"
     })
-    void processAndAssociateTransactions(double oldAmount, double currentAmount, double newAmount, double expected, int monthsBetween, int historyMonths) {
+    void processAndAssociateTransactions_multipleTransactions_withHistory_BelongTo(double oldAmount, double currentAmount,
+                                                                                   double newAmount, double expected, int monthsBetween, int historyMonths) {
         List<Transaction> allTransactions = new ArrayList<>();
-        List<Transaction> transactionsWithoutContract = createRandomTransactions();
-        List<Transaction> transactionsWithContract = createTransactionsForContract(counterPartyForContract, newAmount, 10, historyMonths);
+        List<Transaction> transactionsWithoutContract = dataCreator.createRandomTransactions();
+        List<Transaction> transactionsWithContract = dataCreator.createTransactionsForContract(counterPartyForContract, newAmount, 10, historyMonths);
 
         allTransactions.addAll(transactionsWithContract);
         allTransactions.addAll(transactionsWithoutContract);
 
-        Contract contract = createContract(COUNTER_PARTY_NAME, counterPartyForContract, currentAmount, monthsBetween, 5);
-        ContractHistory contractHistory = createContractHistory(contract, currentAmount, oldAmount);
+        Contract contract = dataCreator.createContract(COUNTER_PARTY_NAME, counterPartyForContract, currentAmount, monthsBetween, 5);
+        ContractHistory contractHistory = dataCreator.createContractHistory(contract, currentAmount, oldAmount);
 
         when(baseContractService.findByBankAccount(bankAccount)).thenReturn(List.of(contract));
         when(baseContractHistoryService.findByContractIn(List.of(contract))).thenReturn(List.of(contractHistory));
