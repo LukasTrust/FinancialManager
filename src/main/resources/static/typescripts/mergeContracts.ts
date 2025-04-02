@@ -18,7 +18,22 @@ async function mergeContracts(messages: Record<string, string>): Promise<void> {
         const contractsContainer = document.getElementById("contractsContainer");
         const ids = getIdsFromContainer(contractsContainer);
 
-        const response = await fetch(`/contracts/${bankAccountId}/data/mergeContracts`, {
+        if (ids.length === 0) {
+            showAlert(AlertType.INFO, messages["selectAHeader"]);
+            return;
+        }
+
+        const headerContainer = document.getElementById("headerContract");
+        const headerIds = getIdsFromContainer(headerContainer);
+
+        if (ids.length !== 1) {
+            showAlert(AlertType.INFO, messages["selectContracts"]);
+            return;
+        }
+
+        const headerId = headerIds[0];
+
+        const response = await fetch(`/contracts/${bankAccountId}/data/merge/${headerId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(ids)

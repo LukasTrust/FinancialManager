@@ -133,7 +133,7 @@ public class ContractService {
     }
 
     public ResponseEntity<Response> mergeContracts(Long bankAccountId, Long headerId, List<Long> contractIds) {
-        Result<Contract, ResponseEntity<Response>> headerContractResult = resultService.findContractByIdAndBankAccountId(headerId, bankAccountId);
+        Result<Contract, ResponseEntity<Response>> headerContractResult = resultService.findContractByIdAndBankAccountId(bankAccountId, headerId);
 
         if (headerContractResult.isErr()) {
             return headerContractResult.getError();

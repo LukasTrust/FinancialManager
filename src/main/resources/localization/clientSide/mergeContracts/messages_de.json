@@ -10,5 +10,7 @@
   "lastPaymentDate": "Letztes Zahlungs Datum",
   "selectHeader": "Kopf auswählen",
   "selectHeaderTooltip": "Dadurch kann der Vertrag ausgewählt werden der als Kopf verwendet werden soll",
-  "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut."
+  "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.",
+  "selectAHeader": "Bitte wählen Sie einen Kopf aus",
+  "selectContracts": "Bitte in der ansicht zuvor verträge auswählen"
 }
