@@ -65,4 +65,15 @@ class TransactionUploadServiceTest {
         assertTrue(response.getStatusCode().is2xxSuccessful());
         assertEquals(new ArrayList<>(), response.getBody());
     }
+
+    @Test
+    void uploadDataForTransactions_noId_emptyFiles() {
+        Long id = null;
+        MultipartFile[] files = new MultipartFile[0];
+
+        ResponseEntity<?> response = transactionUploadService.uploadDataForTransactions(id, files);
+
+        assertTrue(response.getStatusCode().is2xxSuccessful());
+        assertEquals(new ArrayList<>(), response.getBody());
+    }
 }
