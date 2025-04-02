@@ -48,19 +48,27 @@ async function mergeContracts(messages) {
     }
 }
 function selectHeader() {
-    const headerContainer = document.getElementById("headerContract");
     if (selectedContract !== null && headerContract !== selectedContract) {
+        const headerContainer = document.getElementById("headerContract");
         removeHeader();
-        moveElements(null, headerContainer, selectedContract);
         headerContract = selectedContract;
-        toggleSelection(selectedContract, null, "selected");
+        selectedContract = null;
+        moveElements(null, headerContainer, headerContract);
+        toggleSelection(headerContract, headerContract, "selected");
         updateContractAvailability();
     }
 }
 function removeHeader() {
-    const contractsContainer = document.getElementById("contractsContainer");
-    moveElements(null, contractsContainer, selectedContract);
-    toggleSelection(selectedContract, null, "selected");
-    selectedContract = null;
+    if (headerContract) {
+        const contractsContainer = document.getElementById("contractsContainer");
+        moveElements(null, contractsContainer, headerContract);
+        if (headerContract.classList.contains("selected")) {
+            selectedContract = null;
+            toggleSelection(headerContract, headerContract, "selected");
+        }
+        headerContract = null;
+        selectedCounterparty = null;
+        updateContractAvailability();
+    }
 }
 //# sourceMappingURL=mergeContracts.js.map

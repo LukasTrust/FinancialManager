@@ -417,7 +417,9 @@ function updateContractAvailability(): void {
     const contractElements = document.querySelectorAll<HTMLElement>("#contractsContainer .listItem");
 
     contractElements.forEach(contract => {
-        if (contract.dataset.counterPartyId === selectedCounterparty) {
+        if (selectedCounterparty === null) {
+            contract.classList.remove("disabled");
+        } else if (contract.dataset.counterPartyId === selectedCounterparty) {
             contract.classList.remove("disabled");
         } else {
             contract.classList.add("disabled");

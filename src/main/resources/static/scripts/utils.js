@@ -302,7 +302,10 @@ function toggleContractSelection(selectedElement, setCounterParty) {
 function updateContractAvailability() {
     const contractElements = document.querySelectorAll("#contractsContainer .listItem");
     contractElements.forEach(contract => {
-        if (contract.dataset.counterPartyId === selectedCounterparty) {
+        if (selectedCounterparty === null) {
+            contract.classList.remove("disabled");
+        }
+        else if (contract.dataset.counterPartyId === selectedCounterparty) {
             contract.classList.remove("disabled");
         }
         else {
