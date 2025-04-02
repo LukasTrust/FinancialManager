@@ -273,7 +273,7 @@ function setMonths(messages) {
         .map((month) => month.replace(/'/g, ''));
     transactionsHiddenToggle = false;
 }
-function createContractList(messages, contracts) {
+function createContractList(messages, contracts, setCounterParty = false) {
     const contractsContainer = document.getElementById("contractsContainer");
     if (!contractsContainer) {
         console.error("Contracts container not found!");
@@ -282,7 +282,7 @@ function createContractList(messages, contracts) {
     const currency = getCurrentCurrencySymbol();
     contracts.forEach((contract) => {
         const listItem = createAndAppendElement(contractsContainer, "div", "listItem tooltip tooltipBottom");
-        listItem.addEventListener("click", () => toggleContractSelection(listItem));
+        listItem.addEventListener("click", () => toggleContractSelection(listItem, setCounterParty));
         listItem.id = contract.id.toString();
         listItem.dataset.counterPartyId = contract.counterParty.id.toString();
         const startDate = formatDateString(contract.startDate);
@@ -294,7 +294,20 @@ function createContractList(messages, contracts) {
         createAndAppendElement(listItem, "div", "tooltipText", `${messages["startDate"]}: ${startDate}   ${messages["lastPaymentDate"]}: ${lastPaymentDate}`);
     });
 }
-function toggleContractSelection(selectedElement) {
+function toggleContractSelection(selectedElement, setCounterParty) {
     selectedContract = toggleSelection(selectedElement, selectedContract, "selected");
+    if (setCounterParty && selectedContract)
+        selectedCounterparty = selectedContract.dataset.counterPartyId;
+}
+function updateContractAvailability() {
+    const contractElements = document.querySelectorAll("#contractsContainer .listItem");
+    contractElements.forEach(contract => {
+        if (contract.dataset.counterPartyId === selectedCounterparty) {
+            contract.classList.remove("disabled");
+        }
+        else {
+            contract.classList.add("disabled");
+        }
+    });
 }
 //# sourceMappingURL=utils.js.map

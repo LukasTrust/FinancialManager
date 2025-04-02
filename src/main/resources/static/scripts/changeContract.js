@@ -212,17 +212,6 @@ function toggleTransactionSelection(selectedElement) {
     }
     updateContractAvailability();
 }
-function updateContractAvailability() {
-    const contractElements = document.querySelectorAll("#contractsContainer .listItem");
-    contractElements.forEach(contract => {
-        if (contract.dataset.counterPartyId === selectedCounterparty) {
-            contract.classList.remove("disabled");
-        }
-        else {
-            contract.classList.add("disabled");
-        }
-    });
-}
 function createContractSection(messages, leftColumn, contractName, startDate, lastPaymentDate, removeButtonHandler) {
     // Remove old contract section if it exists
     let oldContract = leftColumn.querySelector(".tooltip");

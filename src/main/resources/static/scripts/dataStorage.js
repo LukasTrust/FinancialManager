@@ -12,6 +12,7 @@ let transactionsHiddenToggle = false;
 let selectedTransactionGroup = null;
 let selectedCounterparty = null;
 let selectedContract = null;
+let headerContract = null;
 let counterPartyData = [];
 let filteredCounterPartyData = [];
 let counterPartiesHiddenToggle = false;

@@ -165,6 +165,7 @@ async function fillContracts(messages: Record<string, string>): Promise<void> {
     const contractData: Contract[] | undefined = await loadOnlyContracts(messages);
 
     createContractList(messages, contractData);
+
     updateContractAvailability();
 }
 
@@ -278,18 +279,6 @@ function toggleTransactionSelection(selectedElement: HTMLElement | null): void {
     }
 
     updateContractAvailability();
-}
-
-function updateContractAvailability(): void {
-    const contractElements = document.querySelectorAll<HTMLElement>("#contractsContainer .listItem");
-
-    contractElements.forEach(contract => {
-        if (contract.dataset.counterPartyId === selectedCounterparty) {
-            contract.classList.remove("disabled");
-        } else {
-            contract.classList.add("disabled");
-        }
-    });
 }
 
 function createContractSection(

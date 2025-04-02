@@ -12,5 +12,7 @@
   "selectHeaderTooltip": "Dadurch kann der Vertrag ausgewählt werden der als Kopf verwendet werden soll",
   "error_generic": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.",
   "selectAHeader": "Bitte wählen Sie einen Kopf aus",
-  "selectContracts": "Bitte in der ansicht zuvor verträge auswählen"
+  "selectContracts": "Bitte in der ansicht zuvor verträge auswählen",
+  "removeHeader": "Kopf entfernen",
+  "removeHeaderTooltip": "Dadurch wird der momentane Kopf Vertraag deselektiert"
 }

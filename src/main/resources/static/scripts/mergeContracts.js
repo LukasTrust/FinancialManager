@@ -1,14 +1,17 @@
 async function buildMergeContracts(cameFromUrl, contracts) {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     await loadURL("/mergeContracts");
     const messages = await loadLocalization("mergeContracts");
     if (!messages)
         return;
     selectedContract = null;
-    createContractList(messages, contracts);
+    selectedCounterparty = null;
+    headerContract = null;
+    createContractList(messages, contracts, true);
     (_a = document.getElementById("backButton")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", async () => await backToOtherView(cameFromUrl));
     (_b = document.getElementById("mergeContractsHeader")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", async () => await mergeContracts(messages));
     (_c = document.getElementById("selectHeader")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => selectHeader());
+    (_d = document.getElementById("removeHeader")) === null || _d === void 0 ? void 0 : _d.addEventListener("click", () => removeHeader());
 }
 async function mergeContracts(messages) {
     try {
@@ -45,11 +48,19 @@ async function mergeContracts(messages) {
     }
 }
 function selectHeader() {
-    const contractsContainer = document.getElementById("contractsContainer");
     const headerContainer = document.getElementById("headerContract");
-    if (headerContainer.children) {
-        moveElements(headerContainer, contractsContainer);
+    if (selectedContract !== null && headerContract !== selectedContract) {
+        removeHeader();
+        moveElements(null, headerContainer, selectedContract);
+        headerContract = selectedContract;
+        toggleSelection(selectedContract, null, "selected");
+        updateContractAvailability();
     }
-    moveElements(null, headerContainer, selectedContract);
+}
+function removeHeader() {
+    const contractsContainer = document.getElementById("contractsContainer");
+    moveElements(null, contractsContainer, selectedContract);
+    toggleSelection(selectedContract, null, "selected");
+    selectedContract = null;
 }
 //# sourceMappingURL=mergeContracts.js.map

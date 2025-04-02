@@ -16,6 +16,7 @@ let transactionsHiddenToggle: boolean = false;
 let selectedTransactionGroup: HTMLElement | null = null;
 let selectedCounterparty: string | null = null;
 let selectedContract: HTMLElement | null = null;
+let headerContract: HTMLElement | null = null;
 
 let counterPartyData: CounterPartyDisplay[] = [];
 let filteredCounterPartyData: CounterPartyDisplay[] = [];

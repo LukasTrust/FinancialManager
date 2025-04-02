@@ -379,7 +379,7 @@ function setMonths(messages: Record<string, string>): void {
     transactionsHiddenToggle = false;
 }
 
-function createContractList(messages: Record<string, string>, contracts: Contract[]): void {
+function createContractList(messages: Record<string, string>, contracts: Contract[], setCounterParty: boolean = false): void {
     const contractsContainer = document.getElementById("contractsContainer");
 
     if (!contractsContainer) {
@@ -391,7 +391,7 @@ function createContractList(messages: Record<string, string>, contracts: Contrac
 
     contracts.forEach((contract: Contract) => {
         const listItem = createAndAppendElement(contractsContainer, "div", "listItem tooltip tooltipBottom");
-        listItem.addEventListener("click", () => toggleContractSelection(listItem));
+        listItem.addEventListener("click", () => toggleContractSelection(listItem, setCounterParty));
         listItem.id = contract.id.toString();
         listItem.dataset.counterPartyId = contract.counterParty.id.toString();
 
@@ -406,6 +406,21 @@ function createContractList(messages: Record<string, string>, contracts: Contrac
     });
 }
 
-function toggleContractSelection(selectedElement: HTMLElement) {
+function toggleContractSelection(selectedElement: HTMLElement, setCounterParty: boolean) {
     selectedContract = toggleSelection(selectedElement, selectedContract, "selected");
+
+    if (setCounterParty && selectedContract)
+        selectedCounterparty = selectedContract.dataset.counterPartyId;
+}
+
+function updateContractAvailability(): void {
+    const contractElements = document.querySelectorAll<HTMLElement>("#contractsContainer .listItem");
+
+    contractElements.forEach(contract => {
+        if (contract.dataset.counterPartyId === selectedCounterparty) {
+            contract.classList.remove("disabled");
+        } else {
+            contract.classList.add("disabled");
+        }
+    });
 }

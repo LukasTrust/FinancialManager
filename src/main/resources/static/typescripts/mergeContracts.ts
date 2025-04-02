@@ -5,12 +5,15 @@ async function buildMergeContracts(cameFromUrl: string, contracts: Contract[]): 
     if (!messages) return;
 
     selectedContract = null;
+    selectedCounterparty = null;
+    headerContract = null;
 
-    createContractList(messages, contracts);
+    createContractList(messages, contracts, true);
 
     document.getElementById("backButton")?.addEventListener("click", async () => await backToOtherView(cameFromUrl));
     document.getElementById("mergeContractsHeader")?.addEventListener("click", async () => await mergeContracts(messages));
     document.getElementById("selectHeader")?.addEventListener("click", () => selectHeader());
+    document.getElementById("removeHeader")?.addEventListener("click", () => removeHeader());
 }
 
 async function mergeContracts(messages: Record<string, string>): Promise<void> {
@@ -56,12 +59,20 @@ async function mergeContracts(messages: Record<string, string>): Promise<void> {
 }
 
 function selectHeader(): void {
-    const contractsContainer = document.getElementById("contractsContainer");
     const headerContainer = document.getElementById("headerContract");
 
-    if (headerContainer.children) {
-        moveElements(headerContainer, contractsContainer);
+    if (selectedContract !== null && headerContract !== selectedContract) {
+        removeHeader();
+        moveElements(null, headerContainer, selectedContract);
+        headerContract = selectedContract;
+        toggleSelection(selectedContract, null, "selected");
+        updateContractAvailability();
     }
+}
 
-    moveElements(null, headerContainer, selectedContract);
+function removeHeader(): void {
+    const contractsContainer = document.getElementById("contractsContainer");
+    moveElements(null, contractsContainer, selectedContract);
+    toggleSelection(selectedContract, null, "selected");
+    selectedContract = null;
 }
