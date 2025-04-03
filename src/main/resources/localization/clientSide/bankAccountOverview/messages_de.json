@@ -12,6 +12,5 @@
   "endDateText": "Enddatum:",
   "endDateTooltip": "Wählen Sie ein Enddatum aus, um die Transaktionen entsprechend zu filtern",
   "clearDateButton": "Daten löschen",
-  "loadingHeader": "Bitte warten...",
-  "counterPartyName": "Gegenpartei:"
+  "loadingHeader": "Bitte warten..."
 }

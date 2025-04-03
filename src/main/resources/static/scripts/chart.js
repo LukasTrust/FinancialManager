@@ -46,99 +46,54 @@ function createLineChart(responseBody) {
         return;
     }
     // Destroy previous chart instance if it exists
-    if (existingChart) {
+    if (existingChart instanceof Chart) {
         existingChart.destroy();
-        existingChart = null;
     }
     const chartData = transformChartData(responseBody);
     const currency = getCurrentCurrencySymbol();
+    const tooltipOptions = {
+        backgroundColor: 'rgba(30, 30, 30, 0.9)',
+        titleFont: { family: "'Poppins', sans-serif", size: 16, weight: 'bold' },
+        bodyFont: { family: "'Poppins', sans-serif", size: 14 },
+        padding: 14,
+        usePointStyle: true,
+        callbacks: {
+            label: ({ raw }) => {
+                return `    ${raw.counterPartyName}    ${formatNumber(raw.amount, currency)}`;
+            }
+        }
+    };
+    const axisTicks = {
+        color: '#94A3B8',
+        font: { family: "'Poppins', sans-serif", size: 12 }
+    };
     existingChart = new Chart(ctx, {
         type: "line",
         data: chartData,
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            interaction: {
-                intersect: false,
-                mode: 'index',
-            },
+            interaction: { intersect: false, mode: 'nearest', axis: 'x' },
             plugins: {
                 legend: {
                     display: true,
                     position: 'top',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 20,
-                        font: {
-                            family: "'Inter', sans-serif",
-                            size: 12
-                        }
-                    }
+                    labels: { usePointStyle: true, padding: 20, font: { family: "'Poppins', sans-serif", size: 14 } }
                 },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    titleFont: {
-                        family: "'Inter', sans-serif",
-                        size: 14,
-                        weight: 'bold'
-                    },
-                    bodyFont: {
-                        family: "'Inter', sans-serif",
-                        size: 12
-                    },
-                    padding: 12,
-                    usePointStyle: true,
-                    callbacks: {
-                        label: (context) => {
-                            let label = context.dataset.label || "";
-                            if (label) {
-                                label += ": ";
-                            }
-                            if (context.parsed.y !== null) {
-                                label += formatNumber(context.parsed.y, currency);
-                            }
-                            return label;
-                        }
-                    }
-                }
+                tooltip: tooltipOptions
             },
             scales: {
                 x: {
                     type: "time",
-                    time: {
-                        unit: "month",
-                        tooltipFormat: "dd MMM yyyy"
-                    },
-                    grid: {
-                        display: false,
-                        drawBorder: false
-                    },
-                    ticks: {
-                        color: '#6B7280',
-                        font: {
-                            family: "'Inter', sans-serif"
-                        }
-                    }
+                    time: { unit: "month", tooltipFormat: "dd MMM yyyy" },
+                    grid: { display: false, drawBorder: false },
+                    ticks: axisTicks
                 },
                 y: {
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)',
-                        drawBorder: false
-                    },
-                    ticks: {
-                        color: '#6B7280',
-                        font: {
-                            family: "'Inter', sans-serif"
-                        }
-                    }
+                    grid: { color: 'rgba(0, 0, 0, 0.1)', drawBorder: false, lineWidth: 1 },
+                    ticks: axisTicks
                 }
             },
-            elements: {
-                point: {
-                    hoverRadius: 8,
-                    hoverBorderWidth: 2
-                }
-            }
         }
     });
 }
@@ -148,13 +103,15 @@ function transformChartData(responseBody) {
         labels: ((_a = responseBody.seriesList[0]) === null || _a === void 0 ? void 0 : _a.dataPoints.map(dp => new Date(dp.date))) || [],
         datasets: responseBody.seriesList.map(series => ({
             label: series.name,
+            fill: false, // Ensure missing values don't connect
             data: series.dataPoints.map(dp => ({
                 x: new Date(dp.date),
                 y: dp.value,
                 info: dp.info,
+                counterPartyName: dp.counterPartyName,
+                amount: dp.amount,
                 pointStyle: dp.style
-            })),
-            borderWidth: 2
+            }))
         }))
     };
 }

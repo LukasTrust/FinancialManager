@@ -137,6 +137,7 @@ interface ChartSeries {
 
 interface DataPoint {
     value: number,
+    amount: number,
     counterPartyName: string,
     info: string,
     date: Date,
@@ -147,6 +148,24 @@ enum PointStyle {
     GOOD = "GOOD",
     NORMAL = "NORMAL",
     BAD = "BAD"
+}
+
+interface TooltipOptions {
+    backgroundColor: string;
+    titleFont: {
+        family: string;
+        size: number;
+        weight: string;
+    };
+    bodyFont: {
+        family: string;
+        size: number;
+    };
+    padding: number;
+    usePointStyle: boolean;
+    callbacks: {
+        label: (context: any) => string;
+    };
 }
 
 interface KeyFigure {

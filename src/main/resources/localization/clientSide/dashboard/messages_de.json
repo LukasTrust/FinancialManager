@@ -6,6 +6,5 @@
   "startDateTooltip": "Wählen Sie ein Startdatum aus, um die Transaktionen entsprechend zu filtern",
   "endDateText": "Enddatum:",
   "endDateTooltip": "Wählen Sie ein Enddatum aus, um die Transaktionen entsprechend zu filtern",
-  "dashboard": "Dashboard",
-  "counterPartyName": "Gegenpartei:"
+  "dashboard": "Dashboard"
 }

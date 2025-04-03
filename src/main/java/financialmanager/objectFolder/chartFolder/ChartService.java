@@ -108,6 +108,6 @@ public class ChartService {
                 List.of(String.valueOf(difference))
         );
 
-        return new DataPoint(transaction.getAmountInBankAfter(), counterPartyName, info, transaction.getDate(), pointStyle);
+        return new DataPoint(transaction.getAmountInBankAfter(), transaction.getAmount(), counterPartyName, info, transaction.getDate(), pointStyle);
     }
 }
