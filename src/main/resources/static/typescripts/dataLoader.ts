@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadSidebar();
 
     // Load first page to view
-    await buildAddBankAccount();
+    await buildDashboard();
 
     // Listen for clicks on links (or buttons) to dynamically load content
     document.querySelectorAll<HTMLAnchorElement>('a[data-ajax="true"]').forEach(link => {
@@ -54,6 +54,9 @@ async function loadURL(url: string): Promise<void> {
                 break;
             case "/contracts":
                 await buildContracts();
+                break;
+            case "/dashboard":
+                await buildDashboard();
                 break;
         }
     } catch (error) {

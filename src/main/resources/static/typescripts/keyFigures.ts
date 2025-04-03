@@ -1,6 +1,9 @@
-async function loadKeyFigures(messages: Record<string, string>, startDate: string | null = null, endDate: string | null = null): Promise<void> {
+async function loadKeyFigures(messages: Record<string, string>,
+                              startDate: string | null = null,
+                              endDate: string | null = null,
+                              solo: boolean = true): Promise<void> {
     try {
-        let url = `/bankAccountOverview/${bankAccountId}/data/keyFigures`;
+        let url = solo == true ? `/bankAccountOverview/${bankAccountId}/data/keyFigures` : `/dashboard/data/keyFigures`;
         const params = new URLSearchParams();
 
         if (startDate) params.append("startDate", startDate);
@@ -48,7 +51,7 @@ function createKeyFigures(keyFigures: KeyFigure[]): void {
 
         // Create Header
         const keyFigureHeader = createAndAppendElement(keyFigureBox, "div", "keyFigureHeader");
-        createAndAppendElement(keyFigureHeader, "span", "", keyFigure.name, { style: "cursor: pointer" });
+        createAndAppendElement(keyFigureHeader, "span", "", keyFigure.name, {style: "cursor: pointer"});
 
         // Tooltip
         const keyFigureTooltip = createAndAppendElement(keyFigureHeader, "div", "tooltip bi bi-info");
@@ -56,12 +59,12 @@ function createKeyFigures(keyFigures: KeyFigure[]): void {
 
         // Value Container
         const classForValue = keyFigure.value >= 0 ? "positive" : "negative";
-        const valueContainer = createAndAppendElement(keyFigureBox, "div", classForValue, null, { style: "padding: 10px" });
+        const valueContainer = createAndAppendElement(keyFigureBox, "div", classForValue, null, {style: "padding: 10px"});
 
         const iconClass = keyFigure.value >= 0 ? "bi bi-arrow-up" : "bi bi-arrow-down";
         createAndAppendElement(valueContainer, "i", iconClass);
 
-        createAndAppendElement(valueContainer, "span", "", formatNumber(keyFigure.value, currency), { style: "margin: 20px" });
+        createAndAppendElement(valueContainer, "span", "", formatNumber(keyFigure.value, currency), {style: "margin: 20px"});
     }
 
     keyFiguresContainer.appendChild(fragment);

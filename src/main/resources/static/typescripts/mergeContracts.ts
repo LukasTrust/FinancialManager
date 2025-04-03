@@ -19,18 +19,30 @@ async function buildMergeContracts(cameFromUrl: string, contracts: Contract[]): 
 async function mergeContracts(messages: Record<string, string>): Promise<void> {
     try {
         const contractsContainer = document.getElementById("contractsContainer");
-        const ids = getIdsFromContainer(contractsContainer);
+        const elements = Array.from(contractsContainer.querySelectorAll<HTMLElement>(
+            ".normalText, .listItem, .listItemSmall"
+        ));
+
+        if (elements.length === 0) {
+            showAlert(AlertType.INFO, messages["selectContracts"]);
+            return;
+        }
+
+        const ids = elements
+            .filter(span => !span.classList.contains("disabled")) // Ensure element is not disabled
+            .map(span => Number(span.id))
+            .filter(id => !isNaN(id) && id !== 0); // Validate ID
 
         if (ids.length === 0) {
-            showAlert(AlertType.INFO, messages["selectAHeader"]);
+            showAlert(AlertType.INFO, messages["noContractsThatCouldBeMerged"]);
             return;
         }
 
         const headerContainer = document.getElementById("headerContract");
         const headerIds = getIdsFromContainer(headerContainer);
 
-        if (ids.length !== 1) {
-            showAlert(AlertType.INFO, messages["selectContracts"]);
+        if (headerIds.length !== 1) {
+            showAlert(AlertType.INFO, messages["selectAHeader"]);
             return;
         }
 
@@ -50,7 +62,9 @@ async function mergeContracts(messages: Record<string, string>): Promise<void> {
         const responseBody: Response = await response.json();
 
         if (responseBody.alertType === AlertType.SUCCESS) {
-            removeElements(contractsContainer)
+            elements.forEach(item => {
+                removeElements(null, item);
+            })
         }
     } catch (error) {
         console.error("There was an error merging the contracts", error);

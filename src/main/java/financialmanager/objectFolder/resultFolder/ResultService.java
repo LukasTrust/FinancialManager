@@ -218,5 +218,19 @@ public class ResultService {
         return new Ok<>(bankAccount);
     }
 
+    public Result<List<BankAccount>, ResponseEntity<Response>> findBankAccountsByUsers() {
+        Result<Users, ResponseEntity<Response>> currentUserResponse = getCurrentUser();
+
+        if (currentUserResponse.isErr()) {
+            return new Err<>(ResponseEntity.status(HttpStatus.NOT_FOUND).body(currentUserResponse.getError().getBody()));
+        }
+
+        Users currentUser = currentUserResponse.getValue();
+
+        List<BankAccount> bankAccounts = baseBankAccountService.findAllByUsers(currentUser);
+
+        return new Ok<>(bankAccounts);
+    }
+
     //</editor-fold>
 }

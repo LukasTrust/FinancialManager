@@ -37,7 +37,7 @@ public class BankAccountOverviewController {
             @PathVariable("bankAccountId") Long bankAccountId,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return ResponseEntity.ok(chartService.getTransactionDate(Collections.singletonList(bankAccountId), startDate, endDate));
+        return ResponseEntity.ok(chartService.getTransactionDateOfBankAccounts(Collections.singletonList(bankAccountId), startDate, endDate));
     }
 
     @PostMapping("/{bankAccountId}/data/upload")

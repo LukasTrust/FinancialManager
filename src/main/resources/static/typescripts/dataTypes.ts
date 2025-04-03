@@ -125,39 +125,28 @@ interface Response<T = any> {
     data: T;
 }
 
-class PointStyle {
-    static readonly NORMAL = new PointStyle("#000000", "#FFFFFF", 2);
-    static readonly GOOD = new PointStyle("#008000", "#00FF00", 3);
-    static readonly BAD = new PointStyle("#FF0000", "#FFCCCC", 3);
-
-    constructor(
-        public pointBorderColor: string,
-        public pointBackgroundColor: string,
-        public pointBorderWidth: number
-    ) {}
+interface ChartData {
+    title: string,
+    seriesList: ChartSeries[]
 }
 
-class DataPoint {
-    constructor(
-        public value: number,
-        public date: Date,
-        public info: string,
-        public style: PointStyle
-    ) {}
+interface ChartSeries {
+    name: string,
+    dataPoints: DataPoint[]
 }
 
-class ChartSeries {
-    constructor(
-        public name: string,
-        public dataPoints: DataPoint[]
-    ) {}
+interface DataPoint {
+    value: number,
+    counterPartyName: string,
+    info: string,
+    date: Date,
+    style: PointStyle
 }
 
-class ChartData {
-    constructor(
-        public title: string,
-        public seriesList: ChartSeries[]
-    ) {}
+enum PointStyle {
+    GOOD = "GOOD",
+    NORMAL = "NORMAL",
+    BAD = "BAD"
 }
 
 interface KeyFigure {

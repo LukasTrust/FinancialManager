@@ -27,7 +27,18 @@ public class ChartService {
     private final LocaleService localeService;
     private final ResultService resultService;
 
-    public ChartData getTransactionDate(List<Long> bankAccountIds, LocalDate startDate, LocalDate endDate) {
+    public ChartData getTransactionDateOfUser(LocalDate startDate, LocalDate endDate) {
+        Result<List<BankAccount>, ResponseEntity<Response>> bankAccountsResult = resultService.findBankAccountsByUsers();
+
+        if (bankAccountsResult.isErr())
+            return null;
+
+        List<Long> ids = bankAccountsResult.getValue().stream().map(BankAccount::getId).toList();
+
+        return getTransactionDateOfBankAccounts(ids, startDate, endDate);
+    }
+
+    public ChartData getTransactionDateOfBankAccounts(List<Long> bankAccountIds, LocalDate startDate, LocalDate endDate) {
         LocalDate[] dates = Utils.normalizeDateRange(startDate, endDate);
         LocalDate start = dates[0];
         LocalDate end = dates[1];
@@ -89,12 +100,14 @@ public class ChartService {
                 : difference > 0 ? PointStyle.BAD
                 : PointStyle.GOOD;
 
+        String counterPartyName = transaction.getCounterParty().getName();
+
         String info = (pointStyle == PointStyle.NORMAL) ? null
                 : localeService.getMessageWithPlaceHolder(
                 pointStyle == PointStyle.BAD ? "lessAmountAfter" : "moreAmountAfter",
                 List.of(String.valueOf(difference))
         );
 
-        return new DataPoint(transaction.getAmountInBankAfter(), transaction.getDate(), info, pointStyle);
+        return new DataPoint(transaction.getAmountInBankAfter(), counterPartyName, info, transaction.getDate(), pointStyle);
     }
 }

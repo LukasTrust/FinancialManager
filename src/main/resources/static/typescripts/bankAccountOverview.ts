@@ -3,8 +3,8 @@ async function buildBankAccountOverview(): Promise<void> {
     if (!messages) return;
 
     handleFileBrowser(messages);
-    handleDateRangeSelection(messages);
-    await updateVisuals(messages);
+    handleDateRangeSelection(messages, true);
+    await updateVisuals(messages, true);
 
     document.getElementById("deleteDataButton")?.addEventListener("click", async () => await deleteData(messages));
 }
@@ -21,39 +21,11 @@ async function deleteData(messages: Record<string, string>) {
         showAlert(responseBody.alertType, responseBody.message);
 
         if (responseBody.alertType === AlertType.SUCCESS)
-            await updateVisuals(messages);
+            await updateVisuals(messages, true);
 
     } catch (error) {
         console.error("There was an error deleting the data", error);
         showAlert('error', messages["error_generic"]);
-    }
-}
-
-async function updateVisuals(messages: Record<string, string>, startDate: string | null = null, endDate: string | null = null): Promise<void> {
-    await loadLineChart(messages, startDate, endDate);
-    await loadKeyFigures(messages, startDate, endDate);
-}
-
-function handleDateRangeSelection(messages: Record<string, string>): void {
-    const startDate = document.getElementById("startDate") as HTMLInputElement;
-    const endDate = document.getElementById("endDate") as HTMLInputElement;
-    const clearDateButton = document.getElementById("clearDateButton") as HTMLButtonElement;
-
-    startDate.addEventListener("input", async () => await checkDates(messages, startDate, endDate));
-    endDate.addEventListener("input", async () => await checkDates(messages, startDate, endDate));
-    clearDateButton.addEventListener("click", async () => {
-        startDate.value = '';
-        endDate.value = '';
-        await updateVisuals(messages);
-    });
-}
-
-async function checkDates(messages: Record<string, string>, startDate: HTMLInputElement, endDate: HTMLInputElement): Promise<void> {
-    const startValue = startDate.value.trim() || null;
-    const endValue = endDate.value.trim() || null;
-
-    if (startValue || endValue) {
-        await updateVisuals(messages, startValue, endValue);
     }
 }
 
@@ -112,7 +84,7 @@ async function handleSelectedFiles(messages: Record<string, string>, files: File
         closeDialog();
 
         if (newDate) {
-            await updateVisuals(messages);
+            await updateVisuals(messages, true);
         }
     }
 }

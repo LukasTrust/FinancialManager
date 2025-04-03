@@ -1,6 +1,7 @@
 const contentArea: HTMLElement | null = document.getElementById('content');
 let timer: number | null = null;
 let alerts: HTMLElement[] = [];
+declare const Chart: any;
 
 let existingChart: any = null;
 let currentLanguage: string;

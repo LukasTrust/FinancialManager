@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class CsvFileParser extends FileParser {
 
@@ -47,15 +48,18 @@ public class CsvFileParser extends FileParser {
                 return null;
             }
 
-            String[] split = line.split(",");
-            if (split.length == 1) {
-                split = line.split(";");
-            }
+            // Count occurrences of "," and ";"
+            long commaCount = line.chars().filter(ch -> ch == ',').count();
+            long semicolonCount = line.chars().filter(ch -> ch == ';').count();
 
-            return split;
+            // Choose the delimiter based on count
+            String delimiter = semicolonCount > commaCount ? ";" : ",";
+
+            return line.split(Pattern.quote(delimiter)); // Ensure safe splitting
         } catch (IOException e) {
-            log.error("Error in reading data", e);
+            log.error("Error reading data", e);
             return new String[0];
         }
     }
+
 }

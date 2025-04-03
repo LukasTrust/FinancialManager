@@ -1,6 +1,6 @@
-async function loadKeyFigures(messages, startDate = null, endDate = null) {
+async function loadKeyFigures(messages, startDate = null, endDate = null, solo = true) {
     try {
-        let url = `/bankAccountOverview/${bankAccountId}/data/keyFigures`;
+        let url = solo == true ? `/bankAccountOverview/${bankAccountId}/data/keyFigures` : `/dashboard/data/keyFigures`;
         const params = new URLSearchParams();
         if (startDate)
             params.append("startDate", startDate);

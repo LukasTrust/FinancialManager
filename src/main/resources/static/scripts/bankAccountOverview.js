@@ -4,8 +4,8 @@ async function buildBankAccountOverview() {
     if (!messages)
         return;
     handleFileBrowser(messages);
-    handleDateRangeSelection(messages);
-    await updateVisuals(messages);
+    handleDateRangeSelection(messages, true);
+    await updateVisuals(messages, true);
     (_a = document.getElementById("deleteDataButton")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", async () => await deleteData(messages));
 }
 async function deleteData(messages) {
@@ -17,34 +17,11 @@ async function deleteData(messages) {
         const responseBody = await response.json();
         showAlert(responseBody.alertType, responseBody.message);
         if (responseBody.alertType === AlertType.SUCCESS)
-            await updateVisuals(messages);
+            await updateVisuals(messages, true);
     }
     catch (error) {
         console.error("There was an error deleting the data", error);
         showAlert('error', messages["error_generic"]);
-    }
-}
-async function updateVisuals(messages, startDate = null, endDate = null) {
-    await loadLineChart(messages, startDate, endDate);
-    await loadKeyFigures(messages, startDate, endDate);
-}
-function handleDateRangeSelection(messages) {
-    const startDate = document.getElementById("startDate");
-    const endDate = document.getElementById("endDate");
-    const clearDateButton = document.getElementById("clearDateButton");
-    startDate.addEventListener("input", async () => await checkDates(messages, startDate, endDate));
-    endDate.addEventListener("input", async () => await checkDates(messages, startDate, endDate));
-    clearDateButton.addEventListener("click", async () => {
-        startDate.value = '';
-        endDate.value = '';
-        await updateVisuals(messages);
-    });
-}
-async function checkDates(messages, startDate, endDate) {
-    const startValue = startDate.value.trim() || null;
-    const endValue = endDate.value.trim() || null;
-    if (startValue || endValue) {
-        await updateVisuals(messages, startValue, endValue);
     }
 }
 function handleFileBrowser(messages) {
@@ -93,7 +70,7 @@ async function handleSelectedFiles(messages, files) {
         const newDate = await sendFiles(messages, validFiles);
         closeDialog();
         if (newDate) {
-            await updateVisuals(messages);
+            await updateVisuals(messages, true);
         }
     }
 }

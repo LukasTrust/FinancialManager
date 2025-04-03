@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load sidebar
     await loadSidebar();
     // Load first page to view
-    await buildAddBankAccount();
+    await buildDashboard();
     // Listen for clicks on links (or buttons) to dynamically load content
     document.querySelectorAll('a[data-ajax="true"]').forEach(link => {
         link.addEventListener('click', async (event) => {
@@ -46,6 +46,9 @@ async function loadURL(url) {
                 break;
             case "/contracts":
                 await buildContracts();
+                break;
+            case "/dashboard":
+                await buildDashboard();
                 break;
         }
     }

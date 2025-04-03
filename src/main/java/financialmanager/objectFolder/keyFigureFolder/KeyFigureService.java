@@ -27,6 +27,17 @@ public class KeyFigureService {
     private final LocaleService localeService;
     private final ResultService resultService;
 
+    public List<KeyFigure> getKeyFiguresOfUser(LocalDate startDate, LocalDate endDate) {
+        Result<List<BankAccount>, ResponseEntity<Response>> bankAccountsResult = resultService.findBankAccountsByUsers();
+
+        if (bankAccountsResult.isErr())
+            return new ArrayList<>();
+
+        List<Long> ids = bankAccountsResult.getValue().stream().map(BankAccount::getId).toList();
+
+        return getKeyFiguresOfBankAccounts(ids, startDate, endDate);
+    }
+
     public List<KeyFigure> getKeyFiguresOfBankAccounts(List<Long> bankAccountIds, LocalDate startDate, LocalDate endDate) {
         LocalDate[] dates = Utils.normalizeDateRange(startDate, endDate);
         LocalDate start = dates[0];

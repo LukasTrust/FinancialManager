@@ -1,10 +1,11 @@
 async function loadLineChart(
     messages: Record<string, string>,
     startDate: string | null = null,
-    endDate: string | null = null
+    endDate: string | null = null,
+    solo: boolean
 ): Promise<void> {
     try {
-        let url = `/bankAccountOverview/${bankAccountId}/data/lineChart`;
+        let url = solo == true ? `/bankAccountOverview/${bankAccountId}/data/lineChart` :  `/dashboard/data/lineChart`;
         const params = new URLSearchParams();
 
         if (startDate) params.append("startDate", startDate);
@@ -28,21 +29,21 @@ async function loadLineChart(
 
         const responseBody: ChartData = await response.json();
 
+        console.log(responseBody);
+
         const bankName = document.getElementById("bankName");
         if (bankName) {
             bankName.innerText = responseBody.seriesList[0]?.name || "";
         }
 
-        createLineChart(responseBody);
+        createLineChart(responseBody, messages);
     } catch (error) {
         showAlert("ERROR", messages["error_generic"]);
         console.error("Error loading chart:", error);
     }
 }
 
-declare const Chart: any;
-
-function createLineChart(responseBody: ChartData): void {
+function createLineChart(responseBody: ChartData, messages: Record<string, string>): void {
     const chartId = "lineChart";
     const chartContainer = document.getElementById(chartId) as HTMLCanvasElement | null;
     if (!chartContainer) {
@@ -59,6 +60,7 @@ function createLineChart(responseBody: ChartData): void {
     // Destroy previous chart instance if it exists
     if (existingChart) {
         existingChart.destroy();
+        existingChart = null;
     }
 
     const chartData = transformChartData(responseBody);
@@ -70,15 +72,44 @@ function createLineChart(responseBody: ChartData): void {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
             plugins: {
-                legend: { display: true },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            family: "'Inter', sans-serif",
+                            size: 12
+                        }
+                    }
+                },
                 tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        family: "'Inter', sans-serif",
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        family: "'Inter', sans-serif",
+                        size: 12
+                    },
+                    padding: 12,
+                    usePointStyle: true,
                     callbacks: {
                         label: (context: any) => {
                             let label = context.dataset.label || "";
                             if (label) {
-                                label += ": ";
+                                label += ":";
                             }
+                            label += messages["counterPartyName"];
+                            label += context.counterPartyName;
                             if (context.parsed.y !== null) {
                                 label += formatNumber(context.parsed.y, currency);
                             }
@@ -93,7 +124,35 @@ function createLineChart(responseBody: ChartData): void {
                     time: {
                         unit: "month",
                         tooltipFormat: "dd MMM yyyy"
+                    },
+                    grid: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#6B7280',
+                        font: {
+                            family: "'Inter', sans-serif"
+                        }
                     }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#6B7280',
+                        font: {
+                            family: "'Inter', sans-serif"
+                        }
+                    }
+                }
+            },
+            elements: {
+                point: {
+                    hoverRadius: 8,
+                    hoverBorderWidth: 2
                 }
             }
         }
@@ -108,8 +167,39 @@ function transformChartData(responseBody: ChartData) {
             data: series.dataPoints.map(dp => ({
                 x: new Date(dp.date),
                 y: dp.value,
-                info: dp.info
-            }))
+                info: dp.info,
+                counterPartyName: dp.counterPartyName,
+                pointStyle: dp.style
+            })),
+            borderWidth: 2
         }))
     };
+}
+
+function handleDateRangeSelection(messages: Record<string, string>, solo: boolean): void {
+    const startDate = document.getElementById("startDate") as HTMLInputElement;
+    const endDate = document.getElementById("endDate") as HTMLInputElement;
+    const clearDateButton = document.getElementById("clearDateButton") as HTMLButtonElement;
+
+    startDate.addEventListener("input", async () => await checkDates(messages, solo, startDate, endDate));
+    endDate.addEventListener("input", async () => await checkDates(messages, solo, startDate, endDate));
+    clearDateButton.addEventListener("click", async () => {
+        startDate.value = '';
+        endDate.value = '';
+        await updateVisuals(messages, solo);
+    });
+}
+
+async function checkDates(messages: Record<string, string>, solo: boolean, startDate: HTMLInputElement, endDate: HTMLInputElement): Promise<void> {
+    const startValue = startDate.value.trim() || null;
+    const endValue = endDate.value.trim() || null;
+
+    if (startValue || endValue) {
+        await updateVisuals(messages, solo, startValue, endValue);
+    }
+}
+
+async function updateVisuals(messages: Record<string, string>, solo: boolean, startDate: string | null = null, endDate: string | null = null): Promise<void> {
+    await loadLineChart(messages, startDate, endDate, solo);
+    await loadKeyFigures(messages, startDate, endDate, solo);
 }

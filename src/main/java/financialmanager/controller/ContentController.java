@@ -19,8 +19,8 @@ public class ContentController {
 
     @GetMapping("/")
     public String index(Model model) {
-        model.addAttribute("title", "Add Bank Account");
-        model.addAttribute("template", "addBankAccount");
+        model.addAttribute("title", "Dashboard");
+        model.addAttribute("template", "dashboard");
         return "index";
     }
 
@@ -64,5 +64,11 @@ public class ContentController {
     public String getMergeContracts(Model model) {
         model.addAttribute("title", "Merge Contracts");
         return "mergeContracts";
+    }
+
+    @GetMapping("/dashboard")
+    public String getDashboard(Model model) {
+        model.addAttribute("title", "Dashboard");
+        return "dashboard";
     }
 }
