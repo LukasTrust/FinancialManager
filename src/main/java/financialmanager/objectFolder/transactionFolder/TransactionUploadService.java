@@ -1,6 +1,5 @@
 package financialmanager.objectFolder.transactionFolder;
 
-import financialmanager.objectFolder.categoryFolder.CategoryService;
 import financialmanager.objectFolder.contractFolder.BaseContractService;
 import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.contractFolder.ContractAssociationService;
@@ -46,7 +45,6 @@ public class TransactionUploadService {
 
     private final ContractAssociationService contractAssociationService;
     private final CounterPartyService counterPartyService;
-    private final CategoryService categoryService;
     private final FileParserFactory fileParserFactory;
     private final ResponseService responseService;
     private final ResultService resultService;
@@ -157,12 +155,6 @@ public class TransactionUploadService {
         counterPartyService.setCounterPartyForNewTransactions(currentUser, newTransactions);
         stopWatch.stop();
         log.info("{} for setCounterPartyForNewTransactions", stopWatch.getTotalTimeMillis());
-
-        stopWatch = new StopWatch();
-        stopWatch.start();
-        categoryService.addTransactionsToCategories(currentUser, newTransactions);
-        stopWatch.stop();
-        log.info("{} for addTransactionsToCategories", stopWatch.getTotalTimeMillis());
 
         newTransactions.addAll(existingTransactions);
 

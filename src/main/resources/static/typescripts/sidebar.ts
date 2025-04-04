@@ -15,10 +15,11 @@ async function loadSidebar(): Promise<void> {
         const messages = await loadLocalization("sidebar");
         if (!messages) return;
 
-        const bankAccounts = await loadBankAccounts();
+        const localBankAccounts = await loadBankAccounts();
 
-        bankAccounts.forEach((bankAccount) => {
-            bankAccountSymbols[bankAccount.id] = bankAccount.currencySymbol;
+        localBankAccounts.forEach((bankAccount) => {
+            bankAccounts[bankAccount.id] = bankAccount;
+
             addBankAccountToSidebar(messages, bankAccount);
         });
 

@@ -6,14 +6,6 @@ async function buildAddBankAccount(): Promise<void> {
         showHiddenInputs(hiddenInputs);
     });
 
-    const fields = [
-        { addButtonId: "addCounterPartyStrings", inputId: "inputCounterPartyStrings", listId: "counterPartySearchStrings" },
-        { addButtonId: "addAmountStrings", inputId: "inputAmountStrings", listId: "amountSearchStrings" },
-        { addButtonId: "addAmountAfterStrings", inputId: "inputAmountAfterStrings", listId: "amountInBankAfterSearchStrings" },
-        { addButtonId: "addDateStrings", inputId: "inputDateStrings", listId: "dateSearchStrings" },
-        { addButtonId: "addInterestRateStrings", inputId: "inputInterestRateStrings", listId: "interestRateSearchStrings" }
-    ];
-
     const messages = await loadLocalization("addBankAccount");
     if (!messages) return;
 
@@ -21,26 +13,11 @@ async function buildAddBankAccount(): Promise<void> {
 
     submitButton.addEventListener("click", async (event: Event) => {
         event.preventDefault();
-        const listIds = fields.map(field => field.listId);
+        const listIds = searchStringFields.map(field => field.listId);
         await submitAddNewBank(messages, isSavingsAccount.checked, listIds);
     });
 
-    fields.forEach(field => {
-        const addButton = document.getElementById(field.addButtonId) as HTMLButtonElement;
-        const inputField = document.getElementById(field.inputId) as HTMLInputElement;
-        const stringList = document.getElementById(field.listId) as HTMLElement;
-
-        addButton.addEventListener("click", () => {
-            const inputValue = inputField.value.trim();
-
-            if (inputValue) {
-                addStringToList(messages, stringList, inputValue);
-                inputField.value = "";
-            } else {
-                showAlert("info", messages["error_enterWord"]);
-            }
-        });
-    });
+    setUpSearchStringFields(messages);
 }
 
 async function submitAddNewBank(messages: Record<string, string>, isSavingsAccount: boolean, listIds: string[]): Promise<void> {
@@ -121,11 +98,11 @@ function showHiddenInputs(hiddenInputs: HTMLElement): void {
     hiddenInputs.classList.toggle("hidden");
 }
 
-function addStringToList(messages: Record<string, string>, stringList: HTMLElement, text: string): void {
+function addStringToList(messages: Record<string, string>, stringList: HTMLElement, text: string, removeCallback: (element: HTMLElement) => void): void {
     const existingItems = Array.from(stringList.children).map(item => item.textContent?.trim() || "");
     if (existingItems.includes(text)) {
         showAlert("Warning", messages["error_alreadyInList"]);
         return;
     }
-    createListElement(stringList, text, {}, true, true);
+    createListElement(stringList, text, {}, true, true, null, removeCallback);
 }

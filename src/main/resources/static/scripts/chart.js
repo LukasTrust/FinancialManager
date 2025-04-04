@@ -21,7 +21,6 @@ async function loadLineChart(messages, startDate = null, endDate = null, solo) {
             return;
         }
         const responseBody = await response.json();
-        console.log(responseBody);
         const bankName = document.getElementById("bankName");
         if (bankName) {
             bankName.innerText = ((_a = responseBody.seriesList[0]) === null || _a === void 0 ? void 0 : _a.name) || "";

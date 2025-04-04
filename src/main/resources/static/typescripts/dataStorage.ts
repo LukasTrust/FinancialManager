@@ -8,7 +8,14 @@ let currentLanguage: string;
 let monthAbbreviations: string[] = [];
 
 let bankAccountId: number;
-let bankAccountSymbols: Record<string, string> = {};
+let bankAccounts: Record<number, AnyBankAccount> = {};
+const searchStringFields = [
+    { addButtonId: "addCounterPartyStrings", inputId: "inputCounterPartyStrings", listId: "counterPartySearchStrings" },
+    { addButtonId: "addAmountStrings", inputId: "inputAmountStrings", listId: "amountSearchStrings" },
+    { addButtonId: "addAmountAfterStrings", inputId: "inputAmountAfterStrings", listId: "amountInBankAfterSearchStrings" },
+    { addButtonId: "addDateStrings", inputId: "inputDateStrings", listId: "dateSearchStrings" },
+    { addButtonId: "addInterestRateStrings", inputId: "inputInterestRateStrings", listId: "interestRateSearchStrings" }
+];
 
 let transactionData: Transaction[] = []
 let filteredTransactionData: Transaction[] = [];

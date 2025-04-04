@@ -14,5 +14,6 @@
   "counterPartiesNotFound": "Die Gegenparteien wurden nicht gefunden",
   "counterPartySearchStringAlreadyInCounterParty": "Der Suchbegriff ist bereits in einer Gegenpatei vorhanden. Bitte ihn erst dort entfernen before er hier hinzugefügt werden kann",
   "searchStringNotInCounterParty": "Der Suchbegriff ist nicht in der Gegenpartei gespeichert",
-  "deletedData": "Es gab einen Fehler beim löschen der Daten"
+  "deletedData": "Es gab einen Fehler beim löschen der Daten",
+  "invalidListType": "Den Listen Typen gibt es nicht in diesen Bankkonto"
 }

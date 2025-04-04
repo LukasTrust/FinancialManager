@@ -29,8 +29,6 @@ async function loadLineChart(
 
         const responseBody: ChartData = await response.json();
 
-        console.log(responseBody);
-
         const bankName = document.getElementById("bankName");
         if (bankName) {
             bankName.innerText = responseBody.seriesList[0]?.name || "";

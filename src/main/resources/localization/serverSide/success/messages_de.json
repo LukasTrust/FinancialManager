@@ -14,5 +14,7 @@
   "contractsUnhidden": "{} Verträge, {} dazugehörige Transaktionen wurden sichtbar gemacht",
   "mergeContracts": "{} Verträge wurden vereinigt, {} dazugehörige Transaktionen wurden geupdated",
   "deleteContracts": "{} Verträge wurden gelöscht, {} dazugehörigen Transaktionen wurden geupdated",
-  "deletedData": "Die Daten wurden erfolgreich gelöscht"
+  "deletedData": "Die Daten wurden erfolgreich gelöscht",
+  "searchStringRemoved": "Der Suchbegriff wurde entfernt",
+  "searchStringAdded": "Der Suchbegriff wurde hinzugefügt"
 }

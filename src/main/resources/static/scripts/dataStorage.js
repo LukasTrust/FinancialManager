@@ -5,7 +5,14 @@ let existingChart = null;
 let currentLanguage;
 let monthAbbreviations = [];
 let bankAccountId;
-let bankAccountSymbols = {};
+let bankAccounts = {};
+const searchStringFields = [
+    { addButtonId: "addCounterPartyStrings", inputId: "inputCounterPartyStrings", listId: "counterPartySearchStrings" },
+    { addButtonId: "addAmountStrings", inputId: "inputAmountStrings", listId: "amountSearchStrings" },
+    { addButtonId: "addAmountAfterStrings", inputId: "inputAmountAfterStrings", listId: "amountInBankAfterSearchStrings" },
+    { addButtonId: "addDateStrings", inputId: "inputDateStrings", listId: "dateSearchStrings" },
+    { addButtonId: "addInterestRateStrings", inputId: "inputInterestRateStrings", listId: "interestRateSearchStrings" }
+];
 let transactionData = [];
 let filteredTransactionData = [];
 let transactionsHiddenToggle = false;

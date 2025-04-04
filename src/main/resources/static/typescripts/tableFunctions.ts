@@ -342,8 +342,6 @@ function updateCachedDataAndUI(type: Type, messages: Record<string, string>, ids
             break;
 
         case Type.COUNTERPARTY:
-            console.log(filteredCounterPartyData);
-
             filteredCounterPartyData = filteredCounterPartyData.map(counterParty =>
                 idSet.has(counterParty.counterParty.id)
                     ? {
@@ -355,8 +353,6 @@ function updateCachedDataAndUI(type: Type, messages: Record<string, string>, ids
                     }
                     : counterParty
             );
-
-            console.log(filteredCounterPartyData);
 
             counterPartyData = counterPartyData.map(counterParty =>
                 idSet.has(counterParty.counterParty.id)

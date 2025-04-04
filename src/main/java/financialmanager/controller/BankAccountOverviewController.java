@@ -1,5 +1,6 @@
 package financialmanager.controller;
 
+import financialmanager.objectFolder.bankAccountFolder.BankAccountService;
 import financialmanager.objectFolder.chartFolder.ChartData;
 import financialmanager.objectFolder.chartFolder.ChartService;
 import financialmanager.objectFolder.keyFigureFolder.KeyFigure;
@@ -17,14 +18,15 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("bankAccountOverview")
+@RequestMapping("bankAccountOverview/{bankAccountId}/data")
 public class BankAccountOverviewController {
 
     private final ChartService chartService;
     private final KeyFigureService keyFigureService;
+    private final BankAccountService bankAccountService;
     private final TransactionUploadService transactionUploadService;
 
-    @GetMapping("/{bankAccountId}/data/keyFigures")
+    @GetMapping("/keyFigures")
     public ResponseEntity<List<KeyFigure>> getKeyFigures(
             @PathVariable("bankAccountId") Long bankAccountId,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -32,7 +34,7 @@ public class BankAccountOverviewController {
         return ResponseEntity.ok(keyFigureService.getKeyFiguresOfBankAccounts(Collections.singletonList(bankAccountId), startDate, endDate));
     }
 
-    @GetMapping("/{bankAccountId}/data/lineChart")
+    @GetMapping("/lineChart")
     public ResponseEntity<ChartData> getLineChart(
             @PathVariable("bankAccountId") Long bankAccountId,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -40,13 +42,23 @@ public class BankAccountOverviewController {
         return ResponseEntity.ok(chartService.getTransactionDateOfBankAccounts(Collections.singletonList(bankAccountId), startDate, endDate));
     }
 
-    @PostMapping("/{bankAccountId}/data/upload")
+    @PostMapping("/upload")
     @ResponseBody
     public ResponseEntity<?> uploadDataForTransactions(@PathVariable Long bankAccountId, @RequestParam("files") MultipartFile[] files) {
         return transactionUploadService.uploadDataForTransactions(bankAccountId, files);
     }
 
-    @PostMapping("/{bankAccountId}/data/deleteData")
+    @PostMapping("/removeSearchString/{listType}/{searchString}")
+    public ResponseEntity<?> removeSearchString(@PathVariable Long bankAccountId, @PathVariable String listType, @PathVariable String searchString) {
+        return bankAccountService.removeSearchString(bankAccountId, listType, searchString);
+    }
+
+    @PostMapping("/addSearchString/{listType}/{searchString}")
+    public ResponseEntity<?> addSearchString(@PathVariable Long bankAccountId, @PathVariable String listType, @PathVariable String searchString) {
+        return bankAccountService.addSearchString(bankAccountId, listType, searchString);
+    }
+
+    @PostMapping("/deleteData")
     public ResponseEntity<?> deleteData(@PathVariable Long bankAccountId) {
         return transactionUploadService.deleteData(bankAccountId);
     }

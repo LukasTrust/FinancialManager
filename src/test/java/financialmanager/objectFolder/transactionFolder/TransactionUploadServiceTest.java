@@ -1,7 +1,6 @@
 package financialmanager.objectFolder.transactionFolder;
 
 import financialmanager.Utils.fileParser.FileParserFactory;
-import financialmanager.objectFolder.categoryFolder.CategoryService;
 import financialmanager.objectFolder.contractFolder.BaseContractService;
 import financialmanager.objectFolder.contractFolder.ContractAssociationService;
 import financialmanager.objectFolder.contractFolder.contractHistoryFolder.BaseContractHistoryService;
@@ -12,12 +11,10 @@ import financialmanager.objectFolder.resultFolder.ResultService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
@@ -31,7 +28,6 @@ class TransactionUploadServiceTest {
 
     private ContractAssociationService contractAssociationService;
     private CounterPartyService counterPartyService;
-    private CategoryService categoryService;
     private FileParserFactory fileParserFactory;
     private ResponseService responseService;
     private ResultService resultService;
@@ -45,14 +41,13 @@ class TransactionUploadServiceTest {
 
         contractAssociationService = mock(ContractAssociationService.class);
         counterPartyService = mock(CounterPartyService.class);
-        categoryService = mock(CategoryService.class);
         fileParserFactory = mock(FileParserFactory.class);
         responseService = mock(ResponseService.class);
         resultService = mock(ResultService.class);
         localeService = mock(LocaleService.class);
 
         transactionUploadService = new TransactionUploadService(baseTransactionService, baseContractService, baseContractHistoryService,
-                contractAssociationService, counterPartyService, categoryService, fileParserFactory, responseService, resultService, localeService);
+                contractAssociationService, counterPartyService, fileParserFactory, responseService, resultService, localeService);
     }
 
     @Test

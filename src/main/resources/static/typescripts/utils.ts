@@ -30,7 +30,7 @@ function createListElement(
     attributes: Record<string, string> = {},
     addRemove: boolean = true,
     small: boolean = false,
-    toolTipText?: string,
+    toolTipText: string = null,
     removeCallback: (element: HTMLElement) => void = (element) => element.parentElement?.removeChild(element),
     animateTheElements: boolean = false
 ): HTMLElement {
@@ -81,9 +81,9 @@ function createAndAppendElement(
 
 function getCurrentCurrencySymbol(): string {
     if (bankAccountId === 0 || bankAccountId === undefined)
-        return " " + Object.values(bankAccountSymbols)[0];
+        return " " + Object.values(bankAccounts)[0].currencySymbol;
 
-    return " " + bankAccountSymbols[bankAccountId];
+    return " " + bankAccounts[bankAccountId].currencySymbol;
 }
 
 function formatDateString(date: string): string {
@@ -154,13 +154,13 @@ function removeElements(sourceContainer: HTMLElement, soloItem: HTMLElement = nu
     let items = soloItem ? [soloItem] : Array.from(sourceContainer.querySelectorAll<HTMLElement>('.listItem'));
 
     items.forEach((item) => {
-            // Animate the item before removing it
-            animateElement(item);
+        // Animate the item before removing it
+        animateElement(item);
 
-            // Wait for the transition to complete
-            item.addEventListener('transitionend', () => {
-                item.remove(); // Remove the item from the DOM
-            }, {once: true});
+        // Wait for the transition to complete
+        item.addEventListener('transitionend', () => {
+            item.remove(); // Remove the item from the DOM
+        }, {once: true});
     });
 }
 
@@ -177,7 +177,7 @@ function moveElements(sourceContainer: HTMLElement, targetContainer: HTMLElement
     items.forEach((item) => {
         item.addEventListener('transitionend', () => {
             animateElement(item);
-        }, { once: true });
+        }, {once: true});
 
         targetContainer.appendChild(item);
     });
@@ -424,5 +424,25 @@ function updateContractAvailability(): void {
         } else {
             contract.classList.add("disabled");
         }
+    });
+}
+
+function setUpSearchStringFields(messages: Record<string, string>, addListener: boolean = true): void {
+    searchStringFields.forEach(field => {
+        const addButton = document.getElementById(field.addButtonId) as HTMLButtonElement;
+        const inputField = document.getElementById(field.inputId) as HTMLInputElement;
+        const stringList = document.getElementById(field.listId) as HTMLElement;
+
+        if (addListener)
+            addButton.addEventListener("click", () => {
+                const inputValue = inputField.value.trim();
+
+                if (inputValue) {
+                    addStringToList(messages, stringList, inputValue, null);
+                    inputField.value = "";
+                } else {
+                    showAlert("info", messages["error_enterWord"]);
+                }
+            });
     });
 }

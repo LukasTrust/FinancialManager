@@ -276,10 +276,8 @@ function updateCachedDataAndUI(type, messages, ids) {
             splitDataIntoPages(messages, Type.TRANSACTION, filteredTransactionData);
             break;
         case Type.COUNTERPARTY:
-            console.log(filteredCounterPartyData);
             filteredCounterPartyData = filteredCounterPartyData.map(counterParty => idSet.has(counterParty.counterParty.id)
                 ? Object.assign(Object.assign({}, counterParty), { counterParty: Object.assign(Object.assign({}, counterParty.counterParty), { hidden: !counterParty.counterParty.hidden }) }) : counterParty);
-            console.log(filteredCounterPartyData);
             counterPartyData = counterPartyData.map(counterParty => idSet.has(counterParty.counterParty.id)
                 ? Object.assign(Object.assign({}, counterParty), { counterParty: Object.assign(Object.assign({}, counterParty.counterParty), { hidden: !counterParty.counterParty.hidden }) }) : counterParty);
             splitDataIntoPages(messages, Type.COUNTERPARTY, filteredCounterPartyData);

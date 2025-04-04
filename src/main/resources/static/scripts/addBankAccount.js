@@ -4,37 +4,16 @@ async function buildAddBankAccount() {
     isSavingsAccount.addEventListener("change", () => {
         showHiddenInputs(hiddenInputs);
     });
-    const fields = [
-        { addButtonId: "addCounterPartyStrings", inputId: "inputCounterPartyStrings", listId: "counterPartySearchStrings" },
-        { addButtonId: "addAmountStrings", inputId: "inputAmountStrings", listId: "amountSearchStrings" },
-        { addButtonId: "addAmountAfterStrings", inputId: "inputAmountAfterStrings", listId: "amountInBankAfterSearchStrings" },
-        { addButtonId: "addDateStrings", inputId: "inputDateStrings", listId: "dateSearchStrings" },
-        { addButtonId: "addInterestRateStrings", inputId: "inputInterestRateStrings", listId: "interestRateSearchStrings" }
-    ];
     const messages = await loadLocalization("addBankAccount");
     if (!messages)
         return;
     const submitButton = document.getElementById("submitButton");
     submitButton.addEventListener("click", async (event) => {
         event.preventDefault();
-        const listIds = fields.map(field => field.listId);
+        const listIds = searchStringFields.map(field => field.listId);
         await submitAddNewBank(messages, isSavingsAccount.checked, listIds);
     });
-    fields.forEach(field => {
-        const addButton = document.getElementById(field.addButtonId);
-        const inputField = document.getElementById(field.inputId);
-        const stringList = document.getElementById(field.listId);
-        addButton.addEventListener("click", () => {
-            const inputValue = inputField.value.trim();
-            if (inputValue) {
-                addStringToList(messages, stringList, inputValue);
-                inputField.value = "";
-            }
-            else {
-                showAlert("info", messages["error_enterWord"]);
-            }
-        });
-    });
+    setUpSearchStringFields(messages);
 }
 async function submitAddNewBank(messages, isSavingsAccount, listIds) {
     const name = document.getElementById("name").value.trim();
@@ -99,12 +78,12 @@ async function submitAddNewBank(messages, isSavingsAccount, listIds) {
 function showHiddenInputs(hiddenInputs) {
     hiddenInputs.classList.toggle("hidden");
 }
-function addStringToList(messages, stringList, text) {
+function addStringToList(messages, stringList, text, removeCallback) {
     const existingItems = Array.from(stringList.children).map(item => { var _a; return ((_a = item.textContent) === null || _a === void 0 ? void 0 : _a.trim()) || ""; });
     if (existingItems.includes(text)) {
         showAlert("Warning", messages["error_alreadyInList"]);
         return;
     }
-    createListElement(stringList, text, {}, true, true);
+    createListElement(stringList, text, {}, true, true, null, removeCallback);
 }
 //# sourceMappingURL=addBankAccount.js.map

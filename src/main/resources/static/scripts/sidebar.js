@@ -12,9 +12,9 @@ async function loadSidebar() {
         const messages = await loadLocalization("sidebar");
         if (!messages)
             return;
-        const bankAccounts = await loadBankAccounts();
-        bankAccounts.forEach((bankAccount) => {
-            bankAccountSymbols[bankAccount.id] = bankAccount.currencySymbol;
+        const localBankAccounts = await loadBankAccounts();
+        localBankAccounts.forEach((bankAccount) => {
+            bankAccounts[bankAccount.id] = bankAccount;
             addBankAccountToSidebar(messages, bankAccount);
         });
         sidebarToggle.addEventListener('click', () => toggleSidebar(sidebar, content));

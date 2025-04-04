@@ -12,5 +12,16 @@
   "endDateText": "Enddatum:",
   "endDateTooltip": "Wählen Sie ein Enddatum aus, um die Transaktionen entsprechend zu filtern",
   "clearDateButton": "Daten löschen",
-  "loadingHeader": "Bitte warten..."
+  "loadingHeader": "Bitte warten...",
+  "settingsHeader": "Einstellungen",
+  "interestRateHeader": "Suchbegriffe für Zinssätze",
+  "interestRateSearchStrings": "Suchbegriffe für Zinssätze",
+  "counterpartyHeader": "Suchbegriffe für Gegenparteien",
+  "counterpartySearchStrings": "Suchbegriffe für Gegenparteien",
+  "amountHeader": "Suchbegriffe für Beträge",
+  "amountStrings": "Suchbegriffe für Beträge",
+  "amountInBankAfterTransactionHeader": "Suchbegriffe für Kontostand nach Transaktion",
+  "amountInBankAfterTransactionSearchStrings": "Suchbegriffe für Kontostand nach Transaktion",
+  "dateHeader": "Suchbegriffe für Datum",
+  "dateSearchStrings": "Suchbegriffe für Datum"
 }

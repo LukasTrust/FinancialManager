@@ -19,7 +19,7 @@ function animateElement(element) {
         element.style.transform = 'translateY(0)';
     }, 10);
 }
-function createListElement(parent, text, attributes = {}, addRemove = true, small = false, toolTipText, removeCallback = (element) => { var _a; return (_a = element.parentElement) === null || _a === void 0 ? void 0 : _a.removeChild(element); }, animateTheElements = false) {
+function createListElement(parent, text, attributes = {}, addRemove = true, small = false, toolTipText = null, removeCallback = (element) => { var _a; return (_a = element.parentElement) === null || _a === void 0 ? void 0 : _a.removeChild(element); }, animateTheElements = false) {
     let classType = small ? "listItemSmall" : "listItem";
     if (toolTipText) {
         classType += " tooltip tooltipBottom";
@@ -53,8 +53,8 @@ function createAndAppendElement(parent, type, className = null, textContent = nu
 }
 function getCurrentCurrencySymbol() {
     if (bankAccountId === 0 || bankAccountId === undefined)
-        return " " + Object.values(bankAccountSymbols)[0];
-    return " " + bankAccountSymbols[bankAccountId];
+        return " " + Object.values(bankAccounts)[0].currencySymbol;
+    return " " + bankAccounts[bankAccountId].currencySymbol;
 }
 function formatDateString(date) {
     const [year, month, day] = date.split('-');
@@ -311,6 +311,24 @@ function updateContractAvailability() {
         else {
             contract.classList.add("disabled");
         }
+    });
+}
+function setUpSearchStringFields(messages, addListener = true) {
+    searchStringFields.forEach(field => {
+        const addButton = document.getElementById(field.addButtonId);
+        const inputField = document.getElementById(field.inputId);
+        const stringList = document.getElementById(field.listId);
+        if (addListener)
+            addButton.addEventListener("click", () => {
+                const inputValue = inputField.value.trim();
+                if (inputValue) {
+                    addStringToList(messages, stringList, inputValue, null);
+                    inputField.value = "";
+                }
+                else {
+                    showAlert("info", messages["error_enterWord"]);
+                }
+            });
     });
 }
 //# sourceMappingURL=utils.js.map
