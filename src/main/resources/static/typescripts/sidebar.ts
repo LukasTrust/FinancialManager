@@ -2,10 +2,9 @@ async function loadSidebar(): Promise<void> {
     try {
         const sidebar = document.querySelector<HTMLElement>('.sidebar');
         const sidebarToggle = document.querySelector<HTMLElement>('.sidebarToggle');
-        const content = document.querySelector<HTMLElement>('.content');
         const topNav = document.getElementById('topNav') as HTMLElement | null;
 
-        if (!sidebar || !sidebarToggle || !content || !topNav) {
+        if (!sidebar || !sidebarToggle || !topNav) {
             console.error("Required DOM elements for the sidebar are missing.");
             return;
         }
@@ -23,15 +22,14 @@ async function loadSidebar(): Promise<void> {
             addBankAccountToSidebar(messages, bankAccount);
         });
 
-        sidebarToggle.addEventListener('click', () => toggleSidebar(sidebar, content));
+        sidebarToggle.addEventListener('click', () => toggleSidebar(sidebar));
     } catch (error) {
         console.error("Error loading sidebar:", error);
     }
 }
 
-function toggleSidebar(sidebar: HTMLElement, content: HTMLElement): void {
+function toggleSidebar(sidebar: HTMLElement): void {
     sidebar.classList.toggle("collapsed");
-    content.classList.toggle("fullScreen");
 
     const allSubItems = sidebar.querySelectorAll<HTMLElement>('.navSubitem');
     allSubItems.forEach(item => item.classList.toggle('collapsed'));

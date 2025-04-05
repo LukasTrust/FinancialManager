@@ -31,7 +31,7 @@ function createListElement(
     addRemove: boolean = true,
     small: boolean = false,
     toolTipText: string = null,
-    removeCallback: (element: HTMLElement) => void = (element) => element.parentElement?.removeChild(element),
+    removeCallback: (element: HTMLElement) => void = defaultRemoveCallback,
     animateTheElements: boolean = false
 ): HTMLElement {
     let classType = small ? "listItemSmall" : "listItem";
@@ -427,6 +427,10 @@ function updateContractAvailability(): void {
     });
 }
 
+function defaultRemoveCallback(element: HTMLElement): void {
+    element.remove(); // Simpler and safer
+}
+
 function setUpSearchStringFields(messages: Record<string, string>, addListener: boolean = true): void {
     searchStringFields.forEach(field => {
         const addButton = document.getElementById(field.addButtonId) as HTMLButtonElement;
@@ -438,7 +442,7 @@ function setUpSearchStringFields(messages: Record<string, string>, addListener: 
                 const inputValue = inputField.value.trim();
 
                 if (inputValue) {
-                    addStringToList(messages, stringList, inputValue, null);
+                    addStringToList(messages, stringList, inputValue);
                     inputField.value = "";
                 } else {
                     showAlert("info", messages["error_enterWord"]);

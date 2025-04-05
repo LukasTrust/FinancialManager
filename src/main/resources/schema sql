@@ -113,9 +113,6 @@ CREATE TABLE IF NOT EXISTS transaction (
     bank_account_id         BIGINT NOT NULL
         CONSTRAINT transaction_to_bank_account
         REFERENCES bank_account(id),
-    category_id             BIGINT
-        CONSTRAINT transaction_to_category
-        REFERENCES category(id),
     contract_id             BIGINT
         CONSTRAINT transaction_to_contract
         REFERENCES contract(id),

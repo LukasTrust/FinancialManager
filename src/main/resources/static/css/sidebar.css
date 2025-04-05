@@ -1,10 +1,11 @@
 .sidebar {
     width: 270px;
-    position: fixed;
-    margin: 16px;
+    height: calc(100vh - 40px);
+    margin-left: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
     border-radius: 16px;
     background: #151A2D;
-    height: calc(100vh - 32px);
     transition: 0.4s ease;
 }
 
@@ -60,6 +61,12 @@
 
 .sidebar.collapsed .sidebarHeader .sidebarToggle span {
     transform: rotate(180deg);
+}
+
+.sidebarNav {
+    height: calc(100vh - 20%);
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebarNav .navList {
@@ -144,9 +151,7 @@
 }
 
 .sidebarNav .secondaryNav {
-    position: absolute;
-    bottom: 30px;
-    width: 100%;
+    margin-top: auto;
 }
 
 .navSublist {

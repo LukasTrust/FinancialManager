@@ -98,7 +98,7 @@ function showHiddenInputs(hiddenInputs: HTMLElement): void {
     hiddenInputs.classList.toggle("hidden");
 }
 
-function addStringToList(messages: Record<string, string>, stringList: HTMLElement, text: string, removeCallback: (element: HTMLElement) => void): void {
+function addStringToList(messages: Record<string, string>, stringList: HTMLElement, text: string, removeCallback: (element: HTMLElement) => void = defaultRemoveCallback): void {
     const existingItems = Array.from(stringList.children).map(item => item.textContent?.trim() || "");
     if (existingItems.includes(text)) {
         showAlert("Warning", messages["error_alreadyInList"]);

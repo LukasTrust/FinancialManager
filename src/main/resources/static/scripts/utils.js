@@ -19,7 +19,7 @@ function animateElement(element) {
         element.style.transform = 'translateY(0)';
     }, 10);
 }
-function createListElement(parent, text, attributes = {}, addRemove = true, small = false, toolTipText = null, removeCallback = (element) => { var _a; return (_a = element.parentElement) === null || _a === void 0 ? void 0 : _a.removeChild(element); }, animateTheElements = false) {
+function createListElement(parent, text, attributes = {}, addRemove = true, small = false, toolTipText = null, removeCallback = defaultRemoveCallback, animateTheElements = false) {
     let classType = small ? "listItemSmall" : "listItem";
     if (toolTipText) {
         classType += " tooltip tooltipBottom";
@@ -313,6 +313,9 @@ function updateContractAvailability() {
         }
     });
 }
+function defaultRemoveCallback(element) {
+    element.remove(); // Simpler and safer
+}
 function setUpSearchStringFields(messages, addListener = true) {
     searchStringFields.forEach(field => {
         const addButton = document.getElementById(field.addButtonId);
@@ -322,7 +325,7 @@ function setUpSearchStringFields(messages, addListener = true) {
             addButton.addEventListener("click", () => {
                 const inputValue = inputField.value.trim();
                 if (inputValue) {
-                    addStringToList(messages, stringList, inputValue, null);
+                    addStringToList(messages, stringList, inputValue);
                     inputField.value = "";
                 }
                 else {

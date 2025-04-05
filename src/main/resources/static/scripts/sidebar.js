@@ -2,9 +2,8 @@ async function loadSidebar() {
     try {
         const sidebar = document.querySelector('.sidebar');
         const sidebarToggle = document.querySelector('.sidebarToggle');
-        const content = document.querySelector('.content');
         const topNav = document.getElementById('topNav');
-        if (!sidebar || !sidebarToggle || !content || !topNav) {
+        if (!sidebar || !sidebarToggle || !topNav) {
             console.error("Required DOM elements for the sidebar are missing.");
             return;
         }
@@ -17,15 +16,14 @@ async function loadSidebar() {
             bankAccounts[bankAccount.id] = bankAccount;
             addBankAccountToSidebar(messages, bankAccount);
         });
-        sidebarToggle.addEventListener('click', () => toggleSidebar(sidebar, content));
+        sidebarToggle.addEventListener('click', () => toggleSidebar(sidebar));
     }
     catch (error) {
         console.error("Error loading sidebar:", error);
     }
 }
-function toggleSidebar(sidebar, content) {
+function toggleSidebar(sidebar) {
     sidebar.classList.toggle("collapsed");
-    content.classList.toggle("fullScreen");
     const allSubItems = sidebar.querySelectorAll('.navSubitem');
     allSubItems.forEach(item => item.classList.toggle('collapsed'));
 }

@@ -1,7 +1,6 @@
 package financialmanager.objectFolder.transactionFolder;
 
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
-import financialmanager.objectFolder.categoryFolder.Category;
 import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import jakarta.persistence.*;
@@ -52,11 +51,6 @@ public class Transaction {
     @ManyToOne
     @JoinColumn(name = "counter_Party_Id")
     private CounterParty counterParty;
-
-    @Setter
-    @ManyToOne
-    @JoinColumn(name = "category_Id")
-    private Category category;
 
     public Transaction(BankAccount bankAccount, String counterParty, LocalDate date, Double amount, Double amountInBankAfter,
                        Double amountInBankBefore) {

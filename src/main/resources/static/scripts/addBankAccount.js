@@ -78,7 +78,7 @@ async function submitAddNewBank(messages, isSavingsAccount, listIds) {
 function showHiddenInputs(hiddenInputs) {
     hiddenInputs.classList.toggle("hidden");
 }
-function addStringToList(messages, stringList, text, removeCallback) {
+function addStringToList(messages, stringList, text, removeCallback = defaultRemoveCallback) {
     const existingItems = Array.from(stringList.children).map(item => { var _a; return ((_a = item.textContent) === null || _a === void 0 ? void 0 : _a.trim()) || ""; });
     if (existingItems.includes(text)) {
         showAlert("Warning", messages["error_alreadyInList"]);
