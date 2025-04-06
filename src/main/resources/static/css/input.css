@@ -1,5 +1,4 @@
 label {
-    margin-left: 10px;
     color: #fff;
     font-size: 1rem;
     pointer-events: none;
@@ -207,26 +206,19 @@ label {
 .inputDate {
     display: flex;
     flex-direction: column;
-    margin-left: 10px;
-    margin-right: 10px;
-    gap: 5px;
-    flex: 1;
+    gap: 10px;
 }
 
 .inputDate label {
-    margin-left: 0;
     font-weight: bold;
     font-size: 1.2rem;
 }
 
 .inputDate input[type="date"] {
-    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 14px;
     cursor: pointer;
-    width: 100%;
-    max-width: 180px;
     transition: border-color 0.3s ease;
 }
 

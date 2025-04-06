@@ -28,7 +28,9 @@ body {
 
 .mainContainer {
     display: flex;
-
+    padding-left: 20px;
+    padding-top: 30px;
+    width: calc(100% - 300px);
 }
 
 .horizontalContainer {
@@ -45,8 +47,16 @@ body {
     margin-bottom: 10px;;
 }
 
+.marginBottomBig {
+    margin-bottom: 30px;
+}
+
 .marginTop {
     margin-top: 10px;
+}
+
+.marginTopBig {
+    margin-top: 30px;
 }
 
 .marginLeftBig {
@@ -101,9 +111,12 @@ body {
     transition: background 0.3s ease, transform 0.2s ease;
 }
 
+.fullContent {
+    width: 100%;
+}
+
 .mainContent {
     width: 60%;
-    padding-left: 20px;
     padding-right: 20px;
 }
 
@@ -178,5 +191,129 @@ p {
 
 .maxButton:hover {
     background-color: rgb(255, 255, 255, 0.5);
+    z-index: 2;
+}
+
+.textHeader {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.textHeader * {
+    cursor: pointer;
+}
+
+.tooltip {
+    position: relative;
+    cursor: default;
+    color: gray;
+    font-size: 1.5rem;
+}
+
+.tooltipText {
+    visibility: hidden;
+    background-color: black;
+    font-size: 16px;
+    color: white;
+    text-align: center;
+    padding: 6px 10px;
+    border-radius: 8px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 220px;
+    width: max-content;
+    opacity: 0;
+    z-index: 1000;
+    transition: opacity 0.3s ease-in-out 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    white-space: normal;
+    bottom: 130%;
+}
+
+/* Tooltip arrow */
+.tooltipText::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+}
+
+.tooltipText::after {
+    top: 100%;
+    margin-top: -1px;
+    border-color: black transparent transparent transparent;
+}
+
+.tooltipBottom .tooltipText {
+    top: 130%;
+    bottom: auto;
+}
+
+.tooltipBottom .tooltipText::after {
+    bottom: 100%;
+    top: auto;
+    border-color: transparent transparent black transparent;
+}
+
+.tooltip:hover .tooltipText {
+    visibility: visible;
+    opacity: 1;
+}
+
+.chartContainer {
+    display: flex;
+    background: #ffffff;
+    border-radius: 12px;
+    flex-grow: 1;
+    height: 60vh;
+}
+
+.chartContainer canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.positive {
+    background: #e3fcef;
+    border: 2px solid #0f5132;
+    border-radius: 10px;
+    padding: 10px;
+    width: fit-content;
+    align-self: center;
+}
+
+.positive * {
+    color: #0f5132;
+}
+
+.negative {
+    background: #fde2e4;
+    border: 2px solid #842029;
+    border-radius: 10px;
+    padding: 10px;
+    width: fit-content;
+    align-self: center;
+}
+
+.negative * {
+    color: #842029;
+}
+
+.boxContainer {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease-in-out;
+    align-items: center;
+}
+
+.boxContainer:hover {
+    transform: translateY(-5px);
     z-index: 2;
 }

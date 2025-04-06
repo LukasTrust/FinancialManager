@@ -37,8 +37,6 @@
 </head>
 <body>
 <div style="height: inherit" th:insert="~{sidebar :: sidebar}"></div>
-<div id="content" class="content">
-    <div th:replace="~{${template}}"></div> <!-- Dynamically replaced content -->
-</div>
+<div th:replace="~{${template}}"></div>
 </body>
 </html>

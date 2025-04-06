@@ -40,18 +40,18 @@ function createKeyFigures(keyFigures: KeyFigure[]): void {
 
     keyFiguresContainer.innerHTML = '';
 
-    const fragment = document.createDocumentFragment(); // Batch DOM updates
+    const fragment = document.createDocumentFragment();
     const currency = getCurrentCurrencySymbol();
 
     for (const keyFigure of keyFigures) {
         if (!keyFigure) continue; // Skip invalid entries
 
         // Create Key Figure Box
-        const keyFigureBox = createAndAppendElement(fragment, "div", "boxContainer");
+        const keyFigureBox = createAndAppendElement(fragment, "div", "verticalContainer boxContainer");
 
         // Create Header
-        const keyFigureHeader = createAndAppendElement(keyFigureBox, "div", "keyFigureHeader");
-        createAndAppendElement(keyFigureHeader, "span", "", keyFigure.name, {style: "cursor: pointer"});
+        const keyFigureHeader = createAndAppendElement(keyFigureBox, "div", "textHeader marginBottom");
+        createAndAppendElement(keyFigureHeader, "span", "", keyFigure.name);
 
         // Tooltip
         const keyFigureTooltip = createAndAppendElement(keyFigureHeader, "div", "tooltip bi bi-info");
@@ -59,7 +59,7 @@ function createKeyFigures(keyFigures: KeyFigure[]): void {
 
         // Value Container
         const classForValue = keyFigure.value >= 0 ? "positive" : "negative";
-        const valueContainer = createAndAppendElement(keyFigureBox, "div", classForValue, null, {style: "padding: 10px"});
+        const valueContainer = createAndAppendElement(keyFigureBox, "div", classForValue);
 
         const iconClass = keyFigure.value >= 0 ? "bi bi-arrow-up" : "bi bi-arrow-down";
         createAndAppendElement(valueContainer, "i", iconClass);
