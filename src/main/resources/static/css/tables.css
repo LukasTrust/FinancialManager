@@ -21,23 +21,66 @@
     outline: none; /* Remove default outline */
 }
 
+.tableWrapper {
+    overflow-x: auto;
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
 table {
     width: 100%;
-    height: 69vh;
+    table-layout: auto;
     border-collapse: collapse;
 }
 
 thead {
-    background-color: rgba(0, 123, 255, 0.9); /* Semi-transparent header */
+    background-color: #1F2A47;
     color: #fff;
     position: sticky;
-    top: 0;
+    top: -5px;
+    z-index: 1;
 }
 
-thead, tbody tr {
-    display: table; /* Make rows behave like a table */
-    width: 100%; /* Ensure full width */
-    table-layout: fixed; /* Ensure consistent column widths */
+tbody {
+    overflow-y: auto;
+}
+
+thead tr, tbody tr {
+    width: 100%;
+}
+
+tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background 0.3s ease;
+    height: 65px;
+}
+
+tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: background-color 0.2s ease-in-out;
+    z-index: 2;
+}
+
+th {
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.3s ease;
+}
+
+th, td {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    text-align: left;
+    color: #fff;
+    cursor: pointer;
+}
+
+.thHeader {
+    cursor: default;
+    font-size: 1.2rem;
 }
 
 .selectedRow {
@@ -64,67 +107,8 @@ thead, tbody tr {
     transition: opacity 2s ease, max-height 2s ease, padding 2s ease, margin 2s ease;
 }
 
-.thHeader {
-    cursor: default;
-    font-size: 1.2rem;
-}
-
-th, td {
-    padding-top: 14px;
-    padding-bottom: 14px;
-    text-align: left;
-    color: #fff;
-    cursor: pointer;
-}
-
-.tdMargin {
-    margin-left: 5px;
-    margin-right: 5px;
-}
-
-th {
-    font-weight: bold;
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.3s ease;
-}
-
-tbody {
-    display: block;
-    overflow-y: auto;
-    height: inherit;
-}
-
-tr {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Lighter border */
-    transition: background 0.3s ease;
-    height: 65px;
-}
-
-tr:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    transition: background-color 0.2s ease-in-out;
-    z-index: 2;
-}
-
-.rowGroup {
-    border-radius: 8px 8px 0 0;
-    position: relative;
-    height: auto;
-}
-
-.rowWithSubRow {
-    border-bottom: none;
-}
-
-.subRow {
-    display: flex;
-    align-items: center;
-    height: 60px;
-    margin-left: 20px;
-    border-left: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0 0 8px 8px;
-    width: auto;
+.mainRow {
+    border: none;
 }
 
 .middleRow {
@@ -151,15 +135,10 @@ tr:hover {
     padding: 12px 24px; /* Larger padding */
     margin: 0 12px; /* Increased margin */
     border: none;
-    background-color: #007bff;
+    background-color: #03045e;
     color: white;
     border-radius: 6px; /* Rounded corners */
     transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.pagination button:hover {
-    background-color: #0056b3;
-    transform: translateY(-1px); /* Slight lift on hover */
 }
 
 .pagination button:active {
@@ -189,14 +168,14 @@ tr:hover {
 }
 
 .tableCheckbox {
-    appearance: none; /* Remove default appearance */
+    appearance: none;
     width: 18px;
     height: 18px;
-    border: 2px solid #4a90e2; /* Border color */
-    border-radius: 4px; /* Slightly rounded corners */
+    border: 2px solid #4a90e2;
+    border-radius: 4px;
     background-color: white;
     cursor: pointer;
-    position: relative;
+    margin-left: 10px;
     transition: background-color 0.2s, border-color 0.2s;
 }
 

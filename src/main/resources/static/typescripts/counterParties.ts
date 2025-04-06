@@ -147,70 +147,80 @@ function addRowsToCounterPartyTable(data: CounterPartyDisplay[], messages: Recor
 function createCounterPartyRow(tableBody: HTMLElement, counterPartyDisplay: CounterPartyDisplay,
                                currency: string, toolTip: string, messages: Record<string, string>) {
     if (!counterPartyDisplay || typeof counterPartyDisplay !== "object") {
-        console.warn(`Warning: Skipping invalid counterParty:.`, counterPartyDisplay);
+        console.warn(`Warning: Skipping invalid counterParty:`, counterPartyDisplay);
         return;
     }
 
     const counterParty = counterPartyDisplay.counterParty;
 
-    let rowGroupClass: string = counterParty.hidden ? " hiddenRow" : "";
+    let hiddenClass: string = counterParty.hidden ? " hiddenRow" : "";
 
     if (counterParty.hidden && !counterPartiesHiddenToggle) {
-        rowGroupClass += " hidden";
+        hiddenClass += " hidden";
     }
 
-    const rowGroup = createAndAppendElement(tableBody, "div", "rowGroup");
-    animateElement(rowGroup);
+    // Main row
+    const newRow = createAndAppendElement(tableBody, "tr", "mainRow" + hiddenClass, "", {
+        id: counterParty.id.toString(),
+        "data-sort-key": counterParty.id.toString()
+    });
 
-    const newRow = createAndAppendElement(rowGroup, "tr", "rowWithSubRow" + rowGroupClass, "", {id: counterParty.id.toString()});
-    createAndAppendElement(newRow, "td", counterParty.hidden ? "bi bi-eye-slash" : "", "", {style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px"});
-    createCheckBoxForRowGroup(rowGroup, newRow, counterParty.id);
+    // Sub Row for Search Strings
+    const searchStringRow = createAndAppendElement(tableBody, "tr", "" + hiddenClass, "", {
+        "data-pair": counterParty.id.toString(),
+    });
+
+    createCheckBoxForTable(newRow, searchStringRow, counterParty.id, counterParty.hidden);
 
     // Name cell
-    const name = createAndAppendElement(newRow, "td", "", "", {style: "width: 23%"});
+    const name = createAndAppendElement(newRow, "td");
     const nameInput = createInputBox(name, "bi bi-pencil-fill", "name", "text", counterParty.name);
     debounceInputChange(nameInput, (id, newValue, messages) =>
         updateField(id, "name", newValue, messages, Type.COUNTERPARTY), counterParty.id, messages);
 
     // Transaction count
-    const transactionCount = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 15%"});
-    createAndAppendElement(transactionCount, "span", "tdMargin", counterPartyDisplay.transactionCount.toString());
+    const transactionCount = createAndAppendElement(newRow, "td");
+    const transactionCountWrapper = createAndAppendElement(transactionCount, "div", "justifyContentCenter");
+    createAndAppendElement(transactionCountWrapper, "span", "", counterPartyDisplay.transactionCount.toString());
 
     // Contract count
-    const contractCount = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 15%"});
-    createAndAppendElement(contractCount, "span", "tdMargin", counterPartyDisplay.contractCount.toString());
+    const contractCount = createAndAppendElement(newRow, "td");
+    const contractCountWrapper = createAndAppendElement(contractCount, "div", "justifyContentCenter");
+    createAndAppendElement(contractCountWrapper, "span", "", counterPartyDisplay.contractCount.toString());
 
     // Total amount
-    const totalAmount = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 15%"});
-    createAndAppendElement(totalAmount, "span", "tdMargin", formatNumber(counterPartyDisplay.totalAmount, currency),
-        {style: "margin-right: 30px;"});
+    const totalAmount = createAndAppendElement(newRow, "td");
+    const totalAmountWrapper = createAndAppendElement(totalAmount, "div", "justifyContentCenter");
+    createAndAppendElement(totalAmountWrapper, "span", "", formatNumber(counterPartyDisplay.totalAmount, currency));
 
     // Description Cell
-    const description = createAndAppendElement(newRow, "td", "", "",
-        {style: "width: 30%; padding-right: 20px"});
+    const description = createAndAppendElement(newRow, "td", "marginRightBig");
     const descriptionInput = createInputBox(description, "bi bi-pencil-fill", "name", "text", counterParty.description);
     debounceInputChange(descriptionInput, (id, newValue, messages) =>
         updateField(id, "description", newValue, messages, Type.COUNTERPARTY), counterParty.id, messages);
 
-    // Secondary Row for Search Strings
-    const searchStringRow = createAndAppendElement(rowGroup, "tr", "subRow" + rowGroupClass);
+    const searchStringCell = createAndAppendElement(searchStringRow, "td", "", "", {
+        colspan: "6"
+    });
 
-    const counterpartySearchStrings = createAndAppendElement(searchStringRow, "td", "", "", {style: "width: 20%"});
-    createAndAppendElement(counterpartySearchStrings, "h3", "", messages["counterpartySearchStrings"]);
+    const cellWrapper = createAndAppendElement(searchStringCell, "div", "marginLeftBig alignItemsCenter horizontalContainer");
 
-    const searchString = createAndAppendElement(searchStringRow, "td", "", "",
-        {style: "width: 20%"});
+    // Add search strings header text
+    createAndAppendElement(cellWrapper, "h3", "", messages["counterpartySearchStrings"]);
 
-    const searchStringContainer = createAndAppendElement(searchString, "div", "flexContainer");
+    // Search string input and button
+    const searchStringContainer = createAndAppendElement(cellWrapper, "div", "horizontalContainer");
+    const searchStringButton = createAndAppendElement(searchStringContainer, "button", "iconOnlyButton bi bi-plus-circle");
     const searchStringInput = createInputBox(searchStringContainer, "", "name", "text", "", messages["addSearchStringPlaceHolder"]);
-    const searchStringButton = createAndAppendElement(searchStringContainer, "button", "iconOnlyButton bi bi bi-plus-circle");
+    searchStringInput.classList.add("width300");
+
     searchStringButton.addEventListener("click", async () => {
         await addSearchString(counterParty.id, searchStringInput.value, messages, listContainer, toolTip);
         searchStringInput.value = "";
     });
 
-    const searchStringCell = createAndAppendElement(searchStringRow, "td", "", "", {style: "width: 60%"});
-    const listContainer = createAndAppendElement(searchStringCell, "div", "listContainer", "", {style: "justify-content: normal; overflow: visible;"});
+    // List of counterparty search strings
+    const listContainer = createAndAppendElement(cellWrapper, "div", "widthFull listContainer");
 
     counterParty.counterPartySearchStrings.forEach(searchString => {
         createListElement(
@@ -224,6 +234,7 @@ function createCounterPartyRow(tableBody: HTMLElement, counterPartyDisplay: Coun
         );
     });
 
+    // Handle hover effect for the main row and sub-row
     addHoverToOtherElement(newRow, searchStringRow);
 }
 

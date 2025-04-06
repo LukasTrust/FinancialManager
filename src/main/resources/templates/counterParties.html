@@ -1,21 +1,21 @@
-<div th:fragment="counterParties" id="content">
-    <div class="flexContainerColumn">
-        <div class="flexContainer">
+<div th:fragment="counterParties" class="mainContainer" id="content">
+    <div class="verticalContainer widthFull">
+        <div class="horizontalContainer marginBottomBig">
             <h1><span class="bi bi-tag-fill"></span></h1>
             <h1 data-i18n="counterParties"></h1>
         </div>
 
-        <div class="pageContainer">
+        <div class="verticalContainer widthFull">
             <!-- Controls -->
-            <div style="padding: 0" class="flexContainerSpaced">
-                <div style="padding-left: 5px" class="container">
+            <div class="horizontalContainer marginBottomBig">
+                <div class="horizontalContainer alignSelfCenter">
                     <div class="checkboxWrapper">
                         <input id="showHiddenRows" type="checkbox" class="switch">
                         <label for="showHiddenRows" data-i18n="showHiddenCounterParties"></label>
                     </div>
                 </div>
 
-                <div class="container">
+                <div class="horizontalContainer marginLeftAuto">
                     <button class="iconButton tooltip tooltipBottom" id="changeHiddenButton">
                         <i class="bi bi-eye"></i>
                         <span class="normalText" data-i18n="changeHiddenButton"></span>
@@ -29,7 +29,7 @@
                     </button>
                 </div>
 
-                <div style="padding-right: 0" class="container">
+                <div class="horizontalContainer marginLeftAuto">
                     <div class="searchBar">
                         <label for="searchBarInput"></label>
                         <input type="text" id="searchBarInput" data-i18n-placeholder="searchText">
@@ -38,53 +38,68 @@
             </div>
 
             <!-- Table -->
-            <table>
-                <thead>
-                <tr>
-                    <th style="width: 20px" class="thHeader">
-                    </th>
-                    <th style="width: 2%" class="thHeader">
-                    </th>
-                    <th style="width: 23%" class="thHeader">
-                        <span data-i18n="name"></span>
-                        <i data-type="input" data-index="2" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
-                            <span class="tooltipText" data-i18n="sortTooltip"></span>
-                        </i>
-                    </th>
-                    <th style="width: 15%" class="rightAligned thHeader">
-                        <span data-i18n="transactionCount"></span>
-                        <i data-type="number" data-index="3" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
-                            <span class="tooltipText" data-i18n="sortTooltip"></span>
-                        </i>
-                    </th>
-                    <th style="width: 15%" class="rightAligned thHeader">
-                        <span data-i18n="contractCount"></span>
-                        <i data-type="number" data-index="4" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
-                            <span class="tooltipText" data-i18n="sortTooltip"></span>
-                        </i>
-                    </th>
-                    <th style="width: 15%; padding-right: 20px" class="rightAligned thHeader">
-                        <span data-i18n="totalAmount"></span>
-                        <i data-type="number" data-index="5" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
-                            <span class="tooltipText" data-i18n="sortTooltip"></span>
-                        </i>
-                    </th>
-                    <th style="width: 30%" class="thHeader">
-                        <span data-i18n="description"></span>
-                        <i style="margin-right: 20px" data-type="input" data-index="6" class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
-                            <span class="tooltipText" data-i18n="sortTooltip"></span>
-                        </i>
-                    </th>
-                </tr>
-                </thead>
-                <tbody id="tableBody">
-                </tbody>
-            </table>
+
+            <div class="tableWrapper widthFull marginBottomBig">
+                <table>
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th class="thHeader">
+                            <div class="justifyContentCenter horizontalContainer">
+                                <span data-i18n="name"></span>
+                                <i data-type="input" data-index="1"
+                                   class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                                    <span class="tooltipText" data-i18n="sortTooltip"></span>
+                                </i>
+                            </div>
+                        </th>
+                        <th class="thHeader">
+                            <div class="justifyContentCenter horizontalContainer">
+                                <span data-i18n="transactionCount"></span>
+                                <i data-type="number" data-index="2"
+                                   class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                                    <span class="tooltipText" data-i18n="sortTooltip"></span>
+                                </i>
+                            </div>
+                        </th>
+                        <th class="thHeader">
+                            <div class="justifyContentCenter horizontalContainer">
+                                <span data-i18n="contractCount"></span>
+                                <i data-type="number" data-index="3"
+                                   class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                                    <span class="tooltipText" data-i18n="sortTooltip"></span>
+                                </i>
+                            </div>
+                        </th>
+                        <th class="thHeader">
+                            <div class="justifyContentCenter horizontalContainer">
+                                <span data-i18n="totalAmount"></span>
+                                <i data-type="number" data-index="4"
+                                   class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                                    <span class="tooltipText" data-i18n="sortTooltip"></span>
+                                </i>
+                            </div>
+                        </th>
+                        <th class="thHeader">
+                            <div class="justifyContentCenter horizontalContainer">
+                                <span data-i18n="description"></span>
+                                <i data-type="input" data-index="5"
+                                   class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                                    <span class="tooltipText" data-i18n="sortTooltip"></span>
+                                </i>
+                            </div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Pagination -->
             <div class="pagination">
                 <button class="disabled" id="previousButton" data-i18n="previous"></button>
-                <div style="max-width: 200px; min-width: 200px" class="container">
+                <div class="horizontalContainer">
                     <span class="normalText" data-i18n="page"></span>
                     <span class="normalText" data-index="1" id="currentPage"></span>
                     <span class="normalText" data-i18n="of"></span>

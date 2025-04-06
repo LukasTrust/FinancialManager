@@ -1,7 +1,14 @@
+/*Reset & Global Styles*/
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
 }
 
 a {
@@ -11,19 +18,56 @@ a {
     transition: all 0.1s ease-in-out;
 }
 
+/*Typography*/
+h1, h2, h3, p {
+    color: #fff;
+    text-align: center;
+    cursor: default;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+}
+
+h3 {
+    font-size: 1rem;
+}
+
+p {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 25px 0 10px;
+}
+
+.normalText {
+    font-size: 1rem;
+    color: #fff;
+    font-weight: 600;
+    margin-left: 10px;
+    cursor: default;
+}
+
+.textHeader {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.textHeader * {
+    cursor: pointer;
+}
+
+/*Layout Containers*/
 .content {
     display: flex;
     width: 100%;
     transition: 0.4s ease;
-    margin-top: 30px;
-    margin-bottom: 30px;
-    margin-right: 20px;
-}
-
-body {
-    font-family: 'Roboto', sans-serif;
-    display: flex;
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    margin: 30px 20px;
 }
 
 .mainContainer {
@@ -31,6 +75,8 @@ body {
     padding-left: 20px;
     padding-top: 30px;
     width: calc(100% - 300px);
+    transition: width 0.3s ease-in-out, padding-left 0.3s ease-in-out;
+    will-change: width;
 }
 
 .horizontalContainer {
@@ -43,8 +89,49 @@ body {
     flex-direction: column;
 }
 
+.fullContent {
+    width: 100%;
+}
+
+.mainContent {
+    width: 60%;
+    padding-right: 20px;
+}
+
+.sideContent {
+    width: 40%;
+}
+
+.chartContainer {
+    display: flex;
+    background: #ffffff;
+    border-radius: 12px;
+    flex-grow: 1;
+    height: 60vh;
+}
+
+.chartContainer canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.boxContainer {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease-in-out;
+    align-items: center;
+}
+
+.boxContainer:hover {
+    transform: translateY(-5px);
+    z-index: 2;
+}
+
+/*Utilities*/
 .marginBottom {
-    margin-bottom: 10px;;
+    margin-bottom: 10px;
 }
 
 .marginBottomBig {
@@ -63,11 +150,43 @@ body {
     margin-left: 30px;
 }
 
+.marginRightBig {
+    margin-right: 30px;
+}
+
+.marginLeftAuto {
+    margin-left: auto;
+}
+
+.widthFull {
+    width: 100%;
+}
+
+.width300 {
+    width: 300px !important;
+}
+
+.alignSelfCenter {
+    align-self: center;
+}
+
+.alignItemsCenter {
+    align-items: center;
+}
+
+.justifyContentCenter {
+    display: flex;
+    justify-content: center;
+}
+
+/*List Items*/
 .listContainer {
     display: flex;
     min-height: 8vh;
     align-items: center;
-    overflow: scroll;
+    overflow-x: auto; /* enables horizontal scrolling */
+    overflow-y: visible;
+    white-space: nowrap;
 }
 
 .listItemSmall {
@@ -90,12 +209,25 @@ body {
     z-index: 2;
 }
 
-.normalText {
-    font-size: 1rem;
-    color: #fff;
+/*Buttons*/
+button {
+    border: none;
+    outline: none;
+    cursor: pointer;
     font-weight: 600;
-    margin-left: 10px;
-    cursor: default;
+    border-radius: 40px;
+    font-size: 1rem;
+    transition: background 0.3s ease, transform 0.2s ease, color 0.3s ease;
+    padding: 10px 20px;
+    background-color: transparent;
+    color: inherit;
+}
+
+button:hover {
+    filter: brightness(2);
+    transform: scale(1.05) translateZ(0);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    z-index: 2;
 }
 
 .removeButton {
@@ -104,107 +236,36 @@ body {
     padding: inherit;
     background-color: #ff4757;
     color: white;
-    border: none;
     border-radius: 0 8px 8px 0;
-    cursor: pointer;
     font-size: 1.2rem;
-    transition: background 0.3s ease, transform 0.2s ease;
 }
 
-.fullContent {
-    width: 100%;
-}
-
-.mainContent {
-    width: 60%;
-    padding-right: 20px;
-}
-
-.sideContent {
-    width: 40%;
-}
-
-h1 {
-    font-size: 2rem;
-    color: #fff;
-    text-align: center;
-    cursor: default;
-}
-
-h2 {
-    font-size: 1.5rem;
-    color: #fff;
-    text-align: center;
-    cursor: default;
-}
-
-h3 {
-    font-size: 1rem;
-    color: #fff;
-    text-align: center;
-    cursor: default;
-}
-
-p {
-    font-size: 0.9rem;
-    color: #fff;
-    font-weight: 600;
-    margin: 25px 0 10px;
-    cursor: default;
-}
-
-.beforeHidden {
-    opacity: 1;
-    overflow: hidden;
-    transition: opacity 0.5s ease, max-height 2s ease;
-}
-
-.hidden {
-    opacity: 0;
-    max-height: 0;
-    height: 0;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-    transition: opacity 2s ease, max-height 2s ease;
+.iconButton {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #03045e;
+    color: white;
+    border-radius: 4px;
+    width: auto;
 }
 
 .iconOnlyButton {
     background: transparent;
-    border: none;
     color: white;
     font-size: 1.5em;
-    transition: color 0.3s ease, transform 0.2s ease;
+    padding: 5px;
 }
 
 .maxButton {
     width: 100%;
-    padding: 10px;
-    border-radius: 40px;
-    background-color: rgb(255, 255, 255, 1);
-    border: none;
-    outline: none;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 600;
+    background-color: white;
+    color: black;
 }
 
-.maxButton:hover {
-    background-color: rgb(255, 255, 255, 0.5);
-    z-index: 2;
-}
-
-.textHeader {
-    display: flex;
-    align-items: center;
-    font-size: 18px;
-    font-weight: bold;
-}
-
-.textHeader * {
-    cursor: pointer;
-}
-
+/*Tooltip*/
 .tooltip {
     position: relative;
     cursor: default;
@@ -233,7 +294,6 @@ p {
     bottom: 130%;
 }
 
-/* Tooltip arrow */
 .tooltipText::after {
     content: "";
     position: absolute;
@@ -241,9 +301,6 @@ p {
     transform: translateX(-50%);
     border-width: 6px;
     border-style: solid;
-}
-
-.tooltipText::after {
     top: 100%;
     margin-top: -1px;
     border-color: black transparent transparent transparent;
@@ -265,19 +322,24 @@ p {
     opacity: 1;
 }
 
-.chartContainer {
-    display: flex;
-    background: #ffffff;
-    border-radius: 12px;
-    flex-grow: 1;
-    height: 60vh;
+/*Visibility Transitions*/
+.beforeHidden {
+    opacity: 1;
+    overflow: hidden;
+    transition: opacity 0.5s ease, max-height 2s ease;
 }
 
-.chartContainer canvas {
-    width: 100% !important;
-    height: 100% !important;
+.hidden {
+    opacity: 0;
+    max-height: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    transition: opacity 2s ease, max-height 2s ease;
 }
 
+/*Status Indicators*/
 .positive {
     background: #e3fcef;
     border: 2px solid #0f5132;
@@ -302,18 +364,4 @@ p {
 
 .negative * {
     color: #842029;
-}
-
-.boxContainer {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    transition: transform 0.2s ease-in-out;
-    align-items: center;
-}
-
-.boxContainer:hover {
-    transform: translateY(-5px);
-    z-index: 2;
 }

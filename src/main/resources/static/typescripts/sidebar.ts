@@ -33,6 +33,13 @@ function toggleSidebar(sidebar: HTMLElement): void {
 
     const allSubItems = sidebar.querySelectorAll<HTMLElement>('.navSubitem');
     allSubItems.forEach(item => item.classList.toggle('collapsed'));
+
+    const mainContainer = document.getElementById("content");
+    if (sidebar.classList.contains("collapsed")) {
+        mainContainer.style.width = "calc(100% - 120px)";
+    } else {
+        mainContainer.style.width = "calc(100% - 300px)";
+    }
 }
 
 function addBankAccountToSidebar(messages: Record<string, string>, bankAccount: AnyBankAccount): void {

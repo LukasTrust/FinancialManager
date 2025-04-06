@@ -75,7 +75,7 @@ function createAndAppendElement(
     if (textContent) element.textContent = textContent;
     Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
     Object.entries(eventListeners).forEach(([event, handler]) => element.addEventListener(event, handler));
-    parent.appendChild(element);
+    if (parent) parent.appendChild(element);
     return element;
 }
 
@@ -184,7 +184,7 @@ function moveElements(sourceContainer: HTMLElement, targetContainer: HTMLElement
 }
 
 function createCheckBoxForRowGroup(rowGroup: HTMLElement, newRow: HTMLElement, id: number) {
-    const trCheckBox = createAndAppendElement(newRow, "td", "", "", {style: "width: 2%"});
+    const trCheckBox = createAndAppendElement(newRow, "td");
 
     const checkBox = createAndAppendElement(trCheckBox, "input", "tableCheckbox", "", {
         type: "checkbox",
@@ -252,8 +252,8 @@ function addHoverToSiblings(element: HTMLElement) {
     });
 }
 
-function createCheckBoxForTable(newRow: HTMLElement, id: number, isHidden: boolean) {
-    const trCheckBox = createAndAppendElement(newRow, "td", null, "", {style: "width: 5%"});
+function createCheckBoxForTable(mainRow: HTMLElement, subRow: HTMLElement, id: number, isHidden: boolean) {
+    const trCheckBox = createAndAppendElement(mainRow, "td");
 
     if (isHidden) {
         createAndAppendElement(trCheckBox, "span", "bi bi-eye-slash");
@@ -261,17 +261,27 @@ function createCheckBoxForTable(newRow: HTMLElement, id: number, isHidden: boole
 
     const checkBox = createAndAppendElement(trCheckBox, "input", "tableCheckbox", "", {
         type: "checkbox",
-        id: id.toString(),
-        style: "margin-left: 10px;",
+        id: id.toString()
     }) as HTMLInputElement;
 
-    checkBox.addEventListener("change", () => updateRowStyle(newRow, checkBox));
+    checkBox.addEventListener("change", () => updateRowStyle(mainRow, checkBox));
 
-    newRow.addEventListener("click", (event) => {
+    mainRow.addEventListener("click", (event) => {
         if ((event.target as HTMLInputElement).type === "checkbox") return;
         checkBox.checked = !checkBox.checked;
-        updateRowStyle(newRow, checkBox);
+        updateRowStyle(mainRow, checkBox);
+        if (subRow)
+            updateRowStyle(subRow, checkBox);
     });
+
+    if (subRow) {
+        subRow.addEventListener("click", (event) => {
+            if ((event.target as HTMLInputElement).type === "checkbox") return;
+            checkBox.checked = !checkBox.checked;
+            updateRowStyle(subRow, checkBox);
+            updateRowStyle(mainRow, checkBox);
+        });
+    }
 }
 
 function startTimer(source: string): void {

@@ -26,6 +26,13 @@ function toggleSidebar(sidebar) {
     sidebar.classList.toggle("collapsed");
     const allSubItems = sidebar.querySelectorAll('.navSubitem');
     allSubItems.forEach(item => item.classList.toggle('collapsed'));
+    const mainContainer = document.getElementById("content");
+    if (sidebar.classList.contains("collapsed")) {
+        mainContainer.style.width = "calc(100% - 120px)";
+    }
+    else {
+        mainContainer.style.width = "calc(100% - 300px)";
+    }
 }
 function addBankAccountToSidebar(messages, bankAccount) {
     const { id, name } = bankAccount;

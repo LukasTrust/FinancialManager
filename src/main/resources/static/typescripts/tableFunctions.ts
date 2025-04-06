@@ -172,21 +172,29 @@ function sortTable(tableBody: HTMLElement, columnIndex: number, dataType: DataTy
     const fragment = document.createDocumentFragment();
 
     if (keepSubRowTogether) {
-        const rowGroups = Array.from(tableBody.querySelectorAll<HTMLTableRowElement>(".rowGroup"));
+        // Group rows by main row and sub-row pairs
+        const rowGroups = Array.from(tableBody.querySelectorAll<HTMLTableRowElement>(".mainRow")).map(mainRow => {
+            // Find the associated sub-row
+            const pairId = mainRow.getAttribute("data-sort-key");
+            const subRow = tableBody.querySelector<HTMLTableRowElement>(`tr[data-pair="${pairId}"]`);
+
+            return { mainRow, subRow };
+        });
 
         rowGroups.sort((groupA, groupB) => {
-            const rowA = groupA.querySelector<HTMLTableRowElement>(".rowWithSubRow");
-            const rowB = groupB.querySelector<HTMLTableRowElement>(".rowWithSubRow");
-
-            if (!rowA || !rowB) return 0; // Keep order if any group lacks a main row
-
-            const valueA = parseSortableValue(getCellValue(rowA, columnIndex, dataType), dataType);
-            const valueB = parseSortableValue(getCellValue(rowB, columnIndex, dataType), dataType);
+            const valueA = parseSortableValue(getCellValue(groupA.mainRow, columnIndex, dataType), dataType);
+            const valueB = parseSortableValue(getCellValue(groupB.mainRow, columnIndex, dataType), dataType);
 
             return compareValues(valueA, valueB, isAscending);
         });
 
-        rowGroups.forEach(group => fragment.appendChild(group));
+        // Append rows back to the fragment while keeping the main and sub-row together
+        rowGroups.forEach(group => {
+            fragment.appendChild(group.mainRow);
+            if (group.subRow) {
+                fragment.appendChild(group.subRow);
+            }
+        });
     } else {
         const rows = Array.from(tableBody.querySelectorAll<HTMLTableRowElement>("tr"));
 
