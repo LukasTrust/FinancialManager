@@ -109,9 +109,9 @@ async function addSearchStringBankAccount(searchString, listId, messages) {
 }
 function handleFileBrowser(messages) {
     const fileBrowsButton = document.querySelector(".fileBrowseButton");
-    const fileBrowsInput = document.querySelector(".fileBrowseInput");
+    const fileBrowsInput = document.getElementById("fileBrowseInput");
     const fileUploadBox = document.querySelector(".fileUploadBox");
-    const fileInstructions = document.querySelector(".fileInstructions");
+    const fileInstructions = document.getElementById("fileInstructions");
     fileUploadBox.addEventListener("drop", async (event) => {
         var _a, _b;
         event.preventDefault();
@@ -120,12 +120,12 @@ function handleFileBrowser(messages) {
     fileUploadBox.addEventListener("dragover", (event) => {
         event.preventDefault();
         fileUploadBox.classList.add("active");
-        fileInstructions.innerText = messages["fileUploadDrop"];
+        fileInstructions.textContent = messages["fileUploadDrop"];
     });
     fileUploadBox.addEventListener("dragleave", (event) => {
         event.preventDefault();
         fileUploadBox.classList.remove("active");
-        fileInstructions.innerText = messages["fileUploadDrag"];
+        fileInstructions.textContent = messages["fileUploadDrag"];
     });
     fileBrowsButton.addEventListener("click", () => {
         fileBrowsInput.click();

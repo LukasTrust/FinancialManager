@@ -147,60 +147,29 @@ label {
     box-sizing: inherit;
 }
 
-.fileUploader {
-    width: 350px;
-    margin-bottom: 10px;
-    margin-top: 10px;
-    background: white;
+.fileUploadBox {
+    padding: 14px 20px;
     border-radius: 16px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    transition: transform 0.2s ease-in-out;
-}
-
-.fileUploader .fileUploaderHeader {
-    display: flex;
-    padding: 10px;
-    background: #5145BA;
-    align-items: center;
-    border-radius: 16px 16px 0 0;
-    justify-content: center;
-}
-
-.fileUploaderHeader .fileUploaderTitle {
-    font-size: 1rem;
-    font-weight: 700;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     color: white;
-}
-
-.fileUploader .fileUploadBox {
-    margin: 5px;
-    border-radius: 12px;
-    min-height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px dashed #B1Add4;
-    transition: all 0.2s ease;
-}
-
-.fileUploader .fileUploadBox.active {
-    border: 2px solid #5145BA;
-    background: #F3F6FF;
-}
-
-.fileUploader .fileUploadBox .boxTitle {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #626161;
-}
-
-.fileUploadBox .boxTitle .fileBrowseButton {
-    color: #5145BA;
+    font-size: 0.95rem;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
     cursor: pointer;
+    transition: all 0.3s ease;
+    align-content: center;
 }
 
-.fileUploadBox .boxTitle .fileBrowseButton:hover {
-    text-decoration: underline;
+.fileUploadBox:hover {
+    border-color: #a5b4fc;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.fileBrowseButton {
+    color: #c7d2fe;
+    font-weight: 600;
 }
 
 .inputDate {

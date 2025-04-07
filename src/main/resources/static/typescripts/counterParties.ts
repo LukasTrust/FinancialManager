@@ -194,7 +194,7 @@ function createCounterPartyRow(tableBody: HTMLElement, counterPartyDisplay: Coun
     createAndAppendElement(totalAmountWrapper, "span", "", formatNumber(counterPartyDisplay.totalAmount, currency));
 
     // Description Cell
-    const description = createAndAppendElement(newRow, "td", "marginRightBig");
+    const description = createAndAppendElement(newRow, "td");
     const descriptionInput = createInputBox(description, "bi bi-pencil-fill", "name", "text", counterParty.description);
     debounceInputChange(descriptionInput, (id, newValue, messages) =>
         updateField(id, "description", newValue, messages, Type.COUNTERPARTY), counterParty.id, messages);

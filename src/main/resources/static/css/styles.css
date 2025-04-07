@@ -63,13 +63,6 @@ p {
 }
 
 /*Layout Containers*/
-.content {
-    display: flex;
-    width: 100%;
-    transition: 0.4s ease;
-    margin: 30px 20px;
-}
-
 .mainContainer {
     display: flex;
     padding-left: 20px;
@@ -87,10 +80,6 @@ p {
 .verticalContainer {
     display: flex;
     flex-direction: column;
-}
-
-.fullContent {
-    width: 100%;
 }
 
 .mainContent {
@@ -184,8 +173,6 @@ p {
     display: flex;
     min-height: 8vh;
     align-items: center;
-    overflow-x: auto; /* enables horizontal scrolling */
-    overflow-y: visible;
     white-space: nowrap;
 }
 

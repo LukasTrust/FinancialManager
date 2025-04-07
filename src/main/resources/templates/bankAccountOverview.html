@@ -1,17 +1,17 @@
 <div th:fragment="bankAccountOverview" class="mainContainer" id="content">
-    <div class="flexContainerColumn">
+    <div class="widthFull verticalContainer">
         <!--Header section-->
-        <div class="flexContainerSpaced">
-            <div class="flexContainer">
+        <div class="horizontalContainer marginBottom">
+            <div class="horizontalContainer">
                 <h1><span class="bi bi-bank2"></span></h1>
                 <h1 id="bankName"></h1>
             </div>
         </div>
 
         <!--Chart section-->
-        <div class="pageContainer">
-            <div class="flexContainerSpaced">
-                <div class="container">
+        <div class="verticalContainer">
+            <div class="horizontalContainer marginBottomBig">
+                <div class="horizontalContainer">
                     <div class="inputDate">
                         <div class="textHeader">
                             <label for="startDate">
@@ -34,104 +34,92 @@
                         </div>
                         <input type="date" id="endDate" name="endDate">
                     </div>
-                    <button style="margin-top: 32px; background: #ff4757" class="iconButton" id="clearDateButton">
+                    <button class="iconButton" id="clearDateButton">
                         <span class="bi bi-trash-fill"></span>
                     </button>
 
-                    <button style="margin-top: 32px; background: orange" class="iconButton" id="deleteDataButton">
+                    <button class="iconButton" id="deleteDataButton">
                         <span class="bi bi-trash-fill"></span>
                     </button>
                 </div>
 
-                <div class="fileUploader">
-                    <div class="fileUploaderHeader">
-                        <h2 class="fileUploaderTitle" data-i18n="uploadData"></h2>
-                    </div>
+                <div class="horizontalContainer marginLeftAuto">
+                    <span style="color: #fff" class="textHeader" data-i18n="uploadData"></span>
                     <div class="fileUploadBox">
-                        <h2 class="boxTitle">
-                            <span class="fileInstructions" data-i18n="fileUploadDrag"></span>
-                            <span class="fileBrowseButton" data-i18n="browseFiles"></span>
-                        </h2>
+                        <span id="fileInstructions" data-i18n="fileUploadDrag"></span>
+                        <span class="fileBrowseButton" data-i18n="browseFiles"></span>
+                        <input type="file" id="fileBrowseInput" hidden>
                     </div>
-                    <input class="fileBrowseInput" type="file" multiple hidden>
-                    <ul class="fileList"></ul>
                 </div>
             </div>
 
-            <div class="chartContainer" style="max-height: 61vh">
+            <div class="chartContainer">
                 <canvas id="lineChart"></canvas>
             </div>
 
             <!--Key figures section-->
-            <div class="flexContainerSpaced">
-                <div id="keyFiguresContainer" class="flexContainer"></div>
+            <div class="horizontalContainer">
+                <div id="keyFiguresContainer" class="horizontalContainer"></div>
 
-                <div class="flexContainerColumn">
-                    <div class="flexContainerSpaced">
+                <div class="verticalContainer">
+                    <div class="horizontalContainer">
                         <!-- Counterparty Search Strings -->
-                        <div class="flexContainerColumnSmall">
-                            <h3 data-i18n="counterpartyHeader"></h3>
-                            <div class="inputContainer">
-                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addCounterPartyStrings"
-                                        type="button"></button>
+                        <div class="verticalContainer marginBottom">
+                            <h3 class="marginTop" data-i18n="counterpartyHeader"></h3>
+                            <div class="horizontalContainer">
+                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addCounterPartyStrings" type="button"></button>
                                 <div class="inputBox">
                                     <span class="bi bi-card-text"></span>
                                     <label for="inputCounterPartyStrings"></label>
-                                    <input type="text" id="inputCounterPartyStrings" name="counterPartyStrings"
-                                           data-i18n-placeholder="counterpartySearchStrings">
+                                    <input type="text" id="inputCounterPartyStrings" name="counterPartyStrings" data-i18n-placeholder="counterpartySearchStrings">
                                 </div>
                             </div>
-                            <div id="counterPartySearchStrings" class="listContainer"></div>
+                            <div id="counterPartySearchStrings" class="listContainer marginLeftBig">
+                            </div>
                         </div>
 
                         <!-- Amount Search Strings -->
-                        <div class="flexContainerColumnSmall">
+                        <div class="verticalContainer marginBottom">
                             <h3 data-i18n="amountHeader"></h3>
-                            <div class="inputContainer">
-                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addAmountStrings"
-                                        type="button"></button>
+                            <div class="horizontalContainer">
+                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addAmountStrings" type="button"></button>
                                 <div class="inputBox">
                                     <span class="bi bi-card-text"></span>
                                     <label for="inputAmountStrings"></label>
-                                    <input type="text" id="inputAmountStrings" name="amountStrings"
-                                           data-i18n-placeholder="amountSearchStrings">
+                                    <input type="text" id="inputAmountStrings" name="amountStrings" data-i18n-placeholder="amountSearchStrings">
                                 </div>
                             </div>
-                            <div id="amountSearchStrings" class="listContainer"></div>
+                            <div id="amountSearchStrings" class="listContainer marginLeftBig"></div>
                         </div>
                     </div>
 
-                    <div class="flexContainerSpaced">
+                    <div class="horizontalContainer">
                         <!-- Amount After Transaction Search Strings -->
-                        <div class="flexContainerColumnSmall">
+                        <div class="verticalContainer marginBottom">
                             <h3 data-i18n="amountInBankAfterTransactionHeader"></h3>
-                            <div class="inputContainer">
-                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addAmountAfterStrings"
-                                        type="button"></button>
+                            <div class="horizontalContainer">
+                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addAmountAfterStrings" type="button"></button>
                                 <div class="inputBox">
                                     <span class="bi bi-card-text"></span>
                                     <label for="inputAmountAfterStrings"></label>
-                                    <input type="text" id="inputAmountAfterStrings" name="amountAfterStrings"
-                                           data-i18n-placeholder="amountInBankAfterTransactionSearchStrings">
+                                    <input type="text" id="inputAmountAfterStrings" name="amountAfterStrings" data-i18n-placeholder="amountInBankAfterTransactionSearchStrings">
                                 </div>
                             </div>
-                            <div id="amountInBankAfterSearchStrings" class="listContainer"></div>
+                            <div id="amountInBankAfterSearchStrings" class="listContainer marginLeftBig"></div>
                         </div>
 
                         <!-- Date Search Strings -->
-                        <div class="flexContainerColumnSmall">
+                        <div class="verticalContainer marginBottom">
                             <h3 data-i18n="dateHeader"></h3>
-                            <div class="inputContainer">
-                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addDateStrings"
-                                        type="button"></button>
+                            <div class="horizontalContainer">
+                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addDateStrings" type="button"></button>
                                 <div class="inputBox">
                                     <span class="bi bi-card-text"></span>
                                     <label for="inputDateStrings"></label>
-                                    <input type="text" id="inputDateStrings" name="dateStrings"
-                                           data-i18n-placeholder=dateSearchStrings>
+                                    <input type="text" id="inputDateStrings" name="dateStrings" data-i18n-placeholder="dateSearchStrings">
                                 </div>
                             </div>
-                            <div id="dateSearchStrings" class="listContainer"></div>
+                            <div id="dateSearchStrings" class="listContainer marginLeftBig"></div>
                         </div>
                     </div>
 
@@ -140,23 +128,20 @@
                         <div class="inputBox">
                             <span class="bi bi-piggy-bank"></span>
                             <label for="interestRate"></label>
-                            <input type="number" id="interestRate" name="interestRate"
-                                   data-i18n-placeholder="positiveInterestRate" min="0" step="any">
+                            <input type="number" id="interestRate" name="interestRate" data-i18n-placeholder="positiveInterestRate" min="0" step="any">
                         </div>
 
-                        <div class="flexContainerColumnSmall">
-                            <h3 data-i18n="interestRateHeader"></h3>
-                            <div class="inputContainer">
-                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addInterestRateStrings"
-                                        type="button"></button>
+                        <div class="verticalContainer marginTop">
+                            <h3 class="marginTop" data-i18n="interestRateHeader"></h3>
+                            <div class="horizontalContainer">
+                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addInterestRateStrings" type="button"></button>
                                 <div class="inputBox">
                                     <span class="bi bi-cash-stack"></span>
                                     <label for="inputInterestRateStrings"></label>
-                                    <input type="number" id="inputInterestRateStrings" name="interestRateStrings"
-                                           data-i18n-placeholder="interestRateSearchStrings">
+                                    <input type="text" id="inputInterestRateStrings" name="interestRateStrings" data-i18n-placeholder="interestRateSearchStrings">
                                 </div>
                             </div>
-                            <div id="interestRateSearchStrings" class="listContainer"></div>
+                            <div id="interestRateSearchStrings" class="listContainer marginLeftBig"></div>
                         </div>
                     </div>
                 </div>

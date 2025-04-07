@@ -131,9 +131,9 @@ async function addSearchStringBankAccount(searchString: string, listId: string, 
 
 function handleFileBrowser(messages: Record<string, string>): void {
     const fileBrowsButton = document.querySelector(".fileBrowseButton") as HTMLButtonElement;
-    const fileBrowsInput = document.querySelector(".fileBrowseInput") as HTMLInputElement;
+    const fileBrowsInput = document.getElementById("fileBrowseInput") as HTMLInputElement;
     const fileUploadBox = document.querySelector(".fileUploadBox") as HTMLDivElement;
-    const fileInstructions = document.querySelector(".fileInstructions") as HTMLDivElement;
+    const fileInstructions = document.getElementById("fileInstructions") as HTMLSpanElement;
 
     fileUploadBox.addEventListener("drop", async (event: DragEvent) => {
         event.preventDefault();
@@ -143,13 +143,13 @@ function handleFileBrowser(messages: Record<string, string>): void {
     fileUploadBox.addEventListener("dragover", (event: DragEvent) => {
         event.preventDefault();
         fileUploadBox.classList.add("active");
-        fileInstructions.innerText = messages["fileUploadDrop"];
+        fileInstructions.textContent = messages["fileUploadDrop"];
     });
 
     fileUploadBox.addEventListener("dragleave", (event: DragEvent) => {
         event.preventDefault();
         fileUploadBox.classList.remove("active");
-        fileInstructions.innerText = messages["fileUploadDrag"];
+        fileInstructions.textContent = messages["fileUploadDrag"];
     });
 
     fileBrowsButton.addEventListener("click", () => {

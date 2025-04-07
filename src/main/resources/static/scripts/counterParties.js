@@ -146,7 +146,7 @@ function createCounterPartyRow(tableBody, counterPartyDisplay, currency, toolTip
     const totalAmountWrapper = createAndAppendElement(totalAmount, "div", "justifyContentCenter");
     createAndAppendElement(totalAmountWrapper, "span", "", formatNumber(counterPartyDisplay.totalAmount, currency));
     // Description Cell
-    const description = createAndAppendElement(newRow, "td", "marginRightBig");
+    const description = createAndAppendElement(newRow, "td");
     const descriptionInput = createInputBox(description, "bi bi-pencil-fill", "name", "text", counterParty.description);
     debounceInputChange(descriptionInput, (id, newValue, messages) => updateField(id, "description", newValue, messages, Type.COUNTERPARTY), counterParty.id, messages);
     const searchStringCell = createAndAppendElement(searchStringRow, "td", "", "", {
@@ -165,7 +165,7 @@ function createCounterPartyRow(tableBody, counterPartyDisplay, currency, toolTip
         searchStringInput.value = "";
     });
     // List of counterparty search strings
-    const listContainer = createAndAppendElement(cellWrapper, "div", "widthFull listContainer overFlowVisible");
+    const listContainer = createAndAppendElement(cellWrapper, "div", "widthFull listContainer");
     counterParty.counterPartySearchStrings.forEach(searchString => {
         createListElement(listContainer, searchString, {}, true, true, toolTip, () => removeSearchStringFromCounterParty(counterParty.id, searchString, messages));
     });
