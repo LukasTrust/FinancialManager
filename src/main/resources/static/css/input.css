@@ -189,6 +189,7 @@ label {
     font-size: 14px;
     cursor: pointer;
     transition: border-color 0.3s ease;
+    padding: 5px;
 }
 
 .inputDate input[type="date"]:focus {
