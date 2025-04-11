@@ -34,7 +34,7 @@
                         </div>
                         <input type="date" id="endDate" name="endDate">
                     </div>
-                    <button class="iconButton" id="clearDateButton">
+                    <button class="removeButton" id="clearDateButton">
                         <span class="bi bi-trash-fill"></span>
                     </button>
 
@@ -59,86 +59,93 @@
 
             <!--Key figures section-->
             <div class="horizontalContainer">
-                <div id="keyFiguresContainer" class="horizontalContainer"></div>
+                <div id="keyFiguresContainer" class="horizontalContainer widthHalf"></div>
 
-                <div class="verticalContainer">
-                    <div class="horizontalContainer">
-                        <!-- Counterparty Search Strings -->
-                        <div class="verticalContainer marginBottom">
-                            <h3 class="marginTop" data-i18n="counterpartyHeader"></h3>
-                            <div class="horizontalContainer">
-                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addCounterPartyStrings" type="button"></button>
-                                <div class="inputBox">
-                                    <span class="bi bi-card-text"></span>
-                                    <label for="inputCounterPartyStrings"></label>
-                                    <input type="text" id="inputCounterPartyStrings" name="counterPartyStrings" data-i18n-placeholder="counterpartySearchStrings">
-                                </div>
-                            </div>
-                            <div id="counterPartySearchStrings" class="listContainer marginLeftBig">
+                <div class="horizontalContainer wrapContainer widthHalf height17vh">
+                    <!-- Counterparty Search Strings -->
+                    <div class="verticalContainer marginBottom width350">
+                        <h3 class="marginTop" data-i18n="counterpartyHeader"></h3>
+                        <div class="horizontalContainer">
+                            <button class="iconOnlyButton bi bi bi-plus-circle" id="addCounterPartyStrings"
+                                    type="button"></button>
+                            <div class="inputBox">
+                                <span class="bi bi-card-text"></span>
+                                <label for="inputCounterPartyStrings"></label>
+                                <input type="text" id="inputCounterPartyStrings" name="counterPartyStrings"
+                                       data-i18n-placeholder="counterpartySearchStrings">
                             </div>
                         </div>
-
-                        <!-- Amount Search Strings -->
-                        <div class="verticalContainer marginBottom">
-                            <h3 data-i18n="amountHeader"></h3>
-                            <div class="horizontalContainer">
-                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addAmountStrings" type="button"></button>
-                                <div class="inputBox">
-                                    <span class="bi bi-card-text"></span>
-                                    <label for="inputAmountStrings"></label>
-                                    <input type="text" id="inputAmountStrings" name="amountStrings" data-i18n-placeholder="amountSearchStrings">
-                                </div>
-                            </div>
-                            <div id="amountSearchStrings" class="listContainer marginLeftBig"></div>
+                        <div id="counterPartySearchStrings" class="listContainer marginLeftBig">
                         </div>
                     </div>
 
-                    <div class="horizontalContainer">
-                        <!-- Amount After Transaction Search Strings -->
-                        <div class="verticalContainer marginBottom">
-                            <h3 data-i18n="amountInBankAfterTransactionHeader"></h3>
-                            <div class="horizontalContainer">
-                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addAmountAfterStrings" type="button"></button>
-                                <div class="inputBox">
-                                    <span class="bi bi-card-text"></span>
-                                    <label for="inputAmountAfterStrings"></label>
-                                    <input type="text" id="inputAmountAfterStrings" name="amountAfterStrings" data-i18n-placeholder="amountInBankAfterTransactionSearchStrings">
-                                </div>
+                    <!-- Amount Search Strings -->
+                    <div class="verticalContainer marginBottom width350">
+                        <h3 data-i18n="amountHeader"></h3>
+                        <div class="horizontalContainer">
+                            <button class="iconOnlyButton bi bi bi-plus-circle" id="addAmountStrings"
+                                    type="button"></button>
+                            <div class="inputBox">
+                                <span class="bi bi-card-text"></span>
+                                <label for="inputAmountStrings"></label>
+                                <input type="text" id="inputAmountStrings" name="amountStrings"
+                                       data-i18n-placeholder="amountSearchStrings">
                             </div>
-                            <div id="amountInBankAfterSearchStrings" class="listContainer marginLeftBig"></div>
                         </div>
+                        <div id="amountSearchStrings" class="listContainer marginLeftBig"></div>
+                    </div>
 
-                        <!-- Date Search Strings -->
-                        <div class="verticalContainer marginBottom">
-                            <h3 data-i18n="dateHeader"></h3>
-                            <div class="horizontalContainer">
-                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addDateStrings" type="button"></button>
-                                <div class="inputBox">
-                                    <span class="bi bi-card-text"></span>
-                                    <label for="inputDateStrings"></label>
-                                    <input type="text" id="inputDateStrings" name="dateStrings" data-i18n-placeholder="dateSearchStrings">
-                                </div>
+                    <!-- Amount After Transaction Search Strings -->
+                    <div class="verticalContainer marginBottom width350">
+                        <h3 data-i18n="amountInBankAfterTransactionHeader"></h3>
+                        <div class="horizontalContainer">
+                            <button class="iconOnlyButton bi bi bi-plus-circle" id="addAmountAfterStrings"
+                                    type="button"></button>
+                            <div class="inputBox">
+                                <span class="bi bi-card-text"></span>
+                                <label for="inputAmountAfterStrings"></label>
+                                <input type="text" id="inputAmountAfterStrings" name="amountAfterStrings"
+                                       data-i18n-placeholder="amountInBankAfterTransactionSearchStrings">
                             </div>
-                            <div id="dateSearchStrings" class="listContainer marginLeftBig"></div>
                         </div>
+                        <div id="amountInBankAfterSearchStrings" class="listContainer marginLeftBig"></div>
+                    </div>
+
+                    <!-- Date Search Strings -->
+                    <div class="verticalContainer marginBottom width350">
+                        <h3 data-i18n="dateHeader"></h3>
+                        <div class="horizontalContainer">
+                            <button class="iconOnlyButton bi bi bi-plus-circle" id="addDateStrings"
+                                    type="button"></button>
+                            <div class="inputBox">
+                                <span class="bi bi-card-text"></span>
+                                <label for="inputDateStrings"></label>
+                                <input type="text" id="inputDateStrings" name="dateStrings"
+                                       data-i18n-placeholder="dateSearchStrings">
+                            </div>
+                        </div>
+                        <div id="dateSearchStrings" class="listContainer marginLeftBig"></div>
                     </div>
 
                     <!--Hidden only for is SavingsAccount-->
-                    <div id="hiddenInputs" class="beforeHidden hidden">
+                    <div id="hiddenInputs" class="beforeHidden hidden width350">
                         <div class="inputBox">
                             <span class="bi bi-piggy-bank"></span>
                             <label for="interestRate"></label>
-                            <input type="number" id="interestRate" name="interestRate" data-i18n-placeholder="positiveInterestRate" min="0" step="any">
+                            <input type="number" id="interestRate" name="interestRate"
+                                   data-i18n-placeholder="positiveInterestRate" min="0" step="any">
                         </div>
 
                         <div class="verticalContainer marginTop">
                             <h3 class="marginTop" data-i18n="interestRateHeader"></h3>
                             <div class="horizontalContainer">
-                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addInterestRateStrings" type="button"></button>
+                                <button class="iconOnlyButton bi bi bi-plus-circle" id="addInterestRateStrings"
+                                        type="button"></button>
                                 <div class="inputBox">
                                     <span class="bi bi-cash-stack"></span>
                                     <label for="inputInterestRateStrings"></label>
-                                    <input type="text" id="inputInterestRateStrings" name="interestRateStrings" data-i18n-placeholder="interestRateSearchStrings">
+                                    <input type="text" id="inputInterestRateStrings" name="interestRateStrings"
+                                           data-i18n-placeholder="interestRateSearchStrings">
                                 </div>
                             </div>
                             <div id="interestRateSearchStrings" class="listContainer marginLeftBig"></div>

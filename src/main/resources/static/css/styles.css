@@ -119,6 +119,11 @@ p {
     z-index: 2;
 }
 
+.wrapContainer {
+    flex-wrap: wrap;
+    overflow: auto;
+}
+
 /*Utilities*/
 .marginBottom {
     margin-bottom: 10px;
@@ -152,8 +157,20 @@ p {
     width: 100%;
 }
 
+.widthHalf {
+    width: 50%;
+}
+
 .width300 {
     width: 300px !important;
+}
+
+.width350 {
+    width: 350px !important;
+}
+
+.height17vh {
+    height: 17vh;
 }
 
 .alignSelfCenter {
