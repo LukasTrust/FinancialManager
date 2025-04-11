@@ -173,6 +173,14 @@ p {
     height: 17vh;
 }
 
+.height90vh {
+    height: 90vh;
+}
+
+.bold {
+    font-weight: bold;
+}
+
 .alignSelfCenter {
     align-self: center;
 }

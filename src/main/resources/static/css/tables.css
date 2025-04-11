@@ -167,7 +167,6 @@ th, td {
 }
 
 .tableCheckbox {
-    appearance: none;
     width: 18px;
     height: 18px;
     border: 2px solid #4a90e2;
@@ -207,10 +206,6 @@ th, td {
 .tableCheckbox:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3); /* Subtle focus ring */
-}
-
-.rightAligned {
-    text-align: end;
 }
 
 .highlightCell {

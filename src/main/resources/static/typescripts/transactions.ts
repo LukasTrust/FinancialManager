@@ -43,43 +43,41 @@ function addRowsToTransactionTable(data: Transaction[], messages: Record<string,
             animateElement(newRow);
 
             // Counterparty cell
-            const counterparty = createAndAppendElement(newRow, "td", "", "", {style: "width: 25%"});
-            createAndAppendElement(counterparty, "span", "tdMargin", transaction.counterParty.name, {
-                style: "font-weight: bold; width: 25%",
-            });
+            const counterparty = createAndAppendElement(newRow, "td");
+            createAndAppendElement(counterparty, "span", "bold", transaction.counterParty.name);
 
             // Contract cell
-            const contract = createAndAppendElement(newRow, "td", "", "", {style: "width: 15%"});
+            const contract = createAndAppendElement(newRow, "td");
             if (transaction.contract?.name) {
-                createAndAppendElement(contract, "span", "tdMargin highlightCell highlightCellPink",
+                createAndAppendElement(contract, "span", "highlightCell highlightCellPink",
                     transaction.contract.name);
             }
 
             // Category cell
-            const category = createAndAppendElement(newRow, "td", "", "", {style: "width: 15%"});
+            const category = createAndAppendElement(newRow, "td");
             if (transaction.category?.name) {
-                createAndAppendElement(category, "span", "tdMargin highlightCell highlightCellOrange", transaction.category.name);
+                createAndAppendElement(category, "span", "highlightCell highlightCellOrange", transaction.category.name);
             }
 
             // Date cell
-            const date = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
-            createAndAppendElement(date, "span", "tdMargin", formatDateString(transaction.date));
+            const date = createAndAppendElement(newRow, "td");
+            createAndAppendElement(date, "span", "", formatDateString(transaction.date));
 
             // Amount before cell
-            const amountBefore = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
-            createAndAppendElement(amountBefore, "span", "tdMargin", formatNumber(transaction.amountInBankBefore, currency));
+            const amountBefore = createAndAppendElement(newRow, "td");
+            createAndAppendElement(amountBefore, "span", "", formatNumber(transaction.amountInBankBefore, currency));
 
             // Amount cell with positive/negative styling
-            const amount = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
+            const amount = createAndAppendElement(newRow, "td");
             const amountClass = transaction.amount >= 0 ? "positive" : "negative";
-            createAndAppendElement(amount, "span", `tdMargin rightAligned ${amountClass}`,
-                formatNumber(transaction.amount, currency)
+            const amountWrapper = createAndAppendElement(amount, "div", `${amountClass}`
             );
+            createAndAppendElement(amountWrapper, "span", "", formatNumber(transaction.amount, currency));
 
             // Amount after cell
-            const amountInBankAfter = createAndAppendElement(newRow, "td", "rightAligned", "", {style: "width: 10%"});
+            const amountInBankAfter = createAndAppendElement(newRow, "td");
             createAndAppendElement(amountInBankAfter, "span", "tdMargin",
-                formatNumber(transaction.amountInBankAfter, currency), {style: "margin-right: 30px;"});
+                formatNumber(transaction.amountInBankAfter, currency));
         });
     } catch (error) {
         console.error("Unexpected error in addRowsToTransactionTable:", error);
