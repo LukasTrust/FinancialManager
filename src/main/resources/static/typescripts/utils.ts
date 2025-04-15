@@ -183,32 +183,6 @@ function moveElements(sourceContainer: HTMLElement, targetContainer: HTMLElement
     });
 }
 
-function createCheckBoxForRowGroup(rowGroup: HTMLElement, newRow: HTMLElement, id: number) {
-    const trCheckBox = createAndAppendElement(newRow, "td");
-
-    const checkBox = createAndAppendElement(trCheckBox, "input", "tableCheckbox", "", {
-        type: "checkbox",
-        id: id.toString(),
-        style: "margin-left: 10px;",
-    }) as HTMLInputElement;
-
-    checkBox.addEventListener("change", () => updateRowGroupStyle(rowGroup, checkBox));
-
-    rowGroup.addEventListener("click", (event) => {
-        const target = event.target as HTMLElement;
-
-        // Ignore checkboxes, buttons, and text inputs
-        if ((target as HTMLInputElement).type === 'checkbox' ||
-            target.tagName === 'BUTTON' ||
-            (target.tagName === 'INPUT' && (target as HTMLInputElement).type === 'text')) {
-            return; // Skip the parent's click logic
-        }
-
-        checkBox.checked = !checkBox.checked;
-        updateRowGroupStyle(rowGroup, checkBox);
-    });
-}
-
 function addHoverToOtherElement(newRow: HTMLElement, subRow: HTMLElement) {
     // Add event listeners to newRow
     newRow.addEventListener('mouseenter', () => {

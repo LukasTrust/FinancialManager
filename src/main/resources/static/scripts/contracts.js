@@ -69,62 +69,59 @@ function createContractRow(tableBody, contractDisplay, currency, messages) {
         return;
     }
     const contract = contractDisplay.contract;
-    let hidden = contract.hidden ? " hiddenRow" : "";
+    let hiddenClass = contract.hidden ? " hiddenRow" : "";
     if (contract.hidden && !counterPartiesHiddenToggle) {
-        hidden += " hidden";
+        hiddenClass += " hidden";
     }
-    const rowGroup = createAndAppendElement(tableBody, "div", "rowGroup");
-    animateElement(rowGroup);
-    const newRow = createAndAppendElement(rowGroup, "tr", "rowWithSubRow" + hidden, "", { id: contract.id.toString() });
-    createAndAppendElement(newRow, "td", contract.hidden ? "bi bi-eye-slash" : "", "", { style: "border-bottom: 1px solid rgba(255, 255, 255, 0.1); width: 20px" });
-    createCheckBoxForRowGroup(rowGroup, newRow, contract.id);
+    // Main row
+    const newRow = createAndAppendElement(tableBody, "tr", "mainRow" + hiddenClass, "", {
+        id: contract.id.toString(),
+        "data-sort-key": contract.id.toString()
+    });
+    createCheckBoxForTable(newRow, null, contract.id, contract.hidden);
     // Name cell
-    const name = createAndAppendElement(newRow, "td", "", "", { style: "width: 20%; padding-right: 20px" });
+    const name = createAndAppendElement(newRow, "td");
     const nameInput = createInputBox(name, "bi bi-pencil-fill", "name", "text", contract.name);
     debounceInputChange(nameInput, (id, newValue, messages) => updateField(id, "name", newValue, messages, Type.CONTRACT), contract.id, messages);
     // Description Cell
-    const description = createAndAppendElement(newRow, "td", "", "", { style: "width: 16%" });
+    const description = createAndAppendElement(newRow, "td");
     const descriptionInput = createInputBox(description, "bi bi-pencil-fill", "name", "text", contract.description);
     debounceInputChange(descriptionInput, (id, newValue, messages) => updateField(id, "description", newValue, messages, Type.CONTRACT), contract.id, messages);
     // Transaction count
-    const transactionCount = createAndAppendElement(newRow, "td", "rightAligned", "", { style: "width: 17%; padding-right: 20px" });
+    const transactionCount = createAndAppendElement(newRow, "td");
     createAndAppendElement(transactionCount, "span", "tdMargin", contractDisplay.transactionCount.toString());
     // Total amount
-    const totalAmount = createAndAppendElement(newRow, "td", "rightAligned", "", { style: "width: 10%" });
+    const totalAmount = createAndAppendElement(newRow, "td");
     createAndAppendElement(totalAmount, "span", "tdMargin", formatNumber(contractDisplay.totalAmount, currency));
     // Amount
-    const amount = createAndAppendElement(newRow, "td", "rightAligned", "", { style: "width: 10%" });
+    const amount = createAndAppendElement(newRow, "td");
     createAndAppendElement(amount, "span", "tdMargin", formatNumber(contract.amount, currency));
     // Start date
-    const startDate = createAndAppendElement(newRow, "td", "rightAligned", "", { style: "width: 10%" });
+    const startDate = createAndAppendElement(newRow, "td");
     createAndAppendElement(startDate, "span", "tdMargin", formatDateString(contract.startDate));
     // Last payment date
-    const lastPaymentDate = createAndAppendElement(newRow, "td", "rightAligned", "", { style: "width: 15%; padding-right: 10px" });
+    const lastPaymentDate = createAndAppendElement(newRow, "td");
     createAndAppendElement(lastPaymentDate, "span", "tdMargin", formatDateString(contract.lastPaymentDate));
-    const count = contractDisplay.contractHistories.length;
     let current = 1;
     contractDisplay.contractHistories.forEach(contractHistory => {
-        createContractSubRow(rowGroup, contractHistory, messages, currency, count === current, hidden);
+        createContractSubRow(tableBody, contractHistory, messages, currency, hiddenClass);
         current++;
     });
-    if (count === 0) {
-        rowGroup.style.borderBottom = "1px solid rgba(255, 255, 255, 0.1)";
-    }
     addHoverToSiblings(newRow);
 }
-function createContractSubRow(parent, contractHistory, messages, currency, last, hidden) {
-    const subRow = createAndAppendElement(parent, "tr", last ? "subRow" + hidden : "middleRow" + hidden);
+function createContractSubRow(parent, contractHistory, messages, currency, hidden) {
+    const subRow = createAndAppendElement(parent, "tr", hidden);
     // Changed at
-    const changedAt = createAndAppendElement(subRow, "td", "", "", { style: "width: 30%; padding-left: 20px" });
-    createAndAppendElement(changedAt, "span", "normalText", messages["changedAt"], { style: "padding-right: 30px" });
+    const changedAt = createAndAppendElement(subRow, "td");
+    createAndAppendElement(changedAt, "span", "normalText", messages["changedAt"]);
     createAndAppendElement(changedAt, "span", "", formatDateString(contractHistory.changedAt));
     // Previous amount
-    const previousAmount = createAndAppendElement(subRow, "td", "", "", { style: "width: 30%" });
-    createAndAppendElement(previousAmount, "span", "normalText", messages["previousAmount"], { style: "padding-right: 30px" });
+    const previousAmount = createAndAppendElement(subRow, "td");
+    createAndAppendElement(previousAmount, "span", "normalText", messages["previousAmount"]);
     createAndAppendElement(previousAmount, "span", "", formatNumber(contractHistory.previousAmount, currency));
     // Previous amount
-    const newAmount = createAndAppendElement(subRow, "td", "", "", { style: "width: 20%" });
-    createAndAppendElement(newAmount, "span", "normalText", messages["newAmount"], { style: "padding-right: 30px" });
+    const newAmount = createAndAppendElement(subRow, "td");
+    createAndAppendElement(newAmount, "span", "normalText", messages["newAmount"]);
     createAndAppendElement(newAmount, "span", "", formatNumber(contractHistory.newAmount, currency));
 }
 function updateContract(contractDisplay, data) {

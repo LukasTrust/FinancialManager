@@ -124,26 +124,6 @@ function moveElements(sourceContainer, targetContainer, soloItem = null) {
         targetContainer.appendChild(item);
     });
 }
-function createCheckBoxForRowGroup(rowGroup, newRow, id) {
-    const trCheckBox = createAndAppendElement(newRow, "td");
-    const checkBox = createAndAppendElement(trCheckBox, "input", "tableCheckbox", "", {
-        type: "checkbox",
-        id: id.toString(),
-        style: "margin-left: 10px;",
-    });
-    checkBox.addEventListener("change", () => updateRowGroupStyle(rowGroup, checkBox));
-    rowGroup.addEventListener("click", (event) => {
-        const target = event.target;
-        // Ignore checkboxes, buttons, and text inputs
-        if (target.type === 'checkbox' ||
-            target.tagName === 'BUTTON' ||
-            (target.tagName === 'INPUT' && target.type === 'text')) {
-            return; // Skip the parent's click logic
-        }
-        checkBox.checked = !checkBox.checked;
-        updateRowGroupStyle(rowGroup, checkBox);
-    });
-}
 function addHoverToOtherElement(newRow, subRow) {
     // Add event listeners to newRow
     newRow.addEventListener('mouseenter', () => {
