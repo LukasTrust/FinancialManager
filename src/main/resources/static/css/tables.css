@@ -1,26 +1,28 @@
+/* Search Bar */
 .searchBar {
     display: flex;
     flex: 1;
-    max-width: 400px; /* Slightly wider */
+    max-width: var(--search-max-width);
 }
 
 .searchBar input {
     flex: 1;
-    padding: 10px 16px; /* Larger padding */
-    border: 1px solid rgba(255, 255, 255, 0.3); /* Lighter border */
-    border-radius: 6px; /* Rounded corners */
+    padding: var(--spacing-sm) var(--spacing-xl);
+    border: 1px solid var(--search-border);
+    border-radius: var(--border-radius-md);
     font-size: 14px;
-    background: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
-    color: #333; /* Darker text */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background: var(--search-bg);
+    color: var(--search-text);
+    transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
 }
 
 .searchBar input:focus {
-    border-color: #007bff; /* Highlight on focus */
-    box-shadow: 0 0 8px rgba(0, 123, 255, 0.2); /* Subtle glow */
-    outline: none; /* Remove default outline */
+    border-color: var(--search-focus);
+    box-shadow: 0 0 8px var(--search-shadow);
+    outline: none;
 }
 
+/* Table Structure */
 .tableWrapper {
     flex: 1 1 auto;
     overflow-x: auto;
@@ -34,12 +36,18 @@ table {
 }
 
 thead {
-    background-color: #1F2A47;
-    color: #fff;
+    background-color: var(--table-header-bg);
+    color: var(--table-text-color);
     position: sticky;
     top: -5px;
     z-index: 1;
 }
+
+thead tr:hover {
+    background-color: inherit !important;
+    z-index: auto !important;
+}
+
 
 tbody {
     overflow-y: auto;
@@ -50,14 +58,14 @@ thead tr, tbody tr {
 }
 
 tr {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    transition: background 0.3s ease;
-    height: 65px;
+    border-bottom: 1px solid var(--table-border-color);
+    transition: background var(--transition-normal);
+    height: var(--row-height);
 }
 
 tr:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    transition: background-color 0.2s ease-in-out;
+    background-color: var(--table-row-hover);
+    transition: background-color var(--transition-fast);
     z-index: 2;
 }
 
@@ -65,14 +73,14 @@ th {
     font-weight: bold;
     cursor: pointer;
     user-select: none;
-    transition: background 0.3s ease;
+    transition: background var(--transition-normal);
 }
 
 th, td {
-    padding-top: 14px;
-    padding-bottom: 14px;
+    padding-top: var(--spacing-lg);
+    padding-bottom: var(--spacing-lg);
     text-align: left;
-    color: #fff;
+    color: var(--table-text-color);
     cursor: pointer;
 }
 
@@ -81,23 +89,27 @@ th, td {
     font-size: 1.2rem;
 }
 
+/* Row States */
 .selectedRow {
-    background-color: rgba(0, 123, 255, 0.2) !important; /* Light blue background matching the thead */
-    transition: background-color 0.2s ease-in-out; /* Smooth transition */
+    background-color: var(--table-row-selected) !important;
+    transition: background-color var(--transition-fast);
 }
 
 .hiddenRow {
-    background-color: rgba(200, 200, 200, 0.5); /* Light gray with transparency */
-    filter: grayscale(70%); /* More desaturated */
-    opacity: 0.8; /* Slightly transparent */
-    transition: opacity 0.5s ease, max-height 0.5s ease, padding 0.5s ease, margin 0.5s ease;
+    background-color: var(--table-row-hidden);
+    filter: grayscale(70%);
+    opacity: 0.8;
+    transition: opacity var(--transition-slow), max-height var(--transition-slow),
+    padding var(--transition-slow), margin var(--transition-slow);
 }
 
 :is(.hiddenRow.selectedRow) {
-    background-color: rgba(0, 123, 255, 0.3) !important; /* Slightly darker blue for combined state */
-    filter: grayscale(50%); /* Less desaturated than .hiddenRow alone */
-    opacity: 0.9; /* Less transparent than .hiddenRow alone */
-    transition: opacity 0.5s ease, max-height 0.5s ease, padding 0.5s ease, margin 0.5s ease, background-color 0.2s ease-in-out;
+    background-color: var(--table-row-hidden-selected) !important;
+    filter: grayscale(50%);
+    opacity: 0.9;
+    transition: opacity var(--transition-slow), max-height var(--transition-slow),
+    padding var(--transition-slow), margin var(--transition-slow),
+    background-color var(--transition-fast);
 }
 
 .hiddenRow.hidden {
@@ -110,11 +122,12 @@ th, td {
 }
 
 .hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    transition: background-color 0.2s ease-in-out;
+    background-color: var(--table-row-hover);
+    transition: background-color var(--transition-fast);
     z-index: 2;
 }
 
+/* Pagination */
 .pagination {
     display: flex;
     justify-content: center;
@@ -123,59 +136,58 @@ th, td {
 }
 
 .pagination button {
-    padding: 12px 24px; /* Larger padding */
-    margin: 0 12px; /* Increased margin */
+    padding: var(--spacing-sm) var(--spacing-xxl);
+    margin: 0 var(--spacing-md);
     border: none;
-    background-color: #03045e;
+    background-color: var(--pagination-bg);
     color: white;
-    border-radius: 6px; /* Rounded corners */
-    transition: background 0.3s ease, transform 0.2s ease;
+    border-radius: var(--border-radius-md);
+    transition: background var(--transition-normal), transform var(--transition-fast);
 }
 
 .pagination button:active {
-    transform: translateY(0); /* Reset on click */
+    transform: translateY(0);
 }
 
 .pagination button.disabled {
-    background-color: rgba(204, 204, 204, 0.5); /* Semi-transparent disabled state */
+    background-color: var(--pagination-disabled);
     cursor: not-allowed;
 }
 
 .pagination select {
-    padding: 12px; /* Larger padding */
-    margin-left: 12px; /* Increased margin */
-    border: 1px solid #007bff;
-    border-radius: 6px; /* Rounded corners */
-    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
-    color: #007bff;
+    padding: var(--spacing-sm);
+    margin-left: var(--spacing-md);
+    border: 1px solid var(--pagination-select-border);
+    border-radius: var(--border-radius-md);
+    background-color: var(--pagination-select-bg);
+    color: var(--pagination-select-border);
     cursor: pointer;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
 }
 
 .pagination select:hover {
-    border-color: #0056b3; /* Darker border on hover */
-    box-shadow: 0 0 8px rgba(0, 123, 255, 0.2); /* Subtle glow */
+    border-color: var(--pagination-select-hover);
+    box-shadow: 0 0 8px var(--search-shadow);
     z-index: 2;
 }
 
+/* Checkbox */
 .tableCheckbox {
-    width: 18px;
-    height: 18px;
-    border: 2px solid #4a90e2;
-    border-radius: 4px;
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
+    border: 2px solid var(--checkbox-border);
+    border-radius: var(--border-radius-sm);
     background-color: white;
     cursor: pointer;
-    margin-left: 10px;
-    transition: background-color 0.2s, border-color 0.2s;
+    margin-left: var(--spacing-sm);
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 
-/* Checked state */
 .tableCheckbox:checked {
-    background-color: #4a90e2; /* Background color when checked */
-    border-color: #4a90e2;
+    background-color: var(--checkbox-checked);
+    border-color: var(--checkbox-checked);
 }
 
-/* Checkmark (hidden by default) */
 .tableCheckbox:checked::after {
     content: '';
     position: absolute;
@@ -188,52 +200,51 @@ th, td {
     transform: rotate(45deg);
 }
 
-/* Hover effect */
 .tableCheckbox:hover {
-    border-color: #357abd; /* Darker border on hover */
+    border-color: var(--checkbox-hover);
     z-index: 2;
 }
 
-/* Focus state for accessibility */
 .tableCheckbox:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3); /* Subtle focus ring */
+    box-shadow: 0 0 0 3px var(--checkbox-focus);
 }
 
+/* Highlight Cells */
 .highlightCell {
-    display: inline-block; /* Shrink to fit content */
-    border-radius: 8px; /* Rounded corners */
-    padding: 8px 12px; /* Padding for better spacing */
-    transition: background-color 0.3s ease; /* Smooth transition */
-    color: white; /* White text color */
-    font-weight: bold; /* Bold text for better readability */
+    display: inline-block;
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-xs) var(--spacing-md);
+    transition: background-color var(--transition-normal);
+    color: white;
+    font-weight: bold;
     cursor: pointer;
 }
 
 .highlightCellTeal {
-    background-color: #26a69a; /* Teal */
+    background-color: var(--highlight-teal);
 }
 
 .highlightCellOrange {
-    background-color: #ffa726; /* Orange */
+    background-color: var(--highlight-orange);
 }
 
 .highlightCellPink {
-    background-color: #ec407a; /* Pink */
+    background-color: var(--highlight-pink);
 }
 
 .highlightCellPurple {
-    background-color: #ab47bc; /* Purple */
+    background-color: var(--highlight-purple);
 }
 
-/* Optional: Add hover effect */
 .highlightCell:hover {
-    filter: brightness(95%); /* Slightly darken on hover */
+    filter: brightness(95%);
     z-index: 2;
 }
 
+/* Icons */
 .iconColor {
-    color: #FFD700;
+    color: var(--icon-color);
     font-size: 1.2rem;
     cursor: pointer;
 }

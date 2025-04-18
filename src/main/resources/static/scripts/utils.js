@@ -225,7 +225,7 @@ function createListSection(parent, title, type, data, withSelect = false, left =
     return container;
 }
 function createListContainer(parent, listElementObjects, withSelect) {
-    const listContainer = createAndAppendElement(parent, "div", "verticalContainer height");
+    const listContainer = createAndAppendElement(parent, "div", "verticalContainer height40vh");
     let selectedElement = null;
     listElementObjects.forEach(listElementObject => {
         const listElement = createListElement(listContainer, listElementObject.text, { id: listElementObject.id.toString() }, true, false, listElementObject.toolTip);

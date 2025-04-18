@@ -98,7 +98,7 @@ function showMessageBox(
 
     createAndAppendElement(content, "h2", "", mainText, {style: "margin-top: 30px; margin-bottom: 30px"});
 
-    const buttonContainer = createAndAppendElement(content, "div", "flexContainerSpaced");
+    const buttonContainer = createAndAppendElement(content, "div", "horizontalContainer");
 
     const leftButton = createDialogButton(buttonContainer, leftIcon, leftButtonText, "left", leftButtonCallback);
     if (toolTipLeft) {

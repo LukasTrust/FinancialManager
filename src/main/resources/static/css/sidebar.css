@@ -1,48 +1,51 @@
+/* Sidebar Container */
 .sidebar {
-    width: 270px;
-    height: calc(100vh - 40px);
-    margin-left: 10px;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    border-radius: 16px;
-    background: #151A2D;
-    transition: 0.4s ease;
+    width: var(--sidebar-width);
+    height: var(--sidebar-height);
+    margin-left: var(--margin-sm);
+    margin-top: var(--margin-md);
+    margin-bottom: var(--margin-md);
+    border-radius: var(--border-radius-lg);
+    background: var(--sidebar-bg);
+    transition: var(--transition-normal);
 }
 
 .sidebar.collapsed {
-    width: 90px;
+    width: var(--sidebar-collapsed);
 }
 
+/* Sidebar Header */
 .sidebarHeader {
     position: relative;
     display: flex;
-    padding: 25px 20px;
+    padding: var(--padding-xxl) var(--padding-xl);
     align-items: center;
     justify-content: space-between;
 }
 
 .sidebarHeader .headerLogo img {
-    width: 46px;
-    height: 46px;
+    width: var(--logo-size);
+    height: var(--logo-size);
     display: block;
     object-fit: contain;
-    border-radius: 50%;
+    border-radius: var(--border-radius-circle);
 }
 
+/* Toggle Button */
 .sidebarHeader .sidebarToggle {
     position: absolute;
-    right: 20px;
-    height: 35px;
-    width: 35px;
+    right: var(--padding-xl);
+    height: var(--toggle-size);
+    width: var(--toggle-size);
     border: none;
-    color: #151A2D;
+    color: var(--sidebar-bg);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border-radius: 8px;
-    background: #fff;
-    transition: 0.4s ease;
+    border-radius: var(--border-radius-md);
+    background: var(--sidebar-toggle-bg);
+    transition: var(--transition-normal);
 }
 
 .sidebar.collapsed .sidebarHeader .sidebarToggle {
@@ -50,19 +53,20 @@
 }
 
 .sidebarHeader .sidebarToggle:hover {
-    background: #dde4fb;
+    background: var(--sidebar-toggle-hover);
     z-index: 2;
 }
 
 .sidebarHeader .sidebarToggle span {
-    font-size: 1.75rem;
-    transition: 0.4s ease;
+    font-size: var(--nav-icon-size);
+    transition: var(--transition-normal);
 }
 
 .sidebar.collapsed .sidebarHeader .sidebarToggle span {
     transform: rotate(180deg);
 }
 
+/* Navigation */
 .sidebarNav {
     height: calc(100vh - 20%);
     display: flex;
@@ -72,57 +76,56 @@
 .sidebarNav .navList {
     list-style: none;
     display: flex;
-    gap: 4px;
-    padding: 0 15px;
+    gap: var(--nav-gap);
+    padding: 0 var(--padding-lg);
     flex-direction: column;
     transform: translateY(15px);
-    transition: 0.4s ease;
+    transition: var(--transition-normal);
 }
 
 .sidebar.collapsed .sidebarNav .primaryNav {
     transform: translateY(65px);
 }
 
+/* Navigation Links */
 .sidebarNav .navLink {
-    color: #fff;
+    color: var(--sidebar-text);
     display: flex;
-    gap: 12px;
+    gap: var(--label-gap);
     white-space: nowrap;
-    border-radius: 8px;
+    border-radius: var(--border-radius-md);
     align-items: center;
-    padding: 12px;
+    padding: var(--padding-md);
     text-decoration: none;
-    transition: 0.4s ease;
+    transition: var(--transition-normal);
 }
 
 .sidebarNav .navLink:hover {
-    color: #151A2D;
-    background: #fff;
+    color: var(--sidebar-hover-text);
+    background: var(--sidebar-hover-bg);
     z-index: 2;
 }
 
 .sidebarNav .navLink .navLabel {
-    transition: opacity 0.4s ease;
+    transition: opacity var(--transition-normal);
 }
 
-.sidebar.collapsed .sidebarNav .navLink .navLabel {
-    opacity: 0;
-    pointer-events: none;
-}
-
+.sidebar.collapsed .sidebarNav .navLink .navLabel,
 .sidebar.collapsed .navLabel {
     opacity: 0;
     pointer-events: none;
 }
 
+/* Navigation Items */
 .sidebarNav .navItem {
     position: relative;
 }
 
 .account {
-    transition: 0.4s ease;
+    transition: var(--transition-normal);
 }
 
+/* Tooltips */
 .sidebarNav .navTooltip {
     position: absolute;
     top: -10px;
@@ -130,12 +133,12 @@
     display: none;
     pointer-events: none;
     left: calc(100% + 25px);
-    color: #151A2D;
-    padding: 6px 12px;
-    border-radius: 8px;
-    background: #fff;
+    color: var(--tooltip-text);
+    padding: var(--padding-sm) var(--padding-md);
+    border-radius: var(--border-radius-md);
+    background: var(--tooltip-bg);
     white-space: nowrap;
-    box-shadow: 0 5px 10px rgb(0, 0, 0, 01);
+    box-shadow: var(--tooltip-shadow);
 }
 
 .sidebar.collapsed .sidebarNav .navTooltip {
@@ -146,51 +149,50 @@
     opacity: 1;
     pointer-events: auto;
     transform: translateY(50%);
-    transition: 0.4s ease;
+    transition: var(--transition-normal);
     z-index: 2;
 }
 
+/* Secondary Navigation */
 .sidebarNav .secondaryNav {
     margin-top: auto;
 }
 
+/* Sub Navigation */
 .navSublist {
     list-style: none;
-    padding: 0 15px;
+    padding: 0 var(--padding-lg);
     display: flex;
     margin-top: 5px;
     flex-direction: column;
-    gap: 8px; /* Space between sub-items */
+    gap: var(--subnav-gap);
 }
 
-/* Sub-item styling */
 .navSubItem {
     display: flex;
     align-items: center;
     position: relative;
 }
 
-/* Sub-link styling */
 .navSubLink {
-    color: #ccc; /* Slightly lighter color for distinction */
+    color: var(--sidebar-subtext);
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px;
-    border-radius: 6px;
-    transition: 0.3s ease;
+    gap: var(--icon-gap);
+    padding: var(--padding-sm);
+    border-radius: var(--border-radius-sm);
+    transition: var(--transition-fast);
 }
 
 .navSubLink:hover {
-    color: #151A2D;
-    background: #fff;
+    color: var(--sidebar-hover-text);
+    background: var(--sidebar-hover-bg);
     z-index: 2;
 }
 
-/* Sub-item icon and label alignment */
 .navSubLink .navLabel {
-    font-size: 0.875rem; /* Slightly smaller font size */
+    font-size: var(--subnav-font);
     white-space: nowrap;
-    transition: opacity 0.3s ease;
+    transition: opacity var(--transition-fast);
 }

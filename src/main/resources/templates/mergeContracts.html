@@ -1,17 +1,17 @@
-<div th:fragment="changeContract" id="content">
-    <div class="flexContainerColumn">
+<div th:fragment="changeContract" class="mainContainer" id="content">
+    <div class="verticalContainer widthFull">
         <!--Header-->
-        <div class="flexContainer">
+        <div class="horizontalContainer marginBottomBig">
             <button class="backButton" id="backButton">
                 <span class="bi bi-arrow-left-circle-fill"></span>
             </button>
-            <div class="flexContainer">
+            <div class="horizontalContainer">
                 <h1><span class="bi bi-file-earmark-fill"></span></h1>
                 <h1 data-i18n="mergeContractsHeader"></h1>
             </div>
         </div>
 
-        <div class="flexContainer" style="margin-top: 20px">
+        <div class="horizontalContainer marginBottomBig">
             <button class="iconButton tooltip tooltipBottom" id="mergeContractsHeader">
                 <i class="bi bi-plus-lg"></i>
                 <span class="normalText" data-i18n="mergeContractsHeader"></span>
@@ -30,28 +30,28 @@
             </button>
         </div>
 
-        <div class="container" style="padding: 0 0 20px; gap: 50px">
+        <div class="horizontalContainer">
             <!-- Left Column: Header Contract -->
-            <div class="pageContainer" style="width: 50%">
-                <div class="flexContainer" style="margin-top: 20px">
-                    <h1 data-i18n="headerContract" style="margin-bottom: 10px; margin-left: 20px"></h1>
+            <div class="verticalContainer widthHalf">
+                <div class="horizontalContainer">
+                    <h1 data-i18n="headerContract"></h1>
                     <div class="tooltip tooltipBottom bi bi-info">
                         <span class="tooltipText" data-i18n="headerContractTooltip"></span>
                     </div>
                 </div>
 
-                <div id="headerContract" class="flexContainerColumn" style="overflow: scroll; height: 76vh"></div>
+                <div id="headerContract" class="verticalContainer"></div>
             </div>
 
             <!-- Right Column: Contracts -->
-            <div class="pageContainer" style="padding-right: 0; width: 50%">
-                <div class="flexContainer" style="margin-top: 20px">
-                    <h1 data-i18n="contractsToMerge" style="margin-bottom: 10px; margin-left: 20px;"></h1>
+            <div class="verticalContainer widthHalf">
+                <div class="horizontalContainer">
+                    <h1 data-i18n="contractsToMerge"></h1>
                     <div class="tooltip tooltipBottom bi bi-info">
                         <span class="tooltipText" data-i18n="contractsToMergeTooltip"></span>
                     </div>
                 </div>
-                <div class="flexContainerColumn" id="contractsContainer" style="height: 76vh; overflow: scroll"></div>
+                <div id="contractsContainer" class="verticalContainer"></div>
             </div>
         </div>
     </div>

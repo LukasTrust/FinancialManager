@@ -315,7 +315,7 @@ function createListContainer(
     listElementObjects: ListElementObject[],
     withSelect: boolean
 ): HTMLElement {
-    const listContainer = createAndAppendElement(parent, "div", "verticalContainer height");
+    const listContainer = createAndAppendElement(parent, "div", "verticalContainer height40vh");
 
     let selectedElement: HTMLElement | null = null;
 

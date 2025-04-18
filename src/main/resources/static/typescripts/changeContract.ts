@@ -70,7 +70,7 @@ async function addGroupToContract(messages: Record<string, string>): Promise<voi
             transactionIds.forEach(transactionId => {
                 const transactionElement = document.getElementById(transactionId.toString());
                 if (transactionElement) {
-                    let leftColumn = transactionElement.querySelector(".listContainerColumn") as HTMLElement;
+                    let leftColumn = transactionElement.querySelector(".verticalContainer") as HTMLElement;
                     const toolTip = leftColumn.querySelector(".tooltip") as HTMLElement;
 
                     if (selectedContract)
@@ -178,10 +178,8 @@ function createGroupedTransactions(messages: Record<string, string>, transaction
     }
 
     if (transactions.length === 0) {
-        const header = createAndAppendElement(transactionGroups, "div", "listContainerHeader", "",
-            { style: "flex-direction: row; align-items: center" });
-        createAndAppendElement(header, "i", "bi bi-info-circle-fill", "",
-            { style: "font-size: 1.5rem; margin-right: 20px" });
+        const header = createAndAppendElement(transactionGroups, "div", "horizontalContainer");
+        createAndAppendElement(header, "i", "bi bi-info-circle-fill textHeader");
         createAndAppendElement(header, "div", "normalText", messages["notTransactionSelected"]);
         return;
     }
@@ -190,19 +188,18 @@ function createGroupedTransactions(messages: Record<string, string>, transaction
     const groups = groupTransactions(transactions);
 
     groups.forEach((group, key) => {
-        const listContainerHeader = createAndAppendElement(transactionGroups, "div", "listContainerHeader", "",
-            { style: "margin-bottom: 20px" });
-        createAndAppendElement(listContainerHeader, "h2", "", group.counterPartyName);
+        const horizontalContainer = createAndAppendElement(transactionGroups, "div", "horizontalContainer");
+        createAndAppendElement(horizontalContainer, "h2", "", group.counterPartyName);
 
-        const listContainer = createAndAppendElement(listContainerHeader, "div");
-        listContainerHeader.dataset.counterPartyId = key.toString();
+        const listContainer = createAndAppendElement(horizontalContainer, "div");
+        horizontalContainer.dataset.counterPartyId = key.toString();
 
-        listContainerHeader.addEventListener("click", () => toggleTransactionSelection(listContainerHeader));
+        horizontalContainer.addEventListener("click", () => toggleTransactionSelection(horizontalContainer));
 
         group.transactions.forEach(item => {
             const content = createAndAppendElement(listContainer, "div", "listItemSmall", "", {id: item.id.toString()});
 
-            const left = createAndAppendElement(content, "div", "listContainerColumn");
+            const left = createAndAppendElement(content, "div", "verticalContainer");
 
             createAndAppendElement(left, "div", "normalText",
                 `${messages["amount"]}: ${formatNumber(item.amount, currency)}      ${messages["date"]}: ${formatDateString(item.date)}`
@@ -235,11 +232,11 @@ function createGroupedTransactions(messages: Record<string, string>, transaction
 
                 // If no transactions remain, remove the group
                 if (!listContainer.children.length) {
-                    if (listContainerHeader === selectedTransactionGroup) {
+                    if (horizontalContainer === selectedTransactionGroup) {
                         selectedTransactionGroup = null;
                         toggleTransactionSelection(selectedTransactionGroup);
                     }
-                    transactionGroups.removeChild(listContainerHeader);
+                    transactionGroups.removeChild(horizontalContainer);
                 }
             });
         });
@@ -296,14 +293,12 @@ function createContractSection(
     }
 
     // Add new contract details
-    let newContractContainer = createAndAppendElement(leftColumn, "div", "flexContainer tooltip tooltipBottom");
+    let newContractContainer = createAndAppendElement(leftColumn, "div", "horizontalContainer tooltip tooltipBottom");
     createAndAppendElement(newContractContainer, "div", "normalText", `${messages["contract"]}: ${contractName}`);
     createAndAppendElement(newContractContainer, "div", "tooltipText", `${messages["startDate"]}: ${startDate}   ${messages["lastPaymentDate"]}: ${lastPaymentDate}`);
 
     // Add remove contract button
-    const removeContractButton = createAndAppendElement(newContractContainer, "button", "removeButton bi bi-x-lg", "", {
-        style: "margin-left: 10px"
-    });
+    const removeContractButton = createAndAppendElement(newContractContainer, "button", "removeButton bi bi-x-lg");
     removeContractButton.addEventListener("click", removeButtonHandler);
 
     return newContractContainer;

@@ -1,6 +1,6 @@
 label {
-    color: #fff;
-    font-size: 1rem;
+    color: var(--text-color);
+    font-size: var(--font-size-sm);
     pointer-events: none;
     cursor: default;
 }
@@ -10,7 +10,7 @@ label {
     align-items: center;
     position: relative;
     width: 100%;
-    border-bottom: 2px solid #fff;
+    border-bottom: 2px solid var(--search-border);
 }
 
 .inputBox input {
@@ -19,30 +19,31 @@ label {
     background: transparent;
     border: none;
     outline: none;
-    font-size: 1rem;
-    color: #fff;
+    font-size: var(--font-size-sm);
+    color: var(--text-color);
+    padding: var(--padding-sm) 0;
 }
 
 .inputBox span {
     position: absolute;
-    right: 8px;
-    color: #fff;
-    font-size: 1.2rem;
+    right: var(--spacing-sm);
+    color: var(--text-color);
+    font-size: var(--font-size-md);
 }
 
 @supports (-webkit-appearance: none) or (-moz-appearance: none) {
     .checkboxWrapper input[type=checkbox] {
-        --active: #275EFE;
-        --active-inner: #fff;
-        --focus: 2px rgba(39, 94, 254, .3);
-        --border: #BBC1E1;
-        --border-hover: #275EFE;
-        --background: #fff;
-        --disabled: #F6F8FF;
-        --disabled-inner: #E1E6F9;
+        --active: var(--accent-color);
+        --active-inner: var(--text-color);
+        --focus: 2px rgba(79, 70, 229, 0.3);
+        --border: var(--search-border);
+        --border-hover: var(--accent-color);
+        --background: var(--search-bg);
+        --disabled: var(--pagination-disabled);
+        --disabled-inner: var(--table-row-hidden);
         -webkit-appearance: none;
         -moz-appearance: none;
-        height: 21px;
+        height: var(--checkbox-size);
         outline: none;
         display: inline-block;
         vertical-align: top;
@@ -51,7 +52,7 @@ label {
         cursor: pointer;
         border: 1px solid var(--bc, var(--border));
         background: var(--b, var(--background));
-        transition: background 0.3s, border-color 0.3s, box-shadow 0.2s;
+        transition: background var(--transition-normal), border-color var(--transition-normal), box-shadow var(--transition-fast);
     }
     .checkboxWrapper input[type=checkbox]:after {
         content: "";
@@ -59,7 +60,7 @@ label {
         left: 0;
         top: 0;
         position: absolute;
-        transition: transform var(--d-t, 0.3s) var(--d-t-e, ease), opacity var(--d-o, 0.2s);
+        transition: transform var(--d-t, var(--transition-normal)) var(--d-t-e, ease), opacity var(--d-o, var(--transition-fast));
     }
     .checkboxWrapper input[type=checkbox]:checked {
         --b: var(--active);
@@ -87,7 +88,7 @@ label {
         box-shadow: 0 0 0 var(--focus);
     }
     .checkboxWrapper input[type=checkbox]:not(.switch) {
-        width: 21px;
+        width: var(--checkbox-size);
     }
     .checkboxWrapper input[type=checkbox]:not(.switch):after {
         opacity: var(--o, 0);
@@ -99,10 +100,11 @@ label {
         display: inline-block;
         vertical-align: middle;
         cursor: pointer;
-        margin-left: 4px;
+        margin-left: var(--spacing-xs);
+        color: var(--text-color);
     }
     .checkboxWrapper input[type=checkbox]:not(.switch) {
-        border-radius: 7px;
+        border-radius: var(--border-radius-sm);
     }
     .checkboxWrapper input[type=checkbox]:not(.switch):after {
         width: 5px;
@@ -119,12 +121,12 @@ label {
     }
     .checkboxWrapper input[type=checkbox].switch {
         width: 38px;
-        border-radius: 11px;
+        border-radius: var(--border-radius-xl);
     }
     .checkboxWrapper input[type=checkbox].switch:after {
         left: 2px;
         top: 2px;
-        border-radius: 50%;
+        border-radius: var(--border-radius-circle);
         width: 17px;
         height: 17px;
         background: var(--ab, var(--border));
@@ -148,51 +150,54 @@ label {
 }
 
 .fileUploadBox {
-    padding: 14px 20px;
-    border-radius: 16px;
+    padding: var(--padding-md) var(--padding-xl);
+    border-radius: var(--border-radius-lg);
     background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid var(--search-border);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    color: white;
-    font-size: 0.95rem;
-    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    color: var(--text-color);
+    font-size: var(--font-size-xs);
+    text-shadow: var(--box-shadow-sm);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--transition-normal);
     align-content: center;
 }
 
 .fileUploadBox:hover {
-    border-color: #a5b4fc;
+    border-color: var(--link-color);
     background: rgba(255, 255, 255, 0.2);
 }
 
 .fileBrowseButton {
-    color: #c7d2fe;
-    font-weight: 600;
+    color: var(--link-color);
+    font-weight: var(--font-weight-bold);
 }
 
 .inputDate {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--spacing-sm);
 }
 
 .inputDate label {
-    font-weight: bold;
-    font-size: 1.2rem;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-md);
 }
 
 .inputDate input[type="date"] {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 14px;
+    border: 1px solid var(--search-border);
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-xs);
     cursor: pointer;
-    transition: border-color 0.3s ease;
-    padding: 5px;
+    transition: border-color var(--transition-normal);
+    padding: var(--padding-sm);
+    background: var(--search-bg);
+    color: var(--text-color);
 }
 
 .inputDate input[type="date"]:focus {
-    border-color: #007bff;
+    border-color: var(--accent-color);
     outline: none;
+    box-shadow: 0 0 0 2px var(--search-shadow);
 }
