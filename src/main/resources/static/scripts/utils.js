@@ -208,10 +208,11 @@ function debounce(func, delay) {
         timeoutId = setTimeout(() => func(...args), delay);
     };
 }
-function createListSection(parent, title, type, data, withSelect = false) {
-    const container = createAndAppendElement(parent, "div", "flexContainerColumn", "", { style: "width: 45%" });
-    const header = createAndAppendElement(container, "div", "listContainerHeader");
-    createAndAppendElement(header, "h2", "", title, { style: "margin: 10px" });
+function createListSection(parent, title, type, data, withSelect = false, left = true) {
+    const marginClass = left ? "marginLeftBig" : "marginRightBig";
+    const container = createAndAppendElement(parent, "div", "verticalContainer widthHalf " + marginClass);
+    const header = createAndAppendElement(container, "div", "verticalContainer");
+    createAndAppendElement(header, "h2", "", title);
     if (type === Type.TRANSACTION) {
         createListContainer(header, transactionToListElementObjectArray(data), withSelect);
     }
@@ -224,9 +225,7 @@ function createListSection(parent, title, type, data, withSelect = false) {
     return container;
 }
 function createListContainer(parent, listElementObjects, withSelect) {
-    const listContainer = createAndAppendElement(parent, "div", "listContainerColumn", "", {
-        style: "min-height: 420px; max-height: 420px;",
-    });
+    const listContainer = createAndAppendElement(parent, "div", "verticalContainer height");
     let selectedElement = null;
     listElementObjects.forEach(listElementObject => {
         const listElement = createListElement(listContainer, listElementObject.text, { id: listElementObject.id.toString() }, true, false, listElementObject.toolTip);

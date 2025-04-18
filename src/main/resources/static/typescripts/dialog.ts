@@ -37,7 +37,7 @@ function closeDialog(): void {
 }
 
 function createDialogHeader(parent: HTMLElement, text: string, icon: string): HTMLElement {
-    const header = createAndAppendElement(parent, "h1", "flexContainer");
+    const header = createAndAppendElement(parent, "h1", "horizontalContainer marginTopBig marginLeftBig marginBottomBig");
     createAndAppendElement(header, "i", icon);
     createAndAppendElement(header, "span", "", text);
     return header;
@@ -70,14 +70,14 @@ function createDialogContent(
     width: number,
     height: number
 ): HTMLElement {
-    const flexContainerColumn = createAndAppendElement(document.body, "div", "flexContainerColumn");
-    const header = createDialogHeader(flexContainerColumn, headerText, headerIcon);
-    const closeButton = createAndAppendElement(header, "button", "closeButton") as HTMLButtonElement;
+    const verticalContainer = createAndAppendElement(document.body, "div", "verticalContainer");
+    const header = createDialogHeader(verticalContainer, headerText, headerIcon);
+    const closeButton = createAndAppendElement(header, "button", "exitButton") as HTMLButtonElement;
     createAndAppendElement(closeButton, "i", "bi bi-x-lg");
 
-    createModal(flexContainerColumn, closeButton, width, height);
+    createModal(verticalContainer, closeButton, width, height);
 
-    return flexContainerColumn;
+    return verticalContainer;
 }
 
 function showMessageBox(
@@ -119,21 +119,20 @@ function showChangeHiddenDialog(type: Type, messages: Record<string, string>): v
     const dialogContent = createDialogContent(messages["changeHiddenHeader"], "bi bi-eye", 0, height);
 
     if (type !== Type.TRANSACTION) {
-        createAndAppendElement(dialogContent, "h2", "", messages["infoTransactionsWillAlsoBeAffected"],
-            {style: "margin-right: auto; margin-left: 30px; margin-top: 10px; margin-top: 10px;"})
+        createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig alignSelfStart", messages["infoTransactionsWillAlsoBeAffected"])
     }
 
-    const listContainer = createAndAppendElement(dialogContent, "div", "flexContainerSpaced");
+    const listContainer = createAndAppendElement(dialogContent, "div", "horizontalContainer");
 
     const leftSide = createListSection(listContainer, messages["alreadyHiddenHeader"], type, alreadyHidden);
-    const rightSide = createListSection(listContainer, messages["notHiddenHeader"], type, notHidden);
+    const rightSide = createListSection(listContainer, messages["notHiddenHeader"], type, notHidden, false, false);
 
     createDialogButton(leftSide, "bi bi-eye", messages["unHide"], "left", async () => {
-        await updateVisibility(messages, dialogContent, leftSide, rightSide.querySelector(".listContainerColumn"), false, type);
+        await updateVisibility(messages, dialogContent, leftSide, rightSide.querySelector(".verticalContainer"), false, type);
     });
 
     createDialogButton(rightSide, "bi bi-eye-slash", messages["hide"], "right", async () => {
-        await updateVisibility(messages, dialogContent, rightSide, leftSide.querySelector(".listContainerColumn"), true, type);
+        await updateVisibility(messages, dialogContent, rightSide, leftSide.querySelector(".verticalContainer"), true, type);
     });
 }
 
@@ -142,22 +141,19 @@ function showMergeDialog<T extends CounterPartyDisplay>(type: Type, messages: Re
 
     const dialogContent = createDialogContent(messages["mergeHeader"], "bi bi-arrows-collapse-vertical", 0, 70);
 
-    const info = messages["mergeInfo"];
+    createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig alignSelfStart", messages["mergeInfo"])
 
-    createAndAppendElement(dialogContent, "h2", "", info,
-        {style: "margin-right: auto; margin-left: 30px; margin-top: 10px; margin-top: 10px;"})
-
-    const listContainer = createAndAppendElement(dialogContent, "div", "flexContainerSpaced");
+    const listContainer = createAndAppendElement(dialogContent, "div", "horizontalContainer");
 
     const leftSide = createListSection(listContainer, messages["leftHeader"], type, []);
-    const rightSide = createListSection(listContainer, messages["rightHeader"], type, checkedData, true);
+    const rightSide = createListSection(listContainer, messages["rightHeader"], type, checkedData, true, false);
 
     createDialogButton(leftSide, "bi bi-arrows-collapse-vertical", messages["mergeButton"], "left", async () => {
         await mergeData(dialogContent, messages, leftSide, rightSide, type);
     });
 
     createDialogButton(rightSide, "bi bi-bar-chart-steps", messages["chooseHeader"], "right", () => {
-        chooseHeader(dialogContent, messages, rightSide.querySelector(".listContainerColumn"), leftSide.querySelector(".listContainerColumn"));
+        chooseHeader(dialogContent, messages, rightSide.querySelector(".verticalContainer"), leftSide.querySelector(".verticalContainer"));
     });
 }
 

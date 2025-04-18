@@ -177,12 +177,21 @@ p {
     height: 90vh;
 }
 
+.height {
+    min-height: 40vh;
+    max-height: 40vh;
+}
+
 .bold {
     font-weight: bold;
 }
 
 .alignSelfCenter {
     align-self: center;
+}
+
+.alignSelfStart {
+    align-self: start;
 }
 
 .alignItemsCenter {
@@ -251,6 +260,34 @@ button:hover {
     color: white;
     border-radius: 0 8px 8px 0;
     font-size: 1.2rem;
+}
+
+.exitButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background: #f44336; /* Red color - you can change this */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+}
+
+.exitButton:hover {
+    background: #d32f2f; /* Darker red on hover */
+}
+
+.exitButton:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.5); /* Focus ring */
 }
 
 .iconButton {
@@ -377,4 +414,32 @@ button:hover {
 
 .negative * {
     color: #842029;
+}
+
+dialog {
+    width: 80%;
+    height: 65%;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    background: linear-gradient(135deg, #3a5a80 0%, #2a4365 100%);
+    color: #f8f9fa;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    overflow: visible;
+    position: fixed;
+    inset: 0;
+    margin: auto;
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+}
+
+dialog[open] {
+    opacity: 1;
+    transform: translateY(0);
 }

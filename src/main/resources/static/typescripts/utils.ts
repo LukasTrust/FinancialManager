@@ -290,11 +290,14 @@ function createListSection(
     title: string,
     type: Type,
     data: Transaction[] | CounterPartyDisplay[] | ContractDisplay[],
-    withSelect: boolean = false
+    withSelect: boolean = false,
+    left: boolean = true
 ): HTMLElement {
-    const container = createAndAppendElement(parent, "div", "flexContainerColumn", "", {style: "width: 45%"});
-    const header = createAndAppendElement(container, "div", "listContainerHeader");
-    createAndAppendElement(header, "h2", "", title, {style: "margin: 10px"});
+    const marginClass = left ? "marginLeftBig" : "marginRightBig"
+
+    const container = createAndAppendElement(parent, "div", "verticalContainer widthHalf " + marginClass);
+    const header = createAndAppendElement(container, "div", "verticalContainer");
+    createAndAppendElement(header, "h2", "", title);
 
     if (type === Type.TRANSACTION) {
         createListContainer(header, transactionToListElementObjectArray(data as Transaction[]), withSelect);
@@ -312,9 +315,7 @@ function createListContainer(
     listElementObjects: ListElementObject[],
     withSelect: boolean
 ): HTMLElement {
-    const listContainer = createAndAppendElement(parent, "div", "listContainerColumn", "", {
-        style: "min-height: 420px; max-height: 420px;",
-    });
+    const listContainer = createAndAppendElement(parent, "div", "verticalContainer height");
 
     let selectedElement: HTMLElement | null = null;
 
