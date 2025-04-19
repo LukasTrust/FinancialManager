@@ -1,3 +1,79 @@
 <div th:fragment="addCategories" id="content">
+    <div class="verticalContainer widthFull">
+        <div class="horizontalContainer marginBottomBig">
+            <h1><span class="bi bi-tag-fill"></span></h1>
+            <h1 data-i18n="categories"></h1>
+        </div>
 
+        <div class="verticalContainer widthFull height90vh">
+            <!-- Controls -->
+            <div class="horizontalContainer marginBottomBig">
+                <div class="horizontalContainer marginLeftAuto">
+                    <button class="iconButton tooltip tooltipBottom" id="addButton">
+                        <i class="bi bi bi-plus-circle"></i>
+                        <span class="normalText" data-i18n="addButton"></span>
+                        <span class="tooltipText" data-i18n="addButtonTooltip"></span>
+                    </button>
+
+                </div>
+
+                <div class="horizontalContainer marginLeftAuto">
+                    <div class="searchBar">
+                        <label for="searchBarInput"></label>
+                        <input type="text" id="searchBarInput" data-i18n-placeholder="searchText">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="tableWrapper widthFull marginBottomBig">
+                <table>
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th class="thHeader">
+                            <div class="justifyContentCenter horizontalContainer">
+                                <span data-i18n="name"></span>
+                                <i data-type="input" data-index="1"
+                                   class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                                    <span class="tooltipText" data-i18n="sortTooltip"></span>
+                                </i>
+                            </div>
+                        </th>
+                        <th class="thHeader">
+                            <div class="justifyContentCenter horizontalContainer">
+                                <span data-i18n="description"></span>
+                                <i data-type="input" data-index="2"
+                                   class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                                    <span class="tooltipText" data-i18n="sortTooltip"></span>
+                                </i>
+                            </div>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="disabled" id="previousButton" data-i18n="previous"></button>
+                <div class="horizontalContainer">
+                    <span class="normalText" data-i18n="page"></span>
+                    <span class="normalText" data-index="1" id="currentPage"></span>
+                    <span class="normalText" data-i18n="of"></span>
+                    <span class="normalText" id="numberOfPages"></span>
+                </div>
+                <button id="nextButton" data-i18n="next"></button>
+                <label for="itemsPerPage"></label><select id="itemsPerPage">
+                <option value="0">All</option>
+                <option value="4">4</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+            </select>
+            </div>
+        </div>
+    </div>
 </div>

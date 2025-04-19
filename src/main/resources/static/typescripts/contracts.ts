@@ -119,50 +119,59 @@ function createContractRow(tableBody: HTMLElement, contractDisplay: ContractDisp
 
     // Transaction count
     const transactionCount = createAndAppendElement(newRow, "td");
-    createAndAppendElement(transactionCount, "span", "tdMargin", contractDisplay.transactionCount.toString());
+    const transactionCountWrapper = createAndAppendElement(transactionCount, "div", "justifyContentCenter");
+    createAndAppendElement(transactionCountWrapper, "span", "tdMargin", contractDisplay.transactionCount.toString());
 
     // Total amount
     const totalAmount = createAndAppendElement(newRow, "td");
-    createAndAppendElement(totalAmount, "span", "tdMargin", formatNumber(contractDisplay.totalAmount, currency));
+    const totalAmountWrapper = createAndAppendElement(totalAmount, "div", "justifyContentCenter");
+    createAndAppendElement(totalAmountWrapper, "span", "tdMargin", formatNumber(contractDisplay.totalAmount, currency));
 
     // Amount
     const amount = createAndAppendElement(newRow, "td");
-    createAndAppendElement(amount, "span", "tdMargin", formatNumber(contract.amount, currency));
+    const amountWrapper = createAndAppendElement(amount, "div", "justifyContentCenter");
+    createAndAppendElement(amountWrapper, "span", "tdMargin", formatNumber(contract.amount, currency));
 
     // Start date
     const startDate = createAndAppendElement(newRow, "td");
-    createAndAppendElement(startDate, "span", "tdMargin", formatDateString(contract.startDate));
+    const startDateWrapper = createAndAppendElement(startDate, "div", "justifyContentCenter");
+    createAndAppendElement(startDateWrapper, "span", "tdMargin", formatDateString(contract.startDate));
 
     // Last payment date
     const lastPaymentDate = createAndAppendElement(newRow, "td");
-    createAndAppendElement(lastPaymentDate, "span", "tdMargin", formatDateString(contract.lastPaymentDate));
+    const lastPaymentDateWrapper = createAndAppendElement(lastPaymentDate, "div", "justifyContentCenter");
+    createAndAppendElement(lastPaymentDateWrapper, "span", "tdMargin", formatDateString(contract.lastPaymentDate));
 
     let current = 1;
     contractDisplay.contractHistories.forEach(contractHistory => {
-        createContractSubRow(tableBody, contractHistory, messages, currency, hiddenClass);
+        const subRow = createContractSubRow(tableBody, contractHistory, messages, currency, hiddenClass);
+        addHoverToOtherElement(newRow, subRow);
         current++;
     });
-
-    addHoverToSiblings(newRow);
 }
 
-function createContractSubRow(parent: HTMLElement, contractHistory: ContractHistory, messages: Record<string, string>, currency: string, hidden: string): void {
+function createContractSubRow(parent: HTMLElement, contractHistory: ContractHistory, messages: Record<string, string>, currency: string, hidden: string): HTMLElement {
     const subRow = createAndAppendElement(parent, "tr", hidden);
 
     // Changed at
-    const changedAt = createAndAppendElement(subRow, "td");
-    createAndAppendElement(changedAt, "span", "normalText", messages["changedAt"]);
-    createAndAppendElement(changedAt, "span", "", formatDateString(contractHistory.changedAt));
+    const changedAt = createAndAppendElement(subRow, "td", "", "", {colspan: "2"});
+    const changedAtWrapper = createAndAppendElement(changedAt, "div", "justifyContentCenter");
+    createAndAppendElement(changedAtWrapper, "span", "normalText marginRightBig", messages["changedAt"]);
+    createAndAppendElement(changedAtWrapper, "span", "", formatDateString(contractHistory.changedAt));
 
     // Previous amount
-    const previousAmount = createAndAppendElement(subRow, "td");
-    createAndAppendElement(previousAmount, "span", "normalText", messages["previousAmount"]);
-    createAndAppendElement(previousAmount, "span", "", formatNumber(contractHistory.previousAmount, currency));
+    const previousAmount = createAndAppendElement(subRow, "td", "", "", {colspan: "3"});
+    const previousAmountWrapper = createAndAppendElement(previousAmount, "div", "justifyContentCenter");
+    createAndAppendElement(previousAmountWrapper, "span", "normalText marginRightBig", messages["previousAmount"]);
+    createAndAppendElement(previousAmountWrapper, "span", "", formatNumber(contractHistory.previousAmount, currency));
 
     // Previous amount
-    const newAmount = createAndAppendElement(subRow, "td");
-    createAndAppendElement(newAmount, "span", "normalText", messages["newAmount"]);
-    createAndAppendElement(newAmount, "span", "", formatNumber(contractHistory.newAmount, currency));
+    const newAmount = createAndAppendElement(subRow, "td", "", "", {colspan: "3"});
+    const newAmountWrapper = createAndAppendElement(newAmount, "div", "justifyContentCenter");
+    createAndAppendElement(newAmountWrapper, "span", "normalText marginRightBig", messages["newAmount"]);
+    createAndAppendElement(newAmountWrapper, "span", "", formatNumber(contractHistory.newAmount, currency));
+
+    return subRow;
 }
 
 function updateContract(contractDisplay: ContractDisplay, data: ContractDisplay[]): void {

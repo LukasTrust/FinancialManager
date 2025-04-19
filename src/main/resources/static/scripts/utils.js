@@ -140,25 +140,6 @@ function addHoverToOtherElement(newRow, subRow) {
         newRow.classList.remove('hover'); // Remove the class from newRow
     });
 }
-function addHoverToSiblings(element) {
-    const parent = element.parentElement;
-    if (!parent)
-        return;
-    const siblings = Array.from(parent.children);
-    function addHover() {
-        siblings.forEach(sibling => sibling.classList.add('hover'));
-    }
-    function removeHover() {
-        // Check if the mouse is still within any of the siblings or the original element
-        if ([...siblings].some(sib => sib.matches(':hover')))
-            return;
-        siblings.forEach(sibling => sibling.classList.remove('hover'));
-    }
-    siblings.forEach(sibling => {
-        sibling.addEventListener('mouseenter', addHover);
-        sibling.addEventListener('mouseleave', removeHover);
-    });
-}
 function createCheckBoxForTable(mainRow, subRow, id, isHidden) {
     const trCheckBox = createAndAppendElement(mainRow, "td");
     if (isHidden) {

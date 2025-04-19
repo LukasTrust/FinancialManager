@@ -36,11 +36,11 @@
     --pagination-select-hover: #1d4ed8;
 
     /* Checkbox */
-    --checkbox-border: #3b82f6;
-    --checkbox-hover: #2563eb;
-    --checkbox-checked: var(--accent-color);
-    --checkbox-focus: rgba(59, 130, 246, 0.3);
-    --checkbox-size: 21px;
+    --checkbox-size: 18px;
+    --checkbox-border: #9CA3AF;
+    --checkbox-checked: #4F46E5;
+    --checkbox-hover: #6366F1;
+    --checkbox-focus: #A5B4FC;
 
     /* Sidebar */
     --sidebar-bg: #0b1220;  /* Muted dark navy */
@@ -130,6 +130,11 @@
     --transition-fast: 0.3s ease;
     --transition-normal: 0.4s ease;
     --transition-slow: 0.5s ease;
+
+    /* Scrollbar */
+    --scrollbar-track-bg: #f1f1f1;
+    --scrollbar-thumb-bg: #c1c1c1;
+    --scrollbar-thumb-hover: #a8a8a8;
 
     /* Alert Base Variables */
     --alert-padding-x: 40px;

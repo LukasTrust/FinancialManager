@@ -1,0 +1,14 @@
+{
+  "categories": "Kategories",
+  "addButton": "Füge eine Kategorie hinzu",
+  "addButtonTooltip": "Durch diesen Knopf kann eine neue Kategorie hinzugefügt werden",
+  "searchText": "Suche...",
+  "sortTooltip": "Klick hier um nach dieser Spalte zu sortieren",
+  "previous": "Vorherige",
+  "page": "Seite ",
+  "of": " von ",
+  "next": "Nächste",
+  "perPage": "pro Seite",
+  "name": "Name",
+  "description": "Beschreibung"
+}

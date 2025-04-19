@@ -24,13 +24,40 @@
 
 /* Table Structure */
 .tableWrapper {
-    flex: 1 1 auto;
-    overflow-x: auto;
-    overflow-y: auto;
+    max-height: 75vh;
+    min-width: 100%;
+    overflow: auto;
+}
+
+/* For WebKit browsers (Chrome, Safari, Edge) */
+.tableWrapper::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.tableWrapper::-webkit-scrollbar-track {
+    background: var(--scrollbar-track-bg, #f1f1f1);
+    border-radius: 4px;
+}
+
+.tableWrapper::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-bg, #c1c1c1);
+    border-radius: 4px;
+}
+
+.tableWrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover, #a8a8a8);
+}
+
+/* For Firefox */
+.tableWrapper {
+    scrollbar-color: var(--scrollbar-thumb-bg, #c1c1c1) var(--scrollbar-track-bg, #f1f1f1);
+    scrollbar-width: thin;
 }
 
 table {
     width: 100%;
+    min-width: 100%;
     table-layout: auto;
     border-collapse: collapse;
 }
@@ -47,7 +74,6 @@ thead tr:hover {
     background-color: inherit !important;
     z-index: auto !important;
 }
-
 
 tbody {
     overflow-y: auto;
@@ -173,14 +199,19 @@ th, td {
 
 /* Checkbox */
 .tableCheckbox {
+    appearance: none;
     width: var(--checkbox-size);
     height: var(--checkbox-size);
     border: 2px solid var(--checkbox-border);
-    border-radius: var(--border-radius-sm);
+    border-radius: 4px;
     background-color: white;
     cursor: pointer;
     margin-left: var(--spacing-sm);
-    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+    transition: all 0.2s ease;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .tableCheckbox:checked {
@@ -190,24 +221,27 @@ th, td {
 
 .tableCheckbox:checked::after {
     content: '';
-    position: absolute;
-    left: 5px;
-    top: 2px;
     width: 5px;
     height: 10px;
     border: solid white;
     border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+    transform: rotate(45deg) translate(-1px, -1px);
+    position: relative;
 }
 
 .tableCheckbox:hover {
     border-color: var(--checkbox-hover);
-    z-index: 2;
+    transform: scale(1.05);
 }
 
 .tableCheckbox:focus {
     outline: none;
     box-shadow: 0 0 0 3px var(--checkbox-focus);
+    border-color: var(--checkbox-checked);
+}
+
+.tableCheckbox:active {
+    transform: scale(0.98);
 }
 
 /* Highlight Cells */

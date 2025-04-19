@@ -36,23 +36,28 @@ function addRowsToTransactionTable(data, messages) {
             animateElement(newRow);
             // Counterparty cell
             const counterparty = createAndAppendElement(newRow, "td");
-            createAndAppendElement(counterparty, "span", "bold", transaction.counterParty.name);
+            const counterpartyWrapper = createAndAppendElement(counterparty, "div", "justifyContentCenter");
+            createAndAppendElement(counterpartyWrapper, "span", "bold", transaction.counterParty.name);
             // Contract cell
             const contract = createAndAppendElement(newRow, "td");
             if ((_a = transaction.contract) === null || _a === void 0 ? void 0 : _a.name) {
-                createAndAppendElement(contract, "span", "highlightCell highlightCellPink", transaction.contract.name);
+                const contractWrapper = createAndAppendElement(contract, "div", "justifyContentCenter");
+                createAndAppendElement(contractWrapper, "span", "highlightCell highlightCellPink", transaction.counterParty.name);
             }
             // Category cell
             const category = createAndAppendElement(newRow, "td");
             if ((_b = transaction.category) === null || _b === void 0 ? void 0 : _b.name) {
-                createAndAppendElement(category, "span", "highlightCell highlightCellOrange", transaction.category.name);
+                const categoryWrapper = createAndAppendElement(category, "div", "justifyContentCenter");
+                createAndAppendElement(categoryWrapper, "span", "highlightCell highlightCellOrange", transaction.counterParty.name);
             }
             // Date cell
             const date = createAndAppendElement(newRow, "td");
-            createAndAppendElement(date, "span", "", formatDateString(transaction.date));
+            const dateWrapper = createAndAppendElement(date, "div", "justifyContentCenter");
+            createAndAppendElement(dateWrapper, "span", "", transaction.counterParty.name);
             // Amount before cell
             const amountBefore = createAndAppendElement(newRow, "td");
-            createAndAppendElement(amountBefore, "span", "", formatNumber(transaction.amountInBankBefore, currency));
+            const amountBeforeWrapper = createAndAppendElement(amountBefore, "div", "justifyContentCenter");
+            createAndAppendElement(amountBeforeWrapper, "span", "", formatNumber(transaction.amountInBankBefore, currency));
             // Amount cell with positive/negative styling
             const amount = createAndAppendElement(newRow, "td");
             const amountClass = transaction.amount >= 0 ? "positive" : "negative";
@@ -60,7 +65,8 @@ function addRowsToTransactionTable(data, messages) {
             createAndAppendElement(amountWrapper, "span", "", formatNumber(transaction.amount, currency));
             // Amount after cell
             const amountInBankAfter = createAndAppendElement(newRow, "td");
-            createAndAppendElement(amountInBankAfter, "span", "tdMargin", formatNumber(transaction.amountInBankAfter, currency));
+            const amountInBankAfterWrapper = createAndAppendElement(amountInBankAfter, "div", "justifyContentCenter");
+            createAndAppendElement(amountInBankAfterWrapper, "span", "tdMargin", formatNumber(transaction.amountInBankAfter, currency));
         });
     }
     catch (error) {

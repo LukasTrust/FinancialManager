@@ -313,6 +313,7 @@ button:hover, .button:hover {
     background: transparent;
     border-radius: 50%;
     padding: var(--spacing-xs);
+    margin-bottom: var(--margin-md);
 }
 
 .iconOnlyButton:hover {

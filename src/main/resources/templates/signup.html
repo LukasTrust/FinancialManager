@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/alert.css">
     <link rel="stylesheet" href="css/input.css">
+    <link rel="stylesheet" href="css/root.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <script src="scripts/signup.js" defer></script>
     <script src="scripts/alert.js" defer></script>
@@ -14,45 +15,137 @@
     <script src="scripts/localization.js" defer></script>
     <script src="scripts/dataStorage.js" defer></script>
     <script src="scripts/dataTypes.js" defer></script>
+    <style>
+        body {
+            background: var(--main-gradient);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+        }
+
+        section {
+            width: 100%;
+            max-width: 420px;
+            padding: var(--padding-xxl);
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: var(--padding-md);
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-md);
+            font-weight: var(--font-weight-bold);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--icon-gap);
+            margin-top: var(--margin-md);
+        }
+
+        button[type="submit"]:hover {
+            background: var(--primary-color-light);
+            transform: translateY(-2px);
+        }
+
+        button[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        a {
+            justify-content: center;
+            color: var(--link-color);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--icon-gap);
+            margin-top: var(--spacing-sm);
+            transition: var(--transition-fast);
+        }
+
+        a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        p {
+            margin-bottom: var(--spacing-sm);
+            color: var(--sidebar-subtext);
+        }
+
+        form {
+            background: var(--dialog-gradient);
+            padding: var(--padding-xxl);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--box-shadow-lg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            section {
+                padding: var(--padding-md);
+            }
+
+            form {
+                padding: var(--padding-xl);
+            }
+        }
+    </style>
 </head>
-<body style="justify-content: center; align-items: center;">
-    <section>
-        <form action="/signup" method="post">
-            <h1 data-i18n="signup"></h1>
-            <div class="inputBox">
-                <span class="bi bi-person"></span>
-                <label for="firstName"></label><input type="text" id="firstName" data-i18n-placeholder="firstName" required>
-            </div>
-            <div class="inputBox">
-                <span class="bi bi-person"></span>
-                <label for="lastName"></label><input type="text" id="lastName" data-i18n-placeholder="lastName">
-            </div>
-            <div class="inputBox">
-                <span class="bi bi-envelope"></span>
-                <label for="email"></label><input type="email" id="email" data-i18n-placeholder="email">
-            </div>
-            <div class="inputBox">
-                <span class="bi bi-lock"></span>
-                <label for="password"></label><input type="password" id="password" data-i18n-placeholder="password">
-            </div>
-            <div class="inputBox">
-                <span class="bi bi-lock"></span>
-                <label for="confirmPassword"></label><input type="password" id="confirmPassword" data-i18n-placeholder="confirmPassword">
-            </div>
-            <button type="submit" id="submitButton">
-                <span class="bi bi-box-arrow-right"></span>
-                <span data-i18n="signUp"></span>
-            </button>
-            <div>
-                <p data-i18n="alreadyAccount">
-                </p>
-                <a href="login">
-                    <span class="bi bi-box-arrow-right"> </span>
-                    <span data-i18n="login"></span>
-                </a>
-            </div>
-        </form>
-    </section>
+<body>
+<section>
+    <form action="/signup" method="post">
+        <h1 data-i18n="signUp"></h1>
+        <div class="inputBox">
+            <span class="bi bi-person"></span>
+            <label for="firstName"></label>
+            <input type="text" id="firstName" data-i18n-placeholder="firstName" required>
+        </div>
+        <div class="inputBox">
+            <span class="bi bi-person"></span>
+            <label for="lastName"></label>
+            <input type="text" id="lastName" data-i18n-placeholder="lastName">
+        </div>
+        <div class="inputBox">
+            <span class="bi bi-envelope"></span>
+            <label for="email"></label>
+            <input type="email" id="email" data-i18n-placeholder="email">
+        </div>
+        <div class="inputBox">
+            <span class="bi bi-lock"></span>
+            <label for="password"></label>
+            <input type="password" id="password" data-i18n-placeholder="password">
+        </div>
+        <div class="inputBox">
+            <span class="bi bi-lock"></span>
+            <label for="confirmPassword"></label>
+            <input type="password" id="confirmPassword" data-i18n-placeholder="confirmPassword">
+        </div>
+        <button type="submit" id="submitButton">
+            <span class="bi bi-box-arrow-right"></span>
+            <span data-i18n="signUp"></span>
+        </button>
+
+        <div class="verticalContainer">
+            <p data-i18n="alreadyAccount"></p>
+            <a href="login">
+                <span class="bi bi-box-arrow-right"> </span>
+                <span data-i18n="login"></span>
+            </a>
+        </div>
+    </form>
+</section>
 
 </body>
 </html>

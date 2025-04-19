@@ -203,29 +203,6 @@ function addHoverToOtherElement(newRow: HTMLElement, subRow: HTMLElement) {
     });
 }
 
-function addHoverToSiblings(element: HTMLElement) {
-    const parent = element.parentElement;
-    if (!parent) return;
-
-    const siblings = Array.from(parent.children) as HTMLElement[];
-
-    function addHover() {
-        siblings.forEach(sibling => sibling.classList.add('hover'));
-    }
-
-    function removeHover() {
-        // Check if the mouse is still within any of the siblings or the original element
-        if ([...siblings].some(sib => sib.matches(':hover'))) return;
-
-        siblings.forEach(sibling => sibling.classList.remove('hover'));
-    }
-
-    siblings.forEach(sibling => {
-        sibling.addEventListener('mouseenter', addHover);
-        sibling.addEventListener('mouseleave', removeHover);
-    });
-}
-
 function createCheckBoxForTable(mainRow: HTMLElement, subRow: HTMLElement, id: number, isHidden: boolean) {
     const trCheckBox = createAndAppendElement(mainRow, "td");
 
