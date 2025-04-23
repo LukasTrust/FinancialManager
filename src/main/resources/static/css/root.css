@@ -20,6 +20,9 @@
     --table-border-color: rgba(255, 255, 255, 0.08);
     --table-text-color: #f1f5f9;
 
+    /* Input*/
+    --input-bg: rgba(30, 41, 59, 0.7);
+
     /* Search & Input */
     --search-border: rgba(255, 255, 255, 0.12);
     --search-bg: rgba(15, 23, 42, 0.9);
@@ -73,6 +76,15 @@
     --highlight-orange: #ea580c;
     --highlight-pink: #db2777;
     --highlight-purple: #7c3aed;
+
+    /* Drop down */
+    --dropdown-border: #ccc;
+    --dropdown-border-hover: #999;
+    --dropdown-radius: 8px;
+    --dropdown-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    --dropdown-option-hover-bg: #f0f0f0;
+    --dropdown-padding: 0.6rem 0.8rem;
+    --dropdown-font-size: 0.95rem;
 
     /* Icons */
     --icon-color: #f59e0b;
@@ -135,6 +147,13 @@
     --scrollbar-track-bg: #f1f1f1;
     --scrollbar-thumb-bg: #c1c1c1;
     --scrollbar-thumb-hover: #a8a8a8;
+
+    /* Button */
+    --button-bg: transparent;
+    --button-color: var(--text-color);
+    --button-hover-scale: 1.05;
+    --button-hover-brightness: 2;
+    --button-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 
     /* Alert Base Variables */
     --alert-padding-x: 40px;

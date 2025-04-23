@@ -22,7 +22,7 @@ function addRowsToTransactionTable(data, messages) {
             return;
         const currency = getCurrentCurrencySymbol();
         data.forEach((transaction, index) => {
-            var _a, _b;
+            var _a;
             if (!transaction || typeof transaction !== "object") {
                 console.warn(`Warning: Skipping invalid transaction at index ${index}.`, transaction);
                 return;
@@ -43,12 +43,6 @@ function addRowsToTransactionTable(data, messages) {
             if ((_a = transaction.contract) === null || _a === void 0 ? void 0 : _a.name) {
                 const contractWrapper = createAndAppendElement(contract, "div", "justifyContentCenter");
                 createAndAppendElement(contractWrapper, "span", "highlightCell highlightCellPink", transaction.counterParty.name);
-            }
-            // Category cell
-            const category = createAndAppendElement(newRow, "td");
-            if ((_b = transaction.category) === null || _b === void 0 ? void 0 : _b.name) {
-                const categoryWrapper = createAndAppendElement(category, "div", "justifyContentCenter");
-                createAndAppendElement(categoryWrapper, "span", "highlightCell highlightCellOrange", transaction.counterParty.name);
             }
             // Date cell
             const date = createAndAppendElement(newRow, "td");
@@ -77,14 +71,13 @@ function addRowsToTransactionTable(data, messages) {
 function filterTransactions(messages, searchString) {
     try {
         filteredTransactionData = transactionData.filter(transaction => {
-            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+            var _a, _b, _c, _d, _e, _f, _g, _h;
             return ((_b = (_a = transaction.counterParty) === null || _a === void 0 ? void 0 : _a.name) === null || _b === void 0 ? void 0 : _b.toLowerCase().includes(searchString)) ||
                 ((_d = (_c = transaction.contract) === null || _c === void 0 ? void 0 : _c.name) === null || _d === void 0 ? void 0 : _d.toLowerCase().includes(searchString)) ||
-                ((_f = (_e = transaction.category) === null || _e === void 0 ? void 0 : _e.name) === null || _f === void 0 ? void 0 : _f.toLowerCase().includes(searchString)) ||
-                ((_g = transaction.date) === null || _g === void 0 ? void 0 : _g.toLowerCase().includes(searchString)) ||
-                ((_h = transaction.amountInBankBefore) === null || _h === void 0 ? void 0 : _h.toString().toLowerCase().includes(searchString)) ||
-                ((_j = transaction.amount) === null || _j === void 0 ? void 0 : _j.toString().toLowerCase().includes(searchString)) ||
-                ((_k = transaction.amountInBankAfter) === null || _k === void 0 ? void 0 : _k.toString().toLowerCase().includes(searchString));
+                ((_e = transaction.date) === null || _e === void 0 ? void 0 : _e.toLowerCase().includes(searchString)) ||
+                ((_f = transaction.amountInBankBefore) === null || _f === void 0 ? void 0 : _f.toString().toLowerCase().includes(searchString)) ||
+                ((_g = transaction.amount) === null || _g === void 0 ? void 0 : _g.toString().toLowerCase().includes(searchString)) ||
+                ((_h = transaction.amountInBankAfter) === null || _h === void 0 ? void 0 : _h.toString().toLowerCase().includes(searchString));
         });
         splitDataIntoPages(messages, Type.TRANSACTION, filteredTransactionData);
     }

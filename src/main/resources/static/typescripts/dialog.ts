@@ -70,7 +70,7 @@ function createDialogContent(
     width: number,
     height: number
 ): HTMLElement {
-    const verticalContainer = createAndAppendElement(document.body, "div", "verticalContainer");
+    const verticalContainer = createAndAppendElement(document.body, "div", "verticalContainer marginTop marginBottom marginLeftBig marginRightBig");
     const header = createDialogHeader(verticalContainer, headerText, headerIcon);
     const closeButton = createAndAppendElement(header, "button", "exitButton") as HTMLButtonElement;
     createAndAppendElement(closeButton, "i", "bi bi-x-lg");

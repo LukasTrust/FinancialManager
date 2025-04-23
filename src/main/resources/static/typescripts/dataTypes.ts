@@ -26,11 +26,11 @@ type AnyBankAccount = BankAccount | SavingsBankAccount;
 
 interface Category {
     id: number;
-    users?: User;
+    users: User;
     name: string;
     description?: string;
     maxSpendingPerMonth?: number;
-    counterPartySearchStrings: string[];
+    counterParties: CounterParty[];
 }
 
 interface Contract {
@@ -74,7 +74,6 @@ interface Transaction {
     bankAccount: BankAccount;
     contract?: Contract;
     counterParty: CounterParty;
-    category?: Category;
 }
 
 interface CounterParty {
@@ -102,7 +101,8 @@ interface ListElementObject {
 enum Type {
     TRANSACTION = "transactions",
     COUNTERPARTY = "counterParties",
-    CONTRACT = "contracts"
+    CONTRACT = "contracts",
+    CATEGORY = "categories",
 }
 
 enum DataTypeForSort {
@@ -172,4 +172,12 @@ interface KeyFigure {
     name: string;
     tooltip: string;
     value: number;
+}
+
+interface DropdownOptions {
+    parent: HTMLElement;
+    items: any[];
+    defaultText: string;
+    clearText: string;
+    multiSelect?: boolean;
 }

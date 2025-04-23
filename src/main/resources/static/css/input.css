@@ -26,7 +26,7 @@ label {
 .inputBox input {
     width: 100%;
     padding: var(--padding-md) var(--padding-lg) var(--padding-md) var(--padding-lg);
-    background: rgba(30, 41, 59, 0.7);
+    background: var(--input-bg);
     border: 1px solid var(--table-border-color);
     border-radius: var(--border-radius-md);
     color: var(--text-color);
@@ -235,4 +235,75 @@ input:focus {
     border-color: var(--accent-color);
     outline: none;
     box-shadow: 0 0 0 2px var(--search-shadow);
+}
+
+.dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.dropdownToggle {
+    cursor: pointer;
+    font-weight: 500;
+    padding: var(--dropdown-padding);
+    border: 1px solid var(--dropdown-border);
+    border-radius: var(--dropdown-radius);
+    width: 100%;
+    background: var(--input-bg);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+}
+
+.dropdownToggle::-webkit-scrollbar {
+    height: 6px;
+}
+
+.dropdownToggle::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.dropdownToggle:hover {
+    border-color: var(--dropdown-border-hover);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.dropdownOptions {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    margin-top: 0.3rem;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    border: 1px solid var(--dropdown-border);
+    border-radius: var(--dropdown-radius);
+    background: var(--dialog-gradient);
+    box-shadow: var(--dropdown-shadow);
+}
+
+.dropdownOption {
+    padding: var(--dropdown-padding);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: var(--dropdown-font-size);
+}
+
+.dropdownOption:hover {
+    background-color: var(--dropdown-option-hover-bg);
+}
+
+.selectedDisplay {
+    margin-top: 1rem;
+    font-weight: bold;
 }

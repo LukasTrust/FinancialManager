@@ -1,4 +1,4 @@
-<div th:fragment="addCategories" id="content">
+<div th:fragment="manageCategories" id="content">
     <div class="verticalContainer widthFull">
         <div class="horizontalContainer marginBottomBig">
             <h1><span class="bi bi-tag-fill"></span></h1>
@@ -44,6 +44,15 @@
                             <div class="justifyContentCenter horizontalContainer">
                                 <span data-i18n="description"></span>
                                 <i data-type="input" data-index="2"
+                                   class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
+                                    <span class="tooltipText" data-i18n="sortTooltip"></span>
+                                </i>
+                            </div>
+                        </th>
+                        <th class="thHeader">
+                            <div class="justifyContentCenter horizontalContainer">
+                                <span data-i18n="maxSpendingPerMonth"></span>
+                                <i data-type="input" data-index="3"
                                    class="iconColor bi bi-arrows-expand tooltip tooltipBottom">
                                     <span class="tooltipText" data-i18n="sortTooltip"></span>
                                 </i>

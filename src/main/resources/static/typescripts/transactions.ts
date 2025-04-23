@@ -54,13 +54,6 @@ function addRowsToTransactionTable(data: Transaction[], messages: Record<string,
                 createAndAppendElement(contractWrapper, "span", "highlightCell highlightCellPink", transaction.counterParty.name);
             }
 
-            // Category cell
-            const category = createAndAppendElement(newRow, "td");
-            if (transaction.category?.name) {
-                const categoryWrapper = createAndAppendElement(category, "div", "justifyContentCenter");
-                createAndAppendElement(categoryWrapper, "span", "highlightCell highlightCellOrange", transaction.counterParty.name);
-            }
-
             // Date cell
             const date = createAndAppendElement(newRow, "td");
             const dateWrapper = createAndAppendElement(date, "div", "justifyContentCenter");
@@ -93,7 +86,6 @@ function filterTransactions(messages: Record<string, string>, searchString: stri
         filteredTransactionData = transactionData.filter(transaction =>
             transaction.counterParty?.name?.toLowerCase().includes(searchString) ||
             transaction.contract?.name?.toLowerCase().includes(searchString) ||
-            transaction.category?.name?.toLowerCase().includes(searchString) ||
             transaction.date?.toLowerCase().includes(searchString) ||
             transaction.amountInBankBefore?.toString().toLowerCase().includes(searchString) ||
             transaction.amount?.toString().toLowerCase().includes(searchString) ||
@@ -106,7 +98,6 @@ function filterTransactions(messages: Record<string, string>, searchString: stri
         showAlert("ERROR", messages["error_generic"]);
     }
 }
-
 
 function transactionToListElementObjectArray(transactions: Transaction[]): ListElementObject[] {
     const listElementObjects: ListElementObject[] = [];

@@ -71,4 +71,10 @@ public class ContentController {
         model.addAttribute("title", "Dashboard");
         return "dashboard";
     }
+
+    @GetMapping("/manageCategories")
+    public String getCategories(Model model) {
+        model.addAttribute("title", "Manage Categories");
+        return "manageCategories";
+    }
 }

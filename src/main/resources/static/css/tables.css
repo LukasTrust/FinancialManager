@@ -25,6 +25,7 @@
 /* Table Structure */
 .tableWrapper {
     max-height: 75vh;
+    min-height: 75vh;
     min-width: 100%;
     overflow: auto;
 }

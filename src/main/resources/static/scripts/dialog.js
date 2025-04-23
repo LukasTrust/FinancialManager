@@ -45,7 +45,7 @@ function createDialogButton(parent, iconClass, text, alignment, callback) {
     return button;
 }
 function createDialogContent(headerText, headerIcon, width, height) {
-    const verticalContainer = createAndAppendElement(document.body, "div", "verticalContainer");
+    const verticalContainer = createAndAppendElement(document.body, "div", "verticalContainer marginTop marginBottom marginLeftBig marginRightBig");
     const header = createDialogHeader(verticalContainer, headerText, headerIcon);
     const closeButton = createAndAppendElement(header, "button", "exitButton");
     createAndAppendElement(closeButton, "i", "bi bi-x-lg");

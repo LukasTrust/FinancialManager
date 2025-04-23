@@ -80,14 +80,19 @@ function updateUI(data, currentPageIndex, itemsPerPage, numberOfPages, messages,
     const endIndex = startIndex + itemsPerPage;
     const paginatedData = data.slice(startIndex, endIndex);
     clearTable(currentTableBody);
-    if (type === Type.TRANSACTION) {
-        addRowsToTransactionTable(paginatedData, messages);
-    }
-    else if (type === Type.COUNTERPARTY) {
-        addRowsToCounterPartyTable(paginatedData, messages);
-    }
-    else if (type === Type.CONTRACT) {
-        addRowsToContractTable(paginatedData, messages);
+    switch (type) {
+        case Type.TRANSACTION:
+            addRowsToTransactionTable(paginatedData, messages);
+            break;
+        case Type.COUNTERPARTY:
+            addRowsToCounterPartyTable(paginatedData, messages);
+            break;
+        case Type.CONTRACT:
+            addRowsToContractTable(paginatedData, messages);
+            break;
+        case Type.CATEGORY:
+            addCategoriesTable(paginatedData, messages);
+            break;
     }
     const currentPage = document.getElementById("currentPage");
     const numberOfPagesElement = document.getElementById("numberOfPages");

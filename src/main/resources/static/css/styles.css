@@ -218,7 +218,7 @@ p {
 .listItem {
     display: flex;
     align-items: center;
-    background: var(--secondary-gradient);
+    background: var(--secondary-color);
     box-shadow: var(--box-shadow-sm);
     border-radius: var(--border-radius-md);
     cursor: pointer;
@@ -227,6 +227,7 @@ p {
     margin: 8px;
     padding: 12px;
     will-change: transform, opacity, background;
+    width: inherit;
 }
 
 .listItem:hover {
@@ -238,7 +239,7 @@ p {
 .listItemSmall {
     display: flex;
     align-items: center;
-    background: var(--secondary-gradient);
+    background: var(--secondary-color);
     box-shadow: var(--box-shadow-sm);
     border-radius: var(--border-radius-md);
     cursor: pointer;
@@ -265,12 +266,6 @@ p {
 
 /* Buttons */
 button, .button {
-    --button-bg: transparent;
-    --button-color: var(--text-color);
-    --button-hover-scale: 1.05;
-    --button-hover-brightness: 2;
-    --button-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-
     border: none;
     outline: none;
     cursor: pointer;
@@ -374,6 +369,7 @@ button:hover, .button:hover {
 .iconButton * {
     margin-right: var(--spacing-xs);
     font-size: var(--font-size-md);
+    color: var(--button-color);
 }
 
 .maxButton {
@@ -493,6 +489,10 @@ button:hover, .button:hover {
 
 .negative * {
     color: var(--negative-color);
+}
+
+.red {
+    background: var(--negative-color);
 }
 
 dialog {

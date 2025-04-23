@@ -28,8 +28,12 @@ let headerContract: HTMLElement | null = null;
 
 let counterPartyData: CounterPartyDisplay[] = [];
 let filteredCounterPartyData: CounterPartyDisplay[] = [];
+let counterParties: CounterParty[] = [];
 let counterPartiesHiddenToggle: boolean = false;
 
 let contractData: ContractDisplay[] = [];
 let filteredContractData: ContractDisplay[] = [];
 let contractsHiddenToggle: boolean = false;
+
+let categoryData: Category[] = [];
+let filteredCategoryData: Category[] = [];

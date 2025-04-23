@@ -3,6 +3,7 @@ var Type;
     Type["TRANSACTION"] = "transactions";
     Type["COUNTERPARTY"] = "counterParties";
     Type["CONTRACT"] = "contracts";
+    Type["CATEGORY"] = "categories";
 })(Type || (Type = {}));
 var DataTypeForSort;
 (function (DataTypeForSort) {

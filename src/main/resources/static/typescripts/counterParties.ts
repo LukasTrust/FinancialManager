@@ -195,13 +195,11 @@ function createCounterPartyRow(tableBody: HTMLElement, counterPartyDisplay: Coun
 
     // Description Cell
     const description = createAndAppendElement(newRow, "td");
-    const descriptionInput = createInputBox(description, "bi bi-pencil-fill", "name", "text", counterParty.description);
+    const descriptionInput = createInputBox(description, "bi bi-pencil-fill", "description", "text", counterParty.description);
     debounceInputChange(descriptionInput, (id, newValue, messages) =>
         updateField(id, "description", newValue, messages, Type.COUNTERPARTY), counterParty.id, messages);
 
-    const searchStringCell = createAndAppendElement(searchStringRow, "td", "", "", {
-        colspan: "6"
-    });
+    const searchStringCell = createAndAppendElement(searchStringRow, "td", "", "", { colspan: "6" });
 
     const cellWrapper = createAndAppendElement(searchStringCell, "div", "marginLeftBig alignItemsCenter horizontalContainer");
 

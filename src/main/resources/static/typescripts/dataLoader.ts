@@ -58,6 +58,9 @@ async function loadURL(url: string): Promise<void> {
             case "/dashboard":
                 await buildDashboard();
                 break;
+            case "/manageCategories":
+                await buildManageCategories();
+                break;
         }
     } catch (error) {
         console.error("Error loading content:", error);
@@ -82,7 +85,7 @@ async function loadData(type: Type, messages: Record<string, string>): Promise<v
     try {
         let url: string = `/${type.toString()}`;
 
-        if (type !== Type.COUNTERPARTY)
+        if (type !== Type.COUNTERPARTY && type !== Type.CATEGORY)
             url += `/${bankAccountId}`;
         url += `/data`;
 
@@ -110,11 +113,17 @@ async function loadData(type: Type, messages: Record<string, string>): Promise<v
             case Type.COUNTERPARTY: {
                 counterPartyData = data;
                 filteredCounterPartyData = data;
+                counterParties = counterPartyData.map(counterParty => counterParty.counterParty);
                 break;
             }
             case Type.TRANSACTION: {
                 transactionData = data;
                 filteredTransactionData = data;
+                break;
+            }
+            case Type.CATEGORY: {
+                categoryData = data;
+                filteredCategoryData = data;
                 break;
             }
         }

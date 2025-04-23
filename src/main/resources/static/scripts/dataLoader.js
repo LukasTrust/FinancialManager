@@ -50,6 +50,9 @@ async function loadURL(url) {
             case "/dashboard":
                 await buildDashboard();
                 break;
+            case "/manageCategories":
+                await buildManageCategories();
+                break;
         }
     }
     catch (error) {
@@ -74,7 +77,7 @@ async function loadBankAccounts() {
 async function loadData(type, messages) {
     try {
         let url = `/${type.toString()}`;
-        if (type !== Type.COUNTERPARTY)
+        if (type !== Type.COUNTERPARTY && type !== Type.CATEGORY)
             url += `/${bankAccountId}`;
         url += `/data`;
         const response = await fetch(url, {
@@ -98,11 +101,17 @@ async function loadData(type, messages) {
             case Type.COUNTERPARTY: {
                 counterPartyData = data;
                 filteredCounterPartyData = data;
+                counterParties = counterPartyData.map(counterParty => counterParty.counterParty);
                 break;
             }
             case Type.TRANSACTION: {
                 transactionData = data;
                 filteredTransactionData = data;
+                break;
+            }
+            case Type.CATEGORY: {
+                categoryData = data;
+                filteredCategoryData = data;
                 break;
             }
         }

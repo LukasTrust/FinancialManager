@@ -3,6 +3,8 @@ package financialmanager.objectFolder.resultFolder;
 import financialmanager.Utils.Utils;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BaseBankAccountService;
+import financialmanager.objectFolder.categoryFolder.Category;
+import financialmanager.objectFolder.categoryFolder.CategoryService;
 import financialmanager.objectFolder.contractFolder.BaseContractService;
 import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.counterPartyFolder.BaseCounterPartyService;
@@ -37,6 +39,7 @@ public class ResultService {
     private final BaseCounterPartyService baseCounterPartyService;
     private final BaseUsersService baseUsersService;
     private final BaseBankAccountService baseBankAccountService;
+    private final CategoryService categoryService;
 
     private final ResponseService responseService;
     
@@ -175,7 +178,6 @@ public class ResultService {
     //</editor-fold>
 
     //<editor-fold desc="Users">
-
     public Result<Users, ResponseEntity<Response>> getCurrentUser() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -197,8 +199,8 @@ public class ResultService {
     }
 
     //</editor-fold>
-    //<editor-fold desc="Bank Account">
 
+    //<editor-fold desc="Bank Account">
     public Result<BankAccount, ResponseEntity<Response>> findBankAccountById(Long bankAccountId) {
         Result<Users, ResponseEntity<Response>> currentUserResponse = getCurrentUser();
 
@@ -231,6 +233,20 @@ public class ResultService {
 
         return new Ok<>(bankAccounts);
     }
+
+    //</editor-fold>
+
+    //<editor-fold desc="Category">
+    public Result<List<Category>, ResponseEntity<Response>> findCategoriesByUsers() {
+        Result<Users, ResponseEntity<Response>> currentUserResponse = getCurrentUser();
+
+        if (currentUserResponse.isErr()) {
+            return new Err<>(ResponseEntity.status(HttpStatus.NOT_FOUND).body(currentUserResponse.getError().getBody()));
+        }
+
+        return new Ok<>(categoryService.findAllByUsers(currentUserResponse.getValue()));
+    }
+
 
     //</editor-fold>
 }

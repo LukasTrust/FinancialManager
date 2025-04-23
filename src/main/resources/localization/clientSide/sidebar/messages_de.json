@@ -6,5 +6,6 @@
   "transactions": "Transaktionen",
   "categories": "Kategorien",
   "contracts": "Verträge",
-  "counterParties": "Gegenparteien"
+  "counterParties": "Gegenparteien",
+  "manageCategories": "Kategorien verwalten"
 }
