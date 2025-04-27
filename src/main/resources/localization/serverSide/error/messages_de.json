@@ -15,5 +15,7 @@
   "counterPartySearchStringAlreadyInCounterParty": "Der Suchbegriff ist bereits in einer Gegenpatei vorhanden. Bitte ihn erst dort entfernen before er hier hinzugefügt werden kann",
   "searchStringNotInCounterParty": "Der Suchbegriff ist nicht in der Gegenpartei gespeichert",
   "deletedData": "Es gab einen Fehler beim löschen der Daten",
-  "invalidListType": "Den Listen Typen gibt es nicht in diesen Bankkonto"
+  "invalidListType": "Den Listen Typen gibt es nicht in diesen Bankkonto",
+  "categoryAlreadyExists": "Es gibt bereits eine Kategory mit diesem Name",
+  "categoryNotFound": "Die Kategory wurde nicht gefunden"
 }

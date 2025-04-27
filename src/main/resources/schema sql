@@ -89,18 +89,18 @@ CREATE TABLE IF NOT EXISTS category
 );
 
 -- Many to Many for CATEGORY and COUNTER-PARTY
-CREATE TABLE IF NOT EXISTS category_counter_party
+CREATE TABLE IF NOT EXISTS category_counterparty
 (
     category_id                BIGINT NOT NULL,
-    counter_party_id            BIGINT NOT NULL,
+    counterparty_id            BIGINT NOT NULL,
 
     CONSTRAINT fk_category FOREIGN KEY (category_id)
         REFERENCES category(id),
 
-    CONSTRAINT fk_counter_party FOREIGN KEY (counter_party_id)
+    CONSTRAINT fk_counter_party FOREIGN KEY (counterparty_id)
         REFERENCES counter_party(id),
 
-    PRIMARY KEY (category_id, counter_party_id)
+    PRIMARY KEY (category_id, counterparty_id)
 );
 
 -- Create TRANSACTION table

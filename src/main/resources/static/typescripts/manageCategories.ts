@@ -47,30 +47,40 @@ function showAddCategoryDialog(messages: Record<string, string>): void {
     createAndAppendElement(submitButton, "span", "normalText", messages["submit"]);
     createAndAppendElement(submitButton, "span", "tooltipText", messages["submitTooltip"]);
 
-    submitButton.addEventListener("click", async () => {
+    submitButton.addEventListener("click", async (event) => {
+        event.preventDefault();
+
         const nameValue = name.value;
         const descriptionValue = description.value;
         const maxSpendingPerMonthValue = maxSpendingPerMonth.value;
         const selectedItems = dropdown.getSelectedItems();
 
         if (nameValue === "") {
-            showAlert("ERROR", messages["error_missing_name"]);
+            showAlert("ERROR", messages["error_missing_name"], dialogContent);
             return;
         }
-        if (maxSpendingPerMonthValue !== "" && !isNaN(parseFloat(maxSpendingPerMonthValue))) {
-            showAlert("ERROR", messages["error_invalid_maxSpendingPerMonth"]);
+
+        if (maxSpendingPerMonthValue !== "" && isNaN(parseFloat(maxSpendingPerMonthValue))) {
+            showAlert("ERROR", messages["error_invalid_maxSpendingPerMonth"], dialogContent);
             return;
         }
 
         const maxSpendingPerMonthNumber = maxSpendingPerMonthValue !== "" ? parseFloat(maxSpendingPerMonthValue) : 0;
 
-        await addCategory(nameValue, descriptionValue, maxSpendingPerMonthNumber, selectedItems.map(item => item.id));
+        const result = await addCategory(dialogContent, nameValue, descriptionValue, maxSpendingPerMonthNumber, selectedItems.map(item => item.id), messages);
+
+        if (result) {
+            name.value = "";
+            description.value = "";
+            maxSpendingPerMonth.value = "";
+            dropdown.clearSelection();
+        }
     })
 }
 
-async function addCategory(name: string, description: string, maxSpendingPerMonth: number, counterParties: string[]): Promise<void> {
+async function addCategory(dialogContent: HTMLElement,name: string, description: string, maxSpendingPerMonth: number, counterParties: string[], messages: Record<string, string>): Promise<boolean> {
     try {
-        const response = await fetch(`/categories/${bankAccountId}/data/addCategory`, {
+        const response = await fetch(`/categories/data/addCategory`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -82,16 +92,28 @@ async function addCategory(name: string, description: string, maxSpendingPerMont
         })
 
         if (!response.ok) {
-            await showAlertFromResponse(response);
-            return;
+            await showAlertFromResponse(response, dialogContent);
+            return false;
         }
 
         const responseBody: Response = await response.json();
 
+        showAlert(responseBody.alertType, responseBody.message, dialogContent);
 
+        if (responseBody.alertType == AlertType.SUCCESS) {
+            const category = responseBody.data;
+
+            categoryData.push(category);
+            filteredCategoryData.push(category);
+
+            splitDataIntoPages(messages, Type.CATEGORY, filteredCategoryData);
+            return true;
+        }
+
+        return false;
     } catch (error) {
         console.warn("There was an error adding the category", error);
-        return;
+        return false;
     }
 }
 
@@ -143,5 +165,5 @@ function createCategoryRow(tableBody: HTMLElement, category: Category, toolTip: 
     const maxSpendingPerMonth = createAndAppendElement(newRow, "td");
     const maxSpendingPerMonthInput = createInputBox(maxSpendingPerMonth, "bi bi-pencil-fill", "maxSpendingPerMonth", "number", category.description);
     debounceInputChange(maxSpendingPerMonthInput, (id, newValue, messages) =>
-        updateField(id, "description", newValue, messages, Type.CATEGORY), category.id, messages);
+        updateField(id, "maxSpendingPerMonth", newValue, messages, Type.CATEGORY), category.id, messages);
 }

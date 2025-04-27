@@ -1,6 +1,6 @@
 function getBaseURL(type) {
     let url = `/${type.toString()}`;
-    if (type !== Type.COUNTERPARTY) {
+    if (type !== Type.COUNTERPARTY && type !== Type.CATEGORY) {
         url += `/${bankAccountId}`;
     }
     url += `/data`;
@@ -45,9 +45,8 @@ async function updateField(id, field, newValue, messages, type) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ newValue })
         });
-        if (!response.ok) {
+        if (!response.ok)
             await showAlertFromResponse(response);
-        }
     }
     catch (error) {
         console.error("Unexpected error in updateField:", error);

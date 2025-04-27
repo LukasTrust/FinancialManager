@@ -4,7 +4,7 @@ import financialmanager.Utils.Utils;
 import financialmanager.objectFolder.bankAccountFolder.BankAccount;
 import financialmanager.objectFolder.bankAccountFolder.BaseBankAccountService;
 import financialmanager.objectFolder.categoryFolder.Category;
-import financialmanager.objectFolder.categoryFolder.CategoryService;
+import financialmanager.objectFolder.categoryFolder.BaseCategoryService;
 import financialmanager.objectFolder.contractFolder.BaseContractService;
 import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.counterPartyFolder.BaseCounterPartyService;
@@ -39,7 +39,7 @@ public class ResultService {
     private final BaseCounterPartyService baseCounterPartyService;
     private final BaseUsersService baseUsersService;
     private final BaseBankAccountService baseBankAccountService;
-    private final CategoryService categoryService;
+    private final BaseCategoryService baseCategoryService;
 
     private final ResponseService responseService;
     
@@ -240,13 +240,25 @@ public class ResultService {
     public Result<List<Category>, ResponseEntity<Response>> findCategoriesByUsers() {
         Result<Users, ResponseEntity<Response>> currentUserResponse = getCurrentUser();
 
-        if (currentUserResponse.isErr()) {
+        if (currentUserResponse.isErr())
             return new Err<>(ResponseEntity.status(HttpStatus.NOT_FOUND).body(currentUserResponse.getError().getBody()));
-        }
 
-        return new Ok<>(categoryService.findAllByUsers(currentUserResponse.getValue()));
+        return new Ok<>(baseCategoryService.findAllByUsers(currentUserResponse.getValue()));
     }
 
+    public Result<Category, ResponseEntity<Response>> findCategoryById(Long categoryId) {
+        Result<Users, ResponseEntity<Response>> currentUserResponse = getCurrentUser();
+
+        if (currentUserResponse.isErr())
+            return new Err<>(ResponseEntity.status(HttpStatus.NOT_FOUND).body(currentUserResponse.getError().getBody()));
+
+        Category category = baseCategoryService.findByIdAndUsers(categoryId, currentUserResponse.getValue());
+
+        if (category == null)
+            return new Err<>(responseService.createResponse(HttpStatus.NOT_FOUND, "categoryNotFound", AlertType.ERROR));
+
+        return new Ok<>(baseCategoryService.findByIdAndUsers(categoryId, currentUserResponse.getValue()));
+    }
 
     //</editor-fold>
 }

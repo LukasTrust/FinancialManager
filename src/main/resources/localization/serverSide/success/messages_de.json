@@ -16,5 +16,6 @@
   "deleteContracts": "{} Verträge wurden gelöscht, {} dazugehörigen Transaktionen wurden geupdated",
   "deletedData": "Die Daten wurden erfolgreich gelöscht",
   "searchStringRemoved": "Der Suchbegriff wurde entfernt",
-  "searchStringAdded": "Der Suchbegriff wurde hinzugefügt"
+  "searchStringAdded": "Der Suchbegriff wurde hinzugefügt",
+  "categoryCreated": "Die Kategory wurde hinzugefügt"
 }

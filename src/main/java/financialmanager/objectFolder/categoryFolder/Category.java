@@ -43,4 +43,9 @@ public class Category {
             inverseJoinColumns = @JoinColumn(name = "counterparty_id")
     )
     private List<CounterParty> counterParties;
+
+    public Category(Users users, String name) {
+        this.users = users;
+        this.name = name;
+    }
 }
