@@ -5,8 +5,6 @@ import financialmanager.objectFolder.counterPartyFolder.CounterParty;
 import financialmanager.objectFolder.responseFolder.AlertType;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.responseFolder.ResponseService;
-import financialmanager.objectFolder.resultFolder.Err;
-import financialmanager.objectFolder.resultFolder.Ok;
 import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.objectFolder.resultFolder.ResultService;
 import financialmanager.objectFolder.usersFolder.Users;
@@ -67,5 +65,42 @@ public class CategoryService {
         baseCategoryService.save(category);
 
         return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<Response> updateCounterPartiesField(Map<String, Long> requestBody,
+                                                                boolean isAddOperation) {
+        Long counterPartyId = requestBody.get("counterPartyId");
+        Long categoryId = requestBody.get("categoryId");
+
+        Result<Category, ResponseEntity<Response>> categoryResult = resultService.findCategoryById(categoryId);
+
+        if (categoryResult.isErr())
+            return categoryResult.getError();
+
+        Result<CounterParty, ResponseEntity<Response>> counterPartyResult = resultService.findCounterPartyById(counterPartyId);
+
+        if (counterPartyResult.isErr())
+            return counterPartyResult.getError();
+
+        Category category = categoryResult.getValue();
+        CounterParty counterParty = counterPartyResult.getValue();
+
+        List<String> placeHolders = List.of(counterParty.getName(), category.getName());
+
+        if (isAddOperation) {
+            if (category.getCounterParties().contains(counterParty))
+                return responseService.createResponseWithPlaceHolders(HttpStatus.BAD_REQUEST, "counterPartyAlreadyInCategory", AlertType.WARNING, placeHolders);
+
+            category.getCounterParties().add(counterParty);
+            baseCategoryService.save(category);
+            return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "counterPartyAddedToCategory", AlertType.SUCCESS, placeHolders);
+        }
+
+        if (!category.getCounterParties().contains(counterParty))
+            return responseService.createResponseWithPlaceHolders(HttpStatus.BAD_REQUEST, "counterPartyNotInCategory", AlertType.WARNING, placeHolders);
+
+        category.getCounterParties().remove(counterParty);
+        baseCategoryService.save(category);
+        return responseService.createResponseWithPlaceHolders(HttpStatus.OK, "counterPartyRemovedFromCategory", AlertType.SUCCESS, placeHolders);
     }
 }

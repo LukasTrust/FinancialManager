@@ -3,7 +3,6 @@ package financialmanager.controller;
 import financialmanager.objectFolder.categoryFolder.Category;
 import financialmanager.objectFolder.categoryFolder.CategoryBody;
 import financialmanager.objectFolder.categoryFolder.CategoryService;
-import financialmanager.objectFolder.contractFolder.Contract;
 import financialmanager.objectFolder.responseFolder.Response;
 import financialmanager.objectFolder.resultFolder.Result;
 import financialmanager.objectFolder.resultFolder.ResultService;
@@ -58,5 +57,15 @@ public class CategoryController {
                                                                       @RequestBody Map<String, Object> requestBody) {
         return categoryService.updateContractField(categoryId, requestBody,
                 (category, value) -> category.setMaxSpendingPerMonth(Double.valueOf(value.toString())));
+    }
+
+    @PostMapping("/addCounterPartyToCategory")
+    public ResponseEntity<Response> addCounterPartyToCategory(@RequestBody Map<String, Long> requestBody) {
+        return categoryService.updateCounterPartiesField(requestBody, true);
+    }
+
+    @PostMapping("/removeCounterPartyFromCategory")
+    public ResponseEntity<Response> removeCounterPartyFromCategory(@RequestBody Map<String, Long> requestBody) {
+        return categoryService.updateCounterPartiesField(requestBody, false);
     }
 }

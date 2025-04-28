@@ -5,20 +5,30 @@ class CheckboxDropdown {
     private readonly dropdownToggle: HTMLElement;
     private readonly dropdownOptions: HTMLElement;
     private checkboxes: HTMLInputElement[] = [];
+    private readonly id: string;
     private readonly defaultText: string;
+    private readonly clearText: string;
+    private readonly onCheck?: (item: { id: string; value: string; name: string }) => void;
+    private readonly onUncheck?: (item: { id: string; value: string; name: string }) => void;
 
-    constructor({ parent, items, defaultText, clearText, multiSelect = true }: Omit<DropdownOptions, 'subText'>) {
+    constructor({ id, parent, items, preSelectedItems, defaultText, clearText, multiSelect = true, onCheck, onUncheck }: Omit<DropdownOptions, 'subText'> & {
+        onCheck?: (item: { id: string; value: string; name: string }) => void;
+        onUncheck?: (item: { id: string; value: string; name: string }) => void;
+    }) {
+        this.id = id;
         this.items = items;
         this.multiSelect = multiSelect;
         this.defaultText = defaultText;
+        this.clearText = clearText;
+        this.onCheck = onCheck;
+        this.onUncheck = onUncheck;
 
         this.container = this.createAndAppendElement(parent, "div", "dropdown");
-
         this.dropdownToggle = this.createAndAppendElement(this.container, "div", "dropdownToggle");
         this.dropdownOptions = this.createAndAppendElement(this.container, "div", "dropdownOptions");
 
         this.updateDisplay();
-        this.renderOptions(clearText);
+        this.renderOptions(preSelectedItems);
         this.setupEvents();
     }
 
@@ -33,23 +43,20 @@ class CheckboxDropdown {
         return element;
     }
 
-    private renderOptions(clearText: string) {
-        // Clear existing options
+    private renderOptions(preSelectedItems: { id: string; value: string; name: string }[]) {
         this.dropdownOptions.innerHTML = "";
 
-        // Add Clear button
         const clearBtn = this.createAndAppendElement(
             this.dropdownOptions,
             "button",
             "iconButton red marginTop marginBottom",
-            clearText,
+            this.clearText,
             { type: "button" }
         );
-        clearBtn.addEventListener("click", (e) => {
+        clearBtn.addEventListener("click", () => {
             this.clearSelection();
         });
 
-        // Render item checkboxes
         this.items.forEach(item => {
             const option = this.createAndAppendElement(this.dropdownOptions, "div", "dropdownOption");
 
@@ -58,6 +65,10 @@ class CheckboxDropdown {
                 id: item.id,
                 value: item.value
             }) as HTMLInputElement;
+
+            if (preSelectedItems.find(preSelectedItem => preSelectedItem.id === item.id)) {
+                checkbox.checked = true;
+            }
 
             this.createAndAppendElement(option, "span", "", item.name);
 
@@ -76,7 +87,14 @@ class CheckboxDropdown {
                 this.updateDisplay();
             });
 
-            checkbox.addEventListener("change", () => this.updateDisplay());
+            checkbox.addEventListener("change", () => {
+                if (checkbox.checked) {
+                    this.onCheck?.(item);
+                } else {
+                    this.onUncheck?.(item);
+                }
+                this.updateDisplay();
+            });
         });
     }
 
@@ -95,7 +113,6 @@ class CheckboxDropdown {
 
     private updateDisplay() {
         const selected = this.getSelectedItems();
-
         this.dropdownToggle.innerHTML = "";
 
         if (selected.length > 0) {
@@ -121,7 +138,7 @@ class CheckboxDropdown {
             createListElement(
                 this.dropdownToggle,
                 this.defaultText,
-                {style: "padding: 5px"},
+                { style: "padding: 5px" },
                 false,
                 false,
                 null,

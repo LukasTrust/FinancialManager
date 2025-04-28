@@ -199,8 +199,9 @@ function fillSearchStringFields(messages: Record<string, string>): void {
             return;
         }
 
-        bankAccount[listId].forEach((searchString: string) => {
-            addStringToList(messages, stringList, searchString, (element) => removeSearchString(element, searchString, listId, messages));
-        });
+        if (bankAccount[listId] !== null)
+            bankAccount[listId].forEach((searchString: string) => {
+                addStringToList(messages, stringList, searchString, (element) => removeSearchString(element, searchString, listId, messages));
+            });
     });
 }

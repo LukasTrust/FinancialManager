@@ -80,6 +80,9 @@ function createAndAppendElement(
 }
 
 function getCurrentCurrencySymbol(): string {
+    if (Object.keys(bankAccounts).length === 0 )
+        return " €";
+
     if (bankAccountId === 0 || bankAccountId === undefined)
         return " " + Object.values(bankAccounts)[0].currencySymbol;
 

@@ -1,14 +1,18 @@
 class CheckboxDropdown {
-    constructor({ parent, items, defaultText, clearText, multiSelect = true }) {
+    constructor({ id, parent, items, preSelectedItems, defaultText, clearText, multiSelect = true, onCheck, onUncheck }) {
         this.checkboxes = [];
+        this.id = id;
         this.items = items;
         this.multiSelect = multiSelect;
         this.defaultText = defaultText;
+        this.clearText = clearText;
+        this.onCheck = onCheck;
+        this.onUncheck = onUncheck;
         this.container = this.createAndAppendElement(parent, "div", "dropdown");
         this.dropdownToggle = this.createAndAppendElement(this.container, "div", "dropdownToggle");
         this.dropdownOptions = this.createAndAppendElement(this.container, "div", "dropdownOptions");
         this.updateDisplay();
-        this.renderOptions(clearText);
+        this.renderOptions(preSelectedItems);
         this.setupEvents();
     }
     createAndAppendElement(parent, tagName, className, innerText = "", attributes = {}) {
@@ -22,15 +26,12 @@ class CheckboxDropdown {
         parent.appendChild(element);
         return element;
     }
-    renderOptions(clearText) {
-        // Clear existing options
+    renderOptions(preSelectedItems) {
         this.dropdownOptions.innerHTML = "";
-        // Add Clear button
-        const clearBtn = this.createAndAppendElement(this.dropdownOptions, "button", "iconButton red marginTop marginBottom", clearText, { type: "button" });
-        clearBtn.addEventListener("click", (e) => {
+        const clearBtn = this.createAndAppendElement(this.dropdownOptions, "button", "iconButton red marginTop marginBottom", this.clearText, { type: "button" });
+        clearBtn.addEventListener("click", () => {
             this.clearSelection();
         });
-        // Render item checkboxes
         this.items.forEach(item => {
             const option = this.createAndAppendElement(this.dropdownOptions, "div", "dropdownOption");
             const checkbox = this.createAndAppendElement(option, "input", "tableCheckbox marginLeftBig marginRightBig", "", {
@@ -38,6 +39,9 @@ class CheckboxDropdown {
                 id: item.id,
                 value: item.value
             });
+            if (preSelectedItems.find(preSelectedItem => preSelectedItem.id === item.id)) {
+                checkbox.checked = true;
+            }
             this.createAndAppendElement(option, "span", "", item.name);
             this.checkboxes.push(checkbox);
             option.addEventListener("click", (e) => {
@@ -52,7 +56,16 @@ class CheckboxDropdown {
                 }
                 this.updateDisplay();
             });
-            checkbox.addEventListener("change", () => this.updateDisplay());
+            checkbox.addEventListener("change", () => {
+                var _a, _b;
+                if (checkbox.checked) {
+                    (_a = this.onCheck) === null || _a === void 0 ? void 0 : _a.call(this, item);
+                }
+                else {
+                    (_b = this.onUncheck) === null || _b === void 0 ? void 0 : _b.call(this, item);
+                }
+                this.updateDisplay();
+            });
         });
     }
     setupEvents() {

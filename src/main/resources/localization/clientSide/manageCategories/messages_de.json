@@ -22,5 +22,9 @@
   "error_missing_name": "Bitte einene Namen für die Kategorie hinzufügen",
   "error_invalid_maxSpendingPerMonth": "Bitte eine Zahl eingeben",
   "selectOptionText": "Gegenpartei auswählen",
-  "selectOptionClear": "Auswähl löschen"
+  "selectOptionClear": "Auswähl löschen",
+  "counterPartyAlreadyInCategory": "Die Gegenpartei '{}' ist bereits in der Kategory '{}'",
+  "counterPartyAddedToCategory": "Die Gegenpartei '{}' wurde der Kategory '{}' hinzugefügt",
+  "counterPartyNotInCategory": "Die Gegenpartei '{}' war nicht in der Kategory '{}'",
+  "counterPartyRemovedFromCategory": "Die Gegenpartei '{}' wurde von der Kategory entfernt '{}'"
 }

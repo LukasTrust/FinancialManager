@@ -167,9 +167,10 @@ function fillSearchStringFields(messages) {
             stringList.style.visibility = "hidden";
             return;
         }
-        bankAccount[listId].forEach((searchString) => {
-            addStringToList(messages, stringList, searchString, (element) => removeSearchString(element, searchString, listId, messages));
-        });
+        if (bankAccount[listId] !== null)
+            bankAccount[listId].forEach((searchString) => {
+                addStringToList(messages, stringList, searchString, (element) => removeSearchString(element, searchString, listId, messages));
+            });
     });
 }
 //# sourceMappingURL=bankAccountOverview.js.map

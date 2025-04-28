@@ -12,72 +12,6 @@ async function buildManageCategories(): Promise<void> {
     document.getElementById("addButton")?.addEventListener("click", () => showAddCategoryDialog(messages));
 }
 
-function showAddCategoryDialog(messages: Record<string, string>): void {
-    const dialogContent = createDialogContent(messages["addHeader"], "bi bi bi-plus-circle", 0, 0);
-
-    createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig alignSelfStart", messages["addInfo"])
-
-    const form = createAndAppendElement(dialogContent, "form");
-
-    const nameWrapper = createAndAppendElement(form, "div", "verticalContainer");
-    createAndAppendElement(nameWrapper, "h3", "marginBottom", messages["name"]);
-    const name = createInputBox(nameWrapper, "bi bi-pencil-fill", "name", "text", "", messages["name"]);
-
-    const descriptionWrapper = createAndAppendElement(form, "div", "verticalContainer");
-    createAndAppendElement(descriptionWrapper, "h3", "marginBottom", messages["description"]);
-    const description = createInputBox(descriptionWrapper, "bi bi-pencil-fill", "description", "text", "", messages["description"]);
-
-    const maxSpendingPerMonthWrapper = createAndAppendElement(form, "div", "verticalContainer");
-    createAndAppendElement(maxSpendingPerMonthWrapper, "h3", "marginBottom", messages["maxSpendingPerMonth"]);
-    const maxSpendingPerMonth = createInputBox(maxSpendingPerMonthWrapper, "bi bi-pencil-fill", "maxSpendingPerMonth", "number", "", messages["maxSpendingPerMonth"]);
-
-    const counterPartyWrapper = createAndAppendElement(form, "div", "verticalContainer");
-    createAndAppendElement(counterPartyWrapper, "h3", "marginBottom", messages["counterPartySelection"]);
-
-    const dropdown = new CheckboxDropdown({
-        parent: counterPartyWrapper,
-        items: counterParties,
-        defaultText: messages["selectOptionText"],
-        clearText: messages["selectOptionClear"],
-        multiSelect: true,
-    });
-
-    const submitButton = createAndAppendElement(form, "button", "iconButton tooltip tooltipBottom marginTopBig");
-    createAndAppendElement(submitButton, "i", "bi bi-plus-lg");
-    createAndAppendElement(submitButton, "span", "normalText", messages["submit"]);
-    createAndAppendElement(submitButton, "span", "tooltipText", messages["submitTooltip"]);
-
-    submitButton.addEventListener("click", async (event) => {
-        event.preventDefault();
-
-        const nameValue = name.value;
-        const descriptionValue = description.value;
-        const maxSpendingPerMonthValue = maxSpendingPerMonth.value;
-        const selectedItems = dropdown.getSelectedItems();
-
-        if (nameValue === "") {
-            showAlert("ERROR", messages["error_missing_name"], dialogContent);
-            return;
-        }
-
-        if (maxSpendingPerMonthValue !== "" && isNaN(parseFloat(maxSpendingPerMonthValue))) {
-            showAlert("ERROR", messages["error_invalid_maxSpendingPerMonth"], dialogContent);
-            return;
-        }
-
-        const maxSpendingPerMonthNumber = maxSpendingPerMonthValue !== "" ? parseFloat(maxSpendingPerMonthValue) : 0;
-
-        const result = await addCategory(dialogContent, nameValue, descriptionValue, maxSpendingPerMonthNumber, selectedItems.map(item => item.id), messages);
-
-        if (result) {
-            name.value = "";
-            description.value = "";
-            maxSpendingPerMonth.value = "";
-            dropdown.clearSelection();
-        }
-    })
-}
-
 async function addCategory(dialogContent: HTMLElement,name: string, description: string, maxSpendingPerMonth: number, counterParties: string[], messages: Record<string, string>): Promise<boolean> {
     try {
         const response = await fetch(`/categories/data/addCategory`, {
@@ -115,6 +49,118 @@ async function addCategory(dialogContent: HTMLElement,name: string, description:
         console.warn("There was an error adding the category", error);
         return false;
     }
+}
+
+async function addCounterPartyToCategory(categoryId: number, counterPartyId: number): Promise<void> {
+    try {
+        const response = await fetch(`/categories/data/addCounterPartyToCategory`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                categoryId: categoryId,
+                counterPartyId: counterPartyId
+            })
+        })
+
+        await showAlertFromResponse(response);
+    }
+    catch (error) {
+        console.warn("There was an error adding the counter party to the category", error);
+    }
+}
+
+async function removeCounterPartyFromCategory(categoryId: number, counterPartyId: number): Promise<void> {
+    try {
+        const response = await fetch(`/categories/data/removeCounterPartyFromCategory`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                categoryId: categoryId,
+                counterPartyId: counterPartyId
+            })
+        })
+
+        await showAlertFromResponse(response);
+    }
+    catch (error) {
+        console.warn("There was an error removing the counter party from the category", error);
+    }
+}
+
+function showAddCategoryDialog(messages: Record<string, string>): void {
+    const dialogContent = createDialogContent(messages["addHeader"], "bi bi bi-plus-circle", 0, 0);
+
+    createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig alignSelfStart", messages["addInfo"])
+
+    const form = createAndAppendElement(dialogContent, "form");
+
+    const nameWrapper = createAndAppendElement(form, "div", "verticalContainer");
+    createAndAppendElement(nameWrapper, "h3", "marginBottom", messages["name"]);
+    const name = createInputBox(nameWrapper, "bi bi-pencil-fill", "name", "text", "", messages["name"]);
+
+    const descriptionWrapper = createAndAppendElement(form, "div", "verticalContainer");
+    createAndAppendElement(descriptionWrapper, "h3", "marginBottom", messages["description"]);
+    const description = createInputBox(descriptionWrapper, "bi bi-pencil-fill", "description", "text", "", messages["description"]);
+
+    const maxSpendingPerMonthWrapper = createAndAppendElement(form, "div", "verticalContainer");
+    createAndAppendElement(maxSpendingPerMonthWrapper, "h3", "marginBottom", messages["maxSpendingPerMonth"]);
+    const maxSpendingPerMonth = createInputBox(maxSpendingPerMonthWrapper, "bi bi-pencil-fill", "maxSpendingPerMonth", "number", "", messages["maxSpendingPerMonth"]);
+
+    const dropdown = createDropBoxForCategory("counterPartyDropdown", form, [], messages);
+
+    const submitButton = createAndAppendElement(form, "button", "iconButton tooltip tooltipBottom marginTopBig");
+    createAndAppendElement(submitButton, "i", "bi bi-plus-lg");
+    createAndAppendElement(submitButton, "span", "normalText", messages["submit"]);
+    createAndAppendElement(submitButton, "span", "tooltipText", messages["submitTooltip"]);
+
+    submitButton.addEventListener("click", async (event) => {
+        event.preventDefault();
+
+        const nameValue = name.value;
+        const descriptionValue = description.value;
+        const maxSpendingPerMonthValue = maxSpendingPerMonth.value;
+        const selectedItems = dropdown.getSelectedItems();
+
+        if (nameValue === "") {
+            showAlert("ERROR", messages["error_missing_name"], dialogContent);
+            return;
+        }
+
+        if (maxSpendingPerMonthValue !== "" && isNaN(parseFloat(maxSpendingPerMonthValue))) {
+            showAlert("ERROR", messages["error_invalid_maxSpendingPerMonth"], dialogContent);
+            return;
+        }
+
+        const maxSpendingPerMonthNumber = maxSpendingPerMonthValue !== "" ? parseFloat(maxSpendingPerMonthValue) : 0;
+
+        const result = await addCategory(dialogContent, nameValue, descriptionValue, maxSpendingPerMonthNumber, selectedItems.map(item => item.id), messages);
+
+        if (result) {
+            name.value = "";
+            description.value = "";
+            maxSpendingPerMonth.value = "";
+            dropdown.clearSelection();
+        }
+    })
+}
+
+function createDropBoxForCategory(id: string, parent: HTMLElement, preSelectedItems: any[], messages: Record<string, string>,
+                                  onCheck?: (item: { id: string; value: string; name: string }) => void,
+                                  onUncheck?: (item: { id: string; value: string; name: string }) => void): CheckboxDropdown {
+    const counterPartyWrapper = createAndAppendElement(parent, "div", "verticalContainer");
+    createAndAppendElement(counterPartyWrapper, "h3", "marginBottom", messages["counterPartySelection"]);
+
+    return new CheckboxDropdown({
+        id,
+        parent: counterPartyWrapper,
+        items: counterParties,
+        preSelectedItems,
+        defaultText: messages["selectOptionText"],
+        clearText: messages["selectOptionClear"],
+        multiSelect: true,
+        onCheck,
+        onUncheck,
+    });
 }
 
 function addCategoriesTable(data: Category[], messages: Record<string, string>): void {
@@ -166,4 +212,14 @@ function createCategoryRow(tableBody: HTMLElement, category: Category, toolTip: 
     const maxSpendingPerMonthInput = createInputBox(maxSpendingPerMonth, "bi bi-pencil-fill", "maxSpendingPerMonth", "number", category.description);
     debounceInputChange(maxSpendingPerMonthInput, (id, newValue, messages) =>
         updateField(id, "maxSpendingPerMonth", newValue, messages, Type.CATEGORY), category.id, messages);
+
+    const counterPartyCell = createAndAppendElement(subRow, "td", "", "", { colspan: "3" });
+
+    createDropBoxForCategory(category.id.toString(), counterPartyCell, category.counterParties, messages,
+        async (item) => {
+        await addCounterPartyToCategory(category.id, Number(item.value));
+    },
+        async (item) => {
+        await removeCounterPartyFromCategory(category.id, Number(item.value));
+    });
 }

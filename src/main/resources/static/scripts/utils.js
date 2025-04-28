@@ -53,6 +53,8 @@ function createAndAppendElement(parent, type, className = null, textContent = nu
     return element;
 }
 function getCurrentCurrencySymbol() {
+    if (Object.keys(bankAccounts).length === 0)
+        return " €";
     if (bankAccountId === 0 || bankAccountId === undefined)
         return " " + Object.values(bankAccounts)[0].currencySymbol;
     return " " + bankAccounts[bankAccountId].currencySymbol;

@@ -175,8 +175,10 @@ interface KeyFigure {
 }
 
 interface DropdownOptions {
+    id: string;
     parent: HTMLElement;
     items: any[];
+    preSelectedItems: any[];
     defaultText: string;
     clearText: string;
     multiSelect?: boolean;
