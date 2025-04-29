@@ -87,14 +87,13 @@ class CheckboxDropdown {
         this.dropdownToggle.innerHTML = "";
         if (selected.length > 0) {
             selected.forEach(item => {
-                createListElement(this.dropdownToggle, item.name, {}, true, true, null, (element) => {
-                    const checkbox = this.checkboxes.find(cb => cb.value === item.value);
+                createListElement(this.dropdownToggle, item.name, { id: item.id }, true, true, null, () => {
+                    const checkbox = this.checkboxes.find(cb => cb.id.toString() === item.id.toString());
                     if (checkbox) {
                         checkbox.checked = false;
                         checkbox.dispatchEvent(new Event("change"));
+                        this.updateDisplay();
                     }
-                    element.remove();
-                    this.updateDisplay();
                 }, true);
             });
         }

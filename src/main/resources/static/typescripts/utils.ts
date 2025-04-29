@@ -32,7 +32,7 @@ function createListElement(
     small: boolean = false,
     toolTipText: string = null,
     removeCallback: (element: HTMLElement) => void = defaultRemoveCallback,
-    animateTheElements: boolean = false
+    animateTheElements: boolean = false,
 ): HTMLElement {
     let classType = small ? "listItemSmall" : "listItem";
     if (toolTipText) {

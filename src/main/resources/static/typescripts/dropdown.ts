@@ -124,20 +124,17 @@ class CheckboxDropdown {
                 createListElement(
                     this.dropdownToggle,
                     item.name,
-                    {},
+                    {id: item.id},
                     true,
                     true,
                     null,
-                    (element) => {
-                        console.log(element);
-
-                        const checkbox = this.checkboxes.find(cb => cb.value === item.value);
+                    () => {
+                        const checkbox = this.checkboxes.find(cb => cb.id.toString() === item.id.toString());
                         if (checkbox) {
                             checkbox.checked = false;
                             checkbox.dispatchEvent(new Event("change"));
+                            this.updateDisplay();
                         }
-                        element.remove();
-                        this.updateDisplay();
                     },
                 true
                 );
