@@ -10,7 +10,6 @@ label {
     display: flex;
     align-items: center;
     position: relative;
-    margin-bottom: var(--margin-md);
 }
 
 .inputBox span {

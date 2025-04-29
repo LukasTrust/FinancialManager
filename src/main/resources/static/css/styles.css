@@ -153,8 +153,20 @@ p {
     margin-left: auto;
 }
 
+.paddingTop {
+    padding-top: var(--padding-sm);
+}
+
+.paddingBottom {
+    padding-bottom: var(--padding-sm);
+}
+
 .widthFull {
     width: 100%;
+}
+
+.width95 {
+    width: 95%;
 }
 
 .widthHalf {
@@ -225,7 +237,6 @@ p {
     transition: transform var(--transition-slow), box-shadow var(--transition-slow),
     opacity var(--transition-slow), background var(--transition-slow);
     margin: 8px;
-    padding: 12px;
     will-change: transform, opacity, background;
     width: inherit;
 }
@@ -246,7 +257,6 @@ p {
     transition: transform var(--transition-fast), box-shadow var(--transition-fast);
     width: fit-content;
     gap: var(--spacing-sm);
-    padding: 5px;
     margin-left: 15px;
 }
 
@@ -287,7 +297,7 @@ button, .button {
 button:hover, .button:hover {
     transform: scale(var(--button-hover-scale)) translateZ(0);
     box-shadow: var(--button-shadow);
-    z-index: 2;
+    z-index: 20;
 }
 
 /* Button variants */
@@ -308,7 +318,6 @@ button:hover, .button:hover {
     background: transparent;
     border-radius: 50%;
     padding: var(--spacing-xs);
-    margin-bottom: var(--margin-md);
 }
 
 .iconOnlyButton:hover {

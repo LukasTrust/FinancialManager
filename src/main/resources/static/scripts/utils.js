@@ -25,7 +25,7 @@ function createListElement(parent, text, attributes = {}, addRemove = true, smal
         classType += " tooltip tooltipBottom";
     }
     const item = createAndAppendElement(parent, "div", classType);
-    createAndAppendElement(item, "div", "normalText", text, attributes);
+    createAndAppendElement(item, "div", "normalText paddingTop paddingBottom", text, attributes);
     if (toolTipText) {
         createAndAppendElement(item, "div", "tooltipText", toolTipText);
     }
@@ -89,13 +89,16 @@ function createInputBox(parent, icon, idText, type, text = null, placeHolder = n
     return inputElement;
 }
 function debounceInputChange(inputElement, callback, id, messages, delay = 500) {
+    inputElement.addEventListener("click", (event) => {
+        event.stopPropagation();
+    });
     inputElement.addEventListener("input", (event) => {
-        clearTimeout(inputElement.dataset.timeoutId); // Clear previous timeout
+        clearTimeout(inputElement.dataset.timeoutId);
         const timeoutId = setTimeout(() => {
             const newValue = event.target.value;
             callback(id, newValue, messages);
         }, delay);
-        inputElement.dataset.timeoutId = timeoutId.toString(); // Store timeout ID
+        inputElement.dataset.timeoutId = timeoutId.toString();
     });
 }
 async function backToOtherView(cameFromUrl) {
@@ -194,9 +197,10 @@ function debounce(func, delay) {
         timeoutId = setTimeout(() => func(...args), delay);
     };
 }
-function createListSection(parent, title, type, data, withSelect = false, left = true) {
+function createListSection(parent, title, type, data, withSelect = false, left = true, half = true) {
     const marginClass = left ? "marginLeftBig" : "marginRightBig";
-    const container = createAndAppendElement(parent, "div", "verticalContainer widthHalf " + marginClass);
+    const widthHalfClass = half ? "widthHalf" : "";
+    const container = createAndAppendElement(parent, "div", "verticalContainer " + widthHalfClass + marginClass);
     const header = createAndAppendElement(container, "div", "verticalContainer");
     createAndAppendElement(header, "h2", "", title);
     if (type === Type.TRANSACTION) {
@@ -293,7 +297,7 @@ function updateContractAvailability() {
     });
 }
 function defaultRemoveCallback(element) {
-    element.remove(); // Simpler and safer
+    element.remove();
 }
 function setUpSearchStringFields(messages, addListener = true) {
     searchStringFields.forEach(field => {

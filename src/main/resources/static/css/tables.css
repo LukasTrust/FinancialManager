@@ -85,7 +85,7 @@ thead tr, tbody tr {
 }
 
 tr {
-    border-bottom: 1px solid var(--table-border-color);
+    border-bottom: 3px solid var(--table-border-color);
     transition: background var(--transition-normal);
     height: var(--row-height);
 }

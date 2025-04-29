@@ -40,7 +40,7 @@ function createListElement(
     }
 
     const item = createAndAppendElement(parent, "div", classType);
-    createAndAppendElement(item, "div", "normalText", text, attributes);
+    createAndAppendElement(item, "div", "normalText paddingTop paddingBottom", text, attributes);
 
     if (toolTipText) {
         createAndAppendElement(item, "div", "tooltipText", toolTipText);
@@ -108,7 +108,7 @@ function createInputBox(
     idText: string,
     type: string,
     text: string | null = null,
-    placeHolder: string | null = null
+    placeHolder: string | null = null,
 ): HTMLInputElement {
     const inputBox = createAndAppendElement(parent, "div", "inputBox");
     createAndAppendElement(inputBox, "span", icon);
@@ -138,15 +138,19 @@ function debounceInputChange(
     messages: Record<string, string>,
     delay = 500
 ) {
+    inputElement.addEventListener("click", (event) => {
+        event.stopPropagation();
+    });
+
     inputElement.addEventListener("input", (event) => {
-        clearTimeout(inputElement.dataset.timeoutId as unknown as number); // Clear previous timeout
+        clearTimeout(inputElement.dataset.timeoutId as unknown as number);
 
         const timeoutId = setTimeout(() => {
             const newValue = (event.target as HTMLInputElement).value;
             callback(id, newValue, messages);
         }, delay);
 
-        inputElement.dataset.timeoutId = timeoutId.toString(); // Store timeout ID
+        inputElement.dataset.timeoutId = timeoutId.toString();
     });
 }
 
@@ -274,11 +278,14 @@ function createListSection(
     type: Type,
     data: Transaction[] | CounterPartyDisplay[] | ContractDisplay[] | Category[],
     withSelect: boolean = false,
-    left: boolean = true
+    left: boolean = true,
+    half: boolean = true,
 ): HTMLElement {
     const marginClass = left ? "marginLeftBig" : "marginRightBig"
 
-    const container = createAndAppendElement(parent, "div", "verticalContainer widthHalf " + marginClass);
+    const widthHalfClass = half ? "widthHalf" : "";
+
+    const container = createAndAppendElement(parent, "div", "verticalContainer " + widthHalfClass + marginClass);
     const header = createAndAppendElement(container, "div", "verticalContainer");
     createAndAppendElement(header, "h2", "", title);
 
@@ -398,7 +405,7 @@ function updateContractAvailability(): void {
 }
 
 function defaultRemoveCallback(element: HTMLElement): void {
-    element.remove(); // Simpler and safer
+    element.remove();
 }
 
 function setUpSearchStringFields(messages: Record<string, string>, addListener: boolean = true): void {

@@ -24,7 +24,12 @@ class CheckboxDropdown {
         this.onUncheck = onUncheck;
 
         this.container = this.createAndAppendElement(parent, "div", "dropdown");
+
         this.dropdownToggle = this.createAndAppendElement(this.container, "div", "dropdownToggle");
+        this.dropdownToggle.addEventListener("click", (event) => {
+            event.stopPropagation();
+        });
+
         this.dropdownOptions = this.createAndAppendElement(this.container, "div", "dropdownOptions");
 
         this.renderOptions(preSelectedItems);
@@ -49,7 +54,7 @@ class CheckboxDropdown {
         const clearBtn = this.createAndAppendElement(
             this.dropdownOptions,
             "button",
-            "iconButton red marginTop marginBottom",
+            "iconButton red marginTop marginBottom marginLeftBig",
             this.clearText,
             { type: "button" }
         );
@@ -59,6 +64,9 @@ class CheckboxDropdown {
 
         this.items.forEach(item => {
             const option = this.createAndAppendElement(this.dropdownOptions, "div", "dropdownOption");
+            option.addEventListener("click", (event) => {
+                event.stopPropagation();
+            });
 
             const checkbox = this.createAndAppendElement(option, "input", "tableCheckbox marginLeftBig marginRightBig", "", {
                 type: "checkbox",

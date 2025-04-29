@@ -100,14 +100,14 @@ async function removeCounterPartyFromCategory(categoryId: number, counterPartyId
 function showDeleteCategoryDialog(messages: Record<string, string>): void {
     const dialogContent = createDialogContent(messages["deleteHeader"], "bi bi bi-trash-fill", 0, 0);
 
-    createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig alignSelfStart", messages["deleteInfo"]);
+    createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig", messages["deleteInfo"]);
 
     const ids = getCheckedRows();
 
     const idSet = new Set(ids.map(Number));
     const categories = categoryData.filter(category => idSet.has(category.id));
 
-    const listSection = createListSection(dialogContent, messages["leftHeader"], Type.CATEGORY, categories);
+    const listSection = createListSection(dialogContent, messages["leftHeader"], Type.CATEGORY, categories, false, true, true);
 
     const submitButton = createAndAppendElement(dialogContent, "button", "iconButton tooltip tooltipBottom marginTopBig");
     createAndAppendElement(submitButton, "i", "bi bi-trash-fill");
@@ -177,7 +177,7 @@ function categoryToListElementObjectArray(categories: Category[]): ListElementOb
 function showAddCategoryDialog(messages: Record<string, string>): void {
     const dialogContent = createDialogContent(messages["addHeader"], "bi bi bi-plus-circle", 0, 0);
 
-    createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig alignSelfStart", messages["addInfo"])
+    createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig", messages["addInfo"])
 
     const form = createAndAppendElement(dialogContent, "form");
 
@@ -232,10 +232,12 @@ function showAddCategoryDialog(messages: Record<string, string>): void {
 }
 
 function createDropBoxForCategory(id: string, parent: HTMLElement, preSelectedItems: any[], messages: Record<string, string>,
+                                  left: boolean = false,
                                   onCheck?: (item: { id: string; value: string; name: string }) => void,
                                   onUncheck?: (item: { id: string; value: string; name: string }) => void): CheckboxDropdown {
     const counterPartyWrapper = createAndAppendElement(parent, "div", "verticalContainer");
-    createAndAppendElement(counterPartyWrapper, "h3", "marginBottom", messages["counterPartySelection"]);
+    const counterPartiesClass = left ? "marginBottom alignSelfStart" : "marginBottom";
+    createAndAppendElement(counterPartyWrapper, "h3", counterPartiesClass, messages["counterPartySelection"]);
 
     return new CheckboxDropdown({
         id,
@@ -302,13 +304,15 @@ function createCategoryRow(tableBody: HTMLElement, category: Category, toolTip: 
 
     const counterPartyCell = createAndAppendElement(subRow, "td", "", "", { colspan: "4" });
 
-    createDropBoxForCategory(category.id.toString(), counterPartyCell, category.counterParties, messages,
+    createDropBoxForCategory(category.id.toString(), counterPartyCell, category.counterParties, messages, true,
         async (item) => {
         await addCounterPartyToCategory(category.id, Number(item.id));
     },
         async (item) => {
         await removeCounterPartyFromCategory(category.id, Number(item.id));
     });
+
+    addHoverToOtherElement(newRow, subRow);
 }
 
 function filterCategories(messages: Record<string, string>, searchString: string): void {
