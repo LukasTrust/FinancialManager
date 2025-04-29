@@ -17,5 +17,7 @@
   "deletedData": "Es gab einen Fehler beim löschen der Daten",
   "invalidListType": "Den Listen Typen gibt es nicht in diesen Bankkonto",
   "categoryAlreadyExists": "Es gibt bereits eine Kategory mit diesem Name",
-  "categoryNotFound": "Die Kategory wurde nicht gefunden"
+  "categoryNotFound": "Die Kategory wurde nicht gefunden",
+  "counterPartyNotInCategory": "Die Gegenpartei '{}' war nicht in der Kategory '{}'",
+  "categoriesNotFound": "Die Kategorien wurden nicht gefunden"
 }

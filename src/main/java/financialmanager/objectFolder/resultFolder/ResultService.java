@@ -246,7 +246,7 @@ public class ResultService {
         return new Ok<>(baseCategoryService.findAllByUsers(currentUserResponse.getValue()));
     }
 
-    public Result<Category, ResponseEntity<Response>> findCategoryById(Long categoryId) {
+    public Result<Category, ResponseEntity<Response>> findCategoryByIdAndUsers(Long categoryId) {
         Result<Users, ResponseEntity<Response>> currentUserResponse = getCurrentUser();
 
         if (currentUserResponse.isErr())
@@ -258,6 +258,29 @@ public class ResultService {
             return new Err<>(responseService.createResponse(HttpStatus.NOT_FOUND, "categoryNotFound", AlertType.ERROR));
 
         return new Ok<>(baseCategoryService.findByIdAndUsers(categoryId, currentUserResponse.getValue()));
+    }
+
+    public Result<List<Category>, ResponseEntity<Response>> findCategoriesByIdInAndUsers(List<Long> categoryIds) {
+        Result<Users, ResponseEntity<Response>> currentUserResponse = getCurrentUser();
+
+        if (currentUserResponse.isErr())
+            return new Err<>(ResponseEntity.status(HttpStatus.NOT_FOUND).body(currentUserResponse.getError().getBody()));
+
+        Users currentUser = currentUserResponse.getValue();
+
+        List<Category> categories = baseCategoryService.findAllByUsers(currentUser);
+
+        categories = categories.stream()
+                .filter(category -> categoryIds.contains(category.getId()) &&
+                        category.getUsers().equals(currentUser))
+                .toList();
+
+        if (categories.isEmpty()) {
+            log.warn("No categories found for id: {}", categoryIds);
+            return new Err<>(responseService.createResponse(HttpStatus.NOT_FOUND, "categoriesNotFound", AlertType.ERROR));
+        }
+
+        return new Ok<>(categories);
     }
 
     //</editor-fold>

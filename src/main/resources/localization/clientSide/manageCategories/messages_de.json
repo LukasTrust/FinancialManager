@@ -17,14 +17,17 @@
   "addHeader": "Kategorie erstellen",
   "addInfo": "Hier können Sie eine neue Kategorie erstellen",
   "counterPartySelection": "Wähle Gegenpartein für die Kategorie aus",
-  "submit": "Kategorie erstellen",
-  "submitTooltip": "Eine Kategorie wird dadurch erstellt",
+  "submitAdd": "Kategorie erstellen",
+  "submitAddTooltip": "Eine Kategorie wird dadurch erstellt",
   "error_missing_name": "Bitte einene Namen für die Kategorie hinzufügen",
   "error_invalid_maxSpendingPerMonth": "Bitte eine Zahl eingeben",
   "selectOptionText": "Gegenpartei auswählen",
   "selectOptionClear": "Auswähl löschen",
-  "counterPartyAlreadyInCategory": "Die Gegenpartei '{}' ist bereits in der Kategory '{}'",
-  "counterPartyAddedToCategory": "Die Gegenpartei '{}' wurde der Kategory '{}' hinzugefügt",
-  "counterPartyNotInCategory": "Die Gegenpartei '{}' war nicht in der Kategory '{}'",
-  "counterPartyRemovedFromCategory": "Die Gegenpartei '{}' wurde von der Kategory entfernt '{}'"
+  "deleteButton": "Kategory löschen",
+  "deleteButtonTooltip": "Klicke hier um die ausgewählten Kategorien zu löschen",
+  "deleteHeader": "Kategorie löschen",
+  "deleteInfo": "Die Ausgewählten Kategoiren können gelöscht werden",
+  "noCategoriesToDelete": "Keine Kategorien zum löschen ausgewählt",
+  "submitDelete": "Löschen",
+  "submitDeleteTooltip": "Damit werden die Kategorien gelöscht"
 }

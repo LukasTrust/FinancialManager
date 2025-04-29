@@ -11,6 +11,8 @@ async function buildContracts(): Promise<void> {
 
     setUpSorting(true);
 
+    document.getElementById("searchBarInput")?.addEventListener("input", () => searchTable(messages, type));
+
     document.getElementById("showHiddenRows")?.addEventListener("change", () => changeRowVisibility(type));
 
     document.getElementById("changeHiddenButton")?.addEventListener("click", () => showChangeHiddenDialog(type, messages));
@@ -31,7 +33,7 @@ async function deleteContracts(messages: Record<string, string>): Promise<void> 
 
         const response = await fetch(`/contracts/${bankAccountId}/data/deleteContracts`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(ids)
         });
 
@@ -83,7 +85,7 @@ function addRowsToContractTable(data: ContractDisplay[], messages: Record<string
 }
 
 function createContractRow(tableBody: HTMLElement, contractDisplay: ContractDisplay,
-                               currency: string, messages: Record<string, string>) {
+                           currency: string, messages: Record<string, string>) {
     if (!contractDisplay || typeof contractDisplay !== "object") {
         console.warn(`Warning: Skipping invalid counterParty:.`, contractDisplay);
         return;
@@ -204,4 +206,27 @@ function contractToListElementObjectArray(contracts: ContractDisplay[]): ListEle
     });
 
     return listElementObjects;
+}
+
+function filterContracts(messages: Record<string, string>, searchString: string): void {
+    try {
+        filteredContractData = contractData.filter(contractDisplay =>
+            contractDisplay.contract?.name?.toLowerCase().includes(searchString) ||
+            contractDisplay.contract?.description?.toLowerCase().includes(searchString) ||
+            contractDisplay.contract?.amount.toString().toLowerCase().includes(searchString) ||
+            contractDisplay.contract?.startDate.toLowerCase().includes(searchString) ||
+            contractDisplay.contract?.lastPaymentDate.toLowerCase().includes(searchString) ||
+            contractDisplay.transactionCount?.toString().toLowerCase().includes(searchString) ||
+            contractDisplay.totalAmount?.toString().toLowerCase().includes(searchString) ||
+            contractDisplay.contractHistories.some(contractHistory =>
+                contractHistory.previousAmount.toString().toLowerCase().includes(searchString) ||
+                contractHistory.newAmount.toString().toLowerCase().includes(searchString) ||
+                contractHistory.changedAt.toString().toLowerCase().includes(searchString))
+        );
+
+        splitDataIntoPages(messages, Type.CONTRACT, filteredContractData);
+    } catch (error) {
+        console.error("Unexpected error in filterCounterParties:", error);
+        showAlert("ERROR", messages["error_generic"]);
+    }
 }

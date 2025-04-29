@@ -19,24 +19,38 @@ function searchTable(messages, type) {
         console.error("Search bar input element not found!");
         return;
     }
+    const resetDataMap = {
+        [Type.TRANSACTION]: () => {
+            filteredTransactionData = transactionData;
+            splitDataIntoPages(messages, type, transactionData);
+        },
+        [Type.COUNTERPARTY]: () => {
+            filteredCounterPartyData = counterPartyData;
+            splitDataIntoPages(messages, type, counterPartyData);
+        },
+        [Type.CONTRACT]: () => {
+            filteredContractData = contractData;
+            splitDataIntoPages(messages, type, contractData);
+        },
+        [Type.CATEGORY]: () => {
+            filteredCategoryData = categoryData;
+            splitDataIntoPages(messages, type, categoryData);
+        }
+    };
+    const filterDataMap = {
+        [Type.TRANSACTION]: filterTransactions,
+        [Type.COUNTERPARTY]: filterCounterParties,
+        [Type.CONTRACT]: filterContracts,
+        [Type.CATEGORY]: filterCategories
+    };
     searchBarInput.addEventListener("input", debounce(() => {
+        var _a, _b;
         const inputText = searchBarInput.value.trim().toLowerCase();
         if (inputText.length <= 2) {
-            if (type === Type.TRANSACTION) {
-                filteredTransactionData = transactionData;
-                splitDataIntoPages(messages, type, transactionData);
-            }
-            else if (type === Type.COUNTERPARTY) {
-                filteredCounterPartyData = counterPartyData;
-                splitDataIntoPages(messages, type, counterPartyData);
-            }
-            return;
+            (_a = resetDataMap[type]) === null || _a === void 0 ? void 0 : _a.call(resetDataMap);
         }
-        if (type === Type.TRANSACTION) {
-            filterTransactions(messages, inputText);
-        }
-        else if (type === Type.COUNTERPARTY) {
-            filterCounterParties(messages, inputText);
+        else {
+            (_b = filterDataMap[type]) === null || _b === void 0 ? void 0 : _b.call(filterDataMap, messages, inputText);
         }
     }, 300));
 }

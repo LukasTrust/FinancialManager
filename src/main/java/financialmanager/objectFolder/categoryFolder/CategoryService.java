@@ -49,12 +49,25 @@ public class CategoryService {
         return responseService.createResponseWithData(HttpStatus.CREATED, "categoryCreated", AlertType.SUCCESS, category);
     }
 
+    public ResponseEntity<Response> deleteCategories(List<Long> categoryIds) {
+        Result<List<Category>, ResponseEntity<Response>> categoryResult = resultService.findCategoriesByIdInAndUsers(categoryIds);
+
+        if (categoryResult.isErr())
+            return categoryResult.getError();
+
+        List<Category> categories = categoryResult.getValue();
+
+        baseCategoryService.deleteAll(categories);
+
+        return responseService.createResponse(HttpStatus.OK, "categoriesDeleted", AlertType.SUCCESS);
+    }
+
     public ResponseEntity<Response> updateContractField(Long categoryId,
                                                         Map<String, Object> requestBody,
                                                         BiConsumer<Category, Object> fieldUpdater) {
         Object newValue = requestBody.get("newValue");
 
-        Result<Category, ResponseEntity<Response>> categoryResult = resultService.findCategoryById(categoryId);
+        Result<Category, ResponseEntity<Response>> categoryResult = resultService.findCategoryByIdAndUsers(categoryId);
 
         if (categoryResult.isErr())
             return categoryResult.getError();
@@ -72,7 +85,7 @@ public class CategoryService {
         Long counterPartyId = requestBody.get("counterPartyId");
         Long categoryId = requestBody.get("categoryId");
 
-        Result<Category, ResponseEntity<Response>> categoryResult = resultService.findCategoryById(categoryId);
+        Result<Category, ResponseEntity<Response>> categoryResult = resultService.findCategoryByIdAndUsers(categoryId);
 
         if (categoryResult.isErr())
             return categoryResult.getError();

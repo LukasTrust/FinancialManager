@@ -1,5 +1,5 @@
 async function buildContracts() {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     const messages = await loadLocalization("contracts");
     if (!messages)
         return;
@@ -8,10 +8,11 @@ async function buildContracts() {
     await loadData(type, messages);
     splitDataIntoPages(messages, type, contractData);
     setUpSorting(true);
-    (_a = document.getElementById("showHiddenRows")) === null || _a === void 0 ? void 0 : _a.addEventListener("change", () => changeRowVisibility(type));
-    (_b = document.getElementById("changeHiddenButton")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => showChangeHiddenDialog(type, messages));
-    (_c = document.getElementById("mergeButton")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", async () => await buildMergeContracts("/contracts", getCheckedData(Type.CONTRACT).map(c => c.contract)));
-    (_d = document.getElementById("deleteButton")) === null || _d === void 0 ? void 0 : _d.addEventListener("click", () => deleteContractsDialogs(messages));
+    (_a = document.getElementById("searchBarInput")) === null || _a === void 0 ? void 0 : _a.addEventListener("input", () => searchTable(messages, type));
+    (_b = document.getElementById("showHiddenRows")) === null || _b === void 0 ? void 0 : _b.addEventListener("change", () => changeRowVisibility(type));
+    (_c = document.getElementById("changeHiddenButton")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => showChangeHiddenDialog(type, messages));
+    (_d = document.getElementById("mergeButton")) === null || _d === void 0 ? void 0 : _d.addEventListener("click", async () => await buildMergeContracts("/contracts", getCheckedData(Type.CONTRACT).map(c => c.contract)));
+    (_e = document.getElementById("deleteButton")) === null || _e === void 0 ? void 0 : _e.addEventListener("click", () => deleteContractsDialogs(messages));
 }
 async function deleteContracts(messages) {
     try {
@@ -156,5 +157,27 @@ function contractToListElementObjectArray(contracts) {
         listElementObjects.push(listElementObject);
     });
     return listElementObjects;
+}
+function filterContracts(messages, searchString) {
+    try {
+        filteredContractData = contractData.filter(contractDisplay => {
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+            return ((_b = (_a = contractDisplay.contract) === null || _a === void 0 ? void 0 : _a.name) === null || _b === void 0 ? void 0 : _b.toLowerCase().includes(searchString)) ||
+                ((_d = (_c = contractDisplay.contract) === null || _c === void 0 ? void 0 : _c.description) === null || _d === void 0 ? void 0 : _d.toLowerCase().includes(searchString)) ||
+                ((_e = contractDisplay.contract) === null || _e === void 0 ? void 0 : _e.amount.toString().toLowerCase().includes(searchString)) ||
+                ((_f = contractDisplay.contract) === null || _f === void 0 ? void 0 : _f.startDate.toLowerCase().includes(searchString)) ||
+                ((_g = contractDisplay.contract) === null || _g === void 0 ? void 0 : _g.lastPaymentDate.toLowerCase().includes(searchString)) ||
+                ((_h = contractDisplay.transactionCount) === null || _h === void 0 ? void 0 : _h.toString().toLowerCase().includes(searchString)) ||
+                ((_j = contractDisplay.totalAmount) === null || _j === void 0 ? void 0 : _j.toString().toLowerCase().includes(searchString)) ||
+                contractDisplay.contractHistories.some(contractHistory => contractHistory.previousAmount.toString().toLowerCase().includes(searchString) ||
+                    contractHistory.newAmount.toString().toLowerCase().includes(searchString) ||
+                    contractHistory.changedAt.toString().toLowerCase().includes(searchString));
+        });
+        splitDataIntoPages(messages, Type.CONTRACT, filteredContractData);
+    }
+    catch (error) {
+        console.error("Unexpected error in filterCounterParties:", error);
+        showAlert("ERROR", messages["error_generic"]);
+    }
 }
 //# sourceMappingURL=contracts.js.map

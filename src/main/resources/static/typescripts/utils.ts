@@ -272,7 +272,7 @@ function createListSection(
     parent: HTMLElement,
     title: string,
     type: Type,
-    data: Transaction[] | CounterPartyDisplay[] | ContractDisplay[],
+    data: Transaction[] | CounterPartyDisplay[] | ContractDisplay[] | Category[],
     withSelect: boolean = false,
     left: boolean = true
 ): HTMLElement {
@@ -288,6 +288,8 @@ function createListSection(
         createListContainer(header, counterPartyToListElementObjectArray(data as CounterPartyDisplay[]), withSelect);
     } else if (type === Type.CONTRACT) {
         createListContainer(header, contractToListElementObjectArray(data as ContractDisplay[]), withSelect);
+    } else if (type === Type.CATEGORY) {
+        createListContainer(header, categoryToListElementObjectArray(data as Category[]), withSelect);
     }
 
     return container;

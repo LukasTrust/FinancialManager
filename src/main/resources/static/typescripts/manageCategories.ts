@@ -8,8 +8,13 @@ async function buildManageCategories(): Promise<void> {
     await loadData(Type.COUNTERPARTY, messages);
 
     splitDataIntoPages(messages, type, categoryData);
+    setUpSorting();
 
     document.getElementById("addButton")?.addEventListener("click", () => showAddCategoryDialog(messages));
+
+    document.getElementById("searchBarInput")?.addEventListener("input", () => searchTable(messages, type));
+
+    document.getElementById("deleteButton")?.addEventListener("click", () => showDeleteCategoryDialog(messages));
 }
 
 async function addCategory(dialogContent: HTMLElement,name: string, description: string, maxSpendingPerMonth: number, counterParties: string[], messages: Record<string, string>): Promise<boolean> {
@@ -37,8 +42,13 @@ async function addCategory(dialogContent: HTMLElement,name: string, description:
         if (responseBody.alertType == AlertType.SUCCESS) {
             const category = responseBody.data;
 
-            categoryData.push(category);
-            filteredCategoryData.push(category);
+            if (categoryData.find(c => c.id === category.id) === undefined) {
+                categoryData.push(category);
+
+                if (filteredCategoryData.find(c => c.id === category.id) === undefined) {
+                    filteredCategoryData.push(category);
+                }
+            }
 
             splitDataIntoPages(messages, Type.CATEGORY, filteredCategoryData);
             return true;
@@ -87,6 +97,83 @@ async function removeCounterPartyFromCategory(categoryId: number, counterPartyId
     }
 }
 
+function showDeleteCategoryDialog(messages: Record<string, string>): void {
+    const dialogContent = createDialogContent(messages["deleteHeader"], "bi bi bi-trash-fill", 0, 0);
+
+    createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig alignSelfStart", messages["deleteInfo"]);
+
+    const ids = getCheckedRows();
+
+    const idSet = new Set(ids.map(Number));
+    const categories = categoryData.filter(category => idSet.has(category.id));
+
+    const listSection = createListSection(dialogContent, messages["leftHeader"], Type.CATEGORY, categories);
+
+    const submitButton = createAndAppendElement(dialogContent, "button", "iconButton tooltip tooltipBottom marginTopBig");
+    createAndAppendElement(submitButton, "i", "bi bi-trash-fill");
+    createAndAppendElement(submitButton, "span", "normalText", messages["submitDelete"]);
+    createAndAppendElement(submitButton, "span", "tooltipText", messages["submitDeleteTooltip"]);
+
+    submitButton.addEventListener("click", async (event) => {
+        event.preventDefault();
+        await deleteCategories(dialogContent, listSection, messages);
+    })
+}
+
+async function deleteCategories(dialog: HTMLElement, listSection: HTMLElement, messages: Record<string, string>): Promise<void> {
+    try {
+        const ids: number[] = getIdsFromContainer(listSection);
+        if (ids.length === 0) {
+            showAlert(AlertType.WARNING, messages["noCategoriesToDelete"], dialog);
+            return;
+        }
+
+        console.log(ids);
+
+        const response = await fetch(`/categories/data/deleteCategories`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ids)
+        })
+
+        const responseBody: Response = await response.json();
+
+        showAlert(responseBody.alertType, responseBody.message, dialog);
+
+        if (response.ok) {
+            removeElements(listSection);
+
+            removeDeletedCategories(ids, messages);
+        }
+    }
+    catch (error) {
+        console.warn("There was an error deleting the categories", error);
+    }
+}
+
+function removeDeletedCategories(categoryIds: number[], messages: Record<string, string>): void {
+    categoryData = categoryData.filter(item => !categoryIds.includes(item.id));
+    filteredCategoryData = filteredCategoryData.filter(item => !categoryIds.includes(item.id));
+
+    splitDataIntoPages(messages, Type.CATEGORY, filteredCategoryData);
+}
+
+function categoryToListElementObjectArray(categories: Category[]): ListElementObject[] {
+    let listElementObjects: ListElementObject[] = [];
+
+    categories.forEach(category => {
+        const listElementObject: ListElementObject = {
+            id: category.id,
+            text: category.name,
+            toolTip: category.description,
+        };
+
+        listElementObjects.push(listElementObject);
+    });
+
+    return listElementObjects;
+}
+
 function showAddCategoryDialog(messages: Record<string, string>): void {
     const dialogContent = createDialogContent(messages["addHeader"], "bi bi bi-plus-circle", 0, 0);
 
@@ -110,8 +197,8 @@ function showAddCategoryDialog(messages: Record<string, string>): void {
 
     const submitButton = createAndAppendElement(form, "button", "iconButton tooltip tooltipBottom marginTopBig");
     createAndAppendElement(submitButton, "i", "bi bi-plus-lg");
-    createAndAppendElement(submitButton, "span", "normalText", messages["submit"]);
-    createAndAppendElement(submitButton, "span", "tooltipText", messages["submitTooltip"]);
+    createAndAppendElement(submitButton, "span", "normalText", messages["submitAdd"]);
+    createAndAppendElement(submitButton, "span", "tooltipText", messages["submitAddTooltip"]);
 
     submitButton.addEventListener("click", async (event) => {
         event.preventDefault();
@@ -222,4 +309,20 @@ function createCategoryRow(tableBody: HTMLElement, category: Category, toolTip: 
         async (item) => {
         await removeCounterPartyFromCategory(category.id, Number(item.id));
     });
+}
+
+function filterCategories(messages: Record<string, string>, searchString: string): void {
+    try {
+        filteredCategoryData = categoryData.filter(category =>
+            category.name?.toLowerCase().includes(searchString) ||
+            category.description?.toLowerCase().includes(searchString) ||
+            category.maxSpendingPerMonth?.toString().toLowerCase().includes(searchString) ||
+            category.counterParties?.some(counterParty => counterParty.name?.toLowerCase().includes(searchString))
+        );
+
+        splitDataIntoPages(messages, Type.CATEGORY, filteredCategoryData);
+    } catch (error) {
+        console.error("Unexpected error in filterCounterParties:", error);
+        showAlert("ERROR", messages["error_generic"]);
+    }
 }

@@ -25,27 +25,43 @@ function searchTable(messages: Record<string, string>, type: Type): void {
         return;
     }
 
+    const resetDataMap: Record<Type, () => void> = {
+        [Type.TRANSACTION]: () => {
+            filteredTransactionData = transactionData;
+            splitDataIntoPages(messages, type, transactionData);
+        },
+        [Type.COUNTERPARTY]: () => {
+            filteredCounterPartyData = counterPartyData;
+            splitDataIntoPages(messages, type, counterPartyData);
+        },
+        [Type.CONTRACT]: () => {
+            filteredContractData = contractData;
+            splitDataIntoPages(messages, type, contractData);
+        },
+        [Type.CATEGORY]: () => {
+            filteredCategoryData = categoryData;
+            splitDataIntoPages(messages, type, categoryData);
+        }
+    };
+
+    const filterDataMap: Record<Type, (messages: Record<string, string>, input: string) => void> = {
+        [Type.TRANSACTION]: filterTransactions,
+        [Type.COUNTERPARTY]: filterCounterParties,
+        [Type.CONTRACT]: filterContracts,
+        [Type.CATEGORY]: filterCategories
+    };
+
     searchBarInput.addEventListener("input", debounce(() => {
         const inputText = searchBarInput.value.trim().toLowerCase();
 
         if (inputText.length <= 2) {
-            if (type === Type.TRANSACTION) {
-                filteredTransactionData = transactionData;
-                splitDataIntoPages(messages, type, transactionData);
-            } else if (type === Type.COUNTERPARTY) {
-                filteredCounterPartyData = counterPartyData;
-                splitDataIntoPages(messages, type, counterPartyData);
-            }
-            return;
-        }
-
-        if (type === Type.TRANSACTION) {
-            filterTransactions(messages, inputText);
-        } else if (type === Type.COUNTERPARTY) {
-            filterCounterParties(messages, inputText);
+            resetDataMap[type]?.();
+        } else {
+            filterDataMap[type]?.(messages, inputText);
         }
     }, 300));
 }
+
 
 function splitDataIntoPages(messages: Record<string, string>, type: Type, data: any[]): void {
     const itemsPerPageSelection = document.getElementById("itemsPerPage") as HTMLSelectElement | null;

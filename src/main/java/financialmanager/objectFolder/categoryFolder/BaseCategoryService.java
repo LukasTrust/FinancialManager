@@ -16,6 +16,10 @@ public class BaseCategoryService {
         categoryRepository.save(category);
     }
 
+    public void deleteAll(List<Category> categories) {
+        categoryRepository.deleteAll(categories);
+    }
+
     public Category findByIdAndUsers(Long id, Users user) {
         return categoryRepository.findByIdAndUsers(id, user);
     }

@@ -38,6 +38,11 @@ public class CategoryController {
         return categoryService.createCategory(categoryBody);
     }
 
+    @PostMapping("/deleteCategories")
+    public ResponseEntity<?> deleteCategories(@RequestBody List<Long> ids) {
+        return categoryService.deleteCategories(ids);
+    }
+
     @PostMapping("/{categoryId}/change/name")
     public ResponseEntity<Response> updateCategoryName(@PathVariable Long categoryId,
                                                        @RequestBody Map<String, Object> requestBody) {

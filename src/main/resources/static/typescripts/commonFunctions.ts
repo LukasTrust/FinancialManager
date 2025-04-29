@@ -79,7 +79,7 @@ async function updateField(
     }
 }
 
-async function mergeData(model: HTMLElement, messages: Record<string, string>, leftSide: HTMLElement, updatedContainer: HTMLElement, type: Type): Promise<void> {
+async function mergeData(dialog: HTMLElement, messages: Record<string, string>, leftSide: HTMLElement, updatedContainer: HTMLElement, type: Type): Promise<void> {
     try {
         if (type === Type.TRANSACTION) {
             return;
@@ -89,7 +89,7 @@ async function mergeData(model: HTMLElement, messages: Record<string, string>, l
 
         const ids: number[] = getIdsFromContainer(updatedContainer);
         if (ids.length === 0) {
-            showAlert("INFO", messages["noDataToMerge"], model);
+            showAlert("INFO", messages["noDataToMerge"], dialog);
             return;
         }
 
@@ -104,7 +104,7 @@ async function mergeData(model: HTMLElement, messages: Record<string, string>, l
 
         const responseBody: Response = await response.json();
 
-        showAlert(responseBody.alertType, responseBody.message, model);
+        showAlert(responseBody.alertType, responseBody.message, dialog);
 
         if (response.ok) {
             removeElements(updatedContainer);
@@ -122,6 +122,6 @@ async function mergeData(model: HTMLElement, messages: Record<string, string>, l
         }
     } catch (error) {
         console.error("There was an error merging the counterParties:", error);
-        showAlert('error', messages["error_generic"], model);
+        showAlert('error', messages["error_generic"], dialog);
     }
 }

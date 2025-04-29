@@ -208,6 +208,9 @@ function createListSection(parent, title, type, data, withSelect = false, left =
     else if (type === Type.CONTRACT) {
         createListContainer(header, contractToListElementObjectArray(data), withSelect);
     }
+    else if (type === Type.CATEGORY) {
+        createListContainer(header, categoryToListElementObjectArray(data), withSelect);
+    }
     return container;
 }
 function createListContainer(parent, listElementObjects, withSelect) {

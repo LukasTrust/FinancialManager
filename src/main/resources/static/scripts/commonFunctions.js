@@ -54,7 +54,7 @@ async function updateField(id, field, newValue, messages, type) {
         showAlert('error', messages["error_generic"]);
     }
 }
-async function mergeData(model, messages, leftSide, updatedContainer, type) {
+async function mergeData(dialog, messages, leftSide, updatedContainer, type) {
     try {
         if (type === Type.TRANSACTION) {
             return;
@@ -62,7 +62,7 @@ async function mergeData(model, messages, leftSide, updatedContainer, type) {
         const headerId = getIdsFromContainer(leftSide)[0];
         const ids = getIdsFromContainer(updatedContainer);
         if (ids.length === 0) {
-            showAlert("INFO", messages["noDataToMerge"], model);
+            showAlert("INFO", messages["noDataToMerge"], dialog);
             return;
         }
         let url = getBaseURL(type);
@@ -73,7 +73,7 @@ async function mergeData(model, messages, leftSide, updatedContainer, type) {
             body: JSON.stringify(ids),
         });
         const responseBody = await response.json();
-        showAlert(responseBody.alertType, responseBody.message, model);
+        showAlert(responseBody.alertType, responseBody.message, dialog);
         if (response.ok) {
             removeElements(updatedContainer);
             if (type === Type.COUNTERPARTY) {
@@ -90,7 +90,7 @@ async function mergeData(model, messages, leftSide, updatedContainer, type) {
     }
     catch (error) {
         console.error("There was an error merging the counterParties:", error);
-        showAlert('error', messages["error_generic"], model);
+        showAlert('error', messages["error_generic"], dialog);
     }
 }
 //# sourceMappingURL=commonFunctions.js.map

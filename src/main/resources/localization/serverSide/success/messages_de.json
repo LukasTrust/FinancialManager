@@ -17,5 +17,9 @@
   "deletedData": "Die Daten wurden erfolgreich gelöscht",
   "searchStringRemoved": "Der Suchbegriff wurde entfernt",
   "searchStringAdded": "Der Suchbegriff wurde hinzugefügt",
-  "categoryCreated": "Die Kategory wurde hinzugefügt"
+  "categoryCreated": "Die Kategory wurde hinzugefügt",
+  "counterPartyAlreadyInCategory": "Die Gegenpartei '{}' ist bereits in der Kategory '{}'",
+  "counterPartyAddedToCategory": "Die Gegenpartei '{}' wurde der Kategory '{}' hinzugefügt",
+  "counterPartyRemovedFromCategory": "Die Gegenpartei '{}' wurde von der Kategory entfernt '{}'",
+  "categoriesDeleted": "Die Kategorien wurden gelöscht"
 }
