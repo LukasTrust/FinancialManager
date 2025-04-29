@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -74,6 +75,14 @@ public class BankAccountService {
     }
 
     private boolean updateSearchList(BankAccount bankAccount, String listType, String searchString, boolean isAddOperation) {
+        // Initialize lists if null
+        if (bankAccount.getAmountSearchStrings() == null) bankAccount.setAmountSearchStrings(new ArrayList<>());
+        if (bankAccount.getDateSearchStrings() == null) bankAccount.setDateSearchStrings(new ArrayList<>());
+        if (bankAccount.getAmountInBankAfterSearchStrings() == null)
+            bankAccount.setAmountInBankAfterSearchStrings(new ArrayList<>());
+        if (bankAccount.getCounterPartySearchStrings() == null)
+            bankAccount.setCounterPartySearchStrings(new ArrayList<>());
+
         Map<String, Consumer<String>> searchStringModifiers = Map.of(
                 "amountSearchStrings", str -> modifyList(bankAccount.getAmountSearchStrings(), str, isAddOperation),
                 "dateSearchStrings", str -> modifyList(bankAccount.getDateSearchStrings(), str, isAddOperation),

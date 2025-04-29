@@ -47,21 +47,25 @@ public class BankAccount {
     @Column(nullable = false)
     private String currencySymbol;
 
+    @Setter
     @Type(JsonBinaryType.class)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "amount_search_strings", columnDefinition = "jsonb")
     private List<String> amountSearchStrings;
 
+    @Setter
     @Type(JsonBinaryType.class)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "date_search_strings", columnDefinition = "jsonb")
     private List<String> dateSearchStrings;
 
+    @Setter
     @Type(JsonBinaryType.class)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "counter_party_search_strings", columnDefinition = "jsonb")
     private List<String> counterPartySearchStrings;
 
+    @Setter
     @Type(JsonBinaryType.class)
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "amount_in_bank_after_search_strings", columnDefinition = "jsonb")

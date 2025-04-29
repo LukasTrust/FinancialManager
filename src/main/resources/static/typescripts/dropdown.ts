@@ -27,8 +27,8 @@ class CheckboxDropdown {
         this.dropdownToggle = this.createAndAppendElement(this.container, "div", "dropdownToggle");
         this.dropdownOptions = this.createAndAppendElement(this.container, "div", "dropdownOptions");
 
-        this.updateDisplay();
         this.renderOptions(preSelectedItems);
+        this.updateDisplay();
         this.setupEvents();
     }
 
@@ -76,7 +76,10 @@ class CheckboxDropdown {
 
             option.addEventListener("click", (e) => {
                 const target = e.target as HTMLElement;
-                if (target !== checkbox) checkbox.checked = !checkbox.checked;
+                if (target !== checkbox) {
+                    checkbox.checked = !checkbox.checked;
+                    checkbox.dispatchEvent(new Event("change"));
+                }
 
                 if (!this.multiSelect) {
                     this.checkboxes.forEach(cb => {
@@ -88,6 +91,7 @@ class CheckboxDropdown {
             });
 
             checkbox.addEventListener("change", () => {
+                console.log("check");
                 if (checkbox.checked) {
                     this.onCheck?.(item);
                 } else {
@@ -124,14 +128,18 @@ class CheckboxDropdown {
                     true,
                     true,
                     null,
-                    () => {
+                    (element) => {
+                        console.log(element);
+
                         const checkbox = this.checkboxes.find(cb => cb.value === item.value);
                         if (checkbox) {
                             checkbox.checked = false;
-                            this.updateDisplay();
+                            checkbox.dispatchEvent(new Event("change"));
                         }
+                        element.remove();
+                        this.updateDisplay();
                     },
-                    true
+                true
                 );
             });
         } else {

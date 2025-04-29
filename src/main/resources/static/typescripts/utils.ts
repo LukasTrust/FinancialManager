@@ -49,7 +49,10 @@ function createListElement(
     if (addRemove) {
         const removeButton = createAndAppendElement(item, "button", "removeButton bi bi-x-lg");
 
-        removeButton.addEventListener("click", () => removeCallback(item));
+        removeButton.addEventListener("click", (e) => {
+            e.stopPropagation();
+            removeCallback(item);
+        });
 
         if (small) {
             removeButton.style.marginLeft = "20px";

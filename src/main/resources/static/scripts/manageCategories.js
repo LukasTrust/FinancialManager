@@ -27,7 +27,7 @@ async function addCategory(dialogContent, name, description, maxSpendingPerMonth
         }
         const responseBody = await response.json();
         showAlert(responseBody.alertType, responseBody.message, dialogContent);
-        if (responseBody.alertType === AlertType.SUCCESS) {
+        if (responseBody.alertType == AlertType.SUCCESS) {
             const category = responseBody.data;
             categoryData.push(category);
             filteredCategoryData.push(category);
@@ -170,11 +170,11 @@ function createCategoryRow(tableBody, category, toolTip, messages) {
     const maxSpendingPerMonth = createAndAppendElement(newRow, "td");
     const maxSpendingPerMonthInput = createInputBox(maxSpendingPerMonth, "bi bi-pencil-fill", "maxSpendingPerMonth", "number", category.description);
     debounceInputChange(maxSpendingPerMonthInput, (id, newValue, messages) => updateField(id, "maxSpendingPerMonth", newValue, messages, Type.CATEGORY), category.id, messages);
-    const counterPartyCell = createAndAppendElement(subRow, "td", "", "", { colspan: "3" });
+    const counterPartyCell = createAndAppendElement(subRow, "td", "", "", { colspan: "4" });
     createDropBoxForCategory(category.id.toString(), counterPartyCell, category.counterParties, messages, async (item) => {
-        await addCounterPartyToCategory(42, Number(item.value));
+        await addCounterPartyToCategory(category.id, Number(item.id));
     }, async (item) => {
-        await removeCounterPartyFromCategory(42, Number(item.value));
+        await removeCounterPartyFromCategory(category.id, Number(item.id));
     });
 }
 //# sourceMappingURL=manageCategories.js.map

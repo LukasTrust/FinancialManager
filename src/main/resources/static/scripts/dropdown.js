@@ -11,8 +11,8 @@ class CheckboxDropdown {
         this.container = this.createAndAppendElement(parent, "div", "dropdown");
         this.dropdownToggle = this.createAndAppendElement(this.container, "div", "dropdownToggle");
         this.dropdownOptions = this.createAndAppendElement(this.container, "div", "dropdownOptions");
-        this.updateDisplay();
         this.renderOptions(preSelectedItems);
+        this.updateDisplay();
         this.setupEvents();
     }
     createAndAppendElement(parent, tagName, className, innerText = "", attributes = {}) {
@@ -46,8 +46,10 @@ class CheckboxDropdown {
             this.checkboxes.push(checkbox);
             option.addEventListener("click", (e) => {
                 const target = e.target;
-                if (target !== checkbox)
+                if (target !== checkbox) {
                     checkbox.checked = !checkbox.checked;
+                    checkbox.dispatchEvent(new Event("change"));
+                }
                 if (!this.multiSelect) {
                     this.checkboxes.forEach(cb => {
                         if (cb !== checkbox)
@@ -58,6 +60,7 @@ class CheckboxDropdown {
             });
             checkbox.addEventListener("change", () => {
                 var _a, _b;
+                console.log("check");
                 if (checkbox.checked) {
                     (_a = this.onCheck) === null || _a === void 0 ? void 0 : _a.call(this, item);
                 }
@@ -84,12 +87,14 @@ class CheckboxDropdown {
         this.dropdownToggle.innerHTML = "";
         if (selected.length > 0) {
             selected.forEach(item => {
-                createListElement(this.dropdownToggle, item.name, {}, true, true, null, () => {
+                createListElement(this.dropdownToggle, item.name, {}, true, true, null, (element) => {
                     const checkbox = this.checkboxes.find(cb => cb.value === item.value);
                     if (checkbox) {
                         checkbox.checked = false;
-                        this.updateDisplay();
+                        checkbox.dispatchEvent(new Event("change"));
                     }
+                    element.remove();
+                    this.updateDisplay();
                 }, true);
             });
         }

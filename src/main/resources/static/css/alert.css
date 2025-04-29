@@ -16,6 +16,7 @@
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
+    z-index: 1000;
 }
 
 /* Alert Animations */

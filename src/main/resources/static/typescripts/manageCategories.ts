@@ -213,13 +213,13 @@ function createCategoryRow(tableBody: HTMLElement, category: Category, toolTip: 
     debounceInputChange(maxSpendingPerMonthInput, (id, newValue, messages) =>
         updateField(id, "maxSpendingPerMonth", newValue, messages, Type.CATEGORY), category.id, messages);
 
-    const counterPartyCell = createAndAppendElement(subRow, "td", "", "", { colspan: "3" });
+    const counterPartyCell = createAndAppendElement(subRow, "td", "", "", { colspan: "4" });
 
     createDropBoxForCategory(category.id.toString(), counterPartyCell, category.counterParties, messages,
         async (item) => {
-        await addCounterPartyToCategory(category.id, Number(item.value));
+        await addCounterPartyToCategory(category.id, Number(item.id));
     },
         async (item) => {
-        await removeCounterPartyFromCategory(category.id, Number(item.value));
+        await removeCounterPartyFromCategory(category.id, Number(item.id));
     });
 }
