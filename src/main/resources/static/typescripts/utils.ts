@@ -287,8 +287,8 @@ function createListSection(
     const widthHalfClass = half ? "widthHalf " : " ";
 
     const container = createAndAppendElement(parent, "div", "verticalContainer heightInherit " + widthHalfClass + marginClass);
-    const header = createAndAppendElement(container, "div", "verticalContainer heightInherit");
-    createAndAppendElement(header, "h2", "", title);
+    const header = createAndAppendElement(container, "div", "verticalContainer heightInherit marginBottom marginTopBig");
+    createAndAppendElement(header, "h2", "marginBottom", title);
 
     if (type === Type.TRANSACTION) {
         createListContainer(header, transactionToListElementObjectArray(data as Transaction[]), withSelect);
@@ -308,7 +308,7 @@ function createListContainer(
     listElementObjects: ListElementObject[],
     withSelect: boolean
 ): HTMLElement {
-    const listContainer = createAndAppendElement(parent, "div", "verticalContainer flexGrow");
+    const listContainer = createAndAppendElement(parent, "div", "verticalContainer listContainer flexGrow");
 
     let selectedElement: HTMLElement | null = null;
 

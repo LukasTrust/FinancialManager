@@ -201,8 +201,8 @@ function createListSection(parent, title, type, data, withSelect = false, left =
     const marginClass = left ? "marginLeftBig " : "marginRightBig ";
     const widthHalfClass = half ? "widthHalf " : " ";
     const container = createAndAppendElement(parent, "div", "verticalContainer heightInherit " + widthHalfClass + marginClass);
-    const header = createAndAppendElement(container, "div", "verticalContainer heightInherit");
-    createAndAppendElement(header, "h2", "", title);
+    const header = createAndAppendElement(container, "div", "verticalContainer heightInherit marginBottom marginTopBig");
+    createAndAppendElement(header, "h2", "marginBottom", title);
     if (type === Type.TRANSACTION) {
         createListContainer(header, transactionToListElementObjectArray(data), withSelect);
     }
@@ -218,7 +218,7 @@ function createListSection(parent, title, type, data, withSelect = false, left =
     return container;
 }
 function createListContainer(parent, listElementObjects, withSelect) {
-    const listContainer = createAndAppendElement(parent, "div", "verticalContainer flexGrow");
+    const listContainer = createAndAppendElement(parent, "div", "verticalContainer listContainer flexGrow");
     let selectedElement = null;
     listElementObjects.forEach(listElementObject => {
         const listElement = createListElement(listContainer, listElementObject.text, { id: listElementObject.id.toString() }, true, false, listElementObject.toolTip);

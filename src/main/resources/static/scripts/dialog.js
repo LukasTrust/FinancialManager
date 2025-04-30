@@ -49,7 +49,7 @@ function createDialogButton(parent, iconClass, text, alignment, callback) {
 }
 function createDialogContent(headerText, headerIcon, width, height, fitContent = false) {
     const verticalContainer = createAndAppendElement(document.body, "div", "verticalContainer marginTop" +
-        " marginBottom marginLeftBig marginRightBig height95");
+        " marginBottomBig marginLeftBig marginRightBig height95");
     const header = createDialogHeader(verticalContainer, headerText, headerIcon);
     const closeButton = createAndAppendElement(header, "button", "exitButton");
     createAndAppendElement(closeButton, "i", "bi bi-x-lg");
@@ -98,7 +98,7 @@ function showMergeDialog(type, messages) {
         await mergeData(dialogContent, messages, leftSide, rightSide, type);
     });
     createDialogButton(rightSide, "bi bi-bar-chart-steps", messages["chooseHeader"], "right", () => {
-        chooseHeader(dialogContent, messages, rightSide.querySelector(".verticalContainer"), leftSide.querySelector(".verticalContainer"));
+        chooseHeader(dialogContent, messages, rightSide.querySelector(".listContainer"), leftSide.querySelector(".listContainer"));
     });
 }
 function showLoadingBar(messages, width = 30, height = 10) {

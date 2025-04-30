@@ -237,10 +237,13 @@ p {
 
 /* List Items */
 .listContainer {
-    display: flex;
-    min-height: 8vh;
-    align-items: center;
-    white-space: nowrap;
+    background: var(--pagination-disabled);
+    color: var(--text-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--padding-lg);
+    box-shadow: var(--box-shadow-md);
+    border: 1px solid var(--table-border-color);
+    transition: background var(--transition-normal), box-shadow var(--transition-fast);
 }
 
 .listItem {

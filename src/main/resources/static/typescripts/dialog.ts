@@ -77,7 +77,7 @@ function createDialogContent(
     fitContent: boolean = false,
 ): HTMLElement {
     const verticalContainer = createAndAppendElement(document.body, "div", "verticalContainer marginTop" +
-        " marginBottom marginLeftBig marginRightBig height95");
+        " marginBottomBig marginLeftBig marginRightBig height95");
     const header = createDialogHeader(verticalContainer, headerText, headerIcon);
     const closeButton = createAndAppendElement(header, "button", "exitButton") as HTMLButtonElement;
     createAndAppendElement(closeButton, "i", "bi bi-x-lg");
@@ -160,7 +160,7 @@ function showMergeDialog<T extends CounterPartyDisplay>(type: Type, messages: Re
     });
 
     createDialogButton(rightSide, "bi bi-bar-chart-steps", messages["chooseHeader"], "right", () => {
-        chooseHeader(dialogContent, messages, rightSide.querySelector(".verticalContainer"), leftSide.querySelector(".verticalContainer"));
+        chooseHeader(dialogContent, messages, rightSide.querySelector(".listContainer"), leftSide.querySelector(".listContainer"));
     });
 }
 
