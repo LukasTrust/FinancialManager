@@ -319,7 +319,7 @@ function classifyHiddenOrNot<T extends Transaction | CounterPartyDisplay | Contr
     return {alreadyHidden, notHidden};
 }
 
-function getCheckedData(type: Type): Transaction[] | CounterPartyDisplay[] | ContractDisplay[] {
+function getCheckedData(type: Type): Transaction[] | CounterPartyDisplay[] | ContractDisplay[] | Category[] {
     const checkedRows = new Set(getCheckedRows());
 
     switch (type) {
@@ -329,6 +329,8 @@ function getCheckedData(type: Type): Transaction[] | CounterPartyDisplay[] | Con
             return filteredCounterPartyData.filter(c => checkedRows.has(c.counterParty.id));
         case Type.CONTRACT:
             return filteredContractData.filter(c => checkedRows.has(c.contract.id));
+            case Type.CATEGORY:
+                return filteredCategoryData.filter(c => checkedRows.has(c.id));
         default:
             return [];
     }

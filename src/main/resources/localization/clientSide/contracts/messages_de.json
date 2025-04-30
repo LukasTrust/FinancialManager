@@ -44,5 +44,11 @@
   "yes": "Ja",
   "no": "Nein",
   "yesTooltip": "Dadurch werden die Verträge permanent gelöscht",
-  "noTooltip": "Der Dialog wird geschlossen"
+  "noTooltip": "Der Dialog wird geschlossen",
+  "deleteHeader": "Verträge löschen",
+  "deleteInfo": "Die Ausgewählten Verträge können gelöscht werden",
+  "contractsToDelete": "Verträge zum löschen",
+  "noContractsToDelete": "Keine Verträge zum löschen gefunden",
+  "submitDelete": "Löschen",
+  "submitDeleteTooltip": "Damit werden die Verträge gelöscht"
 }

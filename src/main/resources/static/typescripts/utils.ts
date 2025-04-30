@@ -109,8 +109,9 @@ function createInputBox(
     type: string,
     text: string | null = null,
     placeHolder: string | null = null,
+    extraClass: string = "",
 ): HTMLInputElement {
-    const inputBox = createAndAppendElement(parent, "div", "inputBox");
+    const inputBox = createAndAppendElement(parent, "div", "inputBox " + extraClass);
     createAndAppendElement(inputBox, "span", icon);
     createAndAppendElement(inputBox, "label", "", "", {for: idText});
 
@@ -281,12 +282,12 @@ function createListSection(
     left: boolean = true,
     half: boolean = true,
 ): HTMLElement {
-    const marginClass = left ? "marginLeftBig" : "marginRightBig"
+    const marginClass = left ? "marginLeftBig " : "marginRightBig "
 
-    const widthHalfClass = half ? "widthHalf" : "";
+    const widthHalfClass = half ? "widthHalf " : " ";
 
-    const container = createAndAppendElement(parent, "div", "verticalContainer " + widthHalfClass + marginClass);
-    const header = createAndAppendElement(container, "div", "verticalContainer");
+    const container = createAndAppendElement(parent, "div", "verticalContainer heightInherit " + widthHalfClass + marginClass);
+    const header = createAndAppendElement(container, "div", "verticalContainer heightInherit");
     createAndAppendElement(header, "h2", "", title);
 
     if (type === Type.TRANSACTION) {
@@ -307,7 +308,7 @@ function createListContainer(
     listElementObjects: ListElementObject[],
     withSelect: boolean
 ): HTMLElement {
-    const listContainer = createAndAppendElement(parent, "div", "verticalContainer height40vh");
+    const listContainer = createAndAppendElement(parent, "div", "verticalContainer flexGrow");
 
     let selectedElement: HTMLElement | null = null;
 

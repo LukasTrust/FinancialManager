@@ -2,12 +2,17 @@ function createModal(
     contentHTML: HTMLElement,
     closeButton?: HTMLElement | null,
     width: number = 0,
-    height: number = 0
+    height: number = 0,
+    fitContent: boolean = false,
 ): HTMLDialogElement {
     // Create the dialog element
     const modal = document.createElement("dialog") as HTMLDialogElement;
     modal.appendChild(contentHTML);
     document.body.appendChild(modal);
+
+    if (fitContent) {
+        modal.classList.add("heightFitContent");
+    }
 
     // Set modal size
     if (width !== 0) {
@@ -68,14 +73,16 @@ function createDialogContent(
     headerText: string,
     headerIcon: string,
     width: number,
-    height: number
+    height: number,
+    fitContent: boolean = false,
 ): HTMLElement {
-    const verticalContainer = createAndAppendElement(document.body, "div", "verticalContainer marginTop marginBottom marginLeftBig marginRightBig");
+    const verticalContainer = createAndAppendElement(document.body, "div", "verticalContainer marginTop" +
+        " marginBottom marginLeftBig marginRightBig height95");
     const header = createDialogHeader(verticalContainer, headerText, headerIcon);
     const closeButton = createAndAppendElement(header, "button", "exitButton") as HTMLButtonElement;
     createAndAppendElement(closeButton, "i", "bi bi-x-lg");
 
-    createModal(verticalContainer, closeButton, width, height);
+    createModal(verticalContainer, closeButton, width, height, fitContent);
 
     return verticalContainer;
 }
@@ -122,7 +129,7 @@ function showChangeHiddenDialog(type: Type, messages: Record<string, string>): v
         createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig alignSelfStart", messages["infoTransactionsWillAlsoBeAffected"])
     }
 
-    const listContainer = createAndAppendElement(dialogContent, "div", "horizontalContainer");
+    const listContainer = createAndAppendElement(dialogContent, "div", "horizontalContainer heightInherit");
 
     const leftSide = createListSection(listContainer, messages["alreadyHiddenHeader"], type, alreadyHidden);
     const rightSide = createListSection(listContainer, messages["notHiddenHeader"], type, notHidden, false, false);
@@ -143,7 +150,7 @@ function showMergeDialog<T extends CounterPartyDisplay>(type: Type, messages: Re
 
     createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig alignSelfStart", messages["mergeInfo"])
 
-    const listContainer = createAndAppendElement(dialogContent, "div", "horizontalContainer");
+    const listContainer = createAndAppendElement(dialogContent, "div", "horizontalContainer heightInherit");
 
     const leftSide = createListSection(listContainer, messages["leftHeader"], type, []);
     const rightSide = createListSection(listContainer, messages["rightHeader"], type, checkedData, true, false);

@@ -82,6 +82,10 @@ p {
     flex-direction: column;
 }
 
+.flexGrow {
+    flex: 1;
+}
+
 .mainContent {
     width: 60%;
     padding-right: var(--spacing-md);
@@ -196,6 +200,18 @@ p {
 .height40vh {
     min-height: 40vh;
     max-height: 40vh;
+}
+
+.height95 {
+    height: 95%;
+}
+
+.heightInherit {
+    height: inherit;
+}
+
+.heightFitContent {
+    height: fit-content;
 }
 
 .bold {

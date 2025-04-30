@@ -18,12 +18,12 @@ async function buildContracts(): Promise<void> {
     document.getElementById("changeHiddenButton")?.addEventListener("click", () => showChangeHiddenDialog(type, messages));
 
     document.getElementById("mergeButton")?.addEventListener("click", async () =>
-        await buildMergeContracts("/contracts", getCheckedData(Type.CONTRACT).map(c => c.contract)));
+        await buildMergeContracts("/contracts", getCheckedData(Type.CONTRACT).map(contract => contract.contract)));
 
-    document.getElementById("deleteButton")?.addEventListener("click", () => deleteContractsDialogs(messages));
+    document.getElementById("deleteButton")?.addEventListener("click", () => showDeleteContractDialog(messages));
 }
 
-async function deleteContracts(messages: Record<string, string>): Promise<void> {
+async function deleteContracts(dialog: HTMLElement, listSection: HTMLElement, messages: Record<string, string>): Promise<void> {
     try {
         const contracts = getCheckedData(Type.CONTRACT) as ContractDisplay[];
 
@@ -44,12 +44,12 @@ async function deleteContracts(messages: Record<string, string>): Promise<void> 
 
         const responseBody: Response = await response.json();
 
-        if (responseBody.alertType === AlertType.SUCCESS) {
-            const idSet = new Set(ids);
+        showAlert(responseBody.alertType, responseBody.message, dialog);
 
-            contractData = contractData.filter(contract => !idSet.has(contract.contract.id));
-            filteredContractData = filteredContractData.filter(contract => !idSet.has(contract.contract.id));
-            splitDataIntoPages(messages, Type.CONTRACT, filteredContractData);
+        if (response.ok) {
+            removeElements(listSection);
+
+            removeDeletedCategories(ids, messages);
         }
     } catch (error) {
         console.error("There was an error deleting the contracts", error);
@@ -57,16 +57,29 @@ async function deleteContracts(messages: Record<string, string>): Promise<void> 
     }
 }
 
-function deleteContractsDialogs(messages: Record<string, string>): void {
-    const selectedContracts = getCheckedData(Type.CONTRACT) as ContractDisplay[];
+function showDeleteContractDialog(messages: Record<string, string>): void {
+    const dialogContent = createDialogContent(messages["deleteHeader"], "bi bi bi-trash-fill", 0, 0);
 
-    if (!selectedContracts || selectedContracts.length === 0) {
-        return;
+    createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig", messages["deleteInfo"]);
+
+    const contracts = getCheckedData(Type.CONTRACT) as ContractDisplay[];
+
+    const listSection = createListSection(dialogContent, messages["contractsToDelete"], Type.CONTRACT, contracts, false, true, false);
+
+    if (!contracts || contracts.length === 0) {
+        const childContainer = listSection.querySelector('div.flexGrow') as HTMLElement;
+        createAndAppendElement(childContainer, "h2", "red marginTopBig", messages["noContractsToDelete"]);
     }
 
-    showMessageBox(messages["deleteButton"], "bi bi-trash-fill", messages["deleteText"], messages["yes"], "bi bi-trash-fill", messages["no"],
-        "bi bi-x-circle-fill", (async () => await deleteContracts(messages)), (() => closeDialog()),
-        messages["yesTooltip"], messages["noTooltip"]);
+    const submitButton = createAndAppendElement(dialogContent, "button", "iconButton tooltip tooltipBottom marginTopBig");
+    createAndAppendElement(submitButton, "i", "bi bi-trash-fill");
+    createAndAppendElement(submitButton, "span", "normalText", messages["submitDelete"]);
+    createAndAppendElement(submitButton, "span", "tooltipText", messages["submitDeleteTooltip"]);
+
+    submitButton.addEventListener("click", async (event) => {
+        event.preventDefault();
+        await deleteContracts(dialogContent, listSection, messages);
+    })
 }
 
 function addRowsToContractTable(data: ContractDisplay[], messages: Record<string, string>): void {

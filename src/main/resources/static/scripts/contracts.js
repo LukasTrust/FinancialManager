@@ -11,10 +11,10 @@ async function buildContracts() {
     (_a = document.getElementById("searchBarInput")) === null || _a === void 0 ? void 0 : _a.addEventListener("input", () => searchTable(messages, type));
     (_b = document.getElementById("showHiddenRows")) === null || _b === void 0 ? void 0 : _b.addEventListener("change", () => changeRowVisibility(type));
     (_c = document.getElementById("changeHiddenButton")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => showChangeHiddenDialog(type, messages));
-    (_d = document.getElementById("mergeButton")) === null || _d === void 0 ? void 0 : _d.addEventListener("click", async () => await buildMergeContracts("/contracts", getCheckedData(Type.CONTRACT).map(c => c.contract)));
-    (_e = document.getElementById("deleteButton")) === null || _e === void 0 ? void 0 : _e.addEventListener("click", () => deleteContractsDialogs(messages));
+    (_d = document.getElementById("mergeButton")) === null || _d === void 0 ? void 0 : _d.addEventListener("click", async () => await buildMergeContracts("/contracts", getCheckedData(Type.CONTRACT).map(contract => contract.contract)));
+    (_e = document.getElementById("deleteButton")) === null || _e === void 0 ? void 0 : _e.addEventListener("click", () => showDeleteContractDialog(messages));
 }
-async function deleteContracts(messages) {
+async function deleteContracts(dialog, listSection, messages) {
     try {
         const contracts = getCheckedData(Type.CONTRACT);
         const ids = contracts
@@ -30,11 +30,10 @@ async function deleteContracts(messages) {
             return;
         }
         const responseBody = await response.json();
-        if (responseBody.alertType === AlertType.SUCCESS) {
-            const idSet = new Set(ids);
-            contractData = contractData.filter(contract => !idSet.has(contract.contract.id));
-            filteredContractData = filteredContractData.filter(contract => !idSet.has(contract.contract.id));
-            splitDataIntoPages(messages, Type.CONTRACT, filteredContractData);
+        showAlert(responseBody.alertType, responseBody.message, dialog);
+        if (response.ok) {
+            removeElements(listSection);
+            removeDeletedCategories(ids, messages);
         }
     }
     catch (error) {
@@ -42,12 +41,23 @@ async function deleteContracts(messages) {
         showAlert('error', messages["error_generic"]);
     }
 }
-function deleteContractsDialogs(messages) {
-    const selectedContracts = getCheckedData(Type.CONTRACT);
-    if (!selectedContracts || selectedContracts.length === 0) {
-        return;
+function showDeleteContractDialog(messages) {
+    const dialogContent = createDialogContent(messages["deleteHeader"], "bi bi bi-trash-fill", 0, 0);
+    createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig", messages["deleteInfo"]);
+    const contracts = getCheckedData(Type.CONTRACT);
+    const listSection = createListSection(dialogContent, messages["contractsToDelete"], Type.CONTRACT, contracts, false, true, false);
+    if (!contracts || contracts.length === 0) {
+        const childContainer = listSection.querySelector('div.flexGrow');
+        createAndAppendElement(childContainer, "h2", "red marginTopBig", messages["noContractsToDelete"]);
     }
-    showMessageBox(messages["deleteButton"], "bi bi-trash-fill", messages["deleteText"], messages["yes"], "bi bi-trash-fill", messages["no"], "bi bi-x-circle-fill", (async () => await deleteContracts(messages)), (() => closeDialog()), messages["yesTooltip"], messages["noTooltip"]);
+    const submitButton = createAndAppendElement(dialogContent, "button", "iconButton tooltip tooltipBottom marginTopBig");
+    createAndAppendElement(submitButton, "i", "bi bi-trash-fill");
+    createAndAppendElement(submitButton, "span", "normalText", messages["submitDelete"]);
+    createAndAppendElement(submitButton, "span", "tooltipText", messages["submitDeleteTooltip"]);
+    submitButton.addEventListener("click", async (event) => {
+        event.preventDefault();
+        await deleteContracts(dialogContent, listSection, messages);
+    });
 }
 function addRowsToContractTable(data, messages) {
     try {

@@ -272,6 +272,8 @@ function getCheckedData(type) {
             return filteredCounterPartyData.filter(c => checkedRows.has(c.counterParty.id));
         case Type.CONTRACT:
             return filteredContractData.filter(c => checkedRows.has(c.contract.id));
+        case Type.CATEGORY:
+            return filteredCategoryData.filter(c => checkedRows.has(c.id));
         default:
             return [];
     }

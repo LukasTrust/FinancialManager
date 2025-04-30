@@ -1,8 +1,11 @@
-function createModal(contentHTML, closeButton, width = 0, height = 0) {
+function createModal(contentHTML, closeButton, width = 0, height = 0, fitContent = false) {
     // Create the dialog element
     const modal = document.createElement("dialog");
     modal.appendChild(contentHTML);
     document.body.appendChild(modal);
+    if (fitContent) {
+        modal.classList.add("heightFitContent");
+    }
     // Set modal size
     if (width !== 0) {
         modal.style.width = `${width}%`;
@@ -44,12 +47,13 @@ function createDialogButton(parent, iconClass, text, alignment, callback) {
     }
     return button;
 }
-function createDialogContent(headerText, headerIcon, width, height) {
-    const verticalContainer = createAndAppendElement(document.body, "div", "verticalContainer marginTop marginBottom marginLeftBig marginRightBig");
+function createDialogContent(headerText, headerIcon, width, height, fitContent = false) {
+    const verticalContainer = createAndAppendElement(document.body, "div", "verticalContainer marginTop" +
+        " marginBottom marginLeftBig marginRightBig height95");
     const header = createDialogHeader(verticalContainer, headerText, headerIcon);
     const closeButton = createAndAppendElement(header, "button", "exitButton");
     createAndAppendElement(closeButton, "i", "bi bi-x-lg");
-    createModal(verticalContainer, closeButton, width, height);
+    createModal(verticalContainer, closeButton, width, height, fitContent);
     return verticalContainer;
 }
 function showMessageBox(headerText, headerIcon, mainText, leftButtonText, leftIcon, rightButtonText, rightIcon, leftButtonCallback, rightButtonCallback, toolTipLeft, toolTipRight) {
@@ -73,7 +77,7 @@ function showChangeHiddenDialog(type, messages) {
     if (type !== Type.TRANSACTION) {
         createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig alignSelfStart", messages["infoTransactionsWillAlsoBeAffected"]);
     }
-    const listContainer = createAndAppendElement(dialogContent, "div", "horizontalContainer");
+    const listContainer = createAndAppendElement(dialogContent, "div", "horizontalContainer heightInherit");
     const leftSide = createListSection(listContainer, messages["alreadyHiddenHeader"], type, alreadyHidden);
     const rightSide = createListSection(listContainer, messages["notHiddenHeader"], type, notHidden, false, false);
     createDialogButton(leftSide, "bi bi-eye", messages["unHide"], "left", async () => {
@@ -87,7 +91,7 @@ function showMergeDialog(type, messages) {
     const checkedData = getCheckedData(type);
     const dialogContent = createDialogContent(messages["mergeHeader"], "bi bi-arrows-collapse-vertical", 0, 70);
     createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig alignSelfStart", messages["mergeInfo"]);
-    const listContainer = createAndAppendElement(dialogContent, "div", "horizontalContainer");
+    const listContainer = createAndAppendElement(dialogContent, "div", "horizontalContainer heightInherit");
     const leftSide = createListSection(listContainer, messages["leftHeader"], type, []);
     const rightSide = createListSection(listContainer, messages["rightHeader"], type, checkedData, true, false);
     createDialogButton(leftSide, "bi bi-arrows-collapse-vertical", messages["mergeButton"], "left", async () => {

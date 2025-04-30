@@ -102,12 +102,14 @@ function showDeleteCategoryDialog(messages: Record<string, string>): void {
 
     createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig", messages["deleteInfo"]);
 
-    const ids = getCheckedRows();
+    const categories = getCheckedData(Type.CATEGORY) as Category[];
 
-    const idSet = new Set(ids.map(Number));
-    const categories = categoryData.filter(category => idSet.has(category.id));
+    const listSection = createListSection(dialogContent, messages["leftHeader"], Type.CATEGORY, categories, false, true, false);
 
-    const listSection = createListSection(dialogContent, messages["leftHeader"], Type.CATEGORY, categories, false, true, true);
+    if (!categories || categories.length === 0) {
+        const childContainer = listSection.querySelector('div.flexGrow') as HTMLElement;
+        createAndAppendElement(childContainer, "h2", "red marginTopBig", messages["noCategoriesToDelete"]);
+    }
 
     const submitButton = createAndAppendElement(dialogContent, "button", "iconButton tooltip tooltipBottom marginTopBig");
     createAndAppendElement(submitButton, "i", "bi bi-trash-fill");
@@ -127,8 +129,6 @@ async function deleteCategories(dialog: HTMLElement, listSection: HTMLElement, m
             showAlert(AlertType.WARNING, messages["noCategoriesToDelete"], dialog);
             return;
         }
-
-        console.log(ids);
 
         const response = await fetch(`/categories/data/deleteCategories`, {
             method: 'POST',
@@ -175,27 +175,30 @@ function categoryToListElementObjectArray(categories: Category[]): ListElementOb
 }
 
 function showAddCategoryDialog(messages: Record<string, string>): void {
-    const dialogContent = createDialogContent(messages["addHeader"], "bi bi bi-plus-circle", 0, 0);
+    const dialogContent = createDialogContent(messages["addHeader"], "bi bi bi-plus-circle", 0, 0, true);
 
     createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig", messages["addInfo"])
 
-    const form = createAndAppendElement(dialogContent, "form");
+    const form = createAndAppendElement(dialogContent, "form", "flexGrow");
 
     const nameWrapper = createAndAppendElement(form, "div", "verticalContainer");
     createAndAppendElement(nameWrapper, "h3", "marginBottom", messages["name"]);
-    const name = createInputBox(nameWrapper, "bi bi-pencil-fill", "name", "text", "", messages["name"]);
+    const name = createInputBox(nameWrapper, "bi bi-pencil-fill", "name", "text", "",
+        messages["name"], "marginBottomBig");
 
     const descriptionWrapper = createAndAppendElement(form, "div", "verticalContainer");
     createAndAppendElement(descriptionWrapper, "h3", "marginBottom", messages["description"]);
-    const description = createInputBox(descriptionWrapper, "bi bi-pencil-fill", "description", "text", "", messages["description"]);
+    const description = createInputBox(descriptionWrapper, "bi bi-pencil-fill", "description", "text", "",
+        messages["description"], "marginBottomBig");
 
     const maxSpendingPerMonthWrapper = createAndAppendElement(form, "div", "verticalContainer");
     createAndAppendElement(maxSpendingPerMonthWrapper, "h3", "marginBottom", messages["maxSpendingPerMonth"]);
-    const maxSpendingPerMonth = createInputBox(maxSpendingPerMonthWrapper, "bi bi-pencil-fill", "maxSpendingPerMonth", "number", "", messages["maxSpendingPerMonth"]);
+    const maxSpendingPerMonth = createInputBox(maxSpendingPerMonthWrapper, "bi bi-pencil-fill", "maxSpendingPerMonth",
+        "number", "", messages["maxSpendingPerMonth"], "marginBottomBig");
 
     const dropdown = createDropBoxForCategory("counterPartyDropdown", form, [], messages);
 
-    const submitButton = createAndAppendElement(form, "button", "iconButton tooltip tooltipBottom marginTopBig");
+    const submitButton = createAndAppendElement(form, "button", "iconButton tooltip tooltipBottom marginTopBig marginBottomBig");
     createAndAppendElement(submitButton, "i", "bi bi-plus-lg");
     createAndAppendElement(submitButton, "span", "normalText", messages["submitAdd"]);
     createAndAppendElement(submitButton, "span", "tooltipText", messages["submitAddTooltip"]);

@@ -83,10 +83,12 @@ async function removeCounterPartyFromCategory(categoryId, counterPartyId) {
 function showDeleteCategoryDialog(messages) {
     const dialogContent = createDialogContent(messages["deleteHeader"], "bi bi bi-trash-fill", 0, 0);
     createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig", messages["deleteInfo"]);
-    const ids = getCheckedRows();
-    const idSet = new Set(ids.map(Number));
-    const categories = categoryData.filter(category => idSet.has(category.id));
-    const listSection = createListSection(dialogContent, messages["leftHeader"], Type.CATEGORY, categories, false, true, true);
+    const categories = getCheckedData(Type.CATEGORY);
+    const listSection = createListSection(dialogContent, messages["leftHeader"], Type.CATEGORY, categories, false, true, false);
+    if (!categories || categories.length === 0) {
+        const childContainer = listSection.querySelector('div.flexGrow');
+        createAndAppendElement(childContainer, "h2", "red marginTopBig", messages["noCategoriesToDelete"]);
+    }
     const submitButton = createAndAppendElement(dialogContent, "button", "iconButton tooltip tooltipBottom marginTopBig");
     createAndAppendElement(submitButton, "i", "bi bi-trash-fill");
     createAndAppendElement(submitButton, "span", "normalText", messages["submitDelete"]);
@@ -103,7 +105,6 @@ async function deleteCategories(dialog, listSection, messages) {
             showAlert(AlertType.WARNING, messages["noCategoriesToDelete"], dialog);
             return;
         }
-        console.log(ids);
         const response = await fetch(`/categories/data/deleteCategories`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -138,20 +139,20 @@ function categoryToListElementObjectArray(categories) {
     return listElementObjects;
 }
 function showAddCategoryDialog(messages) {
-    const dialogContent = createDialogContent(messages["addHeader"], "bi bi bi-plus-circle", 0, 0);
+    const dialogContent = createDialogContent(messages["addHeader"], "bi bi bi-plus-circle", 0, 0, true);
     createAndAppendElement(dialogContent, "h2", "marginBottom marginLeftBig", messages["addInfo"]);
-    const form = createAndAppendElement(dialogContent, "form");
+    const form = createAndAppendElement(dialogContent, "form", "flexGrow");
     const nameWrapper = createAndAppendElement(form, "div", "verticalContainer");
     createAndAppendElement(nameWrapper, "h3", "marginBottom", messages["name"]);
-    const name = createInputBox(nameWrapper, "bi bi-pencil-fill", "name", "text", "", messages["name"]);
+    const name = createInputBox(nameWrapper, "bi bi-pencil-fill", "name", "text", "", messages["name"], "marginBottomBig");
     const descriptionWrapper = createAndAppendElement(form, "div", "verticalContainer");
     createAndAppendElement(descriptionWrapper, "h3", "marginBottom", messages["description"]);
-    const description = createInputBox(descriptionWrapper, "bi bi-pencil-fill", "description", "text", "", messages["description"]);
+    const description = createInputBox(descriptionWrapper, "bi bi-pencil-fill", "description", "text", "", messages["description"], "marginBottomBig");
     const maxSpendingPerMonthWrapper = createAndAppendElement(form, "div", "verticalContainer");
     createAndAppendElement(maxSpendingPerMonthWrapper, "h3", "marginBottom", messages["maxSpendingPerMonth"]);
-    const maxSpendingPerMonth = createInputBox(maxSpendingPerMonthWrapper, "bi bi-pencil-fill", "maxSpendingPerMonth", "number", "", messages["maxSpendingPerMonth"]);
+    const maxSpendingPerMonth = createInputBox(maxSpendingPerMonthWrapper, "bi bi-pencil-fill", "maxSpendingPerMonth", "number", "", messages["maxSpendingPerMonth"], "marginBottomBig");
     const dropdown = createDropBoxForCategory("counterPartyDropdown", form, [], messages);
-    const submitButton = createAndAppendElement(form, "button", "iconButton tooltip tooltipBottom marginTopBig");
+    const submitButton = createAndAppendElement(form, "button", "iconButton tooltip tooltipBottom marginTopBig marginBottomBig");
     createAndAppendElement(submitButton, "i", "bi bi-plus-lg");
     createAndAppendElement(submitButton, "span", "normalText", messages["submitAdd"]);
     createAndAppendElement(submitButton, "span", "tooltipText", messages["submitAddTooltip"]);
@@ -228,11 +229,9 @@ function createCategoryRow(tableBody, category, toolTip, messages) {
     // Name cell
     const name = createAndAppendElement(newRow, "td");
     const nameInput = createInputBox(name, "bi bi-pencil-fill", "name", "text", category.name);
-    nameInput.style.width = "95%";
     debounceInputChange(nameInput, (id, newValue, messages) => updateField(id, "name", newValue, messages, Type.CATEGORY), category.id, messages);
     const description = createAndAppendElement(newRow, "td");
     const descriptionInput = createInputBox(description, "bi bi-pencil-fill", "description", "text", category.description);
-    descriptionInput.style.width = "95%";
     debounceInputChange(descriptionInput, (id, newValue, messages) => updateField(id, "description", newValue, messages, Type.CATEGORY), category.id, messages);
     const maxSpendingPerMonth = createAndAppendElement(newRow, "td");
     const maxSpendingPerMonthInput = createInputBox(maxSpendingPerMonth, "bi bi-pencil-fill", "maxSpendingPerMonth", "number", category.description);

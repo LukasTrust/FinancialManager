@@ -70,8 +70,8 @@ function formatDateString(date) {
 function formatNumber(number, currency) {
     return `${number.toFixed(2).replace('.', ',')} ${currency}`;
 }
-function createInputBox(parent, icon, idText, type, text = null, placeHolder = null) {
-    const inputBox = createAndAppendElement(parent, "div", "inputBox");
+function createInputBox(parent, icon, idText, type, text = null, placeHolder = null, extraClass = "") {
+    const inputBox = createAndAppendElement(parent, "div", "inputBox " + extraClass);
     createAndAppendElement(inputBox, "span", icon);
     createAndAppendElement(inputBox, "label", "", "", { for: idText });
     // Create input element separately to set its value
@@ -198,10 +198,10 @@ function debounce(func, delay) {
     };
 }
 function createListSection(parent, title, type, data, withSelect = false, left = true, half = true) {
-    const marginClass = left ? "marginLeftBig" : "marginRightBig";
-    const widthHalfClass = half ? "widthHalf" : "";
-    const container = createAndAppendElement(parent, "div", "verticalContainer " + widthHalfClass + marginClass);
-    const header = createAndAppendElement(container, "div", "verticalContainer");
+    const marginClass = left ? "marginLeftBig " : "marginRightBig ";
+    const widthHalfClass = half ? "widthHalf " : " ";
+    const container = createAndAppendElement(parent, "div", "verticalContainer heightInherit " + widthHalfClass + marginClass);
+    const header = createAndAppendElement(container, "div", "verticalContainer heightInherit");
     createAndAppendElement(header, "h2", "", title);
     if (type === Type.TRANSACTION) {
         createListContainer(header, transactionToListElementObjectArray(data), withSelect);
@@ -218,7 +218,7 @@ function createListSection(parent, title, type, data, withSelect = false, left =
     return container;
 }
 function createListContainer(parent, listElementObjects, withSelect) {
-    const listContainer = createAndAppendElement(parent, "div", "verticalContainer height40vh");
+    const listContainer = createAndAppendElement(parent, "div", "verticalContainer flexGrow");
     let selectedElement = null;
     listElementObjects.forEach(listElementObject => {
         const listElement = createListElement(listContainer, listElementObject.text, { id: listElementObject.id.toString() }, true, false, listElementObject.toolTip);
